@@ -73,7 +73,7 @@
 
 <section aria-labelledby="evidence-title">
   <h2 id="evidence-title">Measured, not promised</h2>
-  <p>In the recorded run of 2026-10-11 (three models on one machine, 32 held-out tasks, 400-token budget), automatic routing matched the strongest single model's task score (30 of 32), completed one more request — the image task the fixed model cannot take — and recorded no capability violation. Its p95 end-to-end latency was higher, because two requests went to a slower thinking model. Routing itself took under 1 ms at p95.</p>
+  <p>In the recorded run of 2026-10-11 (three models on one machine, 32 held-out tasks, 400-token budget), automatic routing and the strongest single model each scored 30 of 32; automatic routing completed 32 requests versus 31 (the image task the fixed model cannot take), recorded zero capability violations versus one, and had a p95 end-to-end latency of 7.958 s versus 4.760 s because two requests went to a slower thinking model. Routing overhead — the decision itself, separate from the response — was 0.98 ms at p95.</p>
   <p>That is one run on one machine with a small task set; the confidence intervals overlap. Read the <a href="{{ href('/benchmarks/') }}">methodology, numbers and limitations</a>, or regenerate every aggregate from the <a href="{{ facts.REPO_URL }}/tree/{{ site.commit }}/docs/live-runs/2026-10-11-gx10-hardening">raw per-request records</a>.</p>
 </section>
 

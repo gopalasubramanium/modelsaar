@@ -13,7 +13,8 @@ for a site that is not yet public.
 | Core Web Vitals targets | — | lab LCP ≤ 2.5 s ✔, CLS ≤ 0.1 ✔, INP not measurable in lab (TBT 0 ms, max potential FID 130 ms before the nav fix, 0 after); field data at p75 will exist only after launch (CrUX needs traffic) |
 | No-JavaScript | manual: scenarios are `<details>` elements with the first open; copy buttons absent; nav visible | content complete without JS |
 | Installer | see `docs/live-runs/2026-10-11-installer/README.md` | Linux: pipx, uv, pip --user, repeat run, unreachable backend, occupied port; macOS arm64: uv against the GX10 — all executed; served-URL run pending domain connection |
-| Preview deployment | Claude artifact (private link, page-relative build, noindex) | published for review; GitHub Pages preview/production await the owner's push (see README) |
+| Preview | private Claude artifact (page-relative build, noindex) + the local build in the review archive (`site-dist/`, serve with `python3 -m http.server`) | available; no public preview is published because a repository has one Pages site and noindex is not access control |
+| Production publication | `gh-pages` generated-output branch (`site/publish_pages.py build`), served by GitHub Pages branch publishing | branch generated and bundled; push + Pages configuration + DNS are owner actions (`gh/gh_run.command`) — **modelsaar.com not live at the time of writing** |
 | Not done | — | Rich Results Test on the live URL; served `install.sh` bytes from modelsaar.com; HTTPS/redirect checks on the connected domain; real-user research (this is an internal review) |
 
 Internal review against the acceptance questions (no external users yet):

@@ -6,7 +6,7 @@
 
 3/ Tool round trips and chats stay on the model that started them. Failover happens only before a byte reaches you, never inside a tool exchange. Every decision is recorded without the prompt: modelsaar decisions / explain / the status page.
 
-4/ Measured, not promised: one recorded run, 3 models, 32 held-out tasks — auto matched the best single model's score, completed one more request (the image task), 0 capability violations, higher p95 latency. n=32, CIs overlap. Raw records in the repo.
+4/ Measured, not promised: one recorded run, 3 models, 32 held-out tasks — auto and the best single model each scored 30/32; auto completed 32 vs 31 requests, 0 vs 1 capability violations, p95 latency 7.96 s vs 4.76 s. n=32, CIs overlap. Raw records in the repo.
 
 5/ An independent review found 18 real defects in the first public revision. All fixed with regression tests, in a draft PR anyone can read. Status: development preview, no release yet.
 

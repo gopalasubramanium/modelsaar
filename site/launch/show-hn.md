@@ -11,7 +11,7 @@ I run several local models (Ollama on a small box) and got tired of re-selecting
 
 What it is not: it doesn't ship models, replace Ollama/vLLM, or add an LLM judge. Unknown capabilities never qualify a model; if nothing qualifies you get a 422 with blockers and remedies, never a silently degraded answer.
 
-Honest numbers: on one recorded run (3 models, 32 held-out tasks) `auto` matched the best single model's score, completed one more request (the image task the fixed model can't take) and had 0 capability violations, with a higher p95 latency because two requests went to a slow thinking model. n=32, CIs overlap — it shows where routing helps (coverage, transparency), not that it's better in general. Raw per-request records and a script that regenerates every number are in the repo.
+Honest numbers: on one recorded run (3 models, 32 held-out tasks) `auto` and the best single model each scored 30/32; `auto` completed 32 vs 31 requests (the image task the fixed model can't take), recorded 0 vs 1 capability violations, and had a p95 end-to-end latency of 7.96 s vs 4.76 s because two requests went to a slow thinking model (routing overhead itself: 0.98 ms p95). n=32, CIs overlap — it shows where routing helps (coverage, transparency), not that it's better in general. Raw per-request records and a script that regenerates every number are in the repo.
 
 An independent review found 18 real defects in the first public revision (privacy of tokenizer calls, failover inside tool round trips, memory budgets, embedding identity, evaluator scoring, file permissions…); the fixes and regression tests are in a draft PR you can read.
 
