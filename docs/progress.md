@@ -15,6 +15,10 @@ Compact state so another session can continue without repeating finished work.
 
 ### Finding → fix → regression (review of commit 1122e1f)
 
+The reviewer's 18 grouped findings (F01–F18) are reconciled with the eight workstreams below in
+[docs/review-2026-10-11-findings.md](review-2026-10-11-findings.md) (disposition, implementation, regression
+test, execution evidence; `scripts/reproduce_review_baseline.sh` shows 25/27 regression tests failing at `1122e1f`).
+
 Every regression test failed against 1122e1f for the observed defect and passes on the branch
 (`tests/test_hardening_2026_10_11.py` unless noted; run `python -m pytest tests/test_hardening_2026_10_11.py -q`).
 
