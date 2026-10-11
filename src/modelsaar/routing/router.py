@@ -54,6 +54,7 @@ class Router:
                 raise ValueError(f"unknown backend type {b.type}")
             self.adapters[b.id] = cls(b, allowed)
         self.admission = Admission(cfg.admission, list(cfg.resource_pools), list(cfg.backends))
+        self.admission.pool_members = lambda pool_id: [d for d in self.registry.all() if d.resource_pool == pool_id]
         self.affinity = AffinityStore(cfg.affinity)
         self.classifier = LocalClassifier(cfg.routing.classifier)
         self.catalogue = load_catalogue()
@@ -394,6 +395,12 @@ class Router:
                         cands.insert(0, cands.pop(i))
                     c.notes.append("affinity: pinned deployment kept")
                     break
+        for c in cands:
+            mv = self.admission.memory_view(c.deployment)
+            if mv is not None:
+                c.notes.append(f"memory: pool {mv['pool']} ~{mv['estimated_gb']}/{mv['memory_gb']} GB with this deployment (weights-only estimates)")
+                if c.deployment.id in mv["unknown"]:
+                    c.notes.append("memory estimate unknown for this deployment (admitted under unknown_memory_policy=allow)")
         dec.candidates = [c.as_dict() for c in cands]
         chosen = cands[0]
         # Continuity: a request that is tied to the deployment that started the exchange is never

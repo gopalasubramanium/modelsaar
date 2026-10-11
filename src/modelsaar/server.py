@@ -573,6 +573,43 @@ async def admin_refresh(request: Request) -> Response:
     return _json(200, {"registry_version": state.router.registry.version, "error": state.router.last_refresh_error})
 
 
+async def admin_probe(request: Request) -> Response:
+    """Run capability probes for one deployment under the gateway's own admission (slots, memory
+    budget, queue). This is the coordinated path `modelsaar probe` uses while a gateway is running,
+    so probe inference never overlaps with serving beyond the configured limits."""
+    state: GatewayState = request.app.state.gw
+    try:
+        _require_admin(state, request)
+        body = await _read_json(request, state.cfg.server.max_request_bytes)
+    except ProtocolError as e:
+        return _json(e.status, e.body())
+    from .probes import PROBE_NAMES, run_probes
+
+    router = state.router
+    dep_id = str(body.get("deployment", ""))
+    dep = router.registry.get(dep_id)
+    if dep is None:
+        return _json(404, error_body(f"deployment {dep_id!r} not found", code="unknown_deployment"))
+    if dep.role != "generative" or not dep.healthy:
+        return _json(422, error_body(f"{dep_id} is not a healthy generative deployment", code="not_probeable"))
+    if state.cfg.security.locality_mode == "local_only" and dep.locality != "local":
+        return _json(422, error_body(f"{dep_id} is not local; probes send prompts and are refused under local_only", code="locality"))
+    which = body.get("which") or None
+    if which is not None and (not isinstance(which, list) or any(w not in PROBE_NAMES for w in which)):
+        return _json(400, error_body(f"which must be a subset of {sorted(PROBE_NAMES)}", code="invalid_request_error"))
+    timeout = float(body.get("timeout") or 120.0)
+    try:
+        reservation = await router.admission.acquire(dep, timeout=None)
+    except AdmissionRejected as e:
+        return _json(e.status, error_body(e.message, code="admission_rejected"), {"Retry-After": "2"})
+    try:
+        rep = await run_probes(router.adapters[dep.backend_id], dep, state.store, which, timeout=timeout)
+    finally:
+        await reservation.release()
+    await router.refresh()
+    return _json(200, rep.as_dict())
+
+
 async def admin_ui(request: Request) -> Response:
     page = Path(__file__).parent / "static" / "status.html"
     return HTMLResponse(page.read_text(encoding="utf-8"))
@@ -610,6 +647,7 @@ def build_app(cfg: Config, router: Router, auth: Auth, store: Store | None) -> S
             Route("/admin/decisions/{request_id}", admin_decisions, methods=["GET"]),
             Route("/admin/explain", admin_explain, methods=["POST"]),
             Route("/admin/refresh", admin_refresh, methods=["POST"]),
+            Route("/admin/probe", admin_probe, methods=["POST"]),
             Route("/admin/ui", admin_ui, methods=["GET"]),
         ],
         lifespan=lifespan,

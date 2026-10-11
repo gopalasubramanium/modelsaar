@@ -264,3 +264,153 @@ def test_html_200_is_a_typed_502_and_never_pins(gateway, fake):
         assert dec2["affinity"]["status"] == "new"
     finally:
         fake.models["small:1b"].behaviour = "ok"
+
+
+# --------------------------------------------------------------------------- #
+# Finding 3: effective resource configuration
+# --------------------------------------------------------------------------- #
+
+
+def test_pool_memory_budget_is_enforced_before_dispatch(fake):
+    """Finding 3a: memory_gb=1 admitted a deployment with a 20.7 GB estimate."""
+    from modelsaar.config import ResourcePool
+
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", resource_pools=(ResourcePool(id="pool", max_concurrent=4, memory_gb=1.0),))
+    try:
+        n = len(fake.requests)
+        r = chat(g, "ollama/big:27b", "hi")  # ~20.7 GB estimate from the fake's size_bytes
+        assert r.status_code == 422, r.text
+        blockers = r.json()["error"]["modelsaar"]["blockers"]["ollama/big:27b"]
+        assert any("memory" in b for b in blockers), blockers
+        assert _models_hit(fake, n) == []
+        # A small model (0.8 GB) still fits.
+        assert chat(g, "ollama/small:1b", "hi").status_code == 200
+    finally:
+        g.gw.stop()
+
+
+def test_pool_memory_budget_counts_distinct_reservations_and_unknown_policy(fake):
+    """Finding 3a: aggregate reservations stay within the budget; unknown estimates follow policy."""
+    from modelsaar.config import ResourcePool
+
+    fake.models["small:1b"].behaviour = "slow"
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", resource_pools=(ResourcePool(id="pool", max_concurrent=4, max_queue=0, memory_gb=4.0, memory_margin_gb=0.5),))
+    try:
+        import threading
+
+        results: list[int] = []
+
+        def one(model: str):
+            results.append(chat(g, model, "hi").status_code)
+
+        t = threading.Thread(target=one, args=("ollama/small:1b",))
+        t.start()
+        import time as _t
+
+        _t.sleep(0.3)
+        # small:1b (~0.8 GB) is reserved; plain:3b (~0.8 GB) fits (1.6 + 0.5 <= 4); big:27b does not.
+        assert chat(g, "ollama/plain:3b", "hi").status_code == 200
+        rb = chat(g, "ollama/big:27b", "hi")
+        assert rb.status_code == 422
+        t.join()
+        assert results == [200]
+        st = g.admin.get("/admin/status").json()["admission"]["pool:pool"]
+        assert st["memory_gb"] == 4.0 and "memory_reserved_gb" in st
+    finally:
+        fake.models["small:1b"].behaviour = "ok"
+        g.gw.stop()
+
+
+def test_unknown_memory_estimate_policy(fake):
+    from modelsaar.config import BackendConfig, DeclaredModel, ResourcePool
+
+    def gw(policy: str):
+        return build_gateway(
+            f"http://127.0.0.1:{fake.port}",
+            resource_pools=(ResourcePool(id="pool", max_concurrent=4, memory_gb=4.0, unknown_memory_policy=policy),),
+            backends=(
+                BackendConfig(
+                    id="oai",
+                    type="openai_compatible",
+                    base_url=f"http://127.0.0.1:{fake.port}",
+                    resource_pool="pool",
+                    models=(DeclaredModel(name="small:1b", context_length=8192),),
+                ),
+            ),
+            deployments=(),
+        )
+
+    g = gw("reject")
+    try:
+        r = chat(g, "oai/small:1b", "hi")
+        assert r.status_code == 422
+        assert any("unknown" in b and "memory" in b for b in r.json()["error"]["modelsaar"]["blockers"]["oai/small:1b"])
+    finally:
+        g.gw.stop()
+    g = gw("allow")
+    try:
+        r = chat(g, "oai/small:1b", "hi")
+        assert r.status_code == 200
+        dec = g.decision(r.headers["x-modelsaar-request-id"])
+        assert any("memory estimate unknown" in n for c in dec["candidates"] for n in c.get("notes", []))
+    finally:
+        g.gw.stop()
+
+
+def test_admin_probe_runs_under_gateway_admission(fake):
+    """Finding 3b: probes launched while the gateway's one-slot pool is busy must wait, not overlap."""
+    import threading
+    import time as _t
+
+    from modelsaar.config import ResourcePool
+
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", resource_pools=(ResourcePool(id="pool", max_concurrent=1, max_queue=4, queue_timeout_s=10.0),))
+    fake.models["plain:3b"].behaviour = "slow"
+    try:
+        fake.max_active = 0
+        t = threading.Thread(target=lambda: chat(g, "ollama/plain:3b", "occupy"))
+        t.start()
+        _t.sleep(0.2)
+        r = g.admin.post("/admin/probe", json={"deployment": "ollama/small:1b", "which": ["streaming"]})
+        t.join()
+        assert r.status_code == 200, r.text
+        assert r.json()["deployment_id"] == "ollama/small:1b"
+        assert fake.max_active == 1, "probe ran concurrently with the occupied one-slot pool"
+        # Evidence is visible to the running gateway without a restart.
+        d = g.router.registry.get("ollama/small:1b")
+        assert d.cap("streaming") == "supported"
+    finally:
+        fake.models["plain:3b"].behaviour = "ok"
+        g.gw.stop()
+
+
+def test_cli_probe_coordinates_through_running_gateway(fake, tmp_path, capsys):
+    """Finding 3b: `modelsaar probe` used a separate Router (two jobs in a one-slot pool)."""
+    import threading
+    import time as _t
+
+    from modelsaar.cli import main
+    from modelsaar.config import ResourcePool, write_config_atomic
+
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", resource_pools=(ResourcePool(id="pool", max_concurrent=1, max_queue=4, queue_timeout_s=10.0),))
+    cfg_path = g.tmp / "config.yaml"
+    write_config_atomic(g.gw.cfg, cfg_path)
+    fake.models["plain:3b"].behaviour = "slow"
+    try:
+        fake.max_active = 0
+        t = threading.Thread(target=lambda: chat(g, "ollama/plain:3b", "occupy"))
+        t.start()
+        _t.sleep(0.2)
+        main(["--config", str(cfg_path), "probe", "ollama/small:1b", "--which", "streaming"])
+        t.join()
+        out = capsys.readouterr().out
+        assert "via gateway" in out
+        assert fake.max_active == 1
+        # Direct probing while a gateway is listening is refused unless explicitly allowed.
+        import pytest
+
+        with pytest.raises(SystemExit):
+            main(["--config", str(cfg_path), "probe", "ollama/small:1b", "--which", "streaming", "--offline"])
+    finally:
+        fake.models["plain:3b"].behaviour = "ok"
+        g.gw.stop()

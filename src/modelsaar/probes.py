@@ -20,6 +20,7 @@ from .store import Store
 # A 1x1 red PNG (generated with Pillow once; embedded to avoid a dependency).
 # Thinking models spend output tokens on reasoning before the answer; keep probe budgets generous.
 PROBE_MAX_TOKENS = 1024
+PROBE_NAMES = frozenset({"streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"})
 STREAM_PROBE_MAX_TOKENS = 400
 
 _RED_PNG_B64 = (

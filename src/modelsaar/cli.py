@@ -158,8 +158,85 @@ def cmd_discover(args: argparse.Namespace) -> None:
         print(f"  {a:14s} " + (f"-> {c['deployments']} ctx>={c['context_length_min']} tools={c['tools']} vision={c['vision']}" if c else "(not advertised: no usable deployment)"))
 
 
+def _gateway_listening(cfg: Config) -> str | None:
+    """'gateway' when a ModelSaar gateway answers /healthz on the configured address, 'other' when
+    something else holds the port, None when the port is free."""
+    url = f"http://{cfg.server.host}:{cfg.server.port}"
+    try:
+        r = httpx.get(f"{url}/healthz", timeout=2.0)
+    except httpx.ConnectError:
+        return None
+    except httpx.HTTPError:
+        return "other"
+    try:
+        return "gateway" if r.status_code == 200 and r.json().get("status") == "ok" and "version" in r.json() else "other"
+    except ValueError:
+        return "other"
+
+
+def _print_probe_report(rep: dict[str, Any]) -> None:
+    for res in rep.get("results", []):
+        print(f"  {res['capability']:16s} {res['value']:12s} {res['latency_ms']:7.0f}ms  {res.get('note', '')}")
+    for m in rep.get("measurements", []):
+        p50, ttft, load = m.get("p50_ms"), m.get("ttft_ms"), m.get("load_ms")
+        print(f"  latency           p50={p50 and round(p50)}ms ttft={ttft and round(ttft)}ms load~{load and round(load)}ms (samples={m.get('samples')})")
+    for e in rep.get("errors", []):
+        print(f"  error: {e}")
+
+
 def cmd_probe(args: argparse.Namespace) -> None:
+    """Probes use inference. While a gateway is running they go through POST /admin/probe so the
+    gateway's admission (slots, queue, memory budget) coordinates them with live traffic. Direct
+    (offline) probing is only allowed when no gateway listens on the configured port, or with
+    --allow-concurrent (the operator accepts uncoordinated concurrent inference)."""
     cfg = _load(args)
+    listening = _gateway_listening(cfg)
+    if listening == "gateway" and not args.offline:
+        _probe_via_gateway(cfg, args)
+        return
+    if listening is not None and not args.allow_concurrent:
+        what = "a ModelSaar gateway" if listening == "gateway" else "another process"
+        sys.exit(
+            f"{what} is listening on {cfg.server.host}:{cfg.server.port}; direct probing would run inference "
+            "outside the gateway's admission control. Drop --offline to probe through the gateway, stop it, "
+            "or pass --allow-concurrent to accept uncoordinated concurrent inference."
+        )
+    if listening is None:
+        print(f"no gateway at {cfg.server.host}:{cfg.server.port}; probing directly (offline, uncoordinated with any other inference)")
+    _probe_offline(cfg, args)
+
+
+def _probe_via_gateway(cfg: Config, args: argparse.Namespace) -> None:
+    reports: list[dict[str, Any]] = []
+    with _admin_client(cfg) as c:
+        c.timeout = httpx.Timeout(args.timeout * 8 + 60)
+        status = c.get("/admin/status")
+        if status.status_code != 200:
+            sys.exit(f"gateway at {c.base_url} refused the admin key ({status.status_code}); check {cfg.server.admin_key_file}")
+        deps = status.json().get("deployments", [])
+        targets = [
+            d["id"]
+            for d in deps
+            if d.get("role") == "generative" and (d.get("state") or {}).get("healthy") and (args.all or d["id"] in args.deployment)
+        ]
+        if cfg.security.locality_mode == "local_only":
+            targets = [d["id"] for d in deps if d["id"] in targets and d.get("locality") == "local"]
+        if not targets:
+            print("no matching generative deployments (check `modelsaar discover`)")
+        for dep_id in targets:
+            print(f"probing {dep_id} via gateway {c.base_url} (admission-coordinated) ...")
+            r = c.post("/admin/probe", json={"deployment": dep_id, "which": args.which or None, "timeout": args.timeout})
+            if r.status_code != 200:
+                print(f"  refused ({r.status_code}): {r.json().get('error', {}).get('message', r.text[:200])}")
+                continue
+            rep = r.json()
+            _print_probe_report(rep)
+            reports.append(rep)
+    if args.json:
+        _out(reports, True)
+
+
+def _probe_offline(cfg: Config, args: argparse.Namespace) -> None:
     from .probes import run_probes
     from .routing.router import Router
     from .store import Store
@@ -176,11 +253,13 @@ def cmd_probe(args: argparse.Namespace) -> None:
         reports = []
         for d in targets:
             print(f"probing {d.id} (fingerprint {d.fingerprint}) ...")
-            rep = await run_probes(r.adapters[d.backend_id], d, store, args.which or None, timeout=args.timeout)
-            for res in rep.results:
-                print(f"  {res.capability:16s} {res.value:12s} {res.latency_ms:7.0f}ms  {res.note}")
-            for m in rep.measurements:
-                print(f"  latency           p50={m.p50_ms and round(m.p50_ms)}ms ttft={m.ttft_ms and round(m.ttft_ms)}ms load~{m.load_ms and round(m.load_ms)}ms (samples={m.samples})")
+            # The offline path still respects this process's own admission (pool memory budget, slots).
+            reservation = await r.admission.acquire(d, timeout=None)
+            try:
+                rep = await run_probes(r.adapters[d.backend_id], d, store, args.which or None, timeout=args.timeout)
+            finally:
+                await reservation.release()
+            _print_probe_report(rep.as_dict())
             reports.append(rep.as_dict())
         await r.aclose()
         store.close()
@@ -541,6 +620,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--which", nargs="*", choices=["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"])
     s.add_argument("--timeout", type=float, default=120.0)
     s.add_argument("--json", action="store_true")
+    s.add_argument("--offline", action="store_true", help="probe directly instead of through a running gateway (refused while a gateway listens unless --allow-concurrent)")
+    s.add_argument("--allow-concurrent", action="store_true", help="accept uncoordinated inference next to a running gateway/other process")
     s.set_defaults(fn=cmd_probe)
 
     s = sub.add_parser("serve", help="start the gateway")
@@ -605,7 +686,14 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--seed", type=int, default=7)
     s.add_argument("--save-measurements", action="store_true", help="live mode: store per-deployment quality/latency evidence for routing")
     s.add_argument("--probe", action="store_true", help="live mode: run capability probes on every deployment first")
-    s.add_argument("--deployments", nargs="*", help="live mode: restrict the sweep, baselines and the `auto` alias to these deployment ids")
+    s.add_argument(
+        "--deployments",
+        nargs="*",
+        help="live mode: restrict the sweep, baselines and the `auto` alias to these deployment ids (or bare model names when unambiguous)",
+    )
+    s.add_argument("--checkpoint", help="per-task record file (JSONL) for resumable runs; default <out>.records.jsonl when --out is given")
+    s.add_argument("--resume", action="store_true", help="skip tasks already recorded in the checkpoint file")
+    s.add_argument("--allow-concurrent", action="store_true", help="live mode: run even if a gateway/other process listens on the configured port")
     s.set_defaults(fn=cmd_eval)
 
     s = sub.add_parser("demo", help="start a SIMULATED backend + gateway to try the UX without models")

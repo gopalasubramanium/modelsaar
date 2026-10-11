@@ -567,7 +567,18 @@ def run_live(args, tasks: list[dict[str, Any]], checkpoint: Path | None = None, 
     from ..runtime import GatewayThread, free_port
 
     cfg = _load(args)
-    # Run an in-process gateway on a free port so evaluation never disturbs a running instance.
+    # The live evaluation runs its own in-process gateway (own admission) against the same
+    # backends. A gateway already listening on the configured port would run uncoordinated
+    # inference next to it, so that is refused unless the operator accepts it explicitly.
+    from ..cli import _gateway_listening
+
+    listening = _gateway_listening(cfg)
+    if listening is not None and not getattr(args, "allow_concurrent", False):
+        what = "a ModelSaar gateway" if listening == "gateway" else "another process"
+        raise SystemExit(
+            f"{what} is listening on {cfg.server.host}:{cfg.server.port}; a live evaluation would run inference "
+            "outside its admission control. Stop it first, or pass --allow-concurrent to accept that."
+        )
     cfg = cfg.model_copy(update={"server": cfg.server.model_copy(update={"port": free_port()})})
     api = read_keys(cfg.resolve(cfg.server.api_keys_file))
     adm = read_keys(cfg.resolve(cfg.server.admin_key_file))

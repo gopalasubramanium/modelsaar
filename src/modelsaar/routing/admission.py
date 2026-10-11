@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from ..config import AdmissionConfig, BackendConfig, ResourcePool
@@ -27,10 +28,26 @@ class _Slot:
     waiting: int = 0
     uncertain: int = 0
     cond: asyncio.Condition = field(default_factory=asyncio.Condition)
+    # Memory budget (pools only). holders counts active+uncertain reservations per deployment so
+    # a deployment's weights are counted once however many requests it serves concurrently.
+    memory_gb: float | None = None
+    memory_margin_gb: float = 0.0
+    unknown_memory_policy: str = "allow"
+    holders: dict[str, int] = field(default_factory=dict)
 
     @property
     def used(self) -> int:
         return self.active + self.uncertain
+
+    def hold(self, dep_id: str) -> None:
+        self.holders[dep_id] = self.holders.get(dep_id, 0) + 1
+
+    def unhold(self, dep_id: str) -> None:
+        n = self.holders.get(dep_id, 0) - 1
+        if n <= 0:
+            self.holders.pop(dep_id, None)
+        else:
+            self.holders[dep_id] = n
 
 
 @dataclass
@@ -72,6 +89,7 @@ class Reservation:
         for s in self._slots:
             async with s.cond:
                 s.active = max(0, s.active - 1)
+                s.unhold(self.dep_id)
                 s.cond.notify_all()
 
     async def mark_uncertain(self) -> None:
@@ -91,6 +109,7 @@ class Reservation:
             for s in self._slots:
                 async with s.cond:
                     s.uncertain = max(0, s.uncertain - 1)
+                    s.unhold(self.dep_id)  # the hold counted the weights until now
                     s.cond.notify_all()
 
         task = asyncio.create_task(_expire())
@@ -102,8 +121,18 @@ class Admission:
     def __init__(self, cfg: AdmissionConfig, pools: list[ResourcePool], backends: list[BackendConfig]) -> None:
         self.cfg = cfg
         self._pools: dict[str, _Slot] = {
-            p.id: _Slot(p.max_concurrent, p.max_queue, p.queue_timeout_s) for p in pools
+            p.id: _Slot(
+                p.max_concurrent,
+                p.max_queue,
+                p.queue_timeout_s,
+                memory_gb=p.memory_gb,
+                memory_margin_gb=p.memory_margin_gb,
+                unknown_memory_policy=p.unknown_memory_policy,
+            )
+            for p in pools
         }
+        # Set by the router: deployments sharing a pool (for resident-weight accounting).
+        self.pool_members: Callable[[str], list[Deployment]] = lambda pool_id: []
         self._backends: dict[str, _Slot] = {
             b.id: _Slot(b.max_concurrent, cfg.max_queue, cfg.queue_timeout_s) for b in backends
         }
@@ -135,6 +164,59 @@ class Admission:
         for s in self._slots_for(dep):
             if s.used >= s.limit and s.waiting >= s.max_queue:
                 return "admission queue full for this deployment's resource pool/backend"
+        return self.memory_blocker(dep)
+
+    # ---------------------------------------------------------------- #
+    # Memory budget
+    # ---------------------------------------------------------------- #
+    def memory_view(self, dep: Deployment) -> dict | None:
+        """What the pool budget would look like with ``dep`` dispatched. None when the pool has no
+        memory budget. Estimates are weights-only (provenance on each deployment); KV/workspace
+        and runtime overhead are covered only by memory_margin_gb. Unified memory is counted once
+        per pool; a deployment is counted once however many requests it serves."""
+        pool_id = dep.resource_pool
+        s = self._pools.get(pool_id) if pool_id else None
+        if s is None or s.memory_gb is None:
+            return None
+        members = {d.id: d for d in self.pool_members(pool_id)}
+        members.setdefault(dep.id, dep)
+        counted: set[str] = set(s.holders) | {dep.id} | {d.id for d in members.values() if d.loaded}
+        total = 0.0
+        unknown: list[str] = []
+        for did in sorted(counted):
+            d = members.get(did)
+            est = d.memory_gb_estimate if d else None
+            if est is None:
+                unknown.append(did)
+            else:
+                total += est
+        return {
+            "pool": pool_id,
+            "memory_gb": s.memory_gb,
+            "margin_gb": s.memory_margin_gb,
+            "counted": sorted(counted),
+            "estimated_gb": round(total, 2),
+            "unknown": unknown,
+            "policy_unknown": s.unknown_memory_policy,
+            "fits": total + s.memory_margin_gb <= s.memory_gb,
+        }
+
+    def memory_blocker(self, dep: Deployment) -> str | None:
+        v = self.memory_view(dep)
+        if v is None:
+            return None
+        if dep.memory_gb_estimate is None and v["policy_unknown"] == "reject":
+            return (
+                f"memory estimate unknown for {dep.id} and pool {v['pool']} has unknown_memory_policy=reject "
+                f"(declare memory_gb_estimate under backends[].models or deployments[] overrides)"
+            )
+        if not v["fits"]:
+            return (
+                f"memory budget: pool {v['pool']} memory_gb={v['memory_gb']} < resident+reserved estimate "
+                f"{v['estimated_gb']} GB + margin {v['margin_gb']} GB (counted: {', '.join(v['counted'])}; "
+                f"{dep.id} estimate {dep.memory_gb_estimate} GB from {dep.memory_estimate_provenance or 'unknown'}"
+                f"{'; unknown: ' + ', '.join(v['unknown']) if v['unknown'] else ''})"
+            )
         return None
 
     async def acquire(self, dep: Deployment, timeout: float | None = None) -> Reservation:
@@ -145,6 +227,13 @@ class Admission:
                 t = timeout if timeout is not None else s.queue_timeout_s
                 await self._acquire_one(s, t)
                 acquired.append(s)
+            # Atomic with the slot: the memory check runs after the pool slot is held, so two
+            # concurrent admissions cannot both pass against the same free budget.
+            why = self.memory_blocker(dep)
+            if why:
+                raise AdmissionRejected(why, status=503)
+            for s in acquired:
+                s.hold(dep.id)
         except BaseException:
             for s in acquired:
                 async with s.cond:
@@ -180,6 +269,18 @@ class Admission:
         out: dict[str, dict[str, int]] = {}
         for k, s in {**{f"backend:{k}": v for k, v in self._backends.items()}, **{f"pool:{k}": v for k, v in self._pools.items()}}.items():
             out[k] = {"limit": s.limit, "active": s.active, "waiting": s.waiting, "uncertain": s.uncertain}
+            if k.startswith("pool:") and s.memory_gb is not None:
+                members = {d.id: d for d in self.pool_members(k[5:])}
+                reserved = sum((members[d].memory_gb_estimate or 0.0) for d in s.holders if d in members)
+                out[k].update(
+                    {
+                        "memory_gb": s.memory_gb,
+                        "memory_margin_gb": s.memory_margin_gb,
+                        "memory_reserved_gb": round(reserved, 2),
+                        "memory_holders": sorted(s.holders),
+                        "unknown_memory_policy": s.unknown_memory_policy,
+                    }
+                )
         return out
 
 
