@@ -70,6 +70,10 @@ class Deployment:
     parameter_size: str = ""
     quantization: str = ""
     digest: str = ""
+    # Checkpoint identity: a weights digest from the runtime or an operator declaration. Empty
+    # means unknown; a bare model-name match is never an identity.
+    identity: str = ""
+    identity_source: str = ""
     runtime: str = ""
     runtime_version: str = ""
     template_hash: str = ""
@@ -112,6 +116,7 @@ class Deployment:
             "backend": self.backend_id,
             "model": self.model,
             "digest": self.digest,
+            "identity": self.identity,
             "runtime": self.runtime,
             "runtime_version": self.runtime_version,
             "template": self.template_hash,
@@ -142,6 +147,8 @@ class Deployment:
             "family": self.family,
             "parameter_size": self.parameter_size,
             "quantization": self.quantization,
+            "identity": self.identity,
+            "identity_source": self.identity_source,
             "context_length": self.context_length,
             "max_output_tokens": self.max_output_tokens,
             "locality": self.locality,

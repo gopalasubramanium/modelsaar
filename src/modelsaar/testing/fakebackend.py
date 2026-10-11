@@ -48,6 +48,7 @@ class FakeModel:
     good_at: list[str] = field(default_factory=list)
     json_schema_ok: bool = True
     embedding_dimensions: int = 8
+    normalize_embeddings: bool = True
     template: str = "{{ .Prompt }}"
     # Simulated thinking model: spends this many output tokens on reasoning before answering.
     thinking_tokens: int = 0
@@ -408,7 +409,10 @@ class FakeBackend:
             inputs = [inputs]
         data = []
         for i, text in enumerate(inputs or []):
-            vec = [((hash((m.name, str(text), j)) % 1000) / 1000.0) for j in range(m.embedding_dimensions)]
+            vec = [((hash((m.name, str(text), j)) % 1000) / 1000.0 + 0.001) for j in range(m.embedding_dimensions)]
+            if m.normalize_embeddings:
+                norm = sum(v * v for v in vec) ** 0.5
+                vec = [v / norm for v in vec]
             data.append({"object": "embedding", "index": i, "embedding": vec})
         return JSONResponse({"object": "list", "data": data, "model": m.name, "usage": {"prompt_tokens": 3, "total_tokens": 3}})
 

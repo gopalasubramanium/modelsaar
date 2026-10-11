@@ -77,6 +77,9 @@ class OpenAICompatAdapter(BaseAdapter):
                 dep.catalogue_id = d.catalogue_id
                 dep.memory_gb_estimate = d.memory_gb_estimate
                 dep.embedding_dimensions = d.embedding_dimensions
+                if d.identity:
+                    dep.identity = d.identity
+                    dep.identity_source = "operator declaration"
                 if d.memory_gb_estimate:
                     dep.memory_estimate_provenance = "operator declaration"
                 merge_capabilities(

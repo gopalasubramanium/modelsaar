@@ -425,6 +425,61 @@ class Router:
             dec._session = (session_key, source)  # type: ignore[attr-defined]  # not serialized
         return dec
 
+    # ------------------------------------------------------------------ #
+    # Embedding contracts
+    # ------------------------------------------------------------------ #
+    def _embedding_identity_blocker(self, contract, d: Deployment) -> str | None:  # type: ignore[no-untyped-def]
+        """The effective identity of an alias is: embeddings[].identity when declared, else the
+        identity recorded in the state DB on first successful use, else the identity of the first
+        member in contract order. A member is interchangeable only when its identity is known and
+        equal to that. Single-member aliases with an unknown identity are allowed (nothing to
+        interchange) but the decision says so."""
+        expected = contract.identity or self._recorded_embedding_identity(contract.alias)
+        if not expected:
+            first = self.registry.get(contract.deployments[0])
+            expected = first.identity if first else ""
+        if len(contract.deployments) == 1 and not expected:
+            return None
+        if not d.identity:
+            return (
+                f"identity unknown for {d.id} (a model-name match is not an identity); declare "
+                f"backends[].models[].identity to treat it as a replica of alias {contract.alias!r}"
+            )
+        if expected and d.identity != expected:
+            src = "embeddings[].identity" if contract.identity else "the identity recorded for this alias"
+            return (
+                f"identity {d.identity[:24]} ({d.identity_source}) differs from {src} {expected[:24]}; "
+                "changed identity requires an explicit re-indexing decision"
+            )
+        return None
+
+    def _recorded_embedding_identity(self, alias: str) -> str:
+        if not self.store:
+            return ""
+        try:
+            return self.store.get_meta(f"embedding_identity:{alias}") or ""
+        except Exception:  # pragma: no cover
+            return ""
+
+    def record_embedding_identity(self, alias: str, dep: Deployment) -> None:
+        """Called after a validated embedding response: pins the alias to the identity that served it."""
+        if self.store and dep.identity and not self._recorded_embedding_identity(alias):
+            try:
+                self.store.set_meta(f"embedding_identity:{alias}", dep.identity)
+            except Exception:  # pragma: no cover
+                pass
+
+    def embedding_request_problem(self, body: dict[str, Any], contract, dep: Deployment) -> str | None:  # type: ignore[no-untyped-def]
+        """Request options that would change the alias's space are refused, not forwarded."""
+        fmt = body.get("encoding_format")
+        if fmt not in (None, "float"):
+            return f"encoding_format={fmt!r} is not supported by this gateway's embedding contract (only float)"
+        dims = body.get("dimensions")
+        expected = (contract.dimensions if contract else None) or dep.embedding_dimensions
+        if dims is not None and expected and int(dims) != expected:
+            return f"dimensions={dims} would change the embedding space of {contract.alias if contract else dep.id} ({expected}-d)"
+        return None
+
     def pin_session(self, dec: Decision, caller_id: str, dep_id: str) -> None:
         sess = getattr(dec, "_session", None)
         if sess:
@@ -594,6 +649,20 @@ class Router:
                     dec.exclusions[d.id] = [
                         f"embedding dimensions {d.embedding_dimensions} differ from contract {contract.dimensions}"
                     ]
+                else:
+                    keep.append(d)
+            res.eligible = keep
+        if contract:
+            keep = []
+            for d in res.eligible:
+                why = self._embedding_identity_blocker(contract, d)
+                if why:
+                    dec.exclusions[d.id] = [why]
+                    if "re-index" not in " ".join(dec.remedies):
+                        dec.remedies.append(
+                            "members of an embeddings alias must be one verified identity (shared digest or a declared "
+                            "backends[].models[].identity); after changing the model, re-index and set embeddings[].identity"
+                        )
                 else:
                     keep.append(d)
             res.eligible = keep

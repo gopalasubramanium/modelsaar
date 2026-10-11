@@ -420,6 +420,14 @@ async def embeddings(request: Request) -> Response:
     dep = router.registry.get(dec.chosen)  # type: ignore[arg-type]
     adapter = router.adapters[dep.backend_id]
     headers = {"X-ModelSaar-Request-Id": dec.request_id, "X-ModelSaar-Deployment": dep.id}
+    contract = next((c for c in state.cfg.embeddings if c.alias == dec.alias), None) if dec.alias else None
+    problem = router.embedding_request_problem(body, contract, dep)
+    if problem:
+        state.requests_failed += 1
+        dec.outcome = "unsupported_contract_option"
+        dec.outcome_detail = problem
+        router.record(dec)
+        return _json(400, error_body(problem, code="unsupported_contract_option", modelsaar={"request_id": dec.request_id}), headers)
     try:
         reservation = await router.admission.acquire(dep)
     except AdmissionRejected as e:
@@ -439,11 +447,72 @@ async def embeddings(request: Request) -> Response:
         dec.outcome = "upstream_error"
         router.record(dec)
         return _json(resp.status, resp.body, headers)
+    expected_dims = (contract.dimensions if contract else None) or dep.embedding_dimensions
+    violation = _embedding_problem(resp.body, _embedding_input_count(body.get("input")), expected_dims, contract.normalized if contract else None)
+    if violation:
+        state.requests_failed += 1
+        dec.outcome = "embedding_contract_violation"
+        dec.outcome_detail = violation
+        router.record(dec)
+        return _json(
+            502,
+            error_body(
+                f"backend output violates the embedding contract: {violation}",
+                code="embedding_contract_violation",
+                modelsaar={"request_id": dec.request_id, "deployment": dep.id},
+            ),
+            headers,
+        )
     out = dict(resp.body)
     out["model"] = dec.requested_model if state.cfg.server.response_model_field == "requested" else dep.id
+    if contract:
+        router.record_embedding_identity(contract.alias, dep)
     dec.outcome = "ok"
     router.record(dec)
     return _json(200, out, headers)
+
+
+def _embedding_input_count(inp: Any) -> int:
+    if isinstance(inp, str):
+        return 1
+    if isinstance(inp, list):
+        if inp and all(isinstance(x, int) for x in inp):
+            return 1  # one token array
+        return len(inp)
+    return 1
+
+
+def _embedding_problem(body: Any, n_inputs: int, dims: int | None, normalized: bool | None) -> str | None:
+    """Validate count, indices, dimensions, finiteness and (when the contract says so) unit norm."""
+    import math
+
+    if not isinstance(body, dict) or not isinstance(body.get("data"), list):
+        return "response has no data list"
+    data = body["data"]
+    if len(data) != n_inputs:
+        return f"{len(data)} vectors returned for {n_inputs} inputs"
+    seen_dims: int | None = None
+    for i, item in enumerate(data):
+        if not isinstance(item, dict):
+            return f"data[{i}] is not an object"
+        if item.get("index") != i:
+            return f"data[{i}].index is {item.get('index')!r}"
+        vec = item.get("embedding")
+        if not isinstance(vec, list) or not vec:
+            return f"data[{i}].embedding is not a non-empty list (base64 encodings are not supported)"
+        if not all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in vec):
+            return f"data[{i}].embedding contains non-finite or non-numeric values"
+        if seen_dims is None:
+            seen_dims = len(vec)
+        elif len(vec) != seen_dims:
+            return f"data[{i}].embedding has {len(vec)} dimensions, data[0] has {seen_dims}"
+        if dims and len(vec) != dims:
+            return f"data[{i}].embedding has {len(vec)} dimensions; contract requires {dims}"
+        if normalized:
+            norm = math.sqrt(sum(v * v for v in vec))
+            if abs(norm - 1.0) > 1e-2:
+                return f"data[{i}].embedding has L2 norm {norm:.3f}; contract declares normalized vectors (set normalized: false if the model does not normalize)"
+    return None
 
 
 # --------------------------------------------------------------------------- #

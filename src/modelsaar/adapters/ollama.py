@@ -81,6 +81,8 @@ class OllamaAdapter(BaseAdapter):
                 parameter_size=str(details.get("parameter_size", "")),
                 quantization=str(details.get("quantization_level", "")),
                 digest=str(m.get("digest", "")),
+                identity=str(m.get("digest", "")),
+                identity_source="ollama digest" if m.get("digest") else "",
                 runtime="ollama",
                 runtime_version=self.runtime_version,
                 resource_pool=self.cfg.resource_pool,

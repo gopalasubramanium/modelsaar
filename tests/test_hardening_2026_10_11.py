@@ -414,3 +414,141 @@ def test_cli_probe_coordinates_through_running_gateway(fake, tmp_path, capsys):
     finally:
         fake.models["plain:3b"].behaviour = "ok"
         g.gw.stop()
+
+
+# --------------------------------------------------------------------------- #
+# Finding 4: immutable embedding spaces
+# --------------------------------------------------------------------------- #
+
+
+def _embed(g, model: str, inp, **extra):
+    body = {"model": model, "input": inp}
+    body.update(extra)
+    return g.client.post("/v1/embeddings", json=body)
+
+
+def test_alias_never_interchanges_distinct_models_with_equal_dimensions(fake):
+    """Finding 4: two different models (same dims) under one alias switched with residency."""
+    from modelsaar.config import EmbeddingContract
+    from modelsaar.testing.fakebackend import FakeModel
+
+    fake.models["embed-twin:0.6b"] = FakeModel("embed-twin:0.6b", ["embedding"], 2048, parameter_size="0.6B", embedding_dimensions=8, loaded=True)
+    g = build_gateway(
+        f"http://127.0.0.1:{fake.port}",
+        embeddings=(EmbeddingContract(alias="docs", deployments=("ollama/embed:0.6b", "ollama/embed-twin:0.6b"), dimensions=8),),
+    )
+    try:
+        r = _embed(g, "docs", ["a"])
+        assert r.status_code == 200
+        assert r.headers["x-modelsaar-deployment"] == "ollama/embed:0.6b", "resident twin must not be preferred over the contract identity"
+        dec = g.decision(r.headers["x-modelsaar-request-id"])
+        assert "identity" in " ".join(dec["exclusions"].get("ollama/embed-twin:0.6b", []))
+        del fake.models["embed:0.6b"]
+        g.refresh()
+        r = _embed(g, "docs", ["a"])
+        assert r.status_code == 422
+        assert "re-index" in " ".join(r.json()["error"]["modelsaar"]["remedies"])
+    finally:
+        fake.models.pop("embed-twin:0.6b", None)
+        g.gw.stop()
+
+
+def test_known_identical_replicas_share_an_alias(fake):
+    """Finding 4: same digest on two backends is a verified replica set."""
+    from modelsaar.config import BackendConfig, EmbeddingContract
+
+    twin = FakeBackend(make_models())
+    twin.start()
+    g = build_gateway(
+        f"http://127.0.0.1:{fake.port}",
+        backends=(
+            BackendConfig(id="ollama", type="ollama", base_url=f"http://127.0.0.1:{fake.port}", resource_pool="pool", max_concurrent=4),
+            BackendConfig(id="second", type="ollama", base_url=f"http://127.0.0.1:{twin.port}", resource_pool="pool", max_concurrent=4),
+        ),
+        embeddings=(EmbeddingContract(alias="docs", deployments=("ollama/embed:0.6b", "second/embed:0.6b"), dimensions=8),),
+    )
+    try:
+        r = _embed(g, "docs", "a")
+        assert r.status_code == 200
+        dec = g.decision(r.headers["x-modelsaar-request-id"])
+        assert dec["exclusions"] == {}
+        del fake.models["embed:0.6b"]
+        g.refresh()
+        r = _embed(g, "docs", "a")
+        assert r.status_code == 200 and r.headers["x-modelsaar-deployment"] == "second/embed:0.6b"
+    finally:
+        g.gw.stop()
+        twin.stop()
+
+
+def test_unknown_identity_is_not_a_verified_replica(fake):
+    """Finding 4: a name match on a generic endpoint without a declared identity proves nothing."""
+    from modelsaar.config import BackendConfig, DeclaredModel, EmbeddingContract
+
+    def gw(identity):
+        return build_gateway(
+            f"http://127.0.0.1:{fake.port}",
+            backends=(
+                BackendConfig(id="ollama", type="ollama", base_url=f"http://127.0.0.1:{fake.port}", resource_pool="pool", max_concurrent=4),
+                BackendConfig(
+                    id="oai",
+                    type="openai_compatible",
+                    base_url=f"http://127.0.0.1:{fake.port}",
+                    resource_pool="pool",
+                    models=(DeclaredModel(name="embed:0.6b", role="embedding", embedding_dimensions=8, identity=identity),),
+                ),
+            ),
+            embeddings=(EmbeddingContract(alias="docs", deployments=("ollama/embed:0.6b", "oai/embed:0.6b"), dimensions=8),),
+        )
+
+    g = gw(None)
+    try:
+        r = _embed(g, "docs", "a")
+        assert r.status_code == 200
+        dec = g.decision(r.headers["x-modelsaar-request-id"])
+        assert any("identity unknown" in x for x in dec["exclusions"].get("oai/embed:0.6b", []))
+        digest = g.router.registry.get("ollama/embed:0.6b").identity
+    finally:
+        g.gw.stop()
+    g = gw(digest)
+    try:
+        r = _embed(g, "docs", "a")
+        assert r.status_code == 200
+        assert g.decision(r.headers["x-modelsaar-request-id"])["exclusions"] == {}
+    finally:
+        g.gw.stop()
+
+
+def test_wrong_output_shape_is_a_contract_error(fake):
+    """Finding 4: an 8-d contract returned 200 when the backend produced 4-d vectors."""
+    from modelsaar.config import EmbeddingContract
+
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", embeddings=(EmbeddingContract(alias="docs", deployments=("ollama/embed:0.6b",), dimensions=8),))
+    try:
+        assert _embed(g, "docs", ["a", "b"]).status_code == 200
+        fake.models["embed:0.6b"].embedding_dimensions = 4
+        r = _embed(g, "docs", ["a", "b"])
+        assert r.status_code == 502, r.text
+        assert r.json()["error"]["code"] == "embedding_contract_violation"
+        fake.models["embed:0.6b"].embedding_dimensions = 8
+        fake.models["embed:0.6b"].normalize_embeddings = False
+        r = _embed(g, "docs", ["a"])
+        assert r.status_code == 502 and "normal" in r.json()["error"]["message"]
+    finally:
+        fake.models["embed:0.6b"].embedding_dimensions = 8
+        fake.models["embed:0.6b"].normalize_embeddings = True
+        g.gw.stop()
+
+
+def test_request_level_contract_changes_rejected(fake):
+    from modelsaar.config import EmbeddingContract
+
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", embeddings=(EmbeddingContract(alias="docs", deployments=("ollama/embed:0.6b",), dimensions=8),))
+    try:
+        r = _embed(g, "docs", "a", dimensions=4)
+        assert r.status_code == 400 and r.json()["error"]["code"] == "unsupported_contract_option"
+        r = _embed(g, "docs", "a", encoding_format="base64")
+        assert r.status_code == 400 and r.json()["error"]["code"] == "unsupported_contract_option"
+        assert _embed(g, "docs", "a", dimensions=8, encoding_format="float").status_code == 200
+    finally:
+        g.gw.stop()
