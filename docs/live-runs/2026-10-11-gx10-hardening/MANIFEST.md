@@ -85,10 +85,10 @@ Exact comparison `auto` vs `fixed-strong` (qwen3-coder), from the records:
 * success **30/32 each**. They differ on exactly two tasks: `vis-02` (image task) — `auto` routed it to
   gemma4 and passed, the fixed model returned 422 (capability violation); `long-01` — both used
   qwen3-coder, the fixed sweep's response passed and the `auto` run's response failed
-  (`missing 'LINE 0: THE QUICK BROWN'`): run-to-run variation of the same model at temperature 0, not a
-  routing difference. Both failed `math-05`.
+  (`missing 'LINE 0: THE QUICK BROWN'`). The long-01 result differed despite selection of the same
+  model; the cause has not been isolated. Both failed `math-05`.
 * completion 32/32 vs 31/32; capability violations 0 vs 1 (the 422).
-* end-to-end latency: p50 598 ms vs 639 ms; p95 7 958 ms vs 4 760 ms — the two `auto` requests to
+* end-to-end latency: p50 598 ms vs 639 ms; p95 7.958 s vs 4.760 s — the two `auto` requests to
   gemma4 took 16.6 s and 21.6 s. **Routing overhead** (decision time inside the gateway, separate from
   response latency): mean 0.67 ms, p95 0.98 ms, max 4.22 ms.
 * n = 32; the 95 % Wilson intervals overlap for every pair of policies. Equal point estimates with

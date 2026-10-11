@@ -175,10 +175,14 @@ mistakes (auto failed, oracle succeeded): `math-05` (qwen3-coder answered 100 fo
 catalogue's `code` tag to qwen3.6 in deployment order, which fails coding under this budget — a
 reminder that tags are hypotheses and measured evidence is what `auto` uses.
 
-**Reading.** On this task set and hardware, `auto` matched the best single model on success (0.938 =
-0.938, identical CI) and beat it on completion (1.000 vs 0.969) and capability violations (0 vs 1)
-because the fixed model cannot take images; its p95 is higher because the two tasks it sent to
-gemma4 are slow (16.6 s and 21.6 s). Acceptance targets (docs/evaluation.md): violations 0 ✔;
+**Reading.** On this task set and hardware, `auto` and fixed-strong each scored 30/32; `auto`
+completed 32 versus 31 requests, recorded zero versus one capability violation (the fixed model cannot
+take the image task), and had a p95 end-to-end latency of 7.958 s versus 4.760 s because the two tasks it
+sent to gemma4 took 16.6 s and 21.6 s. Routing overhead (0.98 ms p95) is separate from end-to-end
+latency. The two policies differ on exactly two tasks: `vis-02` (solved by `auto`) and `long-01`, whose
+result differed despite selection of the same model; the cause has not been isolated. Equal point
+estimates with overlapping intervals establish neither equivalence nor general superiority, and nothing
+here shows faster answers. Acceptance targets (docs/evaluation.md): violations 0 ✔;
 completion ≥ fixed-strong ✔; success ≥ fixed-strong − 0.05 ✔; overhead p95 < 5 ms ✔. The explicit
 option (request a concrete deployment id, or `auto-fast`) remains the right choice when one model is
 known to be best for a workload.
