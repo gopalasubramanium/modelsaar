@@ -8,7 +8,7 @@ Compact state so another session can continue without repeating finished work.
 * Live checks executed on the owner's Mac against the GX10's Ollama 0.32.13 (8 models): discovery, probes,
   routing, streaming, tool calls, 3-deployment evaluation — see docs/verification-report.md. Three bugs found
   by the live run were fixed (thinking-model probe budgets, discover/doctor evidence, fingerprint vs served context).
-* Repository delivered to the owner's `Model_Router/modelsaar` folder. No public repo/package/image.
+* Public repository: https://github.com/gopalasubramanium/modelsaar (owner-authorized, pushed 2026-10-11 from the owner's Mac); CI green. PyPI and GHCR publication prepared in `release.yml`, not yet executed.
 
 ## Next actions
 

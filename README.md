@@ -1,5 +1,7 @@
 # ModelSaar
 
+[![ci](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml/badge.svg)](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml)
+
 **Intelligent routing for local AI models.** One endpoint. Intelligent model selection.
 
 ModelSaar is a small, local-first, OpenAI-compatible gateway. Your applications (Open WebUI,
@@ -43,7 +45,7 @@ Prerequisites: Python 3.10+, and a running local inference server with at least 
 
 ```bash
 # 1. install from source (no PyPI package is published yet)
-git clone <this repository> modelsaar && cd modelsaar
+git clone https://github.com/gopalasubramanium/modelsaar.git && cd modelsaar
 python3 -m venv .venv && . .venv/bin/activate      # or: uv venv && . .venv/bin/activate
 pip install -e .                                   # or: uv pip install -e .
 

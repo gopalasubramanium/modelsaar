@@ -1,0 +1,77 @@
+name: release
+
+# Runs only when a version tag is pushed (e.g. v0.1.0). Publishes:
+#   * sdist + wheel to PyPI through Trusted Publishing (configure the publisher on pypi.org first:
+#     owner gopalasubramanium, repository modelsaar, workflow release.yml, environment pypi);
+#   * a container image to GitHub Container Registry (ghcr.io/<owner>/modelsaar:<tag> and :latest).
+# Nothing here runs on ordinary pushes; CI (ci.yml) must be green on the tagged commit.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - name: Verify tag matches package version
+        run: |
+          pip install -e .
+          PKG=$(python -c "import modelsaar; print(modelsaar.__version__)")
+          test "v$PKG" = "${GITHUB_REF_NAME}" || { echo "tag ${GITHUB_REF_NAME} != package version $PKG"; exit 1; }
+      - name: Test
+        run: |
+          pip install -e .[dev]
+          pytest -q -m "not live"
+      - name: Build sdist and wheel
+        run: |
+          pip install build twine
+          python -m build
+          twine check dist/*
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # OIDC for PyPI Trusted Publishing; no API token stored in the repo
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4
+        with:
+          print-hash: true
+
+  image:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        run: |
+          IMAGE=ghcr.io/${{ github.repository_owner }}/modelsaar
+          docker build -t "$IMAGE:${GITHUB_REF_NAME}" -t "$IMAGE:latest" .
+          docker run --rm "$IMAGE:${GITHUB_REF_NAME}" modelsaar --version
+          docker push "$IMAGE:${GITHUB_REF_NAME}"
+          docker push "$IMAGE:latest"

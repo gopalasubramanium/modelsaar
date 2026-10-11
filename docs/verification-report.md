@@ -24,6 +24,7 @@ real; simulated runs are labelled as such.
 | CLI end-to-end | `init`, `discover`, `doctor`, `explain`, `config validate`, `client-config --dry-run`, `uninstall` against the fake backend (tests/test_units.py) | pass |
 | Probes | streaming/tools/parallel_tools/json_object/json_schema/vision/latency against the fake backend; fingerprint invalidation | pass |
 | Independent adversarial review | separate agent, read + executed ad-hoc attacks (see docs/research/adversarial-review-2026-10-11.md) | 28 findings; 3 high, 8 medium and 9 low fixed with regression tests; remaining INFO items documented |
+| GitHub Actions CI on the public repository | https://github.com/gopalasubramanium/modelsaar/actions, run #2 (commit 7e2948c) | **green**: tests on 3.10/3.12/3.13, ruff, pip-audit (runtime deps, no known vulnerabilities), gitleaks, Docker image built and `modelsaar --version` smoked inside it. Run #1 failed only because pip-audit tried to resolve the local package on PyPI (fixed). |
 
 ### Acceptance cases (spec §15) → tests
 
@@ -116,7 +117,7 @@ for unloaded models was assumed 4096 during the run; only 3 of 8 deployments wer
 | Live evaluation over all 8 deployments (full sweep) | the full run (~2 h) was interrupted; the 3-deployment subset completed | `modelsaar eval --mode live --save-measurements --out eval.json` detached (`run_live_eval.command` without `--deployments`) |
 | Generic OpenAI-compatible adapter against vLLM / llama.cpp server / LM Studio, incl. `/tokenize` | no such server available | `modelsaar init --endpoint http://127.0.0.1:8000/v1 --type openai_compatible`, declare models, `probe --all`, `live_check.sh` |
 | Open WebUI, OpenClaw, OpenCode, Hermes Agent: real client tool round trip | no client installed in the build environment | Apply `modelsaar client-config <client>`; in the client ask for something that needs a tool; confirm with `modelsaar decisions` that the follow-up (tool result) stayed on the same deployment |
-| Docker image build / compose | no Docker daemon in the build container | `docker build -t modelsaar:local . && docker run --rm modelsaar:local modelsaar --version`; `docker compose up --build` |
+| Docker Compose against a real backend | not exercised | `docker compose up --build` with `examples/config.docker.yaml` pointing at the GX10 |
 | Offline operation with host-level network block | requires the owner's firewall | Block outbound traffic, run `modelsaar serve` + a client, confirm chat completes |
 | Classifier benefit on real models | no real classifier model | enable `routing.classifier` with a small local model and compare `modelsaar eval --mode live` with/without |
 | Memory/residency measurements on specific hardware | no GPU/unified memory host here | `live_check.sh` records `/api/ps` sizes; eval records latency; add observations to docs/catalogue.md |
