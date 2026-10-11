@@ -1,0 +1,30 @@
+commit: 01727604726077fe70e7acef398427149e45c4c1
+host: Darwin Mac 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:02:59 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8142 arm64
+python: Python 3.12.15  modelsaar: modelsaar 0.1.0
+isolation backends: sandbox-exec=/usr/bin/sandbox-exec bwrap=missing docker=missing
+command: python -m pytest -rs -v --durations=5
+started: Sun 11 Oct 2026 19:55:08 IST
+============================= test session starts ==============================
+platform darwin -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /Users/sgopala/.modelsaar-live/repo
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.13.0, anyio-4.15.1
+collected 160 items
+
+tests/test_acceptance.py ....................................            [ 22%]
+tests/test_classifier_schema.py ...........................              [ 39%]
+tests/test_evaluation.py ..........................................      [ 65%]
+tests/test_hardening_2026_10_11.py ...........................           [ 82%]
+tests/test_review_regressions.py ................                        [ 92%]
+tests/test_units.py ............                                         [100%]
+
+============================= slowest 5 durations ==============================
+2.18s call     tests/test_hardening_2026_10_11.py::test_timeout_holds_slot_uncertain_then_recovers
+2.02s call     tests/test_acceptance.py::test_admission_limits_and_queue_rejection
+2.01s call     tests/test_evaluation.py::test_sandbox_timeout_fails_cleanly
+1.27s call     tests/test_hardening_2026_10_11.py::test_pool_memory_budget_counts_distinct_reservations_and_unknown_policy
+1.26s call     tests/test_hardening_2026_10_11.py::test_admin_probe_runs_under_gateway_admission
+============================= 160 passed in 48.24s =============================
+pytest exit=0
+finished: Sun 11 Oct 2026 19:55:56 IST
