@@ -124,7 +124,10 @@ async def run_doctor(cfg: Config | None, cfg_error: str | None, path: Path) -> D
 
     # Deployments (discovery-level checks)
     try:
-        router = Router(cfg, None)
+        from .store import Store
+
+        db = cfg.resolve(cfg.server.state_db)
+        router = Router(cfg, Store(db) if db.exists() else None)
         await router.refresh()
     except Exception as e:
         rep.add("fail", "discovery", f"discovery failed: {e}")

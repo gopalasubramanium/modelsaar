@@ -182,3 +182,44 @@ def test_failover_pins_session_to_answering_deployment(gateway, fake):
         assert r2.headers["x-modelsaar-deployment"] == answered
     finally:
         fake.models["small:1b"].behaviour = "ok"
+
+
+def test_probes_handle_thinking_models(fake):
+    """Live finding (GX10, 2026-10-11): thinking models exhausted small probe budgets and were wrongly
+    marked unsupported. Probes now use larger budgets, count reasoning deltas, and report `unknown`
+    (not `unsupported`) when the output budget is exhausted."""
+    from modelsaar.probes import PROBE_MAX_TOKENS, run_probes
+    from modelsaar.testing.fakebackend import FakeModel
+
+    fake.models["think:9b"] = FakeModel("think:9b", ["completion", "tools", "vision", "thinking"], 8192, parameter_size="9B", thinking_tokens=300)
+    fake.models["think-huge:9b"] = FakeModel("think-huge:9b", ["completion", "vision", "thinking"], 8192, parameter_size="9B", thinking_tokens=PROBE_MAX_TOKENS + 10)
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", deployments=())
+    try:
+        r = g.router
+        d = r.registry.get("ollama/think:9b")
+        rep = g.gw.run(run_probes(r.adapters["ollama"], d, g.gw.store, ["streaming", "json_object", "json_schema", "vision"]))
+        vals = {x.capability: x.value for x in rep.results}
+        assert vals == {"streaming": "supported", "json_object": "supported", "json_schema": "supported", "vision": "supported"}, vals
+        d2 = r.registry.get("ollama/think-huge:9b")
+        rep = g.gw.run(run_probes(r.adapters["ollama"], d2, g.gw.store, ["streaming", "json_object", "json_schema", "vision"]))
+        vals = {x.capability: x.value for x in rep.results}
+        # Streaming is a transport property: reasoning deltas were streamed, so it is supported.
+        assert vals["streaming"] == "supported"
+        assert {vals["json_object"], vals["json_schema"], vals["vision"]} == {"unknown"}, vals
+        assert all("budget exhausted" in x.note for x in rep.results if x.capability != "streaming")
+    finally:
+        g.gw.stop()
+
+
+def test_discover_and_doctor_see_stored_probes(fake, tmp_path: Path):
+    """Live finding: discover/doctor ignored the state DB and reported probed capabilities as unknown."""
+    env = {"MODELSAAR_HOME": str(tmp_path / "home")}
+    r = subprocess.run([sys.executable, "-m", "modelsaar.cli", "init", "--endpoint", f"http://127.0.0.1:{fake.port}", "--type", "ollama"], capture_output=True, text=True, env={**__import__("os").environ, **env}, check=False)
+    assert r.returncode == 0, r.stderr
+    r = subprocess.run([sys.executable, "-m", "modelsaar.cli", "probe", "ollama/big:27b", "--which", "json_schema"], capture_output=True, text=True, env={**__import__("os").environ, **env}, check=False)
+    assert r.returncode == 0 and "json_schema      supported" in r.stdout, r.stdout + r.stderr
+    r = subprocess.run([sys.executable, "-m", "modelsaar.cli", "discover"], capture_output=True, text=True, env={**__import__("os").environ, **env}, check=False)
+    line = next(ln for ln in r.stdout.splitlines() if ln.startswith("ollama/big:27b"))
+    assert "json_schema=supported" in line, line
+    r = subprocess.run([sys.executable, "-m", "modelsaar.cli", "doctor"], capture_output=True, text=True, env={**__import__("os").environ, **env}, check=False)
+    assert "deployment:ollama/big:27b: capabilities unknown: ['json_schema']" not in r.stdout

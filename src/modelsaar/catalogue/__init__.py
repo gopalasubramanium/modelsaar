@@ -66,7 +66,7 @@ def apply_catalogue(dep: Deployment, entries: list[dict[str, Any]]) -> str | Non
     priors = e.get("quality_prior") or {}
     if priors and not dep.quality_prior:
         dep.quality_prior = {k: float(v) for k, v in priors.items()}
-        dep.quality_prior_provenance = "catalogue (model-card/vendor derived; NOT a local measurement)"
+        dep.quality_prior_provenance = "catalogue"  # model-card/vendor derived hypothesis, NOT a local measurement
     if e.get("intended_use_note"):
         dep.intended_use_note = e["intended_use_note"]
     return e["id"]

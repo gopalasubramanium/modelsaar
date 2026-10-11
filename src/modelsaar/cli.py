@@ -46,6 +46,15 @@ def _load(args: argparse.Namespace) -> Config:
         sys.exit(f"invalid config {path}: {e}")
 
 
+def _router_with_evidence(cfg: Config):  # type: ignore[no-untyped-def]
+    """Router that sees stored probe/measurement evidence when a state DB exists (never creates one)."""
+    from .routing.router import Router
+    from .store import Store
+
+    db = cfg.resolve(cfg.server.state_db)
+    return Router(cfg, Store(db) if db.exists() else None)
+
+
 def _admin_client(cfg: Config) -> httpx.Client:
     keys = read_keys(cfg.resolve(cfg.server.admin_key_file))
     if not keys:
@@ -99,10 +108,9 @@ def cmd_init(args: argparse.Namespace) -> None:
     print(f"admin key: {adm_p}")
     # One-shot discovery so the user sees what will be routable.
     cfg = load_config(path)
-    from .routing.router import Router
 
     async def _disc() -> list[dict[str, Any]]:
-        r = Router(cfg, None)
+        r = _router_with_evidence(cfg)
         await r.refresh()
         out = r.registry.snapshot()
         err = r.last_refresh_error
@@ -124,10 +132,9 @@ def cmd_init(args: argparse.Namespace) -> None:
 
 def cmd_discover(args: argparse.Namespace) -> None:
     cfg = _load(args)
-    from .routing.router import Router
 
     async def _run() -> dict[str, Any]:
-        r = Router(cfg, None)
+        r = _router_with_evidence(cfg)
         await r.refresh()
         out = {"error": r.last_refresh_error, "deployments": r.registry.snapshot(), "aliases": {a: r.alias_contract(a) for a in cfg.aliases}}
         await r.aclose()
@@ -345,10 +352,9 @@ def cmd_client_config(args: argparse.Namespace) -> None:
             if con:
                 aliases.append(AliasInfo(a, con["context_length_min"] or 4096, con["tools"] == "supported", con["vision"] == "supported", con.get("description", "")))
     except Exception:
-        from .routing.router import Router
 
         async def _run() -> list[AliasInfo]:
-            r = Router(cfg, None)
+            r = _router_with_evidence(cfg)
             await r.refresh()
             out = []
             for a in cfg.aliases:

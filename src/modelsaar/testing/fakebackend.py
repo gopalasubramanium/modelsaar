@@ -49,6 +49,8 @@ class FakeModel:
     json_schema_ok: bool = True
     embedding_dimensions: int = 8
     template: str = "{{ .Prompt }}"
+    # Simulated thinking model: spends this many output tokens on reasoning before answering.
+    thinking_tokens: int = 0
 
 
 def _expected_json(text: str) -> dict[str, Any]:
@@ -264,6 +266,15 @@ class FakeBackend:
                 await asyncio.sleep(1.0)
             ans = self._answer(m, body)
             rid = f"chatcmpl-fake-{int(time.time()*1000)}"
+            budget = body.get("max_tokens") or 4096
+            if m.thinking_tokens and not body.get("stream") and budget <= m.thinking_tokens:
+                return JSONResponse(
+                    {
+                        "id": rid, "object": "chat.completion", "created": int(time.time()), "model": name,
+                        "choices": [{"index": 0, "message": {"role": "assistant", "content": "", "reasoning_content": "thinking..."}, "finish_reason": "length"}],
+                        "usage": {"prompt_tokens": 10, "completion_tokens": budget, "total_tokens": 10 + budget},
+                    }
+                )
             if not body.get("stream"):
                 if m.behaviour == "bad_json":
                     return Response(b"<html>not json</html>", status_code=200, media_type="text/html")
@@ -306,6 +317,16 @@ class FakeBackend:
                 return b"data: " + json.dumps(obj, ensure_ascii=False).encode("utf-8") + b"\n\n"
 
             yield frame({"role": "assistant", "content": ""})
+            if m.thinking_tokens:
+                budget = body.get("max_tokens") or 4096
+                for _ in range(3):
+                    yield frame({"reasoning_content": "hmm "})
+                if budget <= m.thinking_tokens:
+                    yield frame({}, finish="length")
+                    if (body.get("stream_options") or {}).get("include_usage"):
+                        yield frame({}, usage={"prompt_tokens": 10, "completion_tokens": budget, "total_tokens": 10 + budget})
+                    yield b"data: [DONE]\n\n"
+                    return
             if m.behaviour == "truncate_stream":
                 yield frame({"content": "half"})
                 return  # ends cleanly without finish_reason or [DONE]

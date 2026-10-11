@@ -96,6 +96,7 @@ class StreamObserver:
     first_byte_at: float | None = None
     events: int = 0
     content_chunks: int = 0
+    reasoning_chunks: int = 0
     tool_call_deltas: int = 0
     finish_reason: str | None = None
     usage: dict[str, Any] | None = None
@@ -121,6 +122,8 @@ class StreamObserver:
             delta = ch.get("delta") or {}
             if delta.get("content"):
                 self.content_chunks += 1
+            if delta.get("reasoning_content") or delta.get("reasoning"):
+                self.reasoning_chunks += 1
             for tc in delta.get("tool_calls") or []:
                 self.tool_call_deltas += 1
                 if isinstance(tc.get("index"), int):

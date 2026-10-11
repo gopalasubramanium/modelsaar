@@ -18,6 +18,10 @@ from .registry import Deployment, Measurement
 from .store import Store
 
 # A 1x1 red PNG (generated with Pillow once; embedded to avoid a dependency).
+# Thinking models spend output tokens on reasoning before the answer; keep probe budgets generous.
+PROBE_MAX_TOKENS = 1024
+STREAM_PROBE_MAX_TOKENS = 400
+
 _RED_PNG_B64 = (
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"
 )
@@ -81,8 +85,20 @@ _SCHEMA = {
 async def _chat(adapter: BaseAdapter, dep: Deployment, body: dict[str, Any], timeout: float) -> UpstreamResponse:
     body = dict(body)
     body.setdefault("temperature", 0)
-    body.setdefault("max_tokens", 200)
+    body.setdefault("max_tokens", PROBE_MAX_TOKENS)
     return await adapter.chat(dep, body, stream=False, timeout=timeout)
+
+
+def _budget_exhausted(resp: UpstreamResponse) -> bool:
+    """Empty content with finish_reason=length: the model (probably thinking) used the whole budget."""
+    try:
+        ch = resp.body["choices"][0]
+        return ch.get("finish_reason") == "length" and not (ch.get("message") or {}).get("content")
+    except (KeyError, IndexError, TypeError):
+        return False
+
+
+_EXHAUSTED_NOTE = "output budget exhausted before an answer (thinking model?); increase PROBE_MAX_TOKENS or disable thinking"
 
 
 def _content(resp: UpstreamResponse) -> str:
@@ -164,6 +180,8 @@ async def probe_json_schema(adapter: BaseAdapter, dep: Deployment, timeout: floa
         return ProbeResult("json_schema", "unknown", f"backend returned {r.status} (transient?)", ms)
     if r.status != 200:
         return ProbeResult("json_schema", "unsupported", f"backend returned {r.status} for response_format=json_schema", ms)
+    if _budget_exhausted(r):
+        return ProbeResult("json_schema", "unknown", _EXHAUSTED_NOTE, ms)
     txt = _content(r).strip()
     try:
         obj = json.loads(txt)
@@ -189,6 +207,8 @@ async def probe_json_object(adapter: BaseAdapter, dep: Deployment, timeout: floa
     except AdapterError as e:
         return ProbeResult("json_object", "unknown", f"probe error: {e.message[:100]}")
     ms = (time.monotonic() - t0) * 1000
+    if _budget_exhausted(r):
+        return ProbeResult("json_object", "unknown", _EXHAUSTED_NOTE, ms)
     try:
         obj = json.loads(_content(r).strip())
         return ProbeResult("json_object", "supported" if isinstance(obj, dict) else "unsupported", "", ms)
@@ -218,6 +238,8 @@ async def probe_vision(adapter: BaseAdapter, dep: Deployment, timeout: float) ->
         return ProbeResult("vision", "unknown", f"backend returned {r.status} (transient?)", ms)
     if r.status != 200:
         return ProbeResult("vision", "unsupported", f"backend returned {r.status} for an image request", ms)
+    if _budget_exhausted(r):
+        return ProbeResult("vision", "unknown", _EXHAUSTED_NOTE, ms)
     txt = _content(r).lower()
     if "red" in txt:
         return ProbeResult("vision", "supported", "accepted a base64 image and identified its colour", ms)
@@ -226,7 +248,7 @@ async def probe_vision(adapter: BaseAdapter, dep: Deployment, timeout: float) ->
 
 async def probe_streaming(adapter: BaseAdapter, dep: Deployment, timeout: float) -> tuple[ProbeResult, float | None]:
     t0 = time.monotonic()
-    body = {"messages": [{"role": "user", "content": "Count from 1 to 5, separated by spaces."}], "max_tokens": 40, "temperature": 0}
+    body = {"messages": [{"role": "user", "content": "Count from 1 to 5, separated by spaces."}], "max_tokens": STREAM_PROBE_MAX_TOKENS, "temperature": 0}
     try:
         s: UpstreamStream = await adapter.chat(dep, body, stream=True, timeout=timeout)
     except AdapterError as e:
@@ -246,16 +268,21 @@ async def probe_streaming(adapter: BaseAdapter, dep: Deployment, timeout: float)
     finally:
         await s.close()
     ms = (time.monotonic() - t0) * 1000
-    ok = obs.events >= 2 and obs.content_chunks >= 1 and obs.saw_done
-    return (
-        ProbeResult("streaming", "supported" if ok else "unsupported", f"events={obs.events} content_chunks={obs.content_chunks} done={obs.saw_done} usage={'yes' if obs.usage else 'no'}", ms),
-        ttft,
+    delivered = obs.content_chunks >= 1 or obs.reasoning_chunks >= 1
+    ok = obs.events >= 2 and delivered and obs.saw_done
+    value = "supported" if ok else ("unknown" if (obs.events >= 2 and obs.saw_done and obs.finish_reason == "length") else "unsupported")
+    note = (
+        f"events={obs.events} content_chunks={obs.content_chunks} reasoning_chunks={obs.reasoning_chunks} "
+        f"done={obs.saw_done} finish={obs.finish_reason} usage={'yes' if obs.usage else 'no'}"
     )
+    if value == "unknown":
+        note += "; " + _EXHAUSTED_NOTE
+    return ProbeResult("streaming", value, note, ms), ttft
 
 
 async def measure_latency(adapter: BaseAdapter, dep: Deployment, timeout: float) -> Measurement:
     """Two short requests: the first may include model loading, the second is warm."""
-    body = {"messages": [{"role": "user", "content": "Reply with the single word: ready"}], "max_tokens": 5, "temperature": 0}
+    body = {"messages": [{"role": "user", "content": "Reply with the single word: ready"}], "max_tokens": 256, "temperature": 0}
     times: list[float] = []
     for _ in range(2):
         t0 = time.monotonic()
