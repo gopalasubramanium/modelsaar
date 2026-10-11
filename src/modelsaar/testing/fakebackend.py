@@ -5,7 +5,7 @@ It is used by the contract/fault-injection test suite and by ``modelsaar demo``
 (clearly labelled SIMULATED). Behaviours are deterministic and can be changed
 per model at runtime:
 
-  ok | error_500 | fail_mid_stream | truncate_stream | slow | hang | bad_json | unsupported_tools
+  ok | error_500 | fail_mid_stream | truncate_stream | slow | stall | hang | bad_json | unsupported_tools
 
 Responses are synthetic: a model "answers" by echoing structural facts, calls
 a tool when one is offered, emits schema-conformant JSON when asked, and
@@ -282,6 +282,8 @@ class FakeBackend:
         try:
             if m.behaviour == "slow":
                 await asyncio.sleep(1.0)
+            if m.behaviour == "stall":
+                await asyncio.sleep(1.5)  # longer than a test gateway's request timeout, short enough to finish
             ans = self._answer(m, body)
             rid = f"chatcmpl-fake-{int(time.time()*1000)}"
             budget = body.get("max_tokens") or 4096
@@ -293,9 +295,10 @@ class FakeBackend:
                         "usage": {"prompt_tokens": 10, "completion_tokens": budget, "total_tokens": 10 + budget},
                     }
                 )
+            if m.behaviour == "bad_json":
+                # A reverse proxy's HTML page served with 200, for both streaming and non-streaming.
+                return Response(b"<html>not json</html>", status_code=200, media_type="text/html")
             if not body.get("stream"):
-                if m.behaviour == "bad_json":
-                    return Response(b"<html>not json</html>", status_code=200, media_type="text/html")
                 msg: dict[str, Any] = {"role": "assistant", "content": ans.get("content")}
                 finish = "stop"
                 if ans.get("tool_calls"):

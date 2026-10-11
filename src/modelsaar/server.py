@@ -131,7 +131,6 @@ async def chat_completions(request: Request) -> Response:
         state.requests_failed += 1
         return _no_eligible_response(e.decision)
 
-    response_model = dec.requested_model if state.cfg.server.response_model_field == "requested" else dec.chosen
     base_headers = {"X-ModelSaar-Request-Id": dec.request_id}
     attempts = 0
     max_attempts = 1 + (state.cfg.routing.max_failover_attempts if state.cfg.routing.pre_commit_failover else 0)
@@ -149,6 +148,8 @@ async def chat_completions(request: Request) -> Response:
         adapter = router.adapters[dep.backend_id]
         attempts += 1
         tried.append(dep_id)
+        # Attribution follows the deployment actually dispatched to (per attempt, not once).
+        response_model = dec.requested_model if state.cfg.server.response_model_field == "requested" else dep_id
         try:
             reservation = await router.admission.acquire(dep, timeout=None)
         except AdmissionRejected as e:
@@ -189,9 +190,19 @@ async def chat_completions(request: Request) -> Response:
                     except Exception:
                         payload = error_body(redact(text.decode("utf-8", "replace")[:500]), code="upstream_error")
                     return _json(upstream.status, payload, headers)
-                if circuit:
-                    circuit.record_success()
-                router.pin_session(dec, caller, dep_id)
+                ctype = (upstream.headers.get("content-type") or "").lower()
+                if "text/event-stream" not in ctype:
+                    # A 200 that is not an SSE stream (proxy HTML page, JSON error with 200) is not a
+                    # completion. Nothing has been sent to the client: typed error, no pin, no success.
+                    text = (await upstream.aread())[:300]
+                    await upstream.close()
+                    raise AdapterError(
+                        f"upstream returned 200 with content-type {ctype or 'missing'!r} instead of text/event-stream",
+                        status=502,
+                        retryable=False,
+                        kind="bad_envelope",
+                    )
+                # Circuit success and session pinning are recorded once the stream completes (see _relay).
                 return StreamingResponse(
                     _relay(state, router, dec, dep_id, upstream, reservation, response_model, caller),
                     status_code=200,
@@ -203,13 +214,16 @@ async def chat_completions(request: Request) -> Response:
                 await reservation.release()
                 if resp.status >= 500:
                     raise AdapterError(f"upstream {resp.status}", status=502, retryable=True)
-                if circuit:
-                    circuit.record_success()
                 if resp.status != 200:
                     dec.outcome = "upstream_error"
                     dec.outcome_detail = f"upstream {resp.status}"
                     router.record(dec)
                     return _json(resp.status, resp.body, headers)
+                why = _envelope_problem(resp.body)
+                if why:
+                    raise AdapterError(f"upstream returned 200 but {why}", status=502, retryable=False, kind="bad_envelope")
+                if circuit:
+                    circuit.record_success()
                 out = dict(resp.body)
                 out["model"] = response_model
                 router.pin_session(dec, caller, dep_id)
@@ -219,7 +233,11 @@ async def chat_completions(request: Request) -> Response:
                 router.record(dec)
                 return _json(200, out, headers)
         except Exception as e:  # noqa: BLE001 - every failure path must release the slot
-            await reservation.release()
+            if isinstance(e, AdapterError) and e.kind == "timeout":
+                # The backend did not answer in time but may still be generating: hold the slot.
+                await reservation.mark_uncertain()
+            else:
+                await reservation.release()
             if not isinstance(e, AdapterError):
                 state.requests_failed += 1
                 dec.outcome = "internal_error"
@@ -235,20 +253,28 @@ async def chat_completions(request: Request) -> Response:
                 router.record(dec)
                 return _json(400, error_body(e.message, code="unsupported_semantics", modelsaar={"request_id": dec.request_id}), headers)
             next_id = next((c for c in candidate_ids if c not in tried), None)
-            if e.retryable and attempts < max_attempts and next_id:
+            if e.retryable and attempts < max_attempts and next_id and dec.failover_allowed:
                 dec.reasons.append(f"failover: {dep_id} failed before response commitment ({e.kind}); trying {next_id}")
                 dec.chosen = next_id
                 continue
+            if e.retryable and next_id and not dec.failover_allowed:
+                dec.reasons.append(f"failover refused: {dec.failover_note}")
             state.requests_failed += 1
-            dec.outcome = "upstream_error"
+            dec.outcome = "upstream_bad_response" if e.kind == "bad_envelope" else "upstream_error"
             dec.outcome_detail = redact(e.message)[:200]
             router.record(dec)
             return _json(
                 e.status,
                 error_body(
                     f"backend failed before a response was committed: {redact(e.message)}",
-                    code="upstream_error",
-                    modelsaar={"request_id": dec.request_id, "deployment": dep_id, "failover": dec.failover},
+                    code="upstream_bad_response" if e.kind == "bad_envelope" else "upstream_error",
+                    modelsaar={
+                        "request_id": dec.request_id,
+                        "deployment": dep_id,
+                        "failover": dec.failover,
+                        "failover_allowed": dec.failover_allowed,
+                        "failover_note": dec.failover_note,
+                    },
                 ),
                 headers,
             )
@@ -256,6 +282,21 @@ async def chat_completions(request: Request) -> Response:
 
 class _UpstreamStreamError(Exception):
     """The upstream stream ended abnormally after the response was committed."""
+
+
+def _envelope_problem(body: Any) -> str | None:
+    """Return why ``body`` is not a chat completion envelope, or None if it is one."""
+    if not isinstance(body, dict):
+        return "body is not a JSON object"
+    if "error" in body and "choices" not in body:
+        return "body is an error object"
+    choices = body.get("choices")
+    if not isinstance(choices, list) or not choices:
+        return "choices is missing or empty"
+    first = choices[0]
+    if not isinstance(first, dict) or not isinstance(first.get("message"), dict):
+        return "choices[0].message is missing"
+    return None
 
 
 def _remember_tool_calls(router: Router, caller: str, dep_id: str, resp: dict[str, Any]) -> None:
@@ -340,6 +381,12 @@ async def _relay(
             )
             await reservation.release()
             await upstream.close()
+            # Only a validated, complete stream counts as a success for the circuit and for pinning.
+            d = router.registry.get(dep_id)
+            c = router.admission.circuit(d.backend_id) if d else None
+            if c:
+                c.record_success()
+            router.pin_session(dec, caller, dep_id)
             if tool_ids:
                 router.affinity.remember_tool_calls(caller, tool_ids, dep_id)
                 for i in tool_ids:

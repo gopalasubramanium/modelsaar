@@ -316,10 +316,15 @@ class Router:
                     reservation = None
                     dec.classifier = {"used": False, "status": "skipped", "note": "classifier deployment at capacity"}
                 if reservation is not None:
+                    out = None
                     try:
                         out = await self.classifier.classify(self.adapters[cdep.backend_id], cdep, body, req)
                     finally:
-                        await reservation.release()
+                        if out is not None and out.status == "timeout":
+                            # The classifier may still be generating: hold its slot as uncertain.
+                            await reservation.mark_uncertain()
+                        else:
+                            await reservation.release()
                     dec.classifier = out.as_dict()
                     if out.used and out.task and out.confidence is not None and out.confidence >= 0.5:
                         req.tasks[out.task] = max(req.tasks.get(out.task, 0.0), round(out.confidence, 2))
@@ -391,6 +396,17 @@ class Router:
                     break
         dec.candidates = [c.as_dict() for c in cands]
         chosen = cands[0]
+        # Continuity: a request that is tied to the deployment that started the exchange is never
+        # handed to another model by failover; it fails and the client decides.
+        if req.is_tool_result_turn and dec.affinity.get("tool_round_trip"):
+            dec.failover_allowed = False
+            dec.failover_note = "tool round trip in progress; cross-model handover refused"
+        elif req.needs_continuation:
+            dec.failover_allowed = False
+            dec.failover_note = "reasoning continuation state present; cross-model handover refused"
+        elif affinity_dep and chosen.deployment.id == affinity_dep:
+            dec.failover_allowed = False
+            dec.failover_note = f"session pinned to {affinity_dep}; failover would break continuity"
         dec.chosen = chosen.deployment.id
         dec.evidence = chosen.evidence.split(' (blend')[0]
         dec.reasons.extend(self._reasons(dec, chosen, len(res.eligible), len(res.exclusions)))

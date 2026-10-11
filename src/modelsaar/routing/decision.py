@@ -31,6 +31,10 @@ class Decision:
     outcome: str = "pending"  # pending | ok | upstream_error | no_eligible | admission_rejected | ...
     outcome_detail: str = ""
     failover: list[dict[str, Any]] = field(default_factory=list)
+    # Pre-commit failover is only allowed when nothing ties the request to one deployment
+    # (no tool round trip, no reasoning continuation, no pinned session).
+    failover_allowed: bool = True
+    failover_note: str = ""
     translation_notes: list[str] = field(default_factory=list)
     requirements_note: str = ""
     stream: bool = False
@@ -61,6 +65,8 @@ class Decision:
             "outcome": self.outcome,
             "outcome_detail": self.outcome_detail,
             "failover": self.failover,
+            "failover_allowed": self.failover_allowed,
+            "failover_note": self.failover_note,
             "translation_notes": self.translation_notes,
             "requirements_note": self.requirements_note,
         }

@@ -125,3 +125,142 @@ def test_classifier_requires_local_deployment_under_local_only(fake):
     finally:
         g.gw.stop()
         remote.stop()
+
+
+# --------------------------------------------------------------------------- #
+# Finding 2: dispatch, continuity and completion contract
+# --------------------------------------------------------------------------- #
+
+TOOLS = [{"type": "function", "function": {"name": "bash", "parameters": {"type": "object", "properties": {"command": {"type": "string"}}}}}]
+
+
+def _models_hit(fake, since: int) -> list[str]:
+    return [r["model"] for r in fake.requests[since:]]
+
+
+def test_no_failover_for_tool_result_turn(gateway, fake):
+    """Finding 2a: a tool round trip started on one model must fail rather than be handed to another."""
+    content = [{"type": "text", "text": "look and list"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAAA"}}]
+    r1 = chat(gateway, "auto", content, tools=TOOLS)
+    assert r1.headers["x-modelsaar-deployment"] == "ollama/big:27b"
+    calls = r1.json()["choices"][0]["message"]["tool_calls"]
+    msgs = [
+        {"role": "user", "content": "list"},
+        {"role": "assistant", "content": None, "tool_calls": calls},
+        {"role": "tool", "tool_call_id": calls[0]["id"], "content": "ok"},
+    ]
+    fake.models["big:27b"].behaviour = "error_500"
+    try:
+        n = len(fake.requests)
+        r = gateway.client.post("/v1/chat/completions", json={"model": "auto", "messages": msgs, "tools": TOOLS})
+        assert r.status_code == 502, r.text
+        assert _models_hit(fake, n) == ["big:27b"], "failover switched models inside a tool round trip"
+        dec = gateway.decision(r.headers["x-modelsaar-request-id"])
+        assert dec["failover_allowed"] is False
+        assert "tool" in dec["failover_note"]
+    finally:
+        fake.models["big:27b"].behaviour = "ok"
+
+
+def test_no_failover_for_pinned_session(gateway, fake):
+    """Finding 2a: a session pinned to a deployment is not silently moved by failover."""
+    h = {"X-ModelSaar-Session": "sess-1"}
+    r = gateway.client.post("/v1/chat/completions", json={"model": "auto", "messages": [{"role": "user", "content": "hi"}]}, headers=h)
+    assert r.status_code == 200
+    pinned = r.headers["x-modelsaar-deployment"]
+    name = pinned.split("/", 1)[1]
+    fake.models[name].behaviour = "error_500"
+    try:
+        n = len(fake.requests)
+        r = gateway.client.post("/v1/chat/completions", json={"model": "auto", "messages": [{"role": "user", "content": "again"}]}, headers=h)
+        assert r.status_code == 502, r.text
+        assert _models_hit(fake, n) == [name]
+        dec = gateway.decision(r.headers["x-modelsaar-request-id"])
+        assert dec["failover_allowed"] is False
+        assert "pinned" in dec["failover_note"]
+    finally:
+        fake.models[name].behaviour = "ok"
+
+
+def test_timeout_holds_slot_uncertain_then_recovers(fake):
+    """Finding 2b: a read timeout released the slot immediately although the backend may still be busy."""
+    from modelsaar.config import AdmissionConfig, ResourcePool, ServerConfig
+
+    g = build_gateway(
+        f"http://127.0.0.1:{fake.port}",
+        resource_pools=(ResourcePool(id="pool", max_concurrent=1, max_queue=0, queue_timeout_s=0.2),),
+        admission=AdmissionConfig(uncertain_hold_s=1.0),
+        server=ServerConfig(request_timeout_s=0.3),
+    )
+    fake.models["small:1b"].behaviour = "stall"
+    try:
+        r = chat(g, "ollama/small:1b", "x")
+        assert r.status_code == 504, r.text
+        stats = g.admin.get("/admin/status").json()["admission"]
+        assert stats["pool:pool"]["uncertain"] == 1
+        fake.models["small:1b"].behaviour = "ok"
+        r2 = chat(g, "ollama/small:1b", "y")
+        assert r2.status_code in (429, 503), "slot was free although the backend may still be generating"
+        import time as _t
+
+        _t.sleep(1.6)
+        r3 = chat(g, "ollama/small:1b", "z")
+        assert r3.status_code == 200
+    finally:
+        fake.models["small:1b"].behaviour = "ok"
+        g.gw.stop()
+
+
+def test_circuit_opens_on_truncated_streams(fake):
+    """Finding 2c: success was recorded at stream-header time, so truncations never opened the circuit."""
+    g = build_gateway(
+        f"http://127.0.0.1:{fake.port}",
+        backends=(BackendConfig(id="ollama", type="ollama", base_url=f"http://127.0.0.1:{fake.port}", resource_pool="pool", max_concurrent=4, circuit_failure_threshold=3),),
+    )
+    fake.models["small:1b"].behaviour = "truncate_stream"
+    try:
+        for _ in range(4):
+            with g.client.stream("POST", "/v1/chat/completions", json={"model": "ollama/small:1b", "stream": True, "messages": [{"role": "user", "content": "hi"}]}) as r:
+                if r.status_code == 200:
+                    b"".join(r.iter_bytes())
+        assert g.router.admission.circuit("ollama").is_open()
+    finally:
+        fake.models["small:1b"].behaviour = "ok"
+        g.gw.stop()
+
+
+def test_response_model_follows_failover_target(gateway, fake):
+    """Finding 2d: with response_model_field=deployment the body named the first (failed) deployment."""
+    from modelsaar.config import ServerConfig
+
+    g = build_gateway(f"http://127.0.0.1:{fake.port}", server=ServerConfig(response_model_field="deployment"))
+    fake.models["small:1b"].behaviour = "error_500"
+    try:
+        r = chat(g, "auto", "hello")
+        assert r.status_code == 200
+        assert r.json()["model"] == r.headers["x-modelsaar-deployment"] != "ollama/small:1b"
+    finally:
+        fake.models["small:1b"].behaviour = "ok"
+        g.gw.stop()
+
+
+def test_html_200_is_a_typed_502_and_never_pins(gateway, fake):
+    """Finding 2e: a 200 with a non-OpenAI envelope was relayed as success with model rewritten."""
+    fake.models["small:1b"].behaviour = "bad_json"
+    h = {"X-ModelSaar-Session": "sess-html"}
+    try:
+        r = gateway.client.post("/v1/chat/completions", json={"model": "ollama/small:1b", "messages": [{"role": "user", "content": "hi"}]}, headers=h)
+        assert r.status_code == 502, r.text
+        assert r.json()["error"]["code"] == "upstream_bad_response"
+        with gateway.client.stream("POST", "/v1/chat/completions", json={"model": "ollama/small:1b", "stream": True, "messages": [{"role": "user", "content": "hi"}]}, headers=h) as rs:
+            assert rs.status_code == 502
+        dec = gateway.decision(r.headers["x-modelsaar-request-id"])
+        assert dec["outcome"] != "ok"
+        assert dec["affinity"].get("status") != "found"
+        # A later request in the same session must not have been pinned to the bad deployment.
+        fake.models["small:1b"].behaviour = "ok"
+        r2 = gateway.client.post("/v1/chat/completions", json={"model": "auto", "messages": [{"role": "user", "content": "hi"}]}, headers=h)
+        dec2 = gateway.decision(r2.headers["x-modelsaar-request-id"])
+        assert dec2["affinity"]["status"] == "new"
+    finally:
+        fake.models["small:1b"].behaviour = "ok"

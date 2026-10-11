@@ -131,6 +131,8 @@ class BaseAdapter:
             resp = await self._client.send(req, stream=True)
         except (httpx.ConnectError, httpx.ConnectTimeout) as e:
             raise AdapterError(f"{self.cfg.id}: connection failed: {e}", retryable=True, kind="connect") from e
+        except httpx.ReadTimeout as e:
+            raise AdapterError(f"{self.cfg.id}: read timeout", status=504, retryable=False, kind="timeout") from e
         except httpx.HTTPError as e:
             raise AdapterError(f"{self.cfg.id}: {e.__class__.__name__}: {e}", retryable=False, kind="transport") from e
 

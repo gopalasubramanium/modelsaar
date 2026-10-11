@@ -157,6 +157,9 @@ class LocalClassifier:
             return ClassifierOutcome(False, status="timeout", latency_ms=(time.monotonic() - t0) * 1000)
         except AdapterError as e:
             self.failures += 1
+            if e.kind == "timeout":
+                self.timeouts += 1
+                return ClassifierOutcome(False, status="timeout", note=e.message[:120], latency_ms=(time.monotonic() - t0) * 1000)
             return ClassifierOutcome(False, status="error", note=e.message[:120], latency_ms=(time.monotonic() - t0) * 1000)
         latency = (time.monotonic() - t0) * 1000
         if resp.status != 200:
