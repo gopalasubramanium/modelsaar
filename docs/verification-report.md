@@ -196,6 +196,13 @@ unloaded models was assumed 4096; 3 of 8 deployments swept; one hardware/runtime
 Complete sanitised per-request records: `eval-live.json.records.jsonl` (173 records: ids, status,
 latency, scorer detail; no prompts); machine-readable aggregates: `eval-live.json`.
 
+### Installer and website (branch `website/modelsaar-com`)
+
+| check | outcome |
+|---|---|
+| `https://modelsaar.com/install.sh` (source `site/static/install.sh`, pinned to the hardening branch head) | executed on **Linux x86_64** through all three paths (pipx, uv, `pip --user`), a repeat run, an unreachable backend and an occupied port, against the fixture backend on port 11434; and on the **owner's Mac (arm64, uv, system Python 3.9 too old → uv fetched 3.12)** against the GX10: `modelsaar test` 200 from `ollama/qwen3.8:latest`. Transcripts: `docs/live-runs/2026-10-11-installer/`. The first Mac attempt failed on a corrupt uv cache entry (documented, troubleshooting entry added). The served URL itself could not be exercised before the domain is connected. |
+| Website | built from the repository; static checks, Playwright/axe checks and Lighthouse lab runs recorded in `site/VALIDATION.md` |
+
 ### Still NOT RUN after this pass
 
 | item | how to run |

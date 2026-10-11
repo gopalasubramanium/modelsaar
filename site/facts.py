@@ -18,7 +18,7 @@ VERSION_STRING = "0.1.0 (unreleased development preview)"
 
 # The revision the public installer pins. Must be a commit that is PUBLIC on GitHub and whose CI checks
 # passed. Update this together with install.sh after each verified hardening-branch update.
-INSTALL_SHA = "91f9e6c30b7431a5a09cc34f478f02c82ba62dc6"  # hardening/review-2026-10-11 head; build.py embeds it in install.sh
+INSTALL_SHA = "c96391414fafa61a88e89c57b6e8186cde7fceda"  # hardening/review-2026-10-11 head; build.py embeds it in install.sh
 INSTALL_BRANCH = "hardening/review-2026-10-11"
 
 HOSTING_NOTE = ("The site is published as static files from the project repository through GitHub Pages (GitHub, Inc.), whose "
