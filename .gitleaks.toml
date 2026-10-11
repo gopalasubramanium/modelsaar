@@ -1,0 +1,4 @@
+# Baseline: generated key prefixes used in tests/docs are placeholders.
+[allowlist]
+paths = ['''docs/research/.*''']
+regexes = ['''msk_[A-Za-z0-9_-]{10,}''', '''msa_[A-Za-z0-9_-]{10,}''']

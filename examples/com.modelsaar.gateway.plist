@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- launchd agent: copy to ~/Library/LaunchAgents/ and run `launchctl load ~/Library/LaunchAgents/com.modelsaar.gateway.plist`.
+     Adjust the path to your virtualenv. Remove the file and `launchctl unload` to stop auto-starting. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.modelsaar.gateway</string>
+  <key>ProgramArguments</key>
+  <array><string>/Users/you/modelsaar/.venv/bin/modelsaar</string><string>serve</string></array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>StandardOutPath</key><string>/tmp/modelsaar.log</string>
+  <key>StandardErrorPath</key><string>/tmp/modelsaar.err</string>
+</dict>
+</plist>

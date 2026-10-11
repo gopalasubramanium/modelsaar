@@ -1,0 +1,16 @@
+# Config for running the gateway inside a container (see docker-compose.yml).
+# Keys are generated on first start into /data/keys (run `docker compose exec modelsaar modelsaar keys show --reveal`).
+version: 1
+server:
+  host: 0.0.0.0          # required so Docker can publish the port; compose binds it to 127.0.0.1 on the host
+  port: 8484
+security:
+  allow_lan: true        # explicit acknowledgement of the non-loopback bind inside the container
+  locality_mode: local_only
+resource_pools:
+  - { id: host-machine, kind: unified, max_concurrent: 1 }
+backends:
+  - id: ollama
+    type: ollama
+    base_url: http://host.docker.internal:11434
+    resource_pool: host-machine

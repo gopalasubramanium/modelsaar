@@ -1,0 +1,12 @@
+# systemd user unit: ~/.config/systemd/user/modelsaar.service ; systemctl --user enable --now modelsaar
+[Unit]
+Description=ModelSaar local model router
+After=network.target
+
+[Service]
+ExecStart=%h/modelsaar/.venv/bin/modelsaar serve
+Restart=on-failure
+Environment=MODELSAAR_HOME=%h/.modelsaar
+
+[Install]
+WantedBy=default.target

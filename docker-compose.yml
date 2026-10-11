@@ -1,0 +1,18 @@
+# Gateway only. Point `backends[].base_url` in ./examples/config.docker.yaml at your inference
+# server: on macOS/Windows Docker Desktop use http://host.docker.internal:11434; on Linux the
+# extra_hosts entry below makes the same name work. Ollama must listen beyond loopback
+# (OLLAMA_HOST=0.0.0.0) for a container to reach it.
+services:
+  modelsaar:
+    build: .
+    image: modelsaar:local
+    ports:
+      - "127.0.0.1:8484:8484"      # publish to loopback only; widen deliberately for LAN use
+    volumes:
+      - modelsaar-data:/data
+      - ./examples/config.docker.yaml:/data/config.yaml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+volumes:
+  modelsaar-data:

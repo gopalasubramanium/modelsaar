@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ModelSaar status</title>
+<style>
+  :root { --bg:#fafaf7; --fg:#1d1d1b; --muted:#6b6b66; --line:#e3e1d9; --ok:#1f7a4d; --bad:#b3261e; --warn:#9a6b00; --card:#fff; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#15161a; --fg:#ecebe6; --muted:#a3a39c; --line:#2d2f36; --card:#1d1f25; } }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  main { max-width:1100px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:16px; margin:28px 0 8px; }
+  .muted { color:var(--muted); } .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  input { font:inherit; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--fg); min-width:280px; }
+  button { font:inherit; padding:6px 12px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--fg); cursor:pointer; }
+  table { border-collapse:collapse; width:100%; background:var(--card); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); font-size:13px; vertical-align:top; }
+  th { color:var(--muted); font-weight:600; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .warn { color:var(--warn); }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; }
+  pre { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px; overflow:auto; font-size:12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>ModelSaar <span class="muted" id="ver"></span></h1>
+  <div class="muted">Intelligent routing for local AI models — status and route inspection. The admin key stays in this tab only.</div>
+  <div class="row" style="margin-top:12px">
+    <input id="key" type="password" placeholder="admin key (from ~/.modelsaar/keys/admin_key)">
+    <button id="load">Load</button>
+    <span id="msg" class="muted"></span>
+  </div>
+  <h2>Gateway</h2>
+  <div id="gw" class="muted">Not loaded.</div>
+  <h2>Aliases</h2>
+  <table id="aliases"><thead><tr><th>alias</th><th>profile</th><th>members</th><th>context (min–max)</th><th>tools</th><th>vision</th><th>json_schema</th></tr></thead><tbody></tbody></table>
+  <h2>Deployments</h2>
+  <table id="deps"><thead><tr><th>id</th><th>role</th><th>state</th><th>locality</th><th>ctx</th><th>tools</th><th>vision</th><th>json_schema</th><th>evidence</th></tr></thead><tbody></tbody></table>
+  <h2>Recent decisions</h2>
+  <table id="decs"><thead><tr><th>request</th><th>requested → chosen</th><th>task</th><th>evidence</th><th>overhead</th><th>outcome</th><th>reasons</th></tr></thead><tbody></tbody></table>
+  <h2>Explain a request (dry run, nothing is sent to a model)</h2>
+  <pre contenteditable="true" id="explain">{"model":"auto","messages":[{"role":"user","content":"Write a Python function that parses ISO dates"}]}</pre>
+  <button id="run">Explain</button>
+  <pre id="explainOut" class="muted">—</pre>
+</main>
+<script>
+(function(){
+  const $ = (s)=>document.querySelector(s);
+  let key = '';
+  try { key = sessionStorage.getItem('modelsaar_admin_key') || ''; } catch(e) {}
+  if (key) $('#key').value = key;
+  const esc = (s)=>String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const tri = (v)=>`<span class="${v==='supported'?'ok':v==='unsupported'?'bad':'warn'}">${esc(v)}</span>`;
+  async function api(path, opts){
+    const r = await fetch(path, Object.assign({headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'}}, opts||{}));
+    if (!r.ok) throw new Error(r.status+' '+(await r.text()).slice(0,200));
+    return r.json();
+  }
+  async function load(){
+    key = $('#key').value.trim();
+    try { sessionStorage.setItem('modelsaar_admin_key', key); } catch(e) {}
+    $('#msg').textContent = 'loading…';
+    try {
+      const s = await api('/admin/status');
+      $('#ver').textContent = 'v'+s.version;
+      $('#gw').innerHTML = `config <code>${esc(s.config_path)}</code> (hash ${esc(s.config_hash)}) · bind <code>${esc(s.security.host)}</code> · locality <b>${esc(s.security.locality_mode)}</b> · prompt logging <b>${s.security.log_prompts?'ON':'off'}</b> · requests ${s.requests_total} (failed ${s.requests_failed}) · ready ${s.ready?'<span class=ok>yes</span>':'<span class=bad>no</span>'}${s.last_refresh_error?' · <span class=bad>'+esc(s.last_refresh_error)+'</span>':''}`;
+      const at = $('#aliases tbody'); at.innerHTML='';
+      for (const [name,c] of Object.entries(s.aliases)) {
+        at.insertAdjacentHTML('beforeend', c ? `<tr><td><code>${esc(name)}</code></td><td>${esc(c.profile)}</td><td>${c.deployments.map(esc).join('<br>')}</td><td>${esc(c.context_length_min)}–${esc(c.context_length_max)}</td><td>${tri(c.tools)}</td><td>${tri(c.vision)}</td><td>${tri(c.json_schema)}</td></tr>`
+          : `<tr><td><code>${esc(name)}</code></td><td colspan=6 class=muted>not advertised (no usable deployment)</td></tr>`);
+      }
+      const dt = $('#deps tbody'); dt.innerHTML='';
+      for (const d of s.deployments) {
+        const st = d.state; const flags = [st.healthy?'<span class=ok>healthy</span>':'<span class=bad>unhealthy</span>', st.loaded?'loaded':'not loaded', d.enabled?'':'<span class=bad>disabled</span>'].filter(Boolean).join(' · ');
+        const ev = Object.keys(d.measurements||{}).length ? 'measured: '+Object.keys(d.measurements).join(', ') : (Object.keys(d.quality_prior||{}).length ? 'prior ('+esc(d.quality_prior_provenance)+')' : 'uncalibrated');
+        dt.insertAdjacentHTML('beforeend', `<tr><td><code>${esc(d.id)}</code></td><td>${esc(d.role)}</td><td>${flags}</td><td title="${esc(d.locality_evidence)}">${esc(d.locality)}</td><td>${esc(d.context_length)}</td><td>${tri(d.capabilities.tools.value)}<br><span class=muted>${esc(d.capabilities.tools.provenance)}</span></td><td>${tri(d.capabilities.vision.value)}</td><td>${tri(d.capabilities.json_schema.value)}</td><td>${ev}</td></tr>`);
+      }
+      const ds = await api('/admin/decisions?limit=25');
+      const bt = $('#decs tbody'); bt.innerHTML='';
+      for (const d of ds.decisions) {
+        bt.insertAdjacentHTML('beforeend', `<tr><td><code>${esc(d.request_id)}</code></td><td>${esc(d.requested_model)} → <b>${esc(d.chosen||'—')}</b></td><td>${esc((d.requirements||{}).primary_task)}</td><td>${esc(d.evidence)}</td><td>${esc(d.overhead_ms)} ms</td><td>${esc(d.outcome)}</td><td class=muted>${(d.reasons||[]).map(esc).join('<br>')}</td></tr>`);
+      }
+      $('#msg').textContent = 'loaded '+new Date().toLocaleTimeString();
+    } catch(e) { $('#msg').innerHTML = '<span class=bad>'+esc(e.message)+'</span>'; }
+  }
+  $('#load').addEventListener('click', load);
+  $('#run').addEventListener('click', async ()=>{
+    try { const out = await api('/admin/explain', {method:'POST', body: $('#explain').innerText}); $('#explainOut').textContent = JSON.stringify(out, null, 2); $('#explainOut').className=''; }
+    catch(e) { $('#explainOut').textContent = e.message; }
+  });
+  if (key) load();
+})();
+</script>
+</body>
+</html>

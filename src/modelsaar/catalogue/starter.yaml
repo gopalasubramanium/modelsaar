@@ -1,0 +1,435 @@
+# ModelSaar verified starter catalogue
+#
+# Every entry was checked against primary sources on 2026-10-11 (model cards, publisher
+# posts, ollama.com library pages); see docs/catalogue.md for the per-entry evidence.
+#
+# What this file does:  supplies *priors* (labelled "catalogue"), tags, roles and
+# intended-use notes for deployments whose names match `match`. It never asserts a
+# capability as locally verified. Capability truth comes from the runtime's own
+# metadata (e.g. Ollama /api/show), operator overrides, and `modelsaar probe`.
+#
+# availability: released_weights | announced_weights | api_only | unverified
+# Only released_weights entries with enabled_by_default: true contribute defaults.
+# quality_prior values are coarse hypotheses (0..1), NOT local measurements.
+version: 1
+checked: "2026-10-11"
+entries:
+  # ----------------------------------------------------------------- generative, local
+  - id: gemma-4-e4b-it
+    publisher: Google
+    hf: google/gemma-4-E4B-it
+    match: { ollama: ["gemma4:e4b", "gemma4:latest", "gemma4"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image, audio]
+    context_length: 131072
+    tags: [general, vision, small]
+    quality_prior: { general: 0.6, conversation: 0.65, summarization: 0.6, translation: 0.6, document_vision: 0.55 }
+    sources: ["https://huggingface.co/google/gemma-4-E4B-it", "https://ollama.com/library/gemma4"]
+  - id: granite-4.2-3b
+    publisher: IBM
+    hf: ibm-granite/granite-4.2-3b
+    match: { ollama: ["granite4.2:3b"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text]
+    context_length: 131072
+    tags: [general, small]
+    quality_prior: { general: 0.5, conversation: 0.55, extraction: 0.55 }
+    sources: ["https://huggingface.co/collections/ibm-granite/granite-42-language-models", "https://ollama.com/library/granite4.2"]
+  - id: granite-4.2-8b
+    publisher: IBM
+    hf: ibm-granite/granite-4.2-8b
+    match: { ollama: ["granite4.2:8b"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text]
+    context_length: 131072
+    tags: [general]
+    quality_prior: { general: 0.6, extraction: 0.65, rag: 0.65 }
+    sources: ["https://huggingface.co/ibm-granite/granite-4.2-8b"]
+  - id: granite-4.2-30b
+    publisher: IBM
+    hf: ibm-granite/granite-4.2-30b
+    match: { ollama: ["granite4.2:30b"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text]
+    context_length: 131072
+    tags: [general, reasoning]
+    quality_prior: { general: 0.7, math: 0.65, extraction: 0.7, rag: 0.7 }
+    sources: ["https://huggingface.co/ibm-granite/granite-4.2-30b"]
+  - id: granite-4.1
+    publisher: IBM
+    hf: ibm-granite/granite-4.1-{3b,8b,30b}
+    match: { ollama: ["granite4.1:*", "granite4.1"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text]
+    context_length: 131072
+    tags: [general]
+    quality_prior: { general: 0.55 }
+    sources: ["https://huggingface.co/collections/ibm-granite/granite-41-language-models"]
+  - id: qwen3.8-27b
+    publisher: Alibaba Qwen
+    hf: Qwen/Qwen3.8-27B
+    match: { ollama: ["qwen3.8:27b", "qwen3.8:latest", "qwen3.8"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image, video]
+    context_length: 262144
+    tags: [general, reasoning, code, vision]
+    quality_prior: { general: 0.75, coding: 0.72, agent: 0.7, math: 0.75, extraction: 0.7, document_vision: 0.7, rag: 0.72 }
+    note: "thinking on by default; preserve_thinking default on (reasoning_content round-trip recommended)"
+    sources: ["https://huggingface.co/Qwen/Qwen3.8-27B", "https://ollama.com/library/qwen3.8"]
+  - id: qwen3.6
+    publisher: Alibaba Qwen
+    hf: Qwen/Qwen3.6-35B-A3B | Qwen/Qwen3.6-27B
+    match: { ollama: ["qwen3.6:*", "qwen3.6"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image, video]
+    context_length: 262144
+    tags: [general, reasoning, code, vision]
+    quality_prior: { general: 0.72, coding: 0.7, agent: 0.68, math: 0.7, document_vision: 0.68 }
+    sources: ["https://huggingface.co/Qwen/Qwen3.6-35B-A3B", "https://huggingface.co/Qwen/Qwen3.6-27B", "https://ollama.com/library/qwen3.6"]
+  - id: qwen3.5-9b
+    publisher: Alibaba Qwen
+    hf: Qwen/Qwen3.5-9B
+    match: { ollama: ["qwen3.5:9b", "qwen3.5:latest", "qwen3.5"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image, video]
+    context_length: 262144
+    tags: [general, vision]
+    quality_prior: { general: 0.62, document_vision: 0.65, coding: 0.6 }
+    sources: ["https://huggingface.co/Qwen/Qwen3.5-9B", "https://ollama.com/library/qwen3.5"]
+  - id: qwen3-coder-30b-a3b
+    publisher: Alibaba Qwen
+    hf: Qwen/Qwen3-Coder-30B-A3B-Instruct
+    match: { ollama: ["qwen3-coder:30b", "qwen3-coder:latest", "qwen3-coder"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text]
+    context_length: 262144
+    tags: [code, agent]
+    quality_prior: { coding: 0.78, agent: 0.75, general: 0.6 }
+    note: "non-thinking model; MoE 30.5B total / 3.3B active - memory follows total parameters"
+    sources: ["https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct", "https://ollama.com/library/qwen3-coder"]
+  - id: devstral-small-2
+    publisher: Mistral AI
+    hf: "unverified (Ollama page verified; HF card not fetched 2026-10-11)"
+    match: { ollama: ["devstral-small-2:*", "devstral-small-2"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image]
+    context_length: 393216
+    tags: [code, agent, vision]
+    quality_prior: { coding: 0.75, agent: 0.75, general: 0.6 }
+    sources: ["https://ollama.com/library/devstral-small-2"]
+  - id: north-mini-code-1.0
+    publisher: Cohere Labs
+    hf: CohereLabs/North-Mini-Code-1.0
+    match: { ollama: ["north-mini-code*"] }
+    availability: released_weights
+    licence: "Apache-2.0 + Cohere Labs Acceptable Use Policy"
+    role: generative
+    modalities_in: [text]
+    context_length: 262144
+    tags: [code, agent]
+    quality_prior: { coding: 0.74, agent: 0.72, general: 0.55 }
+    sources: ["https://huggingface.co/CohereLabs/North-Mini-Code-1.0"]
+  - id: ornith-1.5
+    publisher: Ornith AI (deepreinforce)
+    hf: ornith-ai/Ornith-1.5-{9B,35B,397B}
+    match: { ollama: ["ornith-1.5*", "ornith:*", "ornith"] }
+    availability: released_weights
+    licence: "MIT (post-trained on Gemma 4 / Qwen 3.5; inherited terms not addressed on card)"
+    role: generative
+    modalities_in: [text, image]
+    context_length: 262144
+    tags: [code, agent, reasoning, vision]
+    quality_prior: { coding: 0.72, agent: 0.72, general: 0.65 }
+    sources: ["https://huggingface.co/ornith-ai/Ornith-1.5-35B"]
+  - id: laguna-xs-2.1
+    publisher: poolside
+    hf: poolside/Laguna-XS-2.1
+    match: { ollama: ["laguna-xs*"] }
+    availability: released_weights
+    licence: OpenMDW-1.1
+    role: generative
+    modalities_in: [text]
+    context_length: 262144
+    tags: [code, agent]
+    quality_prior: { coding: 0.74, agent: 0.74, general: 0.55 }
+    note: "preserved thinking strongly recommended (keep reasoning_content); known empty-output issue reported on Apple Metal"
+    sources: ["https://huggingface.co/poolside/Laguna-XS-2.1"]
+  - id: laguna-s-2.1
+    publisher: poolside
+    hf: poolside/Laguna-S-2.1
+    match: { ollama: ["laguna-s*"] }
+    availability: released_weights
+    licence: OpenMDW-1.1
+    role: generative
+    modalities_in: [text]
+    context_length: 1048576
+    tags: [code, agent]
+    quality_prior: { coding: 0.78, agent: 0.78, general: 0.6 }
+    note: "118B total / 8B active MoE: ~96 GB at q4_K_M - memory follows total parameters"
+    sources: ["https://huggingface.co/poolside/Laguna-S-2.1"]
+  - id: nemotron-3.5-lightning
+    publisher: NVIDIA
+    hf: nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16
+    match: { ollama: ["nemotron-3.5-lightning*"] }
+    availability: released_weights
+    licence: OpenMDW-1.1
+    role: generative
+    modalities_in: [text]
+    context_length: 1048576
+    tags: [general, reasoning, agent]
+    quality_prior: { general: 0.7, agent: 0.7, math: 0.68 }
+    sources: ["https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Lightning-30B-A3B-BF16"]
+  - id: muse-glimmer-30b
+    publisher: Meta
+    hf: meta-models/Muse-Glimmer-30B
+    match: { ollama: ["muse-glimmer*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image]
+    context_length: 131072
+    tags: [general, agent, vision]
+    quality_prior: { general: 0.7, agent: 0.7, document_vision: 0.65 }
+    sources: ["https://huggingface.co/meta-models/Muse-Glimmer-30B"]
+  - id: lfm2.5-8b-a1b
+    publisher: Liquid AI
+    hf: LiquidAI/LFM2.5-8B-A1B
+    match: { ollama: ["lfm2.5:*", "lfm2.5"] }
+    availability: released_weights
+    licence: "LFM Open License v1.0 (free below USD 10M annual revenue - check terms)"
+    role: generative
+    modalities_in: [text]
+    context_length: 131072
+    tags: [general, small]
+    quality_prior: { general: 0.55 }
+    sources: ["https://huggingface.co/LiquidAI/LFM2.5-8B-A1B", "https://ollama.com/library/lfm2.5"]
+  - id: minicpm-v4.5
+    publisher: OpenBMB
+    hf: openbmb/MiniCPM-V-4_5
+    match: { ollama: ["minicpm-v4.5*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image, video]
+    context_length: 40960
+    tags: [vision]
+    quality_prior: { document_vision: 0.7, general: 0.55 }
+    sources: ["https://huggingface.co/openbmb/MiniCPM-V-4_5"]
+  - id: minicpm-v4.6
+    publisher: OpenBMB
+    hf: openbmb/MiniCPM-V-4.6
+    match: { ollama: ["minicpm-v4.6*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: generative
+    modalities_in: [text, image, video]
+    context_length: 32768
+    tags: [vision, small]
+    quality_prior: { document_vision: 0.6, general: 0.45 }
+    sources: ["https://huggingface.co/OpenBMB/MiniCPM-V-4.6", "https://ollama.com/library/minicpm-v4.6"]
+  - id: glm-5.3-flash
+    publisher: Z.ai
+    hf: zai-org/GLM-5.3-Flash
+    match: { ollama: ["glm-5.3-flash*"] }
+    availability: released_weights
+    licence: MIT
+    role: generative
+    modalities_in: [text, image]
+    context_length: 131072
+    tags: [general, code, agent, vision]
+    quality_prior: { general: 0.72, coding: 0.72, agent: 0.7 }
+    note: "320B total / 18B active MoE; memory follows total parameters"
+    sources: ["https://huggingface.co/zai-org/GLM-5.3-Flash"]
+
+  # ----------------------------------------------------------------- specialist / restricted
+  - id: medgemma
+    publisher: Google
+    hf: google/medgemma-4b-it | google/medgemma-27b-it | google/medgemma-27b-text-it
+    match: { ollama: ["medgemma:*", "medgemma"] }
+    availability: released_weights
+    licence: "Health AI Developer Foundations terms (gated)"
+    role: generative
+    modalities_in: [text, image]
+    context_length: 131072
+    tags: [medical, vision]
+    quality_prior: { general: 0.5 }
+    intended_use_note: "Developer model for medical text/image tasks; NOT validated for clinical decisions. A medical label does not establish professional validation."
+    sources: ["https://huggingface.co/google/medgemma-27b-it"]
+  - id: medgemma-1.5-4b
+    publisher: Google
+    hf: google/medgemma-1.5-4b-it
+    match: { ollama: ["medgemma1.5*"] }
+    availability: released_weights
+    licence: "Health AI Developer Foundations terms (gated)"
+    role: generative
+    modalities_in: [text, image]
+    context_length: 131072
+    tags: [medical, vision, small]
+    quality_prior: { general: 0.45 }
+    intended_use_note: "Developer model for medical imaging/text incl. 3D CT/MRI; NOT validated for clinical use."
+    sources: ["https://huggingface.co/google/medgemma-1.5-4b-it"]
+  - id: granite-guardian-4.1-8b
+    publisher: IBM
+    hf: ibm-granite/granite-guardian-4.1-8b
+    match: { ollama: ["granite4.1-guardian*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: guardrail
+    modalities_in: [text]
+    intended_use_note: "Safety judge with a <guardian>/<score>yes|no</score> prompt format; English only; not a chat model. ModelSaar 0.1 does not run guardrail pipelines; the entry prevents chat routing."
+    sources: ["https://huggingface.co/ibm-granite/granite-guardian-4.1-8b"]
+  - id: glm-ocr
+    publisher: Z.ai
+    hf: zai-org/GLM-OCR
+    match: { ollama: ["glm-ocr*"] }
+    availability: released_weights
+    licence: "MIT (layout stage PP-DocLayout-V3: Apache-2.0)"
+    role: ocr
+    modalities_in: [image, text]
+    intended_use_note: "OCR/document-parsing VLM driven by task-prefix prompts and a layout pipeline; ModelSaar 0.1 does not implement the OCR pipeline, so it is excluded from chat routing."
+    sources: ["https://huggingface.co/zai-org/GLM-OCR"]
+  - id: clef
+    publisher: Cloudflare
+    hf: Cloudflare/clef | Cloudflare/clef-flash
+    match: { ollama: ["clef*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: decision
+    intended_use_note: "Decision model served via Ollama's /v1/systemone (>=0.35.1), returning per-option probabilities; not a chat model. Native decision adapters are a later milestone."
+    sources: ["https://huggingface.co/Cloudflare/clef"]
+  - id: nimble
+    publisher: Bespoke Labs
+    hf: bespokelabs/Bespoke-Nimble-9B
+    match: { ollama: ["nimble*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: decision
+    context_length: 8192
+    intended_use_note: "LoRA adapter on Qwen3.5-9B (requires the base weights); 8,192-token hard limit; decision model via /v1/systemone, not chat."
+    sources: ["https://huggingface.co/bespokelabs/Bespoke-Nimble-9B"]
+  - id: tev1
+    publisher: Together AI
+    hf: togethercomputer/Tev1-4B-experimental
+    match: { ollama: ["tev1*"] }
+    availability: released_weights
+    licence: "weight licence 'being finalized' per card (unresolved)"
+    role: decision
+    enabled_by_default: false
+    intended_use_note: "Decision model; licence unresolved on 2026-10-11, so excluded from defaults."
+    sources: ["https://huggingface.co/togethercomputer/Tev1-4B-experimental"]
+  - id: laya
+    publisher: ConvAI Innovations
+    hf: convaiinnovations/laya
+    match: { ollama: ["laya*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: decision
+    context_length: 512
+    intended_use_note: "Non-autoregressive encoder (ModernBERT/mmBERT) typed-decision classifier; 512/1,024-token contexts; not generative."
+    sources: ["https://huggingface.co/convaiinnovations/laya"]
+
+  # ----------------------------------------------------------------- embeddings
+  - id: qwen3-embedding-0.6b
+    publisher: Alibaba Qwen
+    hf: Qwen/Qwen3-Embedding-0.6B
+    match: { ollama: ["qwen3-embedding:*", "qwen3-embedding"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: embedding
+    context_length: 32768
+    embedding: { dimensions: 1024, mrl: [32, 1024], query_prefix: "Instruct: {task}\nQuery:", normalized: true }
+    sources: ["https://huggingface.co/Qwen/Qwen3-Embedding-0.6B", "https://ollama.com/library/qwen3-embedding"]
+  - id: embeddinggemma-2
+    publisher: Google
+    hf: google/embeddinggemma-2
+    match: { ollama: ["embeddinggemma-2*"] }
+    availability: released_weights
+    licence: Apache-2.0
+    role: embedding
+    context_length: 8192
+    embedding: { dimensions: 768, mrl: [128, 256, 512, 768], query_prefix: "task: search result | query: ", document_prefix: "title: {title} | text: ", normalized: true, multimodal: true }
+    intended_use_note: "Multimodal embedding/retrieval model (text, image, video, audio into one space); truncated vectors must be re-normalized. ModelSaar 0.1 exposes text embeddings only."
+    sources: ["https://developers.googleblog.com/embeddinggemma-2-the-developer-guide/", "https://huggingface.co/google/embeddinggemma-2"]
+
+  # ----------------------------------------------------------------- cloud-only / announced (never enabled by default)
+  - id: mistral-large-4
+    publisher: Mistral AI
+    match: { ollama: ["mistral-large-4*"] }
+    availability: announced_weights
+    enabled_by_default: false
+    licence: "not named in the 2026-10-06 announcement"
+    role: generative
+    note: "API preview; weights promised 'by the end of the month' (2026-10-06). No downloadable checkpoint on 2026-10-11; Ollama entry is cloud-only."
+    sources: ["https://mistral.ai/news/mistral-large-4/"]
+  - id: kimi-k3
+    publisher: Moonshot AI
+    hf: moonshotai/Kimi-K3
+    match: { ollama: ["kimi-k3*"] }
+    availability: released_weights
+    enabled_by_default: false
+    licence: "Kimi K3 License (MIT-style with revenue/MAU clauses)"
+    role: generative
+    context_length: 1048576
+    capability_claims: { continuation: supported }
+    note: "2.8T/104B-active MoE; Ollama cloud-only; thinking always on; multi-turn tool use REQUIRES passing the full assistant message incl. reasoning_content back (card)."
+    sources: ["https://huggingface.co/moonshotai/Kimi-K3"]
+  - id: kimi-k2.7-code
+    publisher: Moonshot AI
+    hf: moonshotai/Kimi-K2.7-Code
+    match: { ollama: ["kimi-k2.7-code*"] }
+    availability: released_weights
+    enabled_by_default: false
+    licence: "Modified MIT (file not read)"
+    role: generative
+    note: "1T/32B-active MoE; Ollama cloud-only; thinking + preserve_thinking forced on."
+    sources: ["https://huggingface.co/moonshotai/Kimi-K2.7-Code"]
+  - id: deepseek-v4-pro
+    publisher: DeepSeek
+    hf: deepseek-ai/DeepSeek-V4-Pro
+    match: { ollama: ["deepseek-v4-pro*"] }
+    availability: released_weights
+    enabled_by_default: false
+    licence: MIT
+    role: generative
+    note: "1.6T/49B-active MoE; Ollama cloud-only; not a consumer-hardware deployment."
+    sources: ["https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro"]
+  - id: deepseek-v4.1-flash
+    publisher: DeepSeek
+    hf: deepseek-ai/DeepSeek-V4.1-Flash
+    match: { ollama: ["deepseek-v4.1-flash*"] }
+    availability: released_weights
+    enabled_by_default: false
+    licence: MIT
+    role: generative
+    note: "552B backbone; Ollama cloud-only."
+    sources: ["https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash"]
+  - id: glm-5.3
+    publisher: Z.ai
+    hf: zai-org/GLM-5.3
+    match: { ollama: ["glm-5.3:*", "glm-5.3"] }
+    availability: released_weights
+    enabled_by_default: false
+    licence: "GLM-5.3 License (custom, MIT-style)"
+    role: generative
+    note: "753B MoE; Ollama cloud-only; community GGUF exists but is not a consumer deployment."
+    sources: ["https://huggingface.co/zai-org/GLM-5.3"]

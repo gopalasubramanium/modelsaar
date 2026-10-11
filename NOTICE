@@ -1,0 +1,18 @@
+ModelSaar - intelligent routing for local AI models
+Copyright 2026 Gopala Subramanium
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this project except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+This licence covers the ModelSaar gateway source code only. It does not license
+any model weights. Model weights referenced in the catalogue are distributed by
+their publishers under their own terms (recorded per entry in
+src/modelsaar/catalogue/starter.yaml and docs/catalogue.md).
+
+Third-party runtime dependencies (installed from PyPI, not vendored):
+  starlette (BSD-3-Clause), uvicorn (BSD-3-Clause), httpx (BSD-3-Clause),
+  pydantic (MIT), PyYAML (MIT).
+Design influences acknowledged in docs/decisions/ADR-001-build-vs-adapt.md:
+  vLLM Semantic Router (Apache-2.0), RouteLLM (Apache-2.0), LiteLLM (MIT core),
+  llama-swap (MIT). No code from these projects is included.

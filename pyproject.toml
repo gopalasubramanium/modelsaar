@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "modelsaar"
+version = "0.1.0"
+description = "ModelSaar - intelligent routing for local AI models. One OpenAI-compatible endpoint that picks the most suitable local deployment per request."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Gopala Subramanium" }]
+keywords = ["llm", "router", "gateway", "ollama", "openai-compatible", "local-first"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+]
+dependencies = [
+  "starlette>=0.40,<2",
+  "uvicorn>=0.30,<1",
+  "httpx>=0.27,<1",
+  "pydantic>=2.6,<3",
+  "pyyaml>=6,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "anyio>=4",
+  "ruff>=0.5",
+  "pip-audit>=2.7",
+]
+
+[project.scripts]
+modelsaar = "modelsaar.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/gopalasubramanium/modelsaar"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+modelsaar = ["catalogue/*.yaml", "evaluation/fixtures/*.jsonl", "static/*.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+  "live: tests that need a real inference backend (opt-in, never run in default CI)",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501", "B008", "B904"]

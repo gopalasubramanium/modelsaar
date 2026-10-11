@@ -1,0 +1,62 @@
+# Full example configuration for ModelSaar (version 1). Copy to ~/.modelsaar/config.yaml.
+version: 1
+server:
+  host: 127.0.0.1
+  port: 8484
+  response_model_field: requested      # or: deployment
+security:
+  allow_lan: false
+  locality_mode: local_only            # or: allow_remote (cloud-forwarded deployments become eligible)
+  log_prompts: false
+resource_pools:
+  - { id: local-machine, kind: unified, memory_gb: 32, max_concurrent: 1, max_queue: 16, queue_timeout_s: 30 }
+backends:
+  - id: ollama
+    type: ollama
+    base_url: http://127.0.0.1:11434
+    resource_pool: local-machine
+  - id: vllm
+    type: openai_compatible
+    base_url: http://127.0.0.1:8000/v1
+    resource_pool: local-machine
+    models:
+      - name: Qwen/Qwen3.8-27B
+        context_length: 65536
+        capabilities: { tools: supported, json_schema: supported, vision: unsupported }
+        tags: [code, reasoning]
+deployments:
+  - backend: ollama
+    model: "qwen3.8:27b"
+    context_length: 32768              # served num_ctx you configured in Ollama
+    tags: [code, reasoning, vision]
+  - backend: ollama
+    model: "some-cloud-model:cloud"
+    enabled: false
+aliases:
+  auto: { profile: quality, description: "Best expected quality within limits" }
+  auto-fast: { profile: fast }
+  auto-code: { profile: quality, require_tags: [code] }
+  auto-vision: { profile: quality, require_vision: true }
+routing:
+  default_profile: quality
+  switching_penalty: 0.08
+  classifier:
+    enabled: false
+    backend: ollama
+    model: "gemma4:e4b"
+    timeout_s: 2.0
+affinity:
+  mode: session
+  ttl_s: 3600
+  session_headers: [X-ModelSaar-Session, X-OpenWebUI-Chat-Id]
+  body_fields: [prompt_cache_key]
+embeddings:
+  - alias: docs-index
+    deployments: ["ollama/embeddinggemma-2:latest"]
+    dimensions: 768
+    note: "bound to the index built on 2026-10; changing the model requires re-indexing"
+admission:
+  uncertain_hold_s: 20
+observability:
+  decision_log: true
+  retention_days: 7
