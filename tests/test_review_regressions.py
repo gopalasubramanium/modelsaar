@@ -120,14 +120,17 @@ def test_any_non_data_image_url_is_external(gateway):
         assert any("remote image URL" in b for why in r.json()["error"]["modelsaar"]["blockers"].values() for b in why), url
 
 
-def test_uninstall_refuses_foreign_files(tmp_path: Path):
-    """Finding 8."""
+def test_uninstall_preserves_foreign_files(tmp_path: Path):
+    """Finding 8 (2026-10-11 review finding 7 refined it): foreign files are never deleted; owned
+    files are removed and the directory is left in place when anything else remains."""
     home = tmp_path / "shared"
     (home / "keys").mkdir(parents=True)
     (home / "config.yaml").write_text("version: 1\n")
     (home / "notes.txt").write_text("mine")
     r = subprocess.run([sys.executable, "-m", "modelsaar.cli", "--config", str(home / "config.yaml"), "uninstall", "--yes"], capture_output=True, text=True, check=False)
-    assert r.returncode != 0 and (home / "notes.txt").exists() and (home / "config.yaml").exists()
+    assert r.returncode == 0, r.stderr
+    assert (home / "notes.txt").exists() and not (home / "config.yaml").exists()
+    assert "left in place" in r.stdout
 
 
 def test_key_files_created_private(tmp_path: Path):

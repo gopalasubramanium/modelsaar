@@ -60,3 +60,5 @@ jobs:
         run: docker build -t modelsaar:ci .
       - name: Smoke the CLI inside the image
         run: docker run --rm modelsaar:ci modelsaar --version
+      - name: Fresh-volume start (Compose-equivalent; keys bootstrapped once, read-only config, non-root)
+        run: scripts/compose-smoke.sh modelsaar:ci

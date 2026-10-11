@@ -9,7 +9,8 @@ preserving unrelated settings.
 from __future__ import annotations
 
 import json
-import shutil
+import os
+import stat
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -327,12 +328,37 @@ def apply_patch(client: str, t: ClientTarget, path: Path | None = None, dry_run:
     if dry_run or not changed:
         return result
     path.parent.mkdir(parents=True, exist_ok=True)
+    # Preserve the existing mode (never weaken it); new files are private because the snippet
+    # carries the gateway API key.
+    mode = stat.S_IMODE(path.stat().st_mode) if existed else 0o600
     if existed:
-        backup = path.with_name(path.name + f".bak-{time.strftime('%Y%m%d-%H%M%S')}")
-        shutil.copy2(path, backup)
+        stamp = time.strftime("%Y%m%d-%H%M%S")
+        backup = path.with_name(path.name + f".bak-{stamp}")
+        n = 1
+        while backup.exists():
+            n += 1
+            backup = path.with_name(path.name + f".bak-{stamp}-{n}")
+        _write_with_mode(backup, text, mode)
         result["backup"] = str(backup)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(after, encoding="utf-8")
+    tmp = path.with_name(path.name + ".tmp")
+    _write_with_mode(tmp, after, mode)
     tmp.replace(path)
     result["applied"] = True
     return result
+
+
+def _write_with_mode(target: Path, content: str, mode: int) -> None:
+    """Create ``target`` with ``mode`` from the first byte (O_EXCL: never follow a planted symlink)."""
+    fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, mode)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(content)
+            f.flush()
+            os.fsync(f.fileno())
+        os.chmod(target, mode)  # the open() mode is subject to umask; enforce the intended bits
+    except Exception:
+        try:
+            target.unlink()
+        except OSError:
+            pass
+        raise

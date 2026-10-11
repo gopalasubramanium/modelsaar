@@ -675,3 +675,121 @@ def test_evidence_scheme_versioning_invalidates_old_rows(tmp_path):
         assert rows and rows[0]["conditions"]["max_tokens"] == 1024
     finally:
         s.close()
+
+
+# --------------------------------------------------------------------------- #
+# Finding 7: first-run and file handling
+# --------------------------------------------------------------------------- #
+
+
+def _cli(args: list[str], env: dict[str, str]):
+    import os
+    import subprocess
+    import sys
+
+    return subprocess.run([sys.executable, "-m", "modelsaar.cli", *args], capture_output=True, text=True, env={**os.environ, **env}, timeout=120)
+
+
+def test_apply_patch_preserves_mode_private_tmp_unique_backups(tmp_path, monkeypatch):
+    """Finding 7: applying a client config turned a 0600 secret-bearing YAML into 0644 under umask 022."""
+    import os
+    import stat
+
+    from modelsaar.clientconfig import AliasInfo, ClientTarget, apply_patch
+
+    monkeypatch.setattr(os, "umask", os.umask)  # no-op; documents the assumption
+    old = os.umask(0o022)
+    try:
+        t = ClientTarget("http://127.0.0.1:8484", aliases=[AliasInfo("auto", 32768, True, False)])
+        hz = tmp_path / "config.yaml"
+        hz.write_text("model:\n  default: foo\napi_key: secret-value\n")
+        os.chmod(hz, 0o600)
+        res = apply_patch("hermes", t, hz, dry_run=False)
+        assert res["applied"]
+        assert stat.S_IMODE(hz.stat().st_mode) == 0o600, "mode weakened"
+        assert stat.S_IMODE(os.stat(res["backup"]).st_mode) == 0o600, "backup weaker than the original"
+        assert not list(tmp_path.glob("*.tmp"))
+        # A second change in the same second must not overwrite the first backup.
+        hz.write_text(hz.read_text().replace("127.0.0.1:8484", "127.0.0.1:9999"))  # drift that the patch repairs
+        res2 = apply_patch("hermes", t, hz, dry_run=False)
+        assert res2["applied"] and res2["backup"] != res["backup"]
+        assert len(list(tmp_path.glob("config.yaml.bak-*"))) == 2
+        # New files are created private (they carry the gateway API key).
+        new = tmp_path / "new" / "config.yaml"
+        res3 = apply_patch("hermes", t, new, dry_run=False)
+        assert res3["applied"] and stat.S_IMODE(new.stat().st_mode) == 0o600
+    finally:
+        os.umask(old)
+
+
+def test_uninstall_removes_only_owned_files_and_refuses_symlinks(tmp_path):
+    """Finding 7: uninstall deleted arbitrary contents beneath keys/ and state/."""
+    import os
+
+    home = tmp_path / "home"
+    (home / "keys").mkdir(parents=True)
+    (home / "state").mkdir()
+    (home / "config.yaml").write_text("version: 1\n")
+    (home / "keys/api_keys").write_text("msk_x\n")
+    (home / "keys/admin_key").write_text("msa_x\n")
+    (home / "state/modelsaar.db").write_bytes(b"")
+    (home / "state/modelsaar.db-wal").write_bytes(b"")
+    (home / "keys/my-private-notes.txt").write_text("keep me")
+    (home / "state/other.db").write_text("keep me too")
+    r = _cli(["uninstall", "--yes"], {"MODELSAAR_HOME": str(home)})
+    assert r.returncode == 0, r.stderr
+    assert not (home / "config.yaml").exists() and not (home / "keys/api_keys").exists() and not (home / "state/modelsaar.db").exists()
+    assert (home / "keys/my-private-notes.txt").exists() and (home / "state/other.db").exists()
+    assert "left in place" in r.stdout
+    # Symlinked boundaries are refused (nothing deleted through them).
+    home2 = tmp_path / "home2"
+    home2.mkdir()
+    (home2 / "config.yaml").write_text("version: 1\n")
+    target = tmp_path / "elsewhere"
+    target.mkdir()
+    (target / "api_keys").write_text("msk_y\n")
+    os.symlink(target, home2 / "keys")
+    r = _cli(["uninstall", "--yes"], {"MODELSAAR_HOME": str(home2)})
+    assert r.returncode != 0 and "symlink" in r.stderr
+    assert (target / "api_keys").exists() and (home2 / "config.yaml").exists()
+
+
+def test_keys_ensure_is_idempotent_and_serve_points_to_it(tmp_path, fake):
+    """Finding 7: a fresh container exited for missing keys although docs promised first-start creation."""
+    home = tmp_path / "home"
+    env = {"MODELSAAR_HOME": str(home)}
+    assert _cli(["init", "--endpoint", f"http://127.0.0.1:{fake.port}", "--type", "ollama"], env).returncode == 0
+    (home / "keys/api_keys").unlink()
+    (home / "keys/admin_key").unlink()
+    r = _cli(["keys", "ensure"], env)
+    assert r.returncode == 0 and "created" in r.stdout
+    api = (home / "keys/api_keys").read_text()
+    r = _cli(["keys", "ensure"], env)
+    assert r.returncode == 0 and "unchanged" in r.stdout
+    assert (home / "keys/api_keys").read_text() == api, "ensure must never rotate"
+    import stat
+
+    assert stat.S_IMODE((home / "keys/api_keys").stat().st_mode) == 0o600
+    # Config may be a read-only mount: ensure writes only under keys/.
+    import os
+
+    os.chmod(home / "config.yaml", 0o444)
+    assert _cli(["keys", "ensure"], env).returncode == 0
+
+
+def test_init_profile_applies_to_auto_alias(tmp_path, fake):
+    """Finding 7: `init --profile fast` set routing.default_profile only; `auto` kept quality."""
+    import yaml
+
+    home = tmp_path / "home"
+    env = {"MODELSAAR_HOME": str(home)}
+    r = _cli(["init", "--endpoint", f"http://127.0.0.1:{fake.port}", "--type", "ollama", "--profile", "fast"], env)
+    assert r.returncode == 0, r.stderr
+    cfg = yaml.safe_load((home / "config.yaml").read_text())
+    assert cfg["routing"]["default_profile"] == "fast"
+    assert cfg["aliases"]["auto"]["profile"] == "fast"
+    r = _cli(["explain", "--message", "hello", "--json"], env)
+    assert r.returncode == 0, r.stderr
+    import json
+
+    assert json.loads(r.stdout)["profile"] == "fast"

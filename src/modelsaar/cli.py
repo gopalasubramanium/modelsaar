@@ -6,7 +6,6 @@ import argparse
 import asyncio
 import json
 import os
-import shutil
 import sys
 import time
 from pathlib import Path
@@ -96,7 +95,10 @@ def cmd_init(args: argparse.Namespace) -> None:
     )
     cfg = cfg.model_copy(update={"server": cfg.server.model_copy(update={"port": args.port})})
     cfg = cfg.model_copy(update={"routing": cfg.routing.model_copy(update={"default_profile": args.profile})})
-    cfg = cfg.model_copy(update={"config_path": str(path)})
+    # The `auto` alias carries its own profile; the advertised default must be what `auto` does.
+    aliases = dict(cfg.aliases)
+    aliases["auto"] = aliases["auto"].model_copy(update={"profile": args.profile})
+    cfg = cfg.model_copy(update={"aliases": aliases, "config_path": str(path)})
     write_config_atomic(cfg, path)
     api_p, adm_p = cfg.resolve(cfg.server.api_keys_file), cfg.resolve(cfg.server.admin_key_file)
     if not read_keys(api_p):
@@ -279,7 +281,7 @@ def cmd_serve(args: argparse.Namespace) -> None:
     configure_logging(cfg.observability.log_level)
     app, router, auth, store = build(cfg)
     if not auth.configured:
-        sys.exit("API/admin key files are missing; run `modelsaar keys rotate` (or `modelsaar init`)")
+        sys.exit("API/admin key files are missing; run `modelsaar keys ensure` (or `modelsaar init`)")
     url = f"http://{cfg.server.host}:{cfg.server.port}"
     print(f"ModelSaar {__version__} on {url}/v1  (config {cfg.config_path}, hash {cfg.config_hash})")
     print(f"API key file:   {cfg.resolve(cfg.server.api_keys_file)}")
@@ -472,6 +474,15 @@ def cmd_keys(args: argparse.Namespace) -> None:
         if args.reveal:
             print("api:", *read_keys(api_p))
             print("admin:", *read_keys(adm_p))
+    elif args.keys_cmd == "ensure":
+        # Idempotent first-run bootstrap: create missing key files, never rotate existing ones,
+        # touch nothing but the key files (the config may be a read-only mount).
+        for label, p, prefix in (("API key", api_p, "msk"), ("admin key", adm_p, "msa")):
+            if read_keys(p):
+                print(f"{label}: unchanged ({p})")
+            else:
+                write_key_file(p, [generate_key(prefix)])
+                print(f"{label}: created ({p})")
     elif args.keys_cmd == "rotate":
         if args.admin:
             write_key_file(adm_p, [generate_key("msa")])
@@ -555,42 +566,65 @@ def cmd_demo(args: argparse.Namespace) -> None:
         fake.stop()
 
 
+def _owned_files(home: Path, cfg: Config | None) -> tuple[list[Path], list[Path]]:
+    """Files ModelSaar creates under its home, and the directories it creates for them."""
+    api = cfg.resolve(cfg.server.api_keys_file) if cfg else home / "keys/api_keys"
+    adm = cfg.resolve(cfg.server.admin_key_file) if cfg else home / "keys/admin_key"
+    db = cfg.resolve(cfg.server.state_db) if cfg else home / "state/modelsaar.db"
+    files = [home / "config.yaml", home / "config.yaml.tmp", api, api.with_name(api.name + ".tmp"), adm, adm.with_name(adm.name + ".tmp")]
+    files += [db, db.with_name(db.name + "-wal"), db.with_name(db.name + "-shm"), db.with_name(db.name + ".tmp")]
+    files += sorted(home.glob("config.yaml.bak*")) if home.exists() else []
+    dirs = sorted({api.parent, adm.parent, db.parent} - {home}, key=lambda d: len(d.parts), reverse=True)
+    return files, dirs
+
+
 def cmd_uninstall(args: argparse.Namespace) -> None:
     path = Path(args.config) if args.config else default_config_path()
     home = path.parent
     print("ModelSaar uninstall removes ONLY the gateway's own files:")
-    print(f"  {home}  (config.yaml, keys/, state/)")
-    print("It does NOT remove models from your inference runtime, nor any client configuration.")
+    print(f"  {home}  (config.yaml and its backups, its key files, its state database)")
+    print("It does NOT remove models from your inference runtime, nor any client configuration,")
+    print("nor any other file you placed under that directory.")
     print("Client configs changed with `client-config --apply` have .bak-<timestamp> backups next to them.")
     print("Afterwards remove the package with: pip uninstall modelsaar   (or `uv tool uninstall modelsaar`)")
     if not args.yes:
-        ans = input(f"delete {home}? [y/N] ").strip().lower()
+        ans = input(f"delete ModelSaar's files under {home}? [y/N] ").strip().lower()
         if ans != "y":
             print("aborted")
             return
     if not home.exists():
         print(f"{home} does not exist; nothing to remove")
         return
-    known = {"config.yaml", "config.yaml.tmp", "keys", "state"}
-    known |= {n for n in os.listdir(home) if n.startswith("config.yaml.bak")}
-    others = sorted(set(os.listdir(home)) - known)
-    if others:
-        sys.exit(
-            f"{home} contains files ModelSaar did not create: {others}. Refusing to delete the directory; "
-            "remove config.yaml, keys/ and state/ manually if you want them gone."
-        )
-    for name in sorted(set(os.listdir(home))):
-        target = home / name
-        if target.is_dir():
-            shutil.rmtree(target)
-        else:
-            target.unlink()
-        print(f"removed {target}")
+    cfg: Config | None
     try:
-        home.rmdir()
-        print(f"removed {home}")
-    except OSError:
-        pass
+        cfg = load_config(path) if path.exists() else None
+    except Exception:
+        cfg = None  # unparseable config: fall back to the default layout
+    files, dirs = _owned_files(home, cfg)
+    # Safety boundaries: never operate through symlinks, never outside home.
+    for p in [home, *dirs]:
+        if p.is_symlink():
+            sys.exit(f"{p} is a symlink; refusing to delete through it. Remove ModelSaar's files manually.")
+    for f in files:
+        try:
+            f.resolve().relative_to(home.resolve())
+        except ValueError:
+            sys.exit(f"{f} resolves outside {home}; refusing. Remove ModelSaar's files manually.")
+    for f in files:
+        if f.is_symlink():
+            print(f"skipped {f} (symlink)")
+            continue
+        if f.exists():
+            f.unlink()
+            print(f"removed {f}")
+    for d in [*dirs, home]:
+        try:
+            d.rmdir()
+            print(f"removed {d}")
+        except OSError:
+            if d.exists():
+                left = sorted(os.listdir(d))
+                print(f"left in place: {d} (not created by ModelSaar or not empty: {left[:5]}{'...' if len(left) > 5 else ''})")
 
 
 # --------------------------------------------------------------------------- #
@@ -668,6 +702,7 @@ def build_parser() -> argparse.ArgumentParser:
     ks = s.add_subparsers(dest="keys_cmd", required=True)
     k = ks.add_parser("show")
     k.add_argument("--reveal", action="store_true")
+    k = ks.add_parser("ensure", help="create missing key files (idempotent; never rotates). Used by the container entrypoint.")
     k = ks.add_parser("rotate")
     k.add_argument("--admin", action="store_true")
     s.set_defaults(fn=cmd_keys)
