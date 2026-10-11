@@ -223,3 +223,19 @@ def test_discover_and_doctor_see_stored_probes(fake, tmp_path: Path):
     assert "json_schema=supported" in line, line
     r = subprocess.run([sys.executable, "-m", "modelsaar.cli", "doctor"], capture_output=True, text=True, env={**__import__("os").environ, **env}, check=False)
     assert "deployment:ollama/big:27b: capabilities unknown: ['json_schema']" not in r.stdout
+
+
+def test_fingerprint_ignores_residency_and_served_context(gateway, fake):
+    """Live finding (GX10): Ollama reports the served context only while a model is loaded, so the
+    fingerprint flipped between 4096 (assumed) and 131072 (observed) on every load/unload and wiped
+    probe evidence. Residency and served context must not be part of the identity."""
+    dep = gateway.router.registry.get("ollama/plain:3b")
+    fp1 = dep.fingerprint
+    fake.models["plain:3b"].loaded = True
+    fake.models["plain:3b"].context_length = 131072  # what /api/ps reports once loaded
+    gateway.refresh()
+    dep = gateway.router.registry.get("ollama/plain:3b")
+    assert dep.loaded and dep.fingerprint == fp1
+    fake.models["plain:3b"].loaded = False
+    gateway.refresh()
+    assert gateway.router.registry.get("ollama/plain:3b").fingerprint == fp1

@@ -105,6 +105,9 @@ class Deployment:
 
     # ------------------------------------------------------------------ #
     def compute_fingerprint(self) -> str:
+        # Intrinsic identity only. The *served* context length and residency change whenever a
+        # runtime loads/unloads a model (Ollama reports it only while loaded); they affect eligibility
+        # per request but do not change what the checkpoint can do, so they must not invalidate evidence.
         parts = {
             "backend": self.backend_id,
             "model": self.model,
@@ -113,7 +116,6 @@ class Deployment:
             "runtime_version": self.runtime_version,
             "template": self.template_hash,
             "quant": self.quantization,
-            "ctx": self.context_length,
             "pool": self.resource_pool,
         }
         s = json.dumps(parts, sort_keys=True)
