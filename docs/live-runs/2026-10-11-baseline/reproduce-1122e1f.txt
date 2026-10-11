@@ -1,0 +1,34 @@
+baseline: 1122e1f2b5006003f8832598c81f658b8945c112
+tests:    tests/test_hardening_2026_10_11.py from 80276bb
+FAILED test_local_only_sends_no_message_text_to_remote_tokenizer              | line 49: AssertionError: remote backend received message text under local_only
+FAILED test_exact_counts_only_for_policy_allowed_and_labelled_as_estimate     | line 83: assert 'tokenize:oai+template-estimate' in "exact token counts used for ['oai/small:1b']"
+FAILED test_unsupported_content_part_types_rejected_before_any_dispatch       | line 101: AssertionError: {"id":"chatcmpl-fake-1791732967667","object":"chat.completion","created":1791732967,"model":"a
+FAILED test_classifier_requires_local_deployment_under_local_only             | line 123: AssertionError: assert 'local' in 'configured classifier deployment not found'
+FAILED test_no_failover_for_tool_result_turn                                  | line 156: AssertionError: {"id":"chatcmpl-fake-1791732969096","object":"chat.completion","created":1791732969,"model":"a
+FAILED test_no_failover_for_pinned_session                                    | line 176: AssertionError: {"id":"chatcmpl-fake-1791732969720","object":"chat.completion","created":1791732969,"model":"a
+FAILED test_timeout_holds_slot_uncertain_then_recovers                        | line 200: assert 0 == 1
+FAILED test_circuit_opens_on_truncated_streams                                | line 226: AssertionError: assert False
+FAILED test_response_model_follows_failover_target                            | line 241: AssertionError: assert 'ollama/small:1b' == 'ollama/plain:3b'
+FAILED test_html_200_is_a_typed_502_and_never_pins                            | line 253: AssertionError: {"error":{"message":"<html>not json</html>","type":"upstream_non_json"},"model":"ollama/small:
+FAILED test_pool_memory_budget_is_enforced_before_dispatch                    | line 282: AssertionError: {"id":"chatcmpl-fake-1791732974400","object":"chat.completion","created":1791732974,"model":"o
+FAILED test_pool_memory_budget_counts_distinct_reservations_and_unknown_policy | line 297: pydantic_core._pydantic_core.ValidationError: 1 validation error for ResourcePool
+FAILED test_unknown_memory_estimate_policy                                    | line 330: pydantic_core._pydantic_core.ValidationError: 1 validation error for ResourcePool
+FAILED test_admin_probe_runs_under_gateway_admission                          | line 376: AssertionError: Not Found
+FAILED test_cli_probe_coordinates_through_running_gateway                     | line 407: AssertionError: assert 'via gateway' in 'probing ollama/small:1b (fingerprint 771e7fc4ed3fc150) ...\n  streami
+FAILED test_alias_never_interchanges_distinct_models_with_equal_dimensions    | line 443: AssertionError: resident twin must not be preferred over the contract identity
+PASSED test_known_identical_replicas_share_an_alias                           | expected behaviour already present at the baseline (positive control)
+FAILED test_unknown_identity_is_not_a_verified_replica                        | line 498: pydantic_core._pydantic_core.ValidationError: 1 validation error for DeclaredModel
+FAILED test_wrong_output_shape_is_a_contract_error                            | line 531: AssertionError: {"object":"list","data":[{"object":"embedding","index":0,"embedding":[0.45004771759490386,0.29
+FAILED test_request_level_contract_changes_rejected                           | line 549: assert (200 == 400)
+FAILED test_endpoint_change_invalidates_stored_probe                          | line 586: assert (404 == 200)
+PASSED test_load_unload_keeps_evidence                                        | expected behaviour already present at the baseline (positive control)
+FAILED test_evidence_scheme_versioning_invalidates_old_rows                   | line 646: ImportError: cannot import name 'EVIDENCE_SCHEME' from 'modelsaar.store' (/tmp/tmp.C6rIAjDAHy/baseline/src/mod
+FAILED test_apply_patch_preserves_mode_private_tmp_unique_backups             | line 709: AssertionError: mode weakened
+FAILED test_uninstall_removes_only_owned_files_and_refuses_symlinks           | line 742: AssertionError: assert (False)
+FAILED test_keys_ensure_is_idempotent_and_serve_points_to_it                  | line 765: assert (2 == 0)
+FAILED test_init_profile_applies_to_auto_alias                                | line 790: AssertionError: assert 'quality' == 'fast'
+FAILED test_cli_test_explains_missing_gateway                                 | line 805: assert ('no gateway is listening' in 'Traceback (most recent call last):\n  File "/home/claude/modelsaar/.venv
+
+======================== 26 failed, 2 passed in 19.66s =========================
+(FAILED/ERROR at the baseline = the defect the test guards against was present; PASSED = the test's
+ scenario already behaved correctly at the baseline or depends on a new test hook only)
