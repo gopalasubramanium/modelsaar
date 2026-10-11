@@ -109,7 +109,96 @@ overhead p95 < 5 ms ✔. The simple mode (request a concrete deployment id) rema
 Caveats: small n (CIs overlap everywhere); `max_tokens 400` penalises thinking models; served context
 for unloaded models was assumed 4096 during the run; only 3 of 8 deployments were swept.
 
-## NOT RUN (needs hardware, a daemon, or a real client)
+## Hardening pass (branch `hardening/review-2026-10-11`, commit `0f8af84` + docs)
+
+The numbers above are the **historical 2026-10-11 results of the 0.1.0 evaluator** and are left as they
+were reported (that evaluator had lenient scorers; see docs/progress.md finding 6). Everything in this
+section was produced by the repaired code.
+
+### Executed (deterministic)
+
+| check | command | outcome |
+|---|---|---|
+| Lint | `ruff check src tests` | pass |
+| Full test suite | `python -m pytest` (cloud container, CPython 3.13.16, Linux x86_64) | **156 passed, 4 skipped** in 70 s. Skips: the four `code_exec` sandbox tests (no bubblewrap / `sandbox-exec` / Docker daemon in that container); they ran on the Mac (`sandbox-exec`) during the live evaluation below. |
+| Regression tests for the review findings | `python -m pytest tests/test_hardening_2026_10_11.py` | 29 passed; each one reproduced its defect against `1122e1f` before the fix (finding → fix → test table in docs/progress.md) |
+| Evaluator tests | `python -m pytest tests/test_evaluation.py tests/test_classifier_schema.py` | 65 passed, 4 skipped (sandbox) |
+| Clean wheel install, loopback default, private keys, one routed request, scheme-1 state DB migration | `scripts/install-check.sh` | **PASS** (`modelsaar 0.1.0` wheel into a fresh venv; `server.host: 127.0.0.1`; `keys/api_keys` mode 600; chat via `auto` ok; `doctor` reports the 1 probe + 1 measurement written under evidence scheme 1; `meta.evidence_scheme = 2`; old rows kept) |
+| Fresh-volume container start (Compose-equivalent: empty volume, read-only config mount, non-root, keys created once, unchanged after restart) | `scripts/compose-smoke.sh` | **NOT RUN here** (no Docker daemon in the build container); the script is a CI step (`container` job) and runs on the next push |
+| Live verification script, dry run against the fake backend (SIMULATED models) | `scripts/live_verify.sh http://127.0.0.1:23111 small:1b big:27b`, then the same command again | all steps exit 0; second run skipped every finished step and resumed the evaluation from its checkpoint (`resumed_records: 126`); no key material in any output file |
+
+### Executed live — owner's Mac → GX10, 2026-10-11 18:32–19:02 IST (`docs/live-runs/2026-10-11-gx10-hardening/`)
+
+Driven by double-clicking `run_live_verify.command` in Finder from this session; the script ran
+detached (`nohup caffeinate`) and copied its folder back. Environment (`00-env.txt`): macOS Darwin
+27.0.0 arm64, CPython 3.12.15, ModelSaar 0.1.0 at commit `0f8af84b66df`, **Ollama 0.32.13** at
+`http://100.83.54.124:11434`; `sandbox-exec` available, so `code_exec` tasks were scored in isolation.
+Config is in `10b-config-redacted.txt`; model digests in `02-backend-tags.txt` (qwen3.6 `096fdbd02fe6…`,
+gemma4:31b `6316f0629137…`, qwen3-coder `06c1097efce0…`, all Q4_K_M); these digests are the deployments'
+identities and part of their fingerprints.
+
+| step | outcome |
+|---|---|
+| `init` (fresh home), `discover`, `doctor` | 8 deployments; `doctor` 0 failures, warnings: assumed served context 4096 for unloaded models, `json_schema` unknown until probed |
+| `probe --all` (offline path: no gateway listening yet) | all 8 probed with evidence (`13-probe-all.txt`): streaming/tools/parallel_tools/json_object/json_schema **supported on all 8**; vision supported on 6, `unsupported` on muse-glimmer (answered but did not identify the colour) and on the two coder models (backend metadata) |
+| `explain` dry runs (chat / code+tools / vision / strict schema) | code+tools → qwen3-coder (catalogue prior 0.77, blend shown), vision → a vision-capable model, schema → json_schema-verified model (`15-18-*.txt`) |
+| gateway started; `/v1/models`, `modelsaar test` | ok |
+| **`POST /admin/probe`** (streaming probe of qwen3.6 through the running gateway's admission) | 200 in 11.0 s; evidence visible without restart (`23-admin-probe-via-gateway.txt`) |
+| **Wire-level client checks** (`scripts/live_client_checks.py`, `client-checks.json`) | chat 200 → qwen3.8, `model` field = `auto` (attribution ok); stream 200 → qwen3-coder, 12 frames, `finish=stop`, `[DONE]`, every frame's `model` = `auto-fast`, `content-type: text/event-stream`; **tool emission** 200 → qwen3-coder, 1 tool call, `finish=tool_calls`; **tool-result continuation** 200 on the same deployment, decision `affinity.tool_round_trip = ollama/qwen3-coder:latest`, `failover_allowed = false`; **session header** (`X-ModelSaar-Session`) pinned the second request to the first's deployment, decision `affinity.status = found`, `session_source = header:X-ModelSaar-Session`; `video_url` part → **400 `unsupported_content_type`** with no backend dispatch |
+| `decisions`, `status` | `27-decisions.txt`: the same `auto` alias sent conversation to qwen3.8 and agent/tool traffic to qwen3-coder; overhead 0.2–0.8 ms |
+| Real clients | **NOT RUN** — none installed on the Mac (`50-real-clients.txt` lists the exact commands per client) |
+
+### Live evaluation with the repaired evaluator (3 deployments; 15 calib / 32 test; `max_tokens 400`, temperature 0, seed 7, scorer `2026.10.11-2`, tasks sha256 `84c34596cb64…`, sandbox `sandbox-exec`)
+
+Deployments: qwen3.6:latest (35.5B, ctx assumed 4096), gemma4:31b (31.3B, ctx assumed 4096),
+qwen3-coder:latest (30.5B, ctx 131072). Calibration picked qwen3-coder as both fixed-strong and
+fixed-fast (calib success 0.933 / p50 0.68 s; gemma4 0.80 / 17.8 s; qwen3.6 0.467 / 4.3 s).
+
+| policy | success | 95 % CI | completion | violations | p50 ms | p95 ms |
+|---|---|---|---|---|---|---|
+| **auto (live routing)** | **0.938** | [0.80, 0.98] | **1.000** | **0** | 598 | 7 958 |
+| fixed-strong (calibrated: qwen3-coder) | 0.938 | [0.80, 0.98] | 0.969 | 1 | 639 | 4 760 |
+| fixed-fast (calibrated: qwen3-coder) | 0.938 | [0.80, 0.98] | 0.969 | 1 | 639 | 4 760 |
+| rules (gold label + specialist tags) | 0.812 | [0.65, 0.91] | 1.000 | 0 | 963 | 4 859 |
+| random (diagnostic) | 0.719 | [0.55, 0.84] | 1.000 | 0 | 4 320 | 24 356 |
+| oracle (offline upper bound, not available at runtime) | 1.000 | [0.89, 1.00] | 1.000 | 0 | 639 | 4 671 |
+
+Per deployment on the test split: qwen3-coder 0.938 (p50 0.64 s, 1 violation = the vision task it
+cannot take), gemma4:31b 0.938 (p50 20.3 s, thinking), qwen3.6 0.500 (p50 4.3 s; 0/5 coding, 0/3
+summarization, 0/2 translation under the 400-token budget — its reasoning consumes the budget).
+Routing overhead mean 0.67 ms, p95 0.98 ms; task-label accuracy 0.844; evidence levels used by `auto`:
+measured for all 32 requests (`measured:2` 25, `measured:1` 7); classifier not enabled. `auto` sent 30/32
+tasks to qwen3-coder and the vision task plus the tool round trip (`cont-01`) to gemma4. Routing
+mistakes (auto failed, oracle succeeded): `math-05` (qwen3-coder answered 100 for 50), `long-01`
+(qwen3-coder dropped a required line). The rules baseline scored 0/5 on coding because it follows the
+catalogue's `code` tag to qwen3.6 in deployment order, which fails coding under this budget — a
+reminder that tags are hypotheses and measured evidence is what `auto` uses.
+
+**Reading.** On this task set and hardware, `auto` matched the best single model on success (0.938 =
+0.938, identical CI) and beat it on completion (1.000 vs 0.969) and capability violations (0 vs 1)
+because the fixed model cannot take images; its p95 is higher because the two tasks it sent to
+gemma4 are slow (16.6 s and 21.6 s). Acceptance targets (docs/evaluation.md): violations 0 ✔;
+completion ≥ fixed-strong ✔; success ≥ fixed-strong − 0.05 ✔; overhead p95 < 5 ms ✔. The explicit
+option (request a concrete deployment id, or `auto-fast`) remains the right choice when one model is
+known to be best for a workload.
+
+Caveats: n = 32 (CIs overlap everywhere); `max_tokens 400` systematically penalises thinking
+models (qwen3.6, gemma4) — a matched larger budget was not run in this pass; served context for
+unloaded models was assumed 4096; 3 of 8 deployments swept; one hardware/runtime; synthetic tasks.
+Complete sanitised per-request records: `eval-live.json.records.jsonl` (173 records: ids, status,
+latency, scorer detail; no prompts); machine-readable aggregates: `eval-live.json`.
+
+### Still NOT RUN after this pass
+
+| item | how to run |
+|---|---|
+| Real clients (Open WebUI, OpenClaw, OpenCode, Hermes) | see `50-real-clients.txt` in the run folder: install/start the client, `modelsaar client-config <client> --apply`, chat, `modelsaar decisions --limit 10` |
+| Fresh-volume container start | `scripts/compose-smoke.sh` on a host with Docker (also runs in CI) |
+| Evaluation with a thinking-matched budget / all 8 deployments | `run_live_verify.command` with `DEPS` widened; raise `MAX_TOKENS` in `evaluation/harness.py` for a separately labelled run |
+| Embeddings contract against a real embedding model (identity binding, output validation) | `ollama pull qwen3-embedding:0.6b`, declare `embeddings:`, `curl /v1/embeddings` |
+| Generic OpenAI-compatible backend (vLLM / llama.cpp) incl. `/tokenize` and `identity` declarations | `modelsaar init --endpoint http://127.0.0.1:8000/v1 --type openai_compatible`, declare models, `scripts/live_verify.sh` |
+
+## NOT RUN (needs hardware, a daemon, or a real client) — status at 0.1.0 / 1122e1f
 
 | item | why not here | how to run |
 |---|---|---|
@@ -128,7 +217,8 @@ for unloaded models was assumed 4096 during the run; only 3 of 8 deployments wer
 * Token estimate is conservative by design; borderline cases use `/tokenize` only on runtimes that have it.
 * With no measurements, `auto` prefers the cheaper of effectively tied candidates; after `eval --save-measurements`
   quality evidence dominates (shown in the simulated run: evidence levels `measured:*` for all test requests).
-* The evaluation code sandbox is basic (subprocess + rlimits), not a security boundary.
+* (0.1.0) The evaluation code sandbox was basic (subprocess + rlimits); since the hardening pass code
+  tasks run only under bubblewrap / `sandbox-exec` / Docker or are skipped.
 * Admin key is also valid for inference (one-way separation).
 
 ## Publication actions requiring separate authorization

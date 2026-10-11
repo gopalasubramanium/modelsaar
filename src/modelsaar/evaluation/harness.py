@@ -354,7 +354,20 @@ def evaluate(
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "mode": "simulated" if run.simulated else "live",
         "deployments": [
-            {"id": d["id"], "family": d["family"], "parameter_size": d["parameter_size"], "quantization": d["quantization"], "runtime": d["backend_type"], "context_length": d["context_length"], "fingerprint": d["fingerprint"]}
+            {
+                "id": d["id"],
+                "family": d["family"],
+                "parameter_size": d["parameter_size"],
+                "quantization": d["quantization"],
+                "runtime": d["backend_type"],
+                "runtime_version": d.get("runtime_version"),
+                "context_length": d["context_length"],
+                "fingerprint": d["fingerprint"],
+                "identity": d.get("identity"),
+                "endpoint": d.get("endpoint"),
+                "tags": d.get("tags"),
+                "memory_gb_estimate": d.get("memory_gb_estimate"),
+            }
             for d in deps
         ],
         "n_calib": len(calib),

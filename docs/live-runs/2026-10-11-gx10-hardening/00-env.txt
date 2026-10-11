@@ -1,0 +1,11 @@
+Darwin Mac 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:02:59 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8142 arm64
+Python 3.12.15
+modelsaar 0.1.0
+0f8af84b66dfcca8f6e8de639a69fa9556f0f2a7
+?? .DS_Store
+?? .github/.DS_Store
+?? docs/.DS_Store
+?? live-verify-0f8af84/
+?? src/.DS_Store
+?? src/modelsaar/.DS_Store
+?? tests/.DS_Store

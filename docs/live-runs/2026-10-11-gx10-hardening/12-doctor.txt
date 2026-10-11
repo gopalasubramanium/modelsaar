@@ -1,0 +1,38 @@
+[OK  ] config: loaded /Users/sgopala/.modelsaar-live/repo/live-verify-0f8af84/home/config.yaml (version 1, hash 77421f1fcef6060b)
+[OK  ] auth: api keys present (/Users/sgopala/.modelsaar-live/repo/live-verify-0f8af84/home/keys/api_keys)
+[OK  ] auth: admin key present (/Users/sgopala/.modelsaar-live/repo/live-verify-0f8af84/home/keys/admin_key)
+[OK  ] network: gateway binds to loopback 127.0.0.1:27782
+[OK  ] backend:ollama: ollama reachable at http://100.83.54.124:11434
+[WARN] deployment:ollama/muse-glimmer:latest: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/muse-glimmer:latest` to verify
+[WARN] deployment:ollama/muse-glimmer:latest: served context length is assumed (4096); trained max is 131072
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/qwen3.6:latest: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/qwen3.6:latest` to verify
+[WARN] deployment:ollama/gemma4:31b: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/gemma4:31b` to verify
+[WARN] deployment:ollama/gemma4:31b: served context length is assumed (4096); trained max is 262144
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/qwen3.8:latest: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/qwen3.8:latest` to verify
+[WARN] deployment:ollama/qwen3-coder-next:latest: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/qwen3-coder-next:latest` to verify
+[WARN] deployment:ollama/qwen3-coder-next:latest: served context length is assumed (4096); trained max is 262144
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/qwen3-coder:latest: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/qwen3-coder:latest` to verify
+[WARN] deployment:ollama/qwen3-coder:latest: served context length is assumed (4096); trained max is 262144
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/qwen3.6-accurate:latest: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/qwen3.6-accurate:latest` to verify
+[WARN] deployment:ollama/qwen3.6-fast:latest: capabilities unknown: ['json_schema'] (requests needing them will not route here)
+       -> run `modelsaar probe ollama/qwen3.6-fast:latest` to verify
+[OK  ] classifier: optional classifier disabled (deterministic routing only)
+[OK  ] alias:auto: advertised with 8 deployment(s)
+[OK  ] alias:auto-quality: advertised with 8 deployment(s)
+[OK  ] alias:auto-balanced: advertised with 8 deployment(s)
+[OK  ] alias:auto-fast: advertised with 8 deployment(s)
+[OK  ] alias:auto-code: advertised with 3 deployment(s)
+[OK  ] alias:auto-vision: advertised with 6 deployment(s)
+
+0 failure(s)
