@@ -118,6 +118,11 @@ for page in pages:
         err(f"{rel}: canonical not absolute ({s.canonical!r})")
     if "TODO" in text or re.search(r"\{\{\s", text):
         err(f"{rel}: placeholder text left in page")
+    # The public site must not expose the owner's inference host or any key: Tailscale CGNAT addresses
+    # (100.64.0.0/10), LAN addresses and ModelSaar/OpenAI-style key literals are refused.
+    leak = re.search(r"\b100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}\b|\b(192\.168|10)\.\d{1,3}\.\d{1,3}\.\d{1,3}\b|\b(ms|sk)-[A-Za-z0-9]{24,}", text)
+    if leak:
+        err(f"{rel}: private host address or key literal in page ({leak.group(0)})")
     if s.imgs_without_alt:
         err(f"{rel}: {s.imgs_without_alt} <img> without alt")
     for ld in s.jsonld:

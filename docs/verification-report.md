@@ -11,7 +11,7 @@ real; simulated runs are labelled as such.
 | Build/test container (cloud) | Linux x86_64, CPython 3.13.16, starlette 1.7.0, uvicorn 0.54.0, httpx 0.28.1, pydantic 2.14.0, PyYAML 6.0.3, pytest 9.1.1. No GPU. Network: PyPI reachable; Hugging Face, Ollama registry and Docker daemon **not** available. |
 | Independent review venv | CPython 3.10.20 (uv), same dependency versions — full test suite passed (reviewer's run). |
 | Owner's Linux VM bridge | aarch64, CPython 3.10.12: `pytest` → **61 passed** at that commit (64 at HEAD); `modelsaar eval --mode simulated --limit 10` ran (Python 3.10/aarch64 compatibility). |
-| **Owner's MacBook Air M5 (macOS, Darwin 27.0.0 arm64) → ASUS GX10 (NVIDIA GB10) over Tailscale** | Real run on 2026-10-11 14:17–16:25 IST: uv-managed CPython 3.12.15, ModelSaar 0.1.0, **Ollama 0.32.13** at `http://100.83.54.124:11434` serving 8 models. Outputs: `live-check-20261011-141721/` (committed next to the report). Driven from this session by double-clicking `run_live_check.command`, `run_live_eval.command`, `run_reprobe.command` in Finder. |
+| **Owner's MacBook Air M5 (macOS, Darwin 27.0.0 arm64) → ASUS GX10 (NVIDIA GB10) over Tailscale** | Real run on 2026-10-11 14:17–16:25 IST: uv-managed CPython 3.12.15, ModelSaar 0.1.0, **Ollama 0.32.13** at `http://<gx10-tailscale-address>:11434` serving 8 models. Outputs: `live-check-20261011-141721/` (committed next to the report). Driven from this session by double-clicking `run_live_check.command`, `run_live_eval.command`, `run_reprobe.command` in Finder. |
 
 ## Executed
 
@@ -64,7 +64,7 @@ Deployments discovered (all Q4_K_M GGUF, declared locality `local` = owner's pri
 
 | check | result |
 |---|---|
-| `init --endpoint http://100.83.54.124:11434` | wrote config + keys; discovered 8 deployments |
+| `init --endpoint http://<gx10-tailscale-address>:11434` | wrote config + keys; discovered 8 deployments |
 | `discover` | capabilities from `/api/show` (tools/vision/thinking), residency + served context from `/api/ps` (131072 while loaded), locality evidence recorded; cloud-alias detection exercised negatively (none present) |
 | `doctor` | 0 failures; warnings only for assumed served context (4096) on unloaded models without Modelfile `num_ctx` |
 | `probe --all` (first pass, probe budgets 40/200 tokens) | **exposed bug**: thinking models (muse-glimmer, qwen3.6*, gemma4) exhausted the budget on reasoning → streaming/JSON/vision recorded `unsupported` (false negatives). Fixed in commit `dadd377` (larger budgets, reasoning deltas counted, exhausted budget → `unknown`). |
@@ -136,7 +136,7 @@ section was produced by the repaired code.
 Driven by double-clicking `run_live_verify.command` in Finder from this session; the script ran
 detached (`nohup caffeinate`) and copied its folder back. Environment (`00-env.txt`): macOS Darwin
 27.0.0 arm64, CPython 3.12.15, ModelSaar 0.1.0 at commit `0f8af84b66df`, **Ollama 0.32.13** at
-`http://100.83.54.124:11434`; `sandbox-exec` available, so `code_exec` tasks were scored in isolation.
+`http://<gx10-tailscale-address>:11434`; `sandbox-exec` available, so `code_exec` tasks were scored in isolation.
 Config is in `10b-config-redacted.txt`; model digests in `02-backend-tags.txt` (qwen3.6 `096fdbd02fe6…`,
 gemma4:31b `6316f0629137…`, qwen3-coder `06c1097efce0…`, all Q4_K_M); these digests are the deployments'
 identities and part of their fingerprints.
