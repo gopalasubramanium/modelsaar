@@ -53,6 +53,7 @@ class OpenAICompatAdapter(BaseAdapter):
                 backend_type="openai_compatible",
                 model=name,
                 runtime="openai_compatible",
+                endpoint=self.endpoint,
                 resource_pool=self.cfg.resource_pool,
                 discovered=name in names,
                 available_on_disk=ok,

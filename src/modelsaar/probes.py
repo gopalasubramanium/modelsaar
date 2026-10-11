@@ -294,7 +294,19 @@ async def measure_latency(adapter: BaseAdapter, dep: Deployment, timeout: float)
         if r.status != 200:
             break
         times.append((time.monotonic() - t0) * 1000)
-    m = Measurement(task="latency_probe", samples=len(times), source="probe", measured_at=time.time())
+    m = Measurement(
+        task="latency_probe",
+        samples=len(times),
+        source="probe",
+        measured_at=time.time(),
+        conditions={
+            "workload": "single short prompt, max_tokens=256, temperature=0",
+            "effective_context": dep.context_length,
+            "runtime": f"{dep.runtime} {dep.runtime_version}".strip(),
+            "endpoint": dep.endpoint,
+            "resident_before": dep.loaded,
+        },
+    )
     if len(times) == 2:
         m.p50_ms = times[1]
         m.p95_ms = max(times)

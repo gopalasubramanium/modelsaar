@@ -85,6 +85,7 @@ class OllamaAdapter(BaseAdapter):
                 identity_source="ollama digest" if m.get("digest") else "",
                 runtime="ollama",
                 runtime_version=self.runtime_version,
+                endpoint=self.endpoint,
                 resource_pool=self.cfg.resource_pool,
                 discovered=True,
                 available_on_disk=True,

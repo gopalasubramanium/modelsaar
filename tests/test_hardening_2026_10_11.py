@@ -552,3 +552,126 @@ def test_request_level_contract_changes_rejected(fake):
         assert _embed(g, "docs", "a", dimensions=8, encoding_format="float").status_code == 200
     finally:
         g.gw.stop()
+
+
+# --------------------------------------------------------------------------- #
+# Finding 5: evidence identity and invalidation
+# --------------------------------------------------------------------------- #
+
+
+def test_endpoint_change_invalidates_stored_probe(fake):
+    """Finding 5: a replacement endpoint under the same backend id/model name inherited a stored
+    successful tools probe although the new server lacks tool support."""
+    from modelsaar.config import BackendConfig, DeclaredModel
+    from modelsaar.testing.fakebackend import FakeModel
+
+    def gw(port: int):
+        return build_gateway(
+            f"http://127.0.0.1:{port}",
+            backends=(
+                BackendConfig(
+                    id="oai",
+                    type="openai_compatible",
+                    base_url=f"http://127.0.0.1:{port}",
+                    resource_pool="pool",
+                    models=(DeclaredModel(name="small:1b", context_length=8192),),
+                ),
+            ),
+            deployments=(),
+        )
+
+    g = gw(fake.port)
+    try:
+        r = g.admin.post("/admin/probe", json={"deployment": "oai/small:1b", "which": ["tools"]})
+        assert r.status_code == 200 and any(x["capability"] == "tools" and x["value"] == "supported" for x in r.json()["results"])
+        assert g.router.registry.get("oai/small:1b").cap("tools") == "supported"
+        fp1 = g.router.registry.get("oai/small:1b").fingerprint
+        state_dir = g.tmp
+    finally:
+        g.gw.stop()
+    # Same backend id and model name, different endpoint without tool support.
+    other = FakeBackend([FakeModel("small:1b", ["completion"], 8192, parameter_size="1.0B")])
+    other.start()
+    g2 = _gateway_with_state(state_dir, other.port)
+    try:
+        d = g2.router.registry.get("oai/small:1b")
+        assert d.fingerprint != fp1, "fingerprint ignored the endpoint"
+        assert d.cap("tools") != "supported", "stored probe from the old endpoint was inherited"
+        assert fp1 in (d.raw_metadata.get("invalidated_probe_fingerprints") or [])
+    finally:
+        g2.gw.stop()
+        other.stop()
+
+
+def _gateway_with_state(state_dir, port: int):
+    """A gateway reusing an existing state directory (keys + DB) with a replaced oai endpoint."""
+    import httpx
+    from conftest import Gateway
+
+    from modelsaar.config import BackendConfig, Config, DeclaredModel, ResourcePool, read_keys
+    from modelsaar.runtime import GatewayThread, free_port
+
+    api = read_keys(state_dir / "keys/api_keys")[0]
+    adm = read_keys(state_dir / "keys/admin_key")[0]
+    cfg = Config(
+        resource_pools=(ResourcePool(id="pool", max_concurrent=2, max_queue=2, queue_timeout_s=2.0),),
+        backends=(
+            BackendConfig(id="oai", type="openai_compatible", base_url=f"http://127.0.0.1:{port}", resource_pool="pool", models=(DeclaredModel(name="small:1b", context_length=8192),)),
+        ),
+        deployments=(),
+    )
+    cfg = cfg.model_copy(update={"server": cfg.server.model_copy(update={"port": free_port(), "residency_refresh_s": 0.5, "discovery_refresh_s": 3600}), "config_path": str(state_dir / "config.yaml"), "config_hash": "test2"})
+    gw = GatewayThread(cfg)
+    gw.start()
+    g = Gateway(gw, api, adm, state_dir)
+    g.client = httpx.Client(base_url=gw.url, headers={"Authorization": f"Bearer {api}"}, timeout=30)
+    g.admin = httpx.Client(base_url=gw.url, headers={"Authorization": f"Bearer {adm}"}, timeout=30)
+    return g
+
+
+def test_load_unload_keeps_evidence(gateway, fake):
+    """Finding 5 (preserved fix): residency and served context changes are not identity changes."""
+    d = gateway.router.registry.get("ollama/big:27b")
+    fp = d.fingerprint
+    fake.models["big:27b"].loaded = not fake.models["big:27b"].loaded
+    gateway.refresh()
+    assert gateway.router.registry.get("ollama/big:27b").fingerprint == fp
+
+
+def test_evidence_scheme_versioning_invalidates_old_rows(tmp_path):
+    """Finding 5: evidence written by the previous scheme / defective evaluator is not loaded."""
+    import sqlite3
+    import time
+
+    from modelsaar.store import EVIDENCE_SCHEME, Store
+
+    db = tmp_path / "state.db"
+    conn = sqlite3.connect(db)
+    conn.executescript(
+        """
+        CREATE TABLE probes (deployment_id TEXT NOT NULL, fingerprint TEXT NOT NULL, capability TEXT NOT NULL,
+          value TEXT NOT NULL, note TEXT NOT NULL DEFAULT '', checked_at REAL NOT NULL,
+          PRIMARY KEY (deployment_id, fingerprint, capability));
+        CREATE TABLE measurements (deployment_id TEXT NOT NULL, fingerprint TEXT NOT NULL, task TEXT NOT NULL,
+          quality REAL, samples INTEGER NOT NULL DEFAULT 0, p50_ms REAL, p95_ms REAL, ttft_ms REAL, load_ms REAL,
+          source TEXT NOT NULL DEFAULT 'eval', measured_at REAL NOT NULL,
+          PRIMARY KEY (deployment_id, fingerprint, task, source));
+        CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+        """
+    )
+    conn.execute("INSERT INTO probes VALUES ('b/m','fp1','tools','supported','',?)", (time.time(),))
+    conn.execute("INSERT INTO measurements VALUES ('b/m','fp1','coding',0.9,10,100,200,NULL,NULL,'eval',?)", (time.time(),))
+    conn.commit()
+    conn.close()
+    s = Store(db)
+    try:
+        assert s.get_meta("evidence_scheme") == str(EVIDENCE_SCHEME)
+        assert s.load_probes("b/m", "fp1") == {}
+        assert s.load_measurements("b/m", "fp1") == []
+        inv = s.invalidated_counts()
+        assert inv["probes"] == 1 and inv["measurements"] == 1
+        s.save_measurement("b/m", "fp1", {"task": "coding", "quality": 0.5, "samples": 4, "source": "eval", "conditions": {"max_tokens": 1024, "scorer_version": "x"}})
+        rows = s.load_measurements("b/m", "fp1")
+        assert rows and rows[0]["conditions"]["max_tokens"] == 1024
+    finally:
+        s.close()

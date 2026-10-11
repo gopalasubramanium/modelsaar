@@ -85,6 +85,8 @@ class BaseAdapter:
             limits=httpx.Limits(max_connections=cfg.max_concurrent + 4),
         )
         self.runtime_version: str = ""
+        # Execution endpoint identity used in deployment fingerprints (no credentials).
+        self.endpoint = f"{parts.scheme}://{parts.netloc}{parts.path.rstrip('/')}"
 
     async def aclose(self) -> None:
         await self._client.aclose()

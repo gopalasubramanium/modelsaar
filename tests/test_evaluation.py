@@ -460,7 +460,7 @@ def test_checkpoint_written_and_resumed(tmp_path):
 def test_resume_ignores_records_from_other_fingerprint(tmp_path):
     ck = tmp_path / "ck.jsonl"
     ck.write_text(json.dumps({"task": "t1", "policy": "calib:d", "deployment": "d", "fingerprint": "old", "ok": True, "status": 200, "latency_ms": 1}) + "\n", encoding="utf-8")
-    run = EvalRun("http://127.0.0.1:9", "k", "a", simulated=True, checkpoint=ck, resume=True)
+    run = EvalRun("http://127.0.0.1:9", "k", "a", simulated=False, checkpoint=ck, resume=True)
     run.fingerprints = {"d": "new"}
     assert run._resumable("t1", "calib:d") is None
     run.fingerprints = {"d": "old"}

@@ -168,6 +168,10 @@ class EvalRun:
         if not prev:
             return None
         dep, fp = prev.get("deployment"), prev.get("fingerprint")
+        if self.simulated:
+            # The simulated backend is deterministic by construction and is started on a fresh
+            # loopback port per run, so its endpoint (part of the fingerprint) differs every time.
+            return prev
         if dep and fp and self.fingerprints.get(dep) not in (None, fp):
             return None  # the deployment changed since the checkpoint: re-run
         return prev
@@ -380,11 +384,24 @@ def evaluate(
     # optional: persist measured evidence for routing (per category + latency)
     if save_measurements_store is not None:
         by_fp = {d["id"]: d["fingerprint"] for d in deps}
+        by_id = {d["id"]: d for d in deps}
         for d in dep_ids:
+            cond = {
+                k: v for k, v in report["conditions"].items() if k != "deployment_fingerprints"
+            } | {
+                "split": "calib",
+                "effective_context": by_id[d].get("context_length"),
+                "runtime": f"{by_id[d].get('runtime', '')} {by_id[d].get('runtime_version', '')}".strip(),
+                "endpoint": by_id[d].get("endpoint"),
+            }
             for cat, v in cal_summary[d]["per_category"].items():
                 if v["success"] is None:
                     continue  # nothing scored in this category (e.g. code_exec skipped): no evidence
-                save_measurements_store.save_measurement(d, by_fp[d], {"task": cat, "quality": v["success"], "samples": v["n"], "p50_ms": cal_summary[d]["p50_ms"], "p95_ms": cal_summary[d]["p95_ms"], "source": "eval"})
+                save_measurements_store.save_measurement(
+                    d,
+                    by_fp[d],
+                    {"task": cat, "quality": v["success"], "samples": v["n"], "p50_ms": cal_summary[d]["p50_ms"], "p95_ms": cal_summary[d]["p95_ms"], "source": "eval", "conditions": cond},
+                )
         try:
             run.admin.post("/admin/refresh")
         except Exception:
