@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+date: Sun, 11 Oct 2026 08:52:06 GMT
+server: uvicorn
+x-modelsaar-request-id: req_3f1ff3ce547a4437
+x-modelsaar-deployment: ollama/qwen3.6:latest
+x-modelsaar-profile: quality
+content-length: 325
+content-type: application/json
+
+{"id":"chatcmpl-292","object":"chat.completion","created":1791708727,"model":"auto","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"","reasoning":"Here's a thinking process:\n\n1"},"finish_reason":"length"}],"usage":{"prompt_tokens":16,"completion_tokens":8,"total_tokens":24}}

@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+date: Sun, 11 Oct 2026 08:52:14 GMT
+server: uvicorn
+x-modelsaar-request-id: req_b40a4e5d49514434
+x-modelsaar-deployment: ollama/qwen3-coder:latest
+x-modelsaar-profile: quality
+content-length: 426
+content-type: application/json
+
+{"id":"chatcmpl-240","object":"chat.completion","created":1791708736,"model":"auto","system_fingerprint":"fp_ollama","choices":[{"index":0,"message":{"role":"assistant","content":"","tool_calls":[{"id":"call_stec6jyt","index":0,"type":"function","function":{"name":"get_current_time","arguments":"{\"city\":\"Paris\"}"}}]},"finish_reason":"tool_calls"}],"usage":{"prompt_tokens":277,"completion_tokens":23,"total_tokens":300}}

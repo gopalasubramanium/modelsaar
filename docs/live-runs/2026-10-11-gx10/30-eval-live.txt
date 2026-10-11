@@ -1,0 +1,67 @@
+Traceback (most recent call last):
+  File "/Users/sgopala/.modelsaar-live/venv/bin/modelsaar", line 10, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/sgopala/.modelsaar-live/repo/src/modelsaar/cli.py", line 617, in main
+    args.fn(args)
+  File "/Users/sgopala/.modelsaar-live/repo/src/modelsaar/cli.py", line 426, in cmd_eval
+    run_eval_cli(args)
+  File "/Users/sgopala/.modelsaar-live/repo/src/modelsaar/evaluation/harness.py", line 306, in run_eval_cli
+    rep = run_live(args, tasks)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/repo/src/modelsaar/evaluation/harness.py", line 376, in run_live
+    rep = evaluate(run, tasks, save_measurements_store=gw.store if args.save_measurements else None)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/repo/src/modelsaar/evaluation/harness.py", line 244, in evaluate
+    sw = run.sweep(test, dep_ids, "test")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/repo/src/modelsaar/evaluation/harness.py", line 124, in sweep
+    out[d][t["id"]] = self.run_one(t, d, f"{policy_prefix}:{d}")
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/repo/src/modelsaar/evaluation/harness.py", line 88, in run_one
+    r = self.c.post("/v1/chat/completions", json=body)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpx/_client.py", line 1144, in post
+    return self.request(
+           ^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-live/venv/lib/python3.12/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

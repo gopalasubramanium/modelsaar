@@ -1,0 +1,5 @@
+req_b40a4e5d49514434 auto           -> ollama/qwen3-coder:latest                ok                0.3ms agent
+req_4af27f13d24e47c1 auto-fast      -> ollama/qwen3-coder:latest                ok                0.2ms conversation
+req_90178b9dbde54b9f auto           -> ollama/qwen3-coder:latest                ok                0.3ms coding
+req_3f1ff3ce547a4437 auto           -> ollama/qwen3.6:latest                    ok                0.3ms conversation
+req_d489261889534385 auto           -> ollama/qwen3.6:latest                    ok                0.2ms conversation

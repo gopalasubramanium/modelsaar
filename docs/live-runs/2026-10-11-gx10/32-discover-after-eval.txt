@@ -1,0 +1,15 @@
+ollama/muse-glimmer:latest               generative ctx=4096    tools=supported   vision=supported   json_schema=unknown     loaded=False healthy=True locality=local
+ollama/qwen3.6:latest                    generative ctx=4096    tools=supported   vision=supported   json_schema=unknown     loaded=False healthy=True locality=local
+ollama/gemma4:31b                        generative ctx=4096    tools=supported   vision=supported   json_schema=unknown     loaded=False healthy=True locality=local
+ollama/qwen3.8:latest                    generative ctx=131072  tools=supported   vision=supported   json_schema=unknown     loaded=True healthy=True locality=local
+ollama/qwen3-coder-next:latest           generative ctx=4096    tools=supported   vision=unsupported json_schema=unknown     loaded=False healthy=True locality=local
+ollama/qwen3-coder:latest                generative ctx=131072  tools=supported   vision=unsupported json_schema=unknown     loaded=True healthy=True locality=local
+ollama/qwen3.6-accurate:latest           generative ctx=131072  tools=supported   vision=supported   json_schema=unknown     loaded=False healthy=True locality=local
+ollama/qwen3.6-fast:latest               generative ctx=65536   tools=supported   vision=supported   json_schema=unknown     loaded=False healthy=True locality=local
+aliases:
+  auto           -> ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-quality   -> ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-balanced  -> ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-fast      -> ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-code      -> ['ollama/qwen3.6:latest', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder:latest'] ctx>=4096 tools=supported vision=partial
+  auto-vision    -> ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=supported

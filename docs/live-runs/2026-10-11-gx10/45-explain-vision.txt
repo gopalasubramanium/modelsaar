@@ -1,0 +1,16 @@
+request req_b7de17f17a054f2a: auto -> ollama/qwen3.8:latest  (profile quality, 0.78 ms)
+task: document_vision {'document_vision': 0.9} ambiguous=False  tokens~4349
+  - task=document_vision (clear); required: image input; context need ~4349 tokens
+  - 5 deployment(s) excluded by hard filters; 3 eligible
+  - ollama/qwen3.8:latest ranked first on profile quality: quality 0.70 (prior:catalogue), latency cost 0.63, resident
+candidates:
+  ollama/qwen3.8:latest                    score=+0.568 quality=0.70±0.25 [prior:catalogue] latency=0.63 residency=0.00 ['latency:measured-other-task', 'load:memory-heuristic']
+  ollama/qwen3.6-fast:latest               score=+0.391 quality=0.58±0.35 [uncalibrated:size-heuristic] latency=0.92 residency=0.00 ['latency:measured-other-task', 'load:memory-heuristic']
+  ollama/qwen3.6-accurate:latest           score=+0.278 quality=0.58±0.35 [uncalibrated:size-heuristic] latency=1.00 residency=1.00 ['latency:measured-other-task', 'load:memory-heuristic']
+excluded:
+  ollama/muse-glimmer:latest: image input required; capability vision is unsupported (probe); effective context 4096 < required 4349 (input~1277 + output 1024 + reasoning 2048; estimate:chars/3+overheads)
+  ollama/qwen3.6:latest: effective context 4096 < required 4349 (input~1277 + output 1024 + reasoning 2048; estimate:chars/3+overheads)
+  ollama/gemma4:31b: effective context 4096 < required 4349 (input~1277 + output 1024 + reasoning 2048; estimate:chars/3+overheads)
+  ollama/qwen3-coder-next:latest: image input required; capability vision is unsupported (source_claim)
+  ollama/qwen3-coder:latest: image input required; capability vision is unsupported (source_claim)
+remedies: shorten the conversation, lower max_tokens, or serve the model with a larger context | use a deployment whose vision capability is supported

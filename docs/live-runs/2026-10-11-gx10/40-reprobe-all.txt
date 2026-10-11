@@ -1,0 +1,64 @@
+probing ollama/muse-glimmer:latest (fingerprint f9c35dad5d916996) ...
+  streaming        supported      21456ms  events=179 content_chunks=9 reasoning_chunks=167 done=True finish=stop usage=yes
+  tools            supported       5918ms  tool call with id and JSON args
+  parallel_tools   supported      16530ms  two distinct tool calls in one turn
+  json_object      supported      17953ms  
+  json_schema      supported      31049ms  schema-conformant object
+  vision           unsupported    40888ms  image accepted but answer did not identify the colour ('white')
+  latency           p50=7581ms ttft=7932ms load~548ms (samples=2)
+probing ollama/qwen3.6:latest (fingerprint 7f961b36c15620b4) ...
+  streaming        supported      11017ms  events=194 content_chunks=5 reasoning_chunks=186 done=True finish=stop usage=yes
+  tools            supported       2281ms  tool call with id and JSON args
+  parallel_tools   supported       2949ms  two distinct tool calls in one turn
+  json_object      supported       3399ms  
+  json_schema      supported       7249ms  schema-conformant object
+  vision           supported       1569ms  accepted a base64 image and identified its colour
+  latency           p50=1540ms ttft=8548ms load~159ms (samples=2)
+probing ollama/gemma4:31b (fingerprint f4d576548daab118) ...
+  streaming        supported      16318ms  events=55 content_chunks=9 reasoning_chunks=43 done=True finish=stop usage=yes
+  tools            supported       6271ms  tool call with id and JSON args
+  parallel_tools   supported       9420ms  two distinct tool calls in one turn
+  json_object      supported       5939ms  
+  json_schema      supported      15430ms  schema-conformant object
+  vision           supported       4879ms  accepted a base64 image and identified its colour
+  latency           p50=4058ms ttft=9178ms load~141ms (samples=2)
+probing ollama/qwen3.8:latest (fingerprint 249104521db3a0f3) ...
+  streaming        supported       1947ms  events=32 content_chunks=5 reasoning_chunks=24 done=True finish=stop usage=yes
+  tools            supported       2353ms  tool call with id and JSON args
+  parallel_tools   supported       3619ms  two distinct tool calls in one turn
+  json_object      supported       2319ms  
+  json_schema      supported       6910ms  schema-conformant object
+  vision           supported       3979ms  accepted a base64 image and identified its colour
+  latency           p50=1340ms ttft=570ms load~0.0ms (samples=2)
+probing ollama/qwen3-coder-next:latest (fingerprint 81e06831490f569d) ...
+  streaming        supported      13608ms  events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes
+  tools            supported       1133ms  tool call with id and JSON args
+  parallel_tools   supported       1394ms  two distinct tool calls in one turn
+  json_object      supported        658ms  
+  json_schema      supported        713ms  schema-conformant object
+  vision           unsupported        0ms  skipped: backend metadata says vision unsupported
+  latency           p50=328ms ttft=13458ms load~193ms (samples=2)
+probing ollama/qwen3-coder:latest (fingerprint 6f8c79abeee290ac) ...
+  streaming        supported       7108ms  events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes
+  tools            supported        630ms  tool call with id and JSON args
+  parallel_tools   supported        927ms  two distinct tool calls in one turn
+  json_object      supported        475ms  
+  json_schema      supported        536ms  schema-conformant object
+  vision           unsupported        0ms  skipped: backend metadata says vision unsupported
+  latency           p50=247ms ttft=6998ms load~0.0ms (samples=2)
+probing ollama/qwen3.6-accurate:latest (fingerprint e8fcfcf5f729d257) ...
+  streaming        supported      10512ms  events=147 content_chunks=5 reasoning_chunks=139 done=True finish=stop usage=yes
+  tools            supported       2347ms  tool call with id and JSON args
+  parallel_tools   supported       2408ms  two distinct tool calls in one turn
+  json_object      supported       3610ms  
+  json_schema      supported      10377ms  schema-conformant object
+  vision           supported       1970ms  accepted a base64 image and identified its colour
+  latency           p50=2122ms ttft=8045ms load~0.0ms (samples=2)
+probing ollama/qwen3.6-fast:latest (fingerprint c3eeae2da0d29f63) ...
+  streaming        supported      10176ms  events=141 content_chunks=5 reasoning_chunks=133 done=True finish=stop usage=yes
+  tools            supported       2581ms  tool call with id and JSON args
+  parallel_tools   supported       2600ms  two distinct tool calls in one turn
+  json_object      supported       3639ms  
+  json_schema      supported       9940ms  schema-conformant object
+  vision           supported       1888ms  accepted a base64 image and identified its colour
+  latency           p50=1949ms ttft=7841ms load~0.0ms (samples=2)

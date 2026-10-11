@@ -5,14 +5,15 @@ Compact state so another session can continue without repeating finished work.
 ## State (2026-10-11)
 
 * Milestones A–D of the build specification are implemented; 61 tests pass (3.10 and 3.13); lint clean.
-* Live checks against real models/clients are NOT RUN in this environment — `scripts/live_check.sh`
-  produces them on the owner's Mac; see docs/verification-report.md.
+* Live checks executed on the owner's Mac against the GX10's Ollama 0.32.13 (8 models): discovery, probes,
+  routing, streaming, tool calls, 3-deployment evaluation — see docs/verification-report.md. Three bugs found
+  by the live run were fixed (thinking-model probe budgets, discover/doctor evidence, fingerprint vs served context).
 * Repository delivered to the owner's `Model_Router/modelsaar` folder. No public repo/package/image.
 
 ## Next actions
 
-1. Owner runs `scripts/live_check.sh` on the Mac with Ollama running; paste `summary.txt` and
-   `eval-live.json` into docs/verification-report.md (replace NOT RUN rows with results + exact versions).
+1. Re-run `modelsaar eval --mode live --save-measurements` (all 8 deployments, detached) so measurements
+   are stored under the corrected fingerprints; consider `max_tokens` ≥ 1024 for thinking models.
 2. Try one real client (Open WebUI is the quickest) with `modelsaar client-config open-webui`; record a
    tool round trip in the report.
 3. If live routing between two deployments works, update the README support matrix.

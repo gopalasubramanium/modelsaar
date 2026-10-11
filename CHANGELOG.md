@@ -10,4 +10,6 @@ control, pre-commit-only failover, decision records and inspection API/status pa
 verified starter catalogue, CLI (`init discover probe serve status doctor explain decisions test
 client-config keys config eval demo uninstall`), client configuration generators for Open WebUI,
 OpenClaw, OpenCode V1/V2 and Hermes Agent, evaluation harness with baselines, fault-injection test
-suite, CI, Dockerfile/compose.
+suite, CI, Dockerfile/compose. Verified live against Ollama 0.32.13 on an ASUS GX10 (8 models);
+fixes from that run: thinking-aware probes, discover/doctor read stored evidence, fingerprint excludes
+served context, `eval --deployments` subset filter.

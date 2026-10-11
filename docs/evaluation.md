@@ -77,6 +77,22 @@ answer correctly by script when the task is in their `good_at` list, so the numb
 real model quality. The identical procedure against real deployments is the NOT RUN item in the
 [verification report](verification-report.md).
 
+## Result on real hardware (GX10 / Ollama 0.32.13, 2026-10-11, 3-deployment subset)
+
+| policy | success | 95 % CI | completion | violations | p50 ms | p95 ms |
+|---|---|---|---|---|---|---|
+| auto (live routing) | 0.875 | [0.72, 0.95] | 1.000 | 0 | 693 | 27 136 |
+| fixed-strong (qwen3-coder) | 0.906 | [0.76, 0.97] | 0.969 | 1 | 646 | 4 849 |
+| fixed-fast (qwen3-coder) | 0.906 | [0.76, 0.97] | 0.969 | 1 | 646 | 4 849 |
+| rules (gold label) | 0.812 | [0.65, 0.91] | 1.000 | 0 | 959 | 4 868 |
+| random | 0.688 | [0.51, 0.82] | 0.938 | 2 | 4 189 | 9 826 |
+| oracle | 0.969 | [0.84, 0.99] | 1.000 | 0 | 552 | 4 585 |
+
+`auto` did not beat the best fixed model here (it mostly chose that model); its measurable gains
+were coverage (no capability violations, 100 % completion) at the price of p95 latency when a
+thinking model was selected. Full context, caveats and the bugs this run exposed are in
+[verification-report.md](verification-report.md).
+
 ## Reporting rules
 
 * Report per-category results with uncertainty; never a single universal "% better".

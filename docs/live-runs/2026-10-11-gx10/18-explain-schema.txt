@@ -1,0 +1,16 @@
+request req_6b1c978725984aca: auto -> ollama/qwen3.8:latest  (profile quality, 0.69 ms)
+task: extraction {'extraction': 0.8} ambiguous=False  tokens~3123
+  - task=extraction (clear); required: strict JSON schema; context need ~3123 tokens
+  - 4 deployment(s) excluded by hard filters; 4 eligible
+  - ollama/qwen3.8:latest ranked first on profile quality: quality 0.70 (prior:catalogue (model-card/vendor derived; NOT a local measurement)), latency cost 0.67, resident
+candidates:
+  ollama/qwen3.8:latest                    score=+0.583 quality=0.70±0.25 [prior:catalogue (model-card/vendor derived; NOT a local measurement)] latency=0.67 residency=0.00 ['latency:measured-other-task', 'load:memory-heuristic']
+  ollama/qwen3-coder:latest                score=+0.544 quality=0.60±0.30 [prior-general:catalogue (model-card/vendor derived; NOT a local measurement)] latency=0.25 residency=0.00 ['latency:measured-other-task', 'load:measured']
+  ollama/qwen3-coder-next:latest           score=+0.504 quality=0.59±0.35 [uncalibrated:size-heuristic] latency=0.27 residency=0.01 ['latency:measured-other-task', 'load:measured']
+  ollama/gemma4:31b                        score=+0.405 quality=0.57±0.35 [uncalibrated:size-heuristic] latency=1.00 residency=0.01 ['latency:measured-other-task', 'load:measured']
+excluded:
+  ollama/muse-glimmer:latest: strict JSON schema output required; capability json_schema is unsupported (probe)
+  ollama/qwen3.6:latest: strict JSON schema output required; capability json_schema is unsupported (probe)
+  ollama/qwen3.6-accurate:latest: strict JSON schema output required; capability json_schema is unsupported (probe)
+  ollama/qwen3.6-fast:latest: strict JSON schema output required; capability json_schema is unsupported (probe)
+remedies: use a deployment whose json_schema capability is supported

@@ -1,0 +1,24 @@
+[OK  ] config: loaded /Users/sgopala/.modelsaar-live/repo/live-check-20261011-141721/home/config.yaml (version 1, hash acb7a5bc6b341fda)
+[OK  ] auth: api keys present (/Users/sgopala/.modelsaar-live/repo/live-check-20261011-141721/home/keys/api_keys)
+[OK  ] auth: admin key present (/Users/sgopala/.modelsaar-live/repo/live-check-20261011-141721/home/keys/admin_key)
+[OK  ] network: gateway binds to loopback 127.0.0.1:22083
+[OK  ] backend:ollama: ollama reachable at http://100.83.54.124:11434
+[WARN] deployment:ollama/muse-glimmer:latest: served context length is assumed (4096); trained max is 131072
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/qwen3.6:latest: served context length is assumed (4096); trained max is 262144
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/gemma4:31b: served context length is assumed (4096); trained max is 262144
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/qwen3-coder-next:latest: served context length is assumed (4096); trained max is 262144
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[WARN] deployment:ollama/qwen3-coder:latest: served context length is assumed (4096); trained max is 262144
+       -> set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length
+[OK  ] classifier: optional classifier disabled (deterministic routing only)
+[OK  ] alias:auto: advertised with 8 deployment(s)
+[OK  ] alias:auto-quality: advertised with 8 deployment(s)
+[OK  ] alias:auto-balanced: advertised with 8 deployment(s)
+[OK  ] alias:auto-fast: advertised with 8 deployment(s)
+[OK  ] alias:auto-code: advertised with 3 deployment(s)
+[OK  ] alias:auto-vision: advertised with 5 deployment(s)
+
+0 failure(s)

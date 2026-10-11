@@ -17,9 +17,9 @@ client ──/v1/chat/completions (model: auto)──▶ ModelSaar ──▶ oll
 
 Status: **0.1.0 — first release candidate.** Core routing, streaming, embeddings, probes, CLI,
 client config generation, evaluation harness and a fault-injection test suite are implemented and
-tested against controlled backends. Live testing against real local models is a runnable procedure
-(see *Verification*), not a claim. Read the [verification report](docs/verification-report.md)
-before relying on any specific compatibility.
+tested against controlled backends, and exercised live against a real Ollama server with eight models
+(discovery, probes, routing, streaming, tool calls, evaluation). Read the
+[verification report](docs/verification-report.md) before relying on any specific compatibility.
 
 ## Why
 
@@ -114,20 +114,22 @@ Inspect: `modelsaar explain -m "..." [--tools --image --json-schema]`, `modelsaa
 
 ## Tested support matrix
 
-Legend: **F** fixture-tested over real HTTP with a controlled fake backend (CI); **D** documented
-from primary sources (config keys verified 2026-10-11); **NOT RUN** needs your hardware/client.
+Legend: **F** fixture-tested over real HTTP with a controlled fake backend (CI); **L** executed live
+against real models (owner's GX10 via Tailscale, 2026-10-11); **D** documented from primary sources
+(config keys verified 2026-10-11); **NOT RUN** needs your hardware/client.
 
 | area | status |
 |---|---|
 | `GET /v1/models`, `POST /v1/chat/completions` (non-stream + SSE), `POST /v1/embeddings`, `/healthz`, `/readyz` | F |
-| Ollama adapter: `/api/tags`, `/api/show`, `/api/ps`, `/api/version`, OpenAI-compat forwarding, cloud-alias detection | F (fixture), **NOT RUN** against a real Ollama |
+| Ollama adapter: `/api/tags`, `/api/show`, `/api/ps`, `/api/version`, OpenAI-compat forwarding, cloud-alias detection | F + **L** (Ollama 0.32.13 on an ASUS GX10, 8 models, 2026-10-11) |
 | Generic OpenAI-compatible adapter (`/models`, `/chat/completions`, `/embeddings`, vLLM `/tokenize`) | F (fixture), **NOT RUN** against vLLM/llama.cpp |
 | Tool round trips, streaming tool deltas, strict schema routing, image routing | F |
 | Failover before commitment / termination after commitment | F |
 | Admission limits, queue rejection, uncertain occupancy on disconnect | F |
 | Probes, fingerprint invalidation, embedding contracts, local-only policy | F |
 | Open WebUI / OpenClaw / OpenCode V1+V2 / Hermes configuration | D; live tool round trip **NOT RUN** |
-| Two real local deployments routed by `auto` | **NOT RUN** here — procedure in [docs/verification-report.md](docs/verification-report.md) |
+| Several real deployments routed by `auto` (chat → qwen3.6, code/tools → qwen3-coder, vision → qwen3.6, agent → gemma4) | **L** — see [docs/verification-report.md](docs/verification-report.md) |
+| Live evaluation vs fixed/rules/random/oracle baselines (3-deployment subset) | **L** — auto 0.875 vs fixed-strong 0.906 (overlapping CIs), 0 capability violations |
 | Responses API, Anthropic Messages | not implemented (explicit 501) |
 
 ## Limitations (0.1)

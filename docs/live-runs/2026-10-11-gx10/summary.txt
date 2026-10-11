@@ -1,0 +1,46 @@
+[14:17:21] ModelSaar live check; backend http://100.83.54.124:11434; output in live-check-20261011-141721
+[14:17:21] == 00-env: bash -c uname -a; python3 --version; modelsaar --version; ollama --version 2>/dev/null || echo 'ollama CLI not found (fine if the server runs elsewhere)'
+[14:17:21]    exit=0
+[14:17:21] == 01-backend-version: curl -sS -m 5 http://100.83.54.124:11434/api/version
+[14:17:21]    exit=0
+[14:17:21] == 02-backend-tags: curl -sS -m 10 http://100.83.54.124:11434/api/tags
+[14:17:21]    exit=0
+[14:17:21] == 03-backend-ps: curl -sS -m 5 http://100.83.54.124:11434/api/ps
+[14:17:22]    exit=0
+[14:17:22] == 10-init: modelsaar init --endpoint http://100.83.54.124:11434 --type ollama --port 22083 --force
+[14:17:23]    exit=0
+[14:17:23] == 11-discover: modelsaar discover
+[14:17:25]    exit=0
+[14:17:25] == 12-doctor: modelsaar doctor
+[14:17:27]    exit=0
+[14:17:27] == 13-probe-all: modelsaar probe --all --timeout 300
+[14:21:46]    exit=0
+[14:21:46] == 14-discover-after-probe: modelsaar discover
+[14:21:48]    exit=0
+[14:21:48] == 15-explain-chat: modelsaar explain -m Give me one sentence of encouragement before an exam.
+[14:21:49]    exit=0
+[14:21:49] == 16-explain-code-tools: modelsaar explain -m Fix the failing pytest in src/app.py --tools
+[14:21:51]    exit=0
+[14:21:51] == 17-explain-vision: modelsaar explain -m What is in this picture? --image
+[14:21:53]    exit=0
+[14:21:53] == 18-explain-schema: modelsaar explain -m Extract name and age from: Priya, 34 --json-schema
+[14:21:54]    exit=0
+[14:21:54] == starting gateway on port 22083
+[14:21:57] == 21-models: curl -sS -m 10 http://127.0.0.1:22083/v1/models -H Authorization: Bearer msk_[REDACTED]
+[14:21:57]    exit=0
+[14:21:57] == 22-test: modelsaar test
+[14:22:06]    exit=0
+[14:22:06] == 23-chat-auto: curl -sS -D - -m 300 http://127.0.0.1:22083/v1/chat/completions -H Authorization: Bearer msk_[REDACTED] -H Content-Type: application/json -d {"model":"auto","messages":[{"role":"user","content":"Reply with one word: ready"}],"max_tokens":8}
+[14:22:07]    exit=0
+[14:22:07] == 24-code-auto: curl -sS -D - -m 600 http://127.0.0.1:22083/v1/chat/completions -H Authorization: Bearer msk_[REDACTED] -H Content-Type: application/json -d {"model":"auto","messages":[{"role":"user","content":"Write a Python function is_palindrome(s) that ignores case and punctuation. Return only code in a ```python block."}],"max_tokens":300}
+[14:22:15]    exit=0
+[14:22:15] == 25-stream-auto: bash -c curl -sS -N -m 300 'http://127.0.0.1:22083/v1/chat/completions' -H 'Authorization: Bearer msk_[REDACTED]' -H 'Content-Type: application/json' -d '{"model":"auto-fast","stream":true,"messages":[{"role":"user","content":"Count from 1 to 5."}],"max_tokens":30}' | head -c 4000
+[14:22:15]    exit=0
+[14:22:15] == 26-tools-auto: curl -sS -D - -m 600 http://127.0.0.1:22083/v1/chat/completions -H Authorization: Bearer msk_[REDACTED] -H Content-Type: application/json -d {"model":"auto","messages":[{"role":"user","content":"What time is it in Paris? Use the tool."}],"tools":[{"type":"function","function":{"name":"get_current_time","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}}],"max_tokens":200}
+[14:22:16]    exit=0
+[14:22:16] == 27-decisions: modelsaar decisions --limit 20
+[14:22:16]    exit=0
+[14:22:16] == 28-status: modelsaar status
+[14:22:16]    exit=0
+[14:22:16] == gateway stopped
+[14:22:16] == 30-eval-live: modelsaar eval --mode live --probe --save-measurements --out live-check-20261011-141721/eval-live.json

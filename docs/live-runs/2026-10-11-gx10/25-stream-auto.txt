@@ -1,0 +1,24 @@
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"1"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":","},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":" 2"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":","},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":" 3"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":","},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":" 4"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":","},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"content":" 5"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"chatcmpl-361","object":"chat.completion.chunk","created":1791708735,"model":"auto-fast","system_fingerprint":"fp_ollama","choices":[],"usage":{"prompt_tokens":16,"completion_tokens":14,"total_tokens":30}}
+
+data: [DONE]
+
