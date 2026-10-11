@@ -10,7 +10,7 @@ real; simulated runs are labelled as such.
 |---|---|
 | Build/test container (cloud) | Linux x86_64, CPython 3.13.16, starlette 1.7.0, uvicorn 0.54.0, httpx 0.28.1, pydantic 2.14.0, PyYAML 6.0.3, pytest 9.1.1. No GPU. Network: PyPI reachable; Hugging Face, Ollama registry and Docker daemon **not** available. |
 | Independent review venv | CPython 3.10.20 (uv), same dependency versions — full test suite passed (reviewer's run). |
-| Owner's machine (MacBook Air M5) | Reachable only through a Linux VM bridge (aarch64, CPython 3.10.12, no route to the macOS host's Ollama). Repository copied there; see "Owner-side checks". |
+| Owner's machine (MacBook Air M5) | Reachable only through a Linux VM bridge (aarch64, CPython 3.10.12, no route to the macOS host's Ollama). Repository copied there; `uv venv --python 3.10` + `pip install -e .[dev]` + `pytest` → **61 passed**; `modelsaar eval --mode simulated --limit 10` ran. This confirms Python 3.10/aarch64 compatibility, not macOS or real-model behaviour. |
 
 ## Executed
 
