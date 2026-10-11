@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import random
 import statistics
+import sys
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -91,6 +92,7 @@ class EvalRun:
             self.records.append(rec)
             return rec
         ms = (time.monotonic() - t0) * 1000
+        print(f"[eval] {policy:40s} {task['id']:12s} HTTP {r.status_code} {ms/1000:6.1f}s", file=sys.stderr, flush=True)
         rec: dict[str, Any] = {
             "task": task["id"],
             "category": task["category"],
@@ -206,8 +208,10 @@ def probe_all(gw) -> list[dict[str, Any]]:  # type: ignore[no-untyped-def]
     return gw.run(_run())
 
 
-def evaluate(run: EvalRun, tasks: list[dict[str, Any]], save_measurements_store=None) -> dict[str, Any]:  # type: ignore[no-untyped-def]
+def evaluate(run: EvalRun, tasks: list[dict[str, Any]], save_measurements_store=None, only: list[str] | None = None) -> dict[str, Any]:  # type: ignore[no-untyped-def]
     deps = run.deployments()
+    if only:
+        deps = [d for d in deps if d["id"] in only or d["id"].split("/", 1)[-1] in only]
     dep_ids = [d["id"] for d in deps]
     calib = [t for t in tasks if t["split"] == "calib"]
     test = [t for t in tasks if t["split"] == "test"]
@@ -364,6 +368,11 @@ def run_live(args, tasks: list[dict[str, Any]]) -> dict[str, Any]:  # type: igno
     cfg = _load(args)
     # Run an in-process gateway on a free port so evaluation never disturbs a running instance.
     cfg = cfg.model_copy(update={"server": cfg.server.model_copy(update={"port": free_port()})})
+    if args.deployments:
+        # Fair comparison: `auto` chooses among the same subset the baselines are swept over.
+        aliases = dict(cfg.aliases)
+        aliases["auto"] = aliases["auto"].model_copy(update={"deployments": tuple(args.deployments)})
+        cfg = cfg.model_copy(update={"aliases": aliases})
     api = read_keys(cfg.resolve(cfg.server.api_keys_file))
     adm = read_keys(cfg.resolve(cfg.server.admin_key_file))
     if not api or not adm:
@@ -373,7 +382,9 @@ def run_live(args, tasks: list[dict[str, Any]]) -> dict[str, Any]:  # type: igno
     try:
         probes = probe_all(gw) if args.probe else []
         run = EvalRun(url, api[0], adm[0], simulated=False, seed=args.seed)
-        rep = evaluate(run, tasks, save_measurements_store=gw.store if args.save_measurements else None)
+        rep = evaluate(run, tasks, save_measurements_store=gw.store if args.save_measurements else None, only=args.deployments or None)
+        if args.deployments:
+            rep["deployment_filter"] = list(args.deployments)
         rep["probes"] = probes
         rep["note"] = "LIVE: real backends from your config; results are specific to the exact deployments/fingerprints listed."
         return rep

@@ -599,6 +599,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--seed", type=int, default=7)
     s.add_argument("--save-measurements", action="store_true", help="live mode: store per-deployment quality/latency evidence for routing")
     s.add_argument("--probe", action="store_true", help="live mode: run capability probes on every deployment first")
+    s.add_argument("--deployments", nargs="*", help="live mode: restrict the sweep, baselines and the `auto` alias to these deployment ids")
     s.set_defaults(fn=cmd_eval)
 
     s = sub.add_parser("demo", help="start a SIMULATED backend + gateway to try the UX without models")
