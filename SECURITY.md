@@ -2,8 +2,9 @@
 
 ModelSaar is a local gateway that handles API keys and forwards prompts to inference backends.
 
-**Reporting.** Please report vulnerabilities privately to the maintainer (see `pyproject.toml`
-authors) rather than in public issues. Include version, configuration shape (no keys), and
+**Reporting.** Please report vulnerabilities privately to the maintainer, Gopala Subramanium
+(gopalasubramanium@gmail.com), or via GitHub's private vulnerability reporting on this repository,
+rather than in public issues. Include version, configuration shape (no keys), and
 reproduction steps. Expect an acknowledgement within 7 days.
 
 **Scope.** Authentication bypass, admin/inference privilege confusion, backend destination

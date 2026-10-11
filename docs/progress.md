@@ -4,7 +4,7 @@ Compact state so another session can continue without repeating finished work.
 
 ## State (2026-10-11)
 
-* Milestones A–D of the build specification are implemented; 61 tests pass (3.10 and 3.13); lint clean.
+* Milestones A–D of the build specification are implemented; 64 tests pass (3.10 and 3.13); lint clean.
 * Live checks executed on the owner's Mac against the GX10's Ollama 0.32.13 (8 models): discovery, probes,
   routing, streaming, tool calls, 3-deployment evaluation — see docs/verification-report.md. Three bugs found
   by the live run were fixed (thinking-model probe budgets, discover/doctor evidence, fingerprint vs served context).

@@ -10,7 +10,7 @@ real; simulated runs are labelled as such.
 |---|---|
 | Build/test container (cloud) | Linux x86_64, CPython 3.13.16, starlette 1.7.0, uvicorn 0.54.0, httpx 0.28.1, pydantic 2.14.0, PyYAML 6.0.3, pytest 9.1.1. No GPU. Network: PyPI reachable; Hugging Face, Ollama registry and Docker daemon **not** available. |
 | Independent review venv | CPython 3.10.20 (uv), same dependency versions — full test suite passed (reviewer's run). |
-| Owner's Linux VM bridge | aarch64, CPython 3.10.12: `pytest` → **61 passed**; `modelsaar eval --mode simulated --limit 10` ran (Python 3.10/aarch64 compatibility). |
+| Owner's Linux VM bridge | aarch64, CPython 3.10.12: `pytest` → **61 passed** at that commit (64 at HEAD); `modelsaar eval --mode simulated --limit 10` ran (Python 3.10/aarch64 compatibility). |
 | **Owner's MacBook Air M5 (macOS, Darwin 27.0.0 arm64) → ASUS GX10 (NVIDIA GB10) over Tailscale** | Real run on 2026-10-11 14:17–16:25 IST: uv-managed CPython 3.12.15, ModelSaar 0.1.0, **Ollama 0.32.13** at `http://100.83.54.124:11434` serving 8 models. Outputs: `live-check-20261011-141721/` (committed next to the report). Driven from this session by double-clicking `run_live_check.command`, `run_live_eval.command`, `run_reprobe.command` in Finder. |
 
 ## Executed
@@ -18,7 +18,7 @@ real; simulated runs are labelled as such.
 | check | command | outcome |
 |---|---|---|
 | Lint | `ruff check src tests` | pass |
-| Unit + contract + fault-injection tests | `python -m pytest -q` | **61 passed** (36 acceptance cases over real HTTP against the controlled fake backend, 12 unit/CLI tests, 13 regression tests for the adversarial review findings) |
+| Unit + contract + fault-injection tests | `python -m pytest -q` | **64 passed** (36 acceptance cases over real HTTP against the controlled fake backend, 12 unit/CLI tests, 16 regression tests for the adversarial-review and live-run findings) |
 | Python 3.10 compatibility | full suite in a 3.10.20 venv (independent reviewer) | pass |
 | Simulated evaluation | `modelsaar eval --mode simulated` | runs end-to-end; see docs/evaluation.md for the numbers (SIMULATED — scripted fake backends) |
 | CLI end-to-end | `init`, `discover`, `doctor`, `explain`, `config validate`, `client-config --dry-run`, `uninstall` against the fake backend (tests/test_units.py) | pass |
