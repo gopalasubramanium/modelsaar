@@ -416,7 +416,6 @@ class Router:
         ``tokenize:<backend>+template-estimate`` rather than exact."""
         if not req.tokens or not candidates:
             return {}
-        from .tokens import _text_of
 
         text: str | None = None
         out: dict[str, int] = {}
