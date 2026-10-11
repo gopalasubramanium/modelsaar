@@ -1,0 +1,24 @@
+name: Routing problem (the wrong deployment was chosen, or none)
+description: A request went to a deployment you did not expect, or was refused although a deployment could serve it.
+labels: [routing]
+body:
+  - type: input
+    id: version
+    attributes: { label: ModelSaar version and commit, placeholder: "modelsaar 0.1.0, 91f9e6c" }
+    validations: { required: true }
+  - type: textarea
+    id: explain
+    attributes: { label: "`modelsaar explain` for the request", description: "e.g. `modelsaar explain -m \"…\" --tools --json` — the candidate breakdown is what we need; no prompt text is required beyond what you choose to include", render: json }
+    validations: { required: true }
+  - type: textarea
+    id: discover
+    attributes: { label: "`modelsaar discover` output", render: text }
+    validations: { required: true }
+  - type: dropdown
+    id: evidence
+    attributes: { label: Had you run probes / evaluation?, options: ["no", "modelsaar probe --all", "modelsaar eval --mode live --save-measurements", "both"] }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: Which deployment you expected and why }
+    validations: { required: true }

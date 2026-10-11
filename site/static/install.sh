@@ -126,7 +126,7 @@ else
   else
     RESULT="the gateway answered but no deployment could serve the request (see the blockers above; 'modelsaar doctor' explains the remedies)"
   fi
-  if [ -n "${STARTED:-}" ]; then kill "$STARTED" 2>/dev/null; wait "$STARTED" 2>/dev/null || true; say "temporary gateway stopped"; fi
+  if [ -n "${STARTED:-}" ]; then kill "$STARTED" 2>/dev/null || true; wait "$STARTED" 2>/dev/null || true; say "temporary gateway stopped"; fi
   say ""
   say "verification: $RESULT"
 fi
