@@ -1,16 +1,29 @@
-"""Scorers for evaluation tasks. Executable where possible; never an LLM judge."""
+"""Scorers for evaluation tasks. Executable where possible; never an LLM judge.
+
+``score(task, response)`` returns ``(ok, detail)``. ``ok`` is ``True``/``False``, or ``None`` when
+the task could not be scored at all (currently only ``code_exec`` without an isolation
+backend); the harness counts ``None`` as *skipped* with its own denominator, never as a failure
+and never as a success.
+"""
 
 from __future__ import annotations
 
 import json
-import os
 import re
-import subprocess
-import sys
-import tempfile
+from collections.abc import Callable
 from typing import Any
 
+from . import sandbox
+
+# Bump whenever a scorer's acceptance rule changes so reports are not compared across rules.
+SCORER_VERSION = "2026.10.11-2"
+
 _CODE_BLOCK = re.compile(r"```(?:python|py)?\s*\n(.*?)```", re.DOTALL)
+# Standalone numeric tokens: optional sign (not glued to a preceding word/number, so "25-7"
+# yields 25 and 7), digits with optional thousands commas, optional decimal part.
+_NUMBER = re.compile(r"(?<![\w.])(-?)(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(?![\w])")
+
+Runner = Callable[[str, str, float], tuple[str, str, int, str]]
 
 
 def _basic_schema_check(obj: Any, schema: dict[str, Any]) -> bool:
@@ -39,42 +52,126 @@ def _basic_schema_check(obj: Any, schema: dict[str, Any]) -> bool:
     return True
 
 
-def run_code_sandboxed(code: str, harness: str, timeout_s: float = 10.0) -> tuple[str, str]:
-    """Run model-written code + harness in a disposable subprocess. Basic sandbox only."""
-    src = code + "\n\n" + harness + "\n"
-    with tempfile.TemporaryDirectory(prefix="modelsaar-eval-") as d:
-        env = {"PATH": os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1", "HOME": d, "TMPDIR": d}
-        preexec = None
-        if sys.platform != "win32":
-            import resource
+def normalise_stdout(s: str) -> str:
+    """Whitespace rule for ``code_exec`` (applied to BOTH expected and actual output).
 
-            def _limits() -> None:
-                try:
-                    resource.setrlimit(resource.RLIMIT_AS, (512 * 1024 * 1024, 512 * 1024 * 1024))
-                    resource.setrlimit(resource.RLIMIT_CPU, (int(timeout_s) + 1, int(timeout_s) + 1))
-                    resource.setrlimit(resource.RLIMIT_FSIZE, (1024 * 1024, 1024 * 1024))
-                except Exception:
-                    pass
+    Trailing whitespace on every line and trailing blank lines are ignored; leading whitespace
+    and internal spacing are significant; ``\\r\\n`` is treated as ``\\n``.
+    """
+    lines = [ln.rstrip() for ln in s.replace("\r\n", "\n").split("\n")]
+    while lines and not lines[-1]:
+        lines.pop()
+    return "\n".join(lines)
 
-            preexec = _limits
+
+def extract_numbers(text: str) -> list[float]:
+    out = []
+    for sign, intpart, frac in _NUMBER.findall(text):
         try:
-            p = subprocess.run(
-                [sys.executable, "-I", "-"],
-                input=src,
-                capture_output=True,
-                text=True,
-                timeout=timeout_s,
-                cwd=d,
-                env=env,
-                preexec_fn=preexec,
-            )
-            return p.stdout.strip(), p.stderr.strip()[-300:]
-        except subprocess.TimeoutExpired:
-            return "", "timeout"
+            out.append(float(sign + intpart.replace(",", "") + (frac or "")))
+        except ValueError:
+            continue
+    return out
 
 
-def score(task: dict[str, Any], response: dict[str, Any]) -> tuple[bool, str]:
-    """Return (success, detail) for a successful HTTP response body."""
+def _number_matches(got: float, want: float, tol: float) -> bool:
+    return abs(got - want) <= max(tol, tol * abs(want))
+
+
+def _tool_definition(task: dict[str, Any], name: str) -> dict[str, Any] | None:
+    for t in task.get("tools") or []:
+        fn = t.get("function") or {}
+        if fn.get("name") == name:
+            return fn
+    return None
+
+
+def _score_tool_call(task: dict[str, Any], msg: dict[str, Any], exp: dict[str, Any]) -> tuple[bool, str]:
+    """Strict: the call must be well-formed AND carry the arguments the task needs.
+
+    (Whether the *agent task* was completed is a separate question; this scorer only says the
+    tool was invoked correctly.)
+    """
+    name = exp["name"]
+    calls = msg.get("tool_calls") or []
+    if not isinstance(calls, list):
+        return False, "tool_calls is not a list"
+    tool_def = _tool_definition(task, name) or {}
+    required = list(((tool_def.get("parameters") or {}).get("required")) or [])
+    args_contains: dict[str, str] = exp.get("args_contains") or {}
+    names = []
+    reasons = []
+    for c in calls:
+        if not isinstance(c, dict):
+            reasons.append("tool call is not an object")
+            continue
+        fn = c.get("function") or {}
+        names.append(fn.get("name"))
+        if fn.get("name") != name:
+            continue
+        cid = c.get("id")
+        if not isinstance(cid, str) or not cid.strip():
+            reasons.append("tool call has no id")
+            continue
+        raw = fn.get("arguments")
+        if raw is None or raw == "":
+            raw = "{}"
+        if isinstance(raw, dict):
+            args: Any = raw
+        else:
+            try:
+                args = json.loads(raw)
+            except (json.JSONDecodeError, TypeError):
+                reasons.append("tool call arguments not JSON")
+                continue
+        if not isinstance(args, dict):
+            reasons.append("tool call arguments are not an object")
+            continue
+        missing = [k for k in required if k not in args]
+        if missing:
+            reasons.append(f"missing required argument(s) {missing}")
+            continue
+        bad = [k for k, sub in args_contains.items() if str(sub) not in str(args.get(k, ""))]
+        if bad:
+            reasons.append(f"argument(s) {bad} do not contain expected substring(s) {[args_contains[k] for k in bad]}")
+            continue
+        return True, f"called {name} with id, valid JSON object args {sorted(args)}" + (f", {args_contains}" if args_contains else "")
+    if reasons:
+        return False, f"tool call {name} rejected: " + "; ".join(reasons)
+    return False, f"expected tool call {name}, got {names} / content"
+
+
+def _score_code_exec(task: dict[str, Any], text: str, exp: dict[str, Any], runner: Runner | None) -> tuple[bool | None, str]:
+    m = _CODE_BLOCK.search(text)
+    code = m.group(1) if m else text
+    if runner is None:
+        backend, reason = sandbox.available()
+        if backend is None:
+            return None, f"skipped: {reason}"
+        runner = sandbox.run
+    out, err, rc, backend = runner(code, exp["harness"], float(exp.get("timeout_s", 10.0)))
+    lines = normalise_stdout(out).split("\n")
+    sentinel_ok = lines and lines[-1] == sandbox.SENTINEL and sandbox.SENTINEL not in lines[:-1]
+    body = normalise_stdout("\n".join(lines[:-1])) if sentinel_ok else normalise_stdout(out)
+    want = normalise_stdout(str(exp["stdout"]))
+    problems = []
+    if rc != 0:
+        problems.append(f"exit code {rc}")
+    if not sentinel_ok:
+        problems.append("harness did not complete (sentinel missing)")
+    if body != want:
+        problems.append(f"stdout {body[:200]!r} != expected {want[:200]!r}")
+    if problems:
+        return False, f"[{backend}] " + "; ".join(problems) + (f" err={err[-300:]!r}" if err else "")
+    return True, f"[{backend}] stdout matches, harness completed, exit 0"
+
+
+def score(task: dict[str, Any], response: dict[str, Any], runner: Runner | None = None) -> tuple[bool | None, str]:
+    """Return (success, detail) for a successful HTTP response body.
+
+    ``runner`` (tests only) replaces the sandbox for ``code_exec``; it must have the signature of
+    :func:`modelsaar.evaluation.sandbox.run`.
+    """
     exp = task["expected"]
     kind = exp["type"]
     try:
@@ -94,17 +191,17 @@ def score(task: dict[str, Any], response: dict[str, Any]) -> tuple[bool, str]:
     if kind == "contains_any":
         hit = next((v for v in exp["value"] if str(v).lower() in low), None)
         return hit is not None, f"contains {hit!r}" if hit else f"none of {exp['value']}"
+    if kind == "number":
+        nums = extract_numbers(text)
+        if not nums:
+            return False, "no numeric token in content"
+        want = float(exp["value"])
+        tol = float(exp.get("tol", 1e-6))
+        got = nums[-1]
+        ok = _number_matches(got, want, tol)
+        return ok, f"last number {got:g} {'==' if ok else '!='} {want:g} (tol {tol:g}, {len(nums)} numeric token(s))"
     if kind == "tool_call":
-        calls = msg.get("tool_calls") or []
-        for c in calls:
-            fn = c.get("function") or {}
-            if fn.get("name") == exp["name"]:
-                try:
-                    json.loads(fn.get("arguments") or "{}")
-                except json.JSONDecodeError:
-                    return False, "tool call arguments not JSON"
-                return True, f"called {exp['name']} with valid JSON"
-        return False, f"expected tool call {exp['name']}, got {[ (c.get('function') or {}).get('name') for c in calls]} / content"
+        return _score_tool_call(task, msg, exp)
     if kind == "json_schema":
         try:
             obj = json.loads(text)
@@ -117,9 +214,6 @@ def score(task: dict[str, Any], response: dict[str, Any]) -> tuple[bool, str]:
                 return False, f"field {k}={obj.get(k)!r} != {v!r}"
         return True, "schema-conformant with correct fields"
     if kind == "code_exec":
-        m = _CODE_BLOCK.search(text)
-        code = m.group(1) if m else text
-        out, err = run_code_sandboxed(code, exp["harness"])
-        ok = out == exp["stdout"]
-        return ok, f"stdout={out!r}" + (f" err={err!r}" if err and not ok else "")
+        return _score_code_exec(task, text, exp, runner)
     return False, f"unknown scorer {kind}"
+

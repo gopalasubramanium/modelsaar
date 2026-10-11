@@ -85,6 +85,23 @@ def _gold_code(t: str) -> str:
     return "It matches three digits, a hyphen, then four digits (undefined is not a function is a JavaScript error)."
 
 
+def _gold_tool_args(fn: dict[str, Any], text: str) -> dict[str, Any]:
+    """Arguments a competent agent would pass for the eval fixtures: every required parameter
+    of the offered tool is filled with a task-appropriate value (the strict ``tool_call`` scorer
+    rejects calls that lack required arguments or the expected substrings)."""
+    low = text.lower()
+    required = list(((fn.get("parameters") or {}).get("required")) or [])
+    args: dict[str, Any] = {}
+    for key in required:
+        if key == "command":
+            args[key] = "pytest -q" if "pytest" in low else "git status" if "git" in low else "ls"
+        elif key == "path":
+            args[key] = "README.md" if "readme" in low else "pyproject.toml" if "pyproject" in low else "."
+        else:
+            args[key] = "x"
+    return args
+
+
 def _expected_text(task: str, text: str, ok: bool, name: str) -> str:
     if not ok:
         return f"I am not sure about that. ({name})"
@@ -207,7 +224,7 @@ class FakeBackend:
             if tools and "tools" in m.capabilities:
                 if ok:
                     fn = tools[0].get("function", {})
-                    return {"tool_calls": [{"id": f"call_{m.name.replace(':', '_')}_0", "type": "function", "function": {"name": fn.get("name", "fn"), "arguments": json.dumps({"command": "ls"})}}]}
+                    return {"tool_calls": [{"id": f"call_{m.name.replace(':', '_')}_0", "type": "function", "function": {"name": fn.get("name", "fn"), "arguments": json.dumps(_gold_tool_args(fn, text))}}]}
                 return {"content": f"I would list the files but I cannot. ({m.name})"}
             rf = body.get("response_format") or {}
             if rf.get("type") == "json_schema":

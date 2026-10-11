@@ -16,20 +16,26 @@ Every request goes through the real HTTP gateway so hard constraints apply equal
 
 from __future__ import annotations
 
+import hashlib
 import json
 import random
 import statistics
+import subprocess
 import sys
 import time
 from collections import defaultdict
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
 import httpx
 
-from .scoring import score
+from . import sandbox
+from .scoring import SCORER_VERSION, score
 
 FIXTURES = Path(__file__).parent / "fixtures" / "tasks.jsonl"
+MAX_TOKENS = 400
+TEMPERATURE = 0
 
 
 def load_tasks(path: Path | None = None, limit: int = 0) -> list[dict[str, Any]]:
@@ -38,8 +44,49 @@ def load_tasks(path: Path | None = None, limit: int = 0) -> list[dict[str, Any]]
     return tasks[:limit] if limit else tasks
 
 
+def dataset_revision(tasks: list[dict[str, Any]], path: Path | None = None) -> dict[str, str | None]:
+    """sha256 of the task file (when known) and of the canonical JSON of the tasks actually run."""
+    p = path or FIXTURES
+    file_sha = hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else None
+    canon = "\n".join(json.dumps(t, sort_keys=True, ensure_ascii=False) for t in tasks)
+    return {"tasks_file": str(p), "tasks_file_sha256": file_sha, "tasks_run_sha256": hashlib.sha256(canon.encode("utf-8")).hexdigest()}
+
+
+def _git_commit() -> str | None:
+    try:
+        p = subprocess.run(["git", "rev-parse", "HEAD"], cwd=Path(__file__).parent, capture_output=True, text=True, timeout=5)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if p.returncode != 0:
+        return None
+    return p.stdout.strip() or None
+
+
+def resolve_selectors(deployments: list[dict[str, Any]], selectors: list[str] | None) -> list[str]:
+    """Map user-supplied deployment selectors to canonical deployment ids, once.
+
+    A selector may be a full id (``ollama/qwen3.6:latest``) or a bare model name
+    (``qwen3.6:latest``). Unknown or ambiguous selectors raise ``ValueError`` so a typo cannot
+    silently shrink the sweep or leave the ``auto`` alias unrestricted.
+    """
+    out: list[str] = []
+    ids = [d["id"] for d in deployments]
+    for sel in selectors or []:
+        if sel in ids:
+            hits = [sel]
+        else:
+            hits = [d["id"] for d in deployments if d["id"].split("/", 1)[-1] == sel or d.get("model") == sel]
+        if not hits:
+            raise ValueError(f"unknown deployment selector {sel!r}; discovered deployments: {ids}")
+        if len(hits) > 1:
+            raise ValueError(f"ambiguous deployment selector {sel!r} matches {hits}; use the full id")
+        if hits[0] not in out:
+            out.append(hits[0])
+    return out
+
+
 def _request_body(task: dict[str, Any], model: str, simulated: bool) -> dict[str, Any]:
-    body: dict[str, Any] = {"model": model, "messages": json.loads(json.dumps(task["messages"])), "temperature": 0, "max_tokens": 400}
+    body: dict[str, Any] = {"model": model, "messages": json.loads(json.dumps(task["messages"])), "temperature": TEMPERATURE, "max_tokens": MAX_TOKENS}
     if task.get("tools"):
         body["tools"] = task["tools"]
     if task.get("response_format"):
@@ -71,26 +118,75 @@ def _wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 
 
 class EvalRun:
-    def __init__(self, gateway_url: str, api_key: str, admin_key: str, simulated: bool, seed: int = 7) -> None:
+    """Issues requests, scores them and keeps per-request records.
+
+    Records are sanitized (ids, status, latency, scorer detail; never prompt text). With a
+    ``checkpoint`` path every record is appended as one JSON line immediately; with
+    ``resume=True`` records already in that file (same ``(policy, task)`` key and, when known,
+    the same deployment fingerprint) are reused instead of re-run.
+    """
+
+    def __init__(self, gateway_url: str, api_key: str, admin_key: str, simulated: bool, seed: int = 7, checkpoint: Path | None = None, resume: bool = False) -> None:
         self.c = httpx.Client(base_url=gateway_url, headers={"Authorization": f"Bearer {api_key}"}, timeout=300)
         self.admin = httpx.Client(base_url=gateway_url, headers={"Authorization": f"Bearer {admin_key}"}, timeout=60)
         self.simulated = simulated
+        self.seed = seed
         self.rng = random.Random(seed)
         self.records: list[dict[str, Any]] = []
+        self.fingerprints: dict[str, str] = {}
+        self.checkpoint = Path(checkpoint) if checkpoint else None
+        self.resumed = 0
+        self._done: dict[tuple[str, str], dict[str, Any]] = {}
+        if resume:
+            if not self.checkpoint:
+                raise ValueError("--resume needs a checkpoint path (--checkpoint PATH or --out)")
+            if self.checkpoint.exists():
+                for ln in self.checkpoint.read_text(encoding="utf-8").splitlines():
+                    if ln.strip():
+                        rec = json.loads(ln)
+                        self._done[(rec["policy"], rec["task"])] = rec
+        if self.checkpoint:
+            self.checkpoint.parent.mkdir(parents=True, exist_ok=True)
 
     def deployments(self) -> list[dict[str, Any]]:
         s = self.admin.get("/admin/status").json()
         return [d for d in s["deployments"] if d["role"] == "generative" and d["state"]["healthy"] and d["enabled"] and d["locality"] == "local"]
 
-    def run_one(self, task: dict[str, Any], model: str, policy: str) -> dict[str, Any]:
+    def all_deployments(self) -> list[dict[str, Any]]:
+        return list(self.admin.get("/admin/status").json()["deployments"])
+
+    def _finish(self, rec: dict[str, Any]) -> dict[str, Any]:
+        self.records.append(rec)
+        if self.checkpoint:
+            with open(self.checkpoint, "a", encoding="utf-8") as f:
+                f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+                f.flush()
+        return rec
+
+    def _resumable(self, task_id: str, policy: str) -> dict[str, Any] | None:
+        prev = self._done.get((policy, task_id))
+        if not prev:
+            return None
+        dep, fp = prev.get("deployment"), prev.get("fingerprint")
+        if dep and fp and self.fingerprints.get(dep) not in (None, fp):
+            return None  # the deployment changed since the checkpoint: re-run
+        return prev
+
+    def run_one(self, task: dict[str, Any], model: str, policy: str, enrich: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
+        prev = self._resumable(task["id"], policy)
+        if prev is not None:
+            self.resumed += 1
+            rec = dict(prev)
+            rec["resumed"] = True
+            self.records.append(rec)  # already in the checkpoint file
+            return rec
         body = _request_body(task, model, self.simulated)
         t0 = time.monotonic()
         try:
             r = self.c.post("/v1/chat/completions", json=body)
         except httpx.HTTPError as e:
             rec = {"task": task["id"], "category": task["category"], "split": task["split"], "policy": policy, "model": model, "status": 0, "ok": False, "detail": f"transport: {e}", "latency_ms": (time.monotonic() - t0) * 1000}
-            self.records.append(rec)
-            return rec
+            return self._finish(rec)
         ms = (time.monotonic() - t0) * 1000
         print(f"[eval] {policy:40s} {task['id']:12s} HTTP {r.status_code} {ms/1000:6.1f}s", file=sys.stderr, flush=True)
         rec: dict[str, Any] = {
@@ -104,9 +200,13 @@ class EvalRun:
             "request_id": r.headers.get("x-modelsaar-request-id"),
             "latency_ms": round(ms, 1),
         }
+        if rec["deployment"] and rec["deployment"] in self.fingerprints:
+            rec["fingerprint"] = self.fingerprints[rec["deployment"]]
         if r.status_code == 200:
             ok, detail = score(task, r.json())
             rec["ok"], rec["detail"] = ok, detail
+            if ok is None:
+                rec["skipped"] = True
         else:
             rec["ok"] = False
             try:
@@ -115,8 +215,9 @@ class EvalRun:
                 rec["violation"] = r.status_code == 422
             except Exception:
                 rec["detail"] = f"HTTP {r.status_code}"
-        self.records.append(rec)
-        return rec
+        if enrich is not None:
+            enrich(rec)
+        return self._finish(rec)
 
     def sweep(self, tasks: list[dict[str, Any]], dep_ids: list[str], policy_prefix: str = "sweep") -> dict[str, dict[str, dict[str, Any]]]:
         """Return results[dep_id][task_id] = record."""
@@ -127,9 +228,7 @@ class EvalRun:
         return out
 
     def run_auto(self, tasks: list[dict[str, Any]], alias: str = "auto") -> dict[str, dict[str, Any]]:
-        out = {}
-        for t in tasks:
-            rec = self.run_one(t, alias, "auto")
+        def enrich(rec: dict[str, Any]) -> None:
             if rec.get("request_id"):
                 try:
                     dec = self.admin.get(f"/admin/decisions/{rec['request_id']}").json()
@@ -139,35 +238,54 @@ class EvalRun:
                     rec["classifier"] = dec.get("classifier")
                 except Exception:
                     pass
-            out[t["id"]] = rec
-        return out
+
+        return {t["id"]: self.run_one(t, alias, "auto", enrich=enrich) for t in tasks}
+
+
+def _is_skipped(r: dict[str, Any]) -> bool:
+    return bool(r.get("skipped")) or r.get("ok") is None
 
 
 def summarize(records_by_task: dict[str, dict[str, Any]], tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    """Aggregate one policy. ``success`` and its CI are computed over *scored* tasks only
+    (``n_scored``); tasks the scorer could not judge are counted in ``skipped`` with the reason,
+    so the denominator is always visible."""
     cats: dict[str, list[bool]] = defaultdict(list)
+    cat_skipped: dict[str, int] = defaultdict(int)
     lat: list[float] = []
-    n_ok = n = n_complete = n_viol = 0
+    n_ok = n = n_scored = n_complete = n_viol = n_skipped = 0
+    skip_reasons: dict[str, int] = defaultdict(int)
     for t in tasks:
         r = records_by_task.get(t["id"])
         if not r:
             continue
         n += 1
-        ok = bool(r.get("ok"))
-        n_ok += ok
         n_complete += r.get("status") == 200
         n_viol += bool(r.get("violation"))
-        cats[t["category"]].append(ok)
         if r.get("status") == 200:
             lat.append(r["latency_ms"])
-    lo, hi = _wilson(n_ok, n)
+        if _is_skipped(r):
+            n_skipped += 1
+            cat_skipped[t["category"]] += 1
+            skip_reasons[str(r.get("detail") or "skipped")] += 1
+            continue
+        n_scored += 1
+        ok = bool(r.get("ok"))
+        n_ok += ok
+        cats[t["category"]].append(ok)
+    lo, hi = _wilson(n_ok, n_scored)
     per_cat = {}
-    for c, v in sorted(cats.items()):
+    for c in sorted(set(cats) | set(cat_skipped)):
+        v = cats.get(c, [])
         k = sum(v)
         clo, chi = _wilson(k, len(v))
-        per_cat[c] = {"success": round(k / len(v), 3), "n": len(v), "ci95": [round(clo, 3), round(chi, 3)]}
+        per_cat[c] = {"success": round(k / len(v), 3) if v else None, "n": len(v), "skipped": cat_skipped.get(c, 0), "ci95": [round(clo, 3), round(chi, 3)]}
     return {
         "n": n,
-        "success": round(n_ok / n, 3) if n else None,
+        "n_scored": n_scored,
+        "skipped": n_skipped,
+        "skip_reasons": dict(skip_reasons),
+        "success": round(n_ok / n_scored, 3) if n_scored else None,
         "ci95": [round(lo, 3), round(hi, 3)],
         "completion_rate": round(n_complete / n, 3) if n else None,
         "capability_violations": n_viol,
@@ -208,13 +326,26 @@ def probe_all(gw) -> list[dict[str, Any]]:  # type: ignore[no-untyped-def]
     return gw.run(_run())
 
 
-def evaluate(run: EvalRun, tasks: list[dict[str, Any]], save_measurements_store=None, only: list[str] | None = None) -> dict[str, Any]:  # type: ignore[no-untyped-def]
+def evaluate(
+    run: EvalRun,
+    tasks: list[dict[str, Any]],
+    save_measurements_store=None,  # type: ignore[no-untyped-def]
+    only: list[str] | None = None,
+    conditions: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """``only`` must already hold canonical deployment ids (see :func:`resolve_selectors`)."""
     deps = run.deployments()
     if only:
-        deps = [d for d in deps if d["id"] in only or d["id"].split("/", 1)[-1] in only]
+        eligible = {d["id"] for d in deps}
+        missing = [i for i in only if i not in eligible]
+        if missing:
+            raise ValueError(f"selected deployments are not eligible (must be local, healthy, enabled, generative): {missing}")
+        deps = [d for d in deps if d["id"] in only]
     dep_ids = [d["id"] for d in deps]
+    run.fingerprints = {d["id"]: d["fingerprint"] for d in deps}
     calib = [t for t in tasks if t["split"] == "calib"]
     test = [t for t in tasks if t["split"] == "test"]
+    backend, backend_reason = sandbox.available()
     report: dict[str, Any] = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "mode": "simulated" if run.simulated else "live",
@@ -224,6 +355,18 @@ def evaluate(run: EvalRun, tasks: list[dict[str, Any]], save_measurements_store=
         ],
         "n_calib": len(calib),
         "n_test": len(test),
+        "sandbox": {"backend": backend, "reason": backend_reason, "code_exec_tasks": sum(1 for t in tasks if t["expected"]["type"] == "code_exec")},
+        "conditions": {
+            "max_tokens": MAX_TOKENS,
+            "temperature": TEMPERATURE,
+            "seed": run.seed,
+            "scorer_version": SCORER_VERSION,
+            "git_commit": _git_commit(),
+            "sandbox_backend": backend,
+            "deployment_fingerprints": dict(run.fingerprints),
+            **(conditions or {}),
+        },
+        "checkpoint": str(run.checkpoint) if run.checkpoint else None,
     }
     if not dep_ids:
         report["error"] = "no eligible local generative deployments"
@@ -239,6 +382,8 @@ def evaluate(run: EvalRun, tasks: list[dict[str, Any]], save_measurements_store=
         by_fp = {d["id"]: d["fingerprint"] for d in deps}
         for d in dep_ids:
             for cat, v in cal_summary[d]["per_category"].items():
+                if v["success"] is None:
+                    continue  # nothing scored in this category (e.g. code_exec skipped): no evidence
                 save_measurements_store.save_measurement(d, by_fp[d], {"task": cat, "quality": v["success"], "samples": v["n"], "p50_ms": cal_summary[d]["p50_ms"], "p95_ms": cal_summary[d]["p95_ms"], "source": "eval"})
         try:
             run.admin.post("/admin/refresh")
@@ -246,7 +391,13 @@ def evaluate(run: EvalRun, tasks: list[dict[str, Any]], save_measurements_store=
             pass
     # 2. test sweep (oracle + per-deployment)
     sw = run.sweep(test, dep_ids, "test")
-    oracle = {t["id"]: {"ok": any(sw[d][t["id"]]["ok"] for d in dep_ids), "status": 200, "latency_ms": min(sw[d][t["id"]]["latency_ms"] for d in dep_ids)} for t in test}
+    oracle: dict[str, dict[str, Any]] = {}
+    for t in test:
+        recs = [sw[d][t["id"]] for d in dep_ids]
+        if all(_is_skipped(r) for r in recs):
+            oracle[t["id"]] = {"ok": None, "skipped": True, "detail": recs[0].get("detail"), "status": 200, "latency_ms": min(r["latency_ms"] for r in recs)}
+        else:
+            oracle[t["id"]] = {"ok": any(r["ok"] for r in recs if not _is_skipped(r)), "status": 200, "latency_ms": min(r["latency_ms"] for r in recs)}
     # 3. auto live
     auto = run.run_auto(test, "auto")
     # 4. derived policies
@@ -271,11 +422,19 @@ def evaluate(run: EvalRun, tasks: list[dict[str, Any]], save_measurements_store=
         "choices": {t["id"]: auto[t["id"]].get("deployment") for t in test},
         "evidence_levels": dict(sorted(defaultdict(int, {e: sum(1 for r in auto.values() if r.get("evidence") == e) for e in {r.get("evidence") for r in auto.values()}}).items(), key=lambda kv: str(kv[0]))),
         "task_label_accuracy": round(sum(1 for t in test if auto[t["id"]].get("inferred_task") == t["category"]) / len(test), 3) if test else None,
-        "routing_mistakes": [t["id"] for t in test if not auto[t["id"]]["ok"] and oracle[t["id"]]["ok"]],
+        "routing_mistakes": [t["id"] for t in test if auto[t["id"]]["ok"] is False and oracle[t["id"]]["ok"] is True],
         "classifier": {"used": sum(1 for r in auto.values() if (r.get("classifier") or {}).get("used")), "timeouts": sum(1 for r in auto.values() if (r.get("classifier") or {}).get("status") == "timeout")},
     }
+    report["resumed_records"] = run.resumed
     report["records"] = run.records
     return report
+
+
+def _fmt(v: Any, width: int, prec: int, na: str = "n/a") -> str:
+    """Right-aligned fixed-point number, or ``na`` when there is nothing to show (e.g. all skipped)."""
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        return f"{v:>{width}.{prec}f}"
+    return f"{na:>{width}s}"
 
 
 def render_report(rep: dict[str, Any]) -> str:
@@ -284,15 +443,34 @@ def render_report(rep: dict[str, Any]) -> str:
         return "\n".join(lines + [f"ERROR: {rep['error']}"])
     lines.append("deployments: " + ", ".join(f"{d['id']} [{d['parameter_size']} {d['quantization']} ctx={d['context_length']}]" for d in rep["deployments"]))
     lines.append(f"calibration: fixed-strong={rep['calibration']['fixed_strong']}  fixed-fast={rep['calibration']['fixed_fast']}  (n_calib={rep['n_calib']}, n_test={rep['n_test']})")
+    sb = rep.get("sandbox") or {}
+    if sb.get("backend"):
+        lines.append(f"sandbox: {sb['backend']} ({sb.get('reason')}); code_exec tasks executed in isolation")
+    else:
+        lines.append(f"sandbox: NONE - {sb.get('code_exec_tasks', 0)} code_exec task(s) SKIPPED and excluded from every denominator: {sb.get('reason')}")
+    cond = rep.get("conditions") or {}
+    lines.append(
+        f"conditions: max_tokens={cond.get('max_tokens')} temperature={cond.get('temperature')} seed={cond.get('seed')} "
+        f"scorer={cond.get('scorer_version')} tasks_sha256={str(cond.get('tasks_file_sha256') or cond.get('tasks_run_sha256') or '')[:12]} git={str(cond.get('git_commit') or 'unknown')[:12]}"
+    )
+    if rep.get("checkpoint"):
+        lines.append(f"checkpoint: {rep['checkpoint']} (resumed {rep.get('resumed_records', 0)} record(s))")
     lines.append("")
-    lines.append(f"{'policy':55s} {'success':>9s} {'95% CI':>15s} {'complete':>9s} {'viol':>5s} {'p50 ms':>8s} {'p95 ms':>8s}")
+    lines.append(f"{'policy':55s} {'success':>9s} {'95% CI':>15s} {'scored':>7s} {'skip':>5s} {'complete':>9s} {'viol':>5s} {'p50 ms':>8s} {'p95 ms':>8s}")
     for name, s in rep["results"].items():
-        lines.append(f"{name:55s} {s['success']:>9.3f} {s['ci95']!s:>15s} {s['completion_rate']:>9.3f} {s['capability_violations']:>5d} {s['p50_ms']!s:>8s} {s['p95_ms']!s:>8s}")
+        lines.append(
+            f"{name:55s} {_fmt(s['success'], 9, 3)} {s['ci95']!s:>15s} {s['n_scored']:>7d} {s['skipped']:>5d} "
+            f"{_fmt(s['completion_rate'], 9, 3)} {s['capability_violations']:>5d} {s['p50_ms']!s:>8s} {s['p95_ms']!s:>8s}"
+        )
     lines.append("")
     cats = sorted({c for s in rep["results"].values() for c in s["per_category"]})
-    lines.append(f"{'per category':55s} " + " ".join(f"{c[:10]:>10s}" for c in cats))
+    lines.append(f"{'per category (success over scored; -- = all skipped)':55s} " + " ".join(f"{c[:10]:>10s}" for c in cats))
     for name, s in rep["results"].items():
-        lines.append(f"{name:55s} " + " ".join(f"{(s['per_category'].get(c) or {}).get('success', float('nan')):>10.2f}" for c in cats))
+        lines.append(f"{name:55s} " + " ".join(_fmt((s["per_category"].get(c) or {}).get("success"), 10, 2, na="--") for c in cats))
+    skipped_any = {reason for s in rep["results"].values() for reason in s.get("skip_reasons", {})}
+    if skipped_any:
+        lines.append("")
+        lines.append("skipped (not counted as success or failure): " + "; ".join(sorted(skipped_any)))
     r = rep["routing"]
     lines.append("")
     lines.append(f"routing overhead: mean {r['overhead_ms_mean']} ms, p95 {r['overhead_ms_p95']} ms; task-label accuracy {r['task_label_accuracy']}; evidence levels {r['evidence_levels']}")
@@ -302,19 +480,35 @@ def render_report(rep: dict[str, Any]) -> str:
 
 
 # --------------------------------------------------------------------------- #
+def _checkpoint_path(args) -> Path | None:  # type: ignore[no-untyped-def]
+    explicit = getattr(args, "checkpoint", None)
+    if explicit:
+        return Path(explicit)
+    out = getattr(args, "out", None)
+    return Path(str(out) + ".records.jsonl") if out else None
+
+
 def run_eval_cli(args) -> None:  # type: ignore[no-untyped-def]
-    tasks = load_tasks(Path(args.tasks) if args.tasks else None, args.limit)
+    tasks_path = Path(args.tasks) if args.tasks else None
+    tasks = load_tasks(tasks_path, args.limit)
+    checkpoint = _checkpoint_path(args)
+    resume = bool(getattr(args, "resume", False))
+    if resume and not checkpoint:
+        raise SystemExit("--resume needs --checkpoint PATH (or --out, whose checkpoint is <out>.records.jsonl)")
+    conditions = dataset_revision(tasks, tasks_path)
     if args.mode == "simulated":
-        rep = run_simulated(tasks, seed=args.seed)
+        rep = run_simulated(tasks, seed=args.seed, checkpoint=checkpoint, resume=resume, conditions=conditions)
     else:
-        rep = run_live(args, tasks)
+        rep = run_live(args, tasks, checkpoint=checkpoint, resume=resume, conditions=conditions)
     print(render_report(rep))
     if args.out:
         Path(args.out).write_text(json.dumps(rep, indent=2), encoding="utf-8")
         print(f"\nreport written to {args.out}")
 
 
-def run_simulated(tasks: list[dict[str, Any]], seed: int = 7) -> dict[str, Any]:
+def run_simulated(
+    tasks: list[dict[str, Any]], seed: int = 7, checkpoint: Path | None = None, resume: bool = False, conditions: dict[str, Any] | None = None
+) -> dict[str, Any]:
     import tempfile
 
     from ..config import BackendConfig, Config, ResourcePool, generate_key, write_key_file
@@ -347,8 +541,8 @@ def run_simulated(tasks: list[dict[str, Any]], seed: int = 7) -> dict[str, Any]:
     url = gw.start()
     try:
         probes = probe_all(gw)
-        run = EvalRun(url, api_key, admin_key, simulated=True, seed=seed)
-        rep = evaluate(run, tasks, save_measurements_store=gw.store)
+        run = EvalRun(url, api_key, admin_key, simulated=True, seed=seed, checkpoint=checkpoint, resume=resume)
+        rep = evaluate(run, tasks, save_measurements_store=gw.store, conditions=conditions or dataset_revision(tasks))
         rep["probes"] = probes
         rep["note"] = (
             "SIMULATED: deployments are fake backends whose correctness is scripted per category; this validates the "
@@ -360,7 +554,14 @@ def run_simulated(tasks: list[dict[str, Any]], seed: int = 7) -> dict[str, Any]:
         fake.stop()
 
 
-def run_live(args, tasks: list[dict[str, Any]]) -> dict[str, Any]:  # type: ignore[no-untyped-def]
+def restrict_auto_alias(cfg, dep_ids: list[str]):  # type: ignore[no-untyped-def]
+    """Return a config whose ``auto`` alias may only choose among ``dep_ids`` (canonical ids)."""
+    aliases = dict(cfg.aliases)
+    aliases["auto"] = aliases["auto"].model_copy(update={"deployments": tuple(dep_ids)})
+    return cfg.model_copy(update={"aliases": aliases})
+
+
+def run_live(args, tasks: list[dict[str, Any]], checkpoint: Path | None = None, resume: bool = False, conditions: dict[str, Any] | None = None) -> dict[str, Any]:  # type: ignore[no-untyped-def]
     from ..cli import _load
     from ..config import read_keys
     from ..runtime import GatewayThread, free_port
@@ -368,23 +569,37 @@ def run_live(args, tasks: list[dict[str, Any]]) -> dict[str, Any]:  # type: igno
     cfg = _load(args)
     # Run an in-process gateway on a free port so evaluation never disturbs a running instance.
     cfg = cfg.model_copy(update={"server": cfg.server.model_copy(update={"port": free_port()})})
-    if args.deployments:
-        # Fair comparison: `auto` chooses among the same subset the baselines are swept over.
-        aliases = dict(cfg.aliases)
-        aliases["auto"] = aliases["auto"].model_copy(update={"deployments": tuple(args.deployments)})
-        cfg = cfg.model_copy(update={"aliases": aliases})
     api = read_keys(cfg.resolve(cfg.server.api_keys_file))
     adm = read_keys(cfg.resolve(cfg.server.admin_key_file))
     if not api or not adm:
         raise SystemExit("keys missing; run `modelsaar init`")
+    selected: list[str] | None = None
+    if args.deployments:
+        # Resolve selectors ONCE against the discovered registry, then restrict the `auto` alias to the
+        # same canonical ids that calibration and every baseline sweep use (fair comparison). The
+        # alias lives in the immutable config, so discover, resolve, stop, rebuild, start again.
+        gw0 = GatewayThread(cfg)
+        url0 = gw0.start()
+        try:
+            discovered = EvalRun(url0, api[0], adm[0], simulated=False).all_deployments()
+        finally:
+            gw0.stop()
+        try:
+            selected = resolve_selectors(discovered, list(args.deployments))
+        except ValueError as e:
+            raise SystemExit(f"--deployments: {e}") from None
+        cfg = restrict_auto_alias(cfg, selected)
     gw = GatewayThread(cfg)
     url = gw.start()
     try:
         probes = probe_all(gw) if args.probe else []
-        run = EvalRun(url, api[0], adm[0], simulated=False, seed=args.seed)
-        rep = evaluate(run, tasks, save_measurements_store=gw.store if args.save_measurements else None, only=args.deployments or None)
-        if args.deployments:
-            rep["deployment_filter"] = list(args.deployments)
+        run = EvalRun(url, api[0], adm[0], simulated=False, seed=args.seed, checkpoint=checkpoint, resume=resume)
+        try:
+            rep = evaluate(run, tasks, save_measurements_store=gw.store if args.save_measurements else None, only=selected, conditions=conditions or dataset_revision(tasks))
+        except ValueError as e:
+            raise SystemExit(f"--deployments: {e}") from None
+        if selected:
+            rep["deployment_filter"] = {"selectors": list(args.deployments), "resolved": selected}
         rep["probes"] = probes
         rep["note"] = "LIVE: real backends from your config; results are specific to the exact deployments/fingerprints listed."
         return rep
