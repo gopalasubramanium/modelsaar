@@ -1,0 +1,13 @@
+# Used only when the site is hosted on Cloudflare Pages (GitHub Pages ignores this file and sets its own
+# headers). Kept so the hosting choice can change without touching the site.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/install.sh
+  Content-Type: text/x-shellscript; charset=utf-8
+  Cache-Control: public, max-age=300

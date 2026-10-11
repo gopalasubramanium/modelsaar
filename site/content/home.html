@@ -1,0 +1,102 @@
+<section class="hero" aria-labelledby="hero-title">
+  <div>
+    <p class="status">Development preview — open source, no release tagged yet</p>
+    <h1 id="hero-title">One address for your local AI.</h1>
+    <p class="lede">Connect the AI apps you already use. ModelSaar sends each request to a suitable available model, chosen from the task, verified model capabilities and the limits you set.</p>
+    <p>Spend less time switching models and configuring apps. Keep control of where your requests run.</p>
+    <div class="actions">
+      <a class="btn primary" href="{{ href('/get-started/') }}">Get started locally</a>
+      <a class="btn" href="{{ href('/how-it-works/') }}">See how it works</a>
+    </div>
+    <p class="small">Needs Python 3.10+ and an inference server you already run (Ollama is detected automatically). The installer pins a reviewed commit and never downloads models.</p>
+    {{ cmd(facts.INSTALL_ONE_LINER) }}
+    <p class="cmd-note">Prefer to read it first? <a href="{{ href('/get-started/#inspect') }}">Inspect the installer</a> or <a href="{{ href('/get-started/#manual') }}">install by hand</a>.</p>
+  </div>
+  <div>
+    {{ c.decision_record(c.SCENARIOS[1], 'req_02…') }}
+  </div>
+</section>
+
+<section aria-labelledby="problem-title">
+  <h2 id="problem-title">Several good models, one app at a time</h2>
+  <div class="two">
+    <div>
+      <p>Once you run more than one local model, every app needs its own model setting, and every task needs you to remember which model handles code, which one can read an image, which one is fast enough for chat. Change a model in Ollama and you change it in four places.</p>
+      <p>ModelSaar sits between your apps and your inference servers. Apps connect once, to one address, and ask for a virtual model called <code>auto</code>. For each request the gateway checks which of your deployments can actually do the job, picks one on evidence, forwards the request unchanged and records why.</p>
+    </div>
+    <div>
+      <p>Three things stay distinct:</p>
+      <dl class="kv">
+        <dt>Apps</dt><dd>Open WebUI, OpenCode, agents, scripts — anything that speaks the OpenAI Chat Completions API. They keep their own tools, memory and loops.</dd>
+        <dt>Inference backends</dt><dd>Ollama, vLLM, llama.cpp server and similar. They load weights and run on your hardware. ModelSaar does not replace them.</dd>
+        <dt>Models</dt><dd>The weights those backends serve, with their own licences. ModelSaar does not ship models or lower their hardware requirements.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="walk-title">
+  <h2 id="walk-title">What a routing decision looks like</h2>
+  <p class="lede">Every request produces a record like these. The scenarios below are scripted illustrations using the three models of a recorded test run — not live inference.</p>
+  {{ c.walkthrough(site) }}
+  <p>Read the full pipeline — requirements, hard filters, ranking, continuity — in <a href="{{ href('/how-it-works/') }}">How it works</a>.</p>
+</section>
+
+<section aria-labelledby="setup-title">
+  <h2 id="setup-title">Three steps to a first routed request</h2>
+  <ol class="steps">
+    <li>
+      <h3>Install ModelSaar</h3>
+      <p>Python 3.10 or newer on macOS, Linux or WSL2. The one-line installer uses <code>uv</code>, <code>pipx</code> or <code>pip --user</code> — whichever you have — and pins a reviewed commit.</p>
+      {{ cmd(facts.INSTALL_ONE_LINER) }}
+    </li>
+    <li>
+      <h3>Connect a backend you already run</h3>
+      <p><code>modelsaar init</code> finds Ollama on <code>127.0.0.1:11434</code> (or takes <code>--endpoint</code> for any OpenAI-compatible server), writes a private config and keys, and lists the models it discovered. Then start the gateway.</p>
+      {{ cmd(facts.FIRST_USE) }}
+    </li>
+    <li>
+      <h3>Connect an app</h3>
+      <p>Point the app at the gateway and pick <code>auto</code> as the model. <code>modelsaar client-config open-webui | opencode | openclaw | hermes</code> prints the exact settings.</p>
+      {{ cmd('Base URL:  ' + facts.GATEWAY_URL + '\nModel:     auto\nAPI key:   $(' + facts.KEY_COMMAND + ')', lang='text') }}
+    </li>
+  </ol>
+  <p>Verify from a second terminal with <code>{{ facts.FIRST_USE_CHECK }}</code>: it lists the models the gateway advertises and sends one chat completion through <code>auto</code>, printing which deployment answered. Full details, including Docker and remote hosts, in <a href="{{ href('/get-started/') }}">Get started</a>.</p>
+</section>
+
+<section aria-labelledby="compat-title">
+  <h2 id="compat-title">What works today, and how we know</h2>
+  <p class="lede">Compatibility is a tested property of an exact client, protocol and backend combination. Each row says what kind of evidence backs it.</p>
+  {{ c.support_matrix(site) }}
+  <p><span class="evidence live">live</span> ran against a real backend; <span class="evidence fixture">fixture tests</span> run in CI against a controlled fake backend; <span class="evidence docs">documented</span> means the configuration was written from the client's own documentation and has not been exercised. Product names identify compatible software; no partnership or endorsement is implied. Details per client and backend: <a href="{{ href('/integrations/') }}">Integrations</a>.</p>
+</section>
+
+<section aria-labelledby="evidence-title">
+  <h2 id="evidence-title">Measured, not promised</h2>
+  <p>In the recorded run of 2026-10-11 (three models on one machine, 32 held-out tasks, 400-token budget), automatic routing matched the strongest single model's task score (30 of 32), completed one more request — the image task the fixed model cannot take — and recorded no capability violation. Its p95 end-to-end latency was higher, because two requests went to a slower thinking model. Routing itself took under 1 ms at p95.</p>
+  <p>That is one run on one machine with a small task set; the confidence intervals overlap. Read the <a href="{{ href('/benchmarks/') }}">methodology, numbers and limitations</a>, or regenerate every aggregate from the <a href="{{ facts.REPO_URL }}/tree/{{ site.commit }}/docs/live-runs/2026-10-11-gx10-hardening">raw per-request records</a>.</p>
+</section>
+
+<section class="faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">Practical questions</h2>
+  <details><summary>What hardware do I need?</summary><p>Whatever your inference backend needs to run the models you want; ModelSaar adds a small Python process and no GPU requirement of its own. It has been run on a MacBook Air talking to an ASUS GX10 over a private network, and on a plain Linux container against a test backend.</p></details>
+  <details><summary>Do I need models already?</summary><p>Yes. ModelSaar never downloads models and never accepts model licences on your behalf. Pull them with your backend (for example <code>ollama pull gemma4:e4b</code>) first. <code>modelsaar demo</code> starts a clearly labelled simulated backend if you want to try the commands without any model.</p></details>
+  <details><summary>Does it use the internet?</summary><p>Not for routing. The gateway binds to loopback, talks only to the backend addresses you configure, sends no telemetry and never fetches remote media. The installer downloads the ModelSaar source from GitHub at a pinned commit, and your package tool downloads its Python dependencies.</p></details>
+  <details><summary>What about cloud models my backend forwards to?</summary><p>By default (<code>locality_mode: local_only</code>) deployments that Ollama marks as cloud-forwarded are excluded, even when a client asks for them by name. Set <code>allow_remote</code> deliberately if you want them; the decision record shows the locality evidence either way.</p></details>
+  <details><summary>I only have one model.</summary><p>Then <code>auto</code> uses that model whenever it qualifies for the request, and you still get one address, generated keys, a health check and a decision record. Adding a second model later changes nothing in your apps.</p></details>
+  <details><summary>Which models are supported?</summary><p>Any model your backend serves. Capabilities (tools, image input, strict JSON, streaming) are discovered from the backend and verified with short probes; a capability that is unknown never qualifies a model for a request that needs it. A small catalogue supplies optional quality hints that are labelled as priors until you measure.</p></details>
+  <details><summary>What happens when nothing qualifies?</summary><p>You get an HTTP 422 with the blocker for every deployment and a remedy — never a silently truncated history, a dropped image or a weakened schema.</p></details>
+  <details><summary>What does it cost? What is the licence?</summary><p>ModelSaar is free, Apache-2.0 licensed open source. Model weights keep their own licences, which you accept through your backend.</p></details>
+  <details><summary>How do I update or uninstall?</summary><p>Re-run the installer: it pins the newer reviewed commit and keeps your config, keys and state. <code>modelsaar uninstall</code> removes only the files ModelSaar created and lists anything it left in place; then remove the package with your package tool. Details in <a href="{{ href('/docs/installation/') }}">Installation</a>.</p></details>
+  <details><summary>How do I see why a model was chosen?</summary><p>Every response carries <code>X-ModelSaar-Request-Id</code> and <code>X-ModelSaar-Deployment</code>. <code>modelsaar decisions</code> lists recent decisions, <code>modelsaar explain -m "…"</code> dry-runs a request, and <code>/admin/ui</code> shows the status page. Records hold metadata only, never your prompts.</p></details>
+</section>
+
+<section aria-labelledby="close-title">
+  <h2 id="close-title">Try it on the models you already have</h2>
+  <p>Python and a running backend are all you need for a first routed request. If something does not work, the <a href="{{ facts.REPO_URL }}/issues/new/choose">issue templates</a> ask for exactly the decision record and doctor output that make it fixable.</p>
+  <div class="actions">
+    <a class="btn primary" href="{{ href('/get-started/') }}">Get started locally</a>
+    <a class="btn" href="{{ facts.REPO_URL }}">Read the source</a>
+    <a class="btn" href="{{ href('/docs/contributing/') }}">Contribute</a>
+  </div>
+</section>

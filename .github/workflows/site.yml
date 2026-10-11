@@ -1,0 +1,66 @@
+name: site
+
+# modelsaar.com — built from site/ with no framework. Every push to the website branch builds and checks
+# the site and keeps the result as an artifact; publishing to GitHub Pages happens only on an explicit
+# workflow_dispatch from a chosen ref, so production is always tied to a known commit. Rollback = dispatch
+# again from the previous good commit.
+on:
+  push:
+    branches: [website/modelsaar-com, main]
+    paths: [site/**, docs/**, README.md, CHANGELOG.md, CONTRIBUTING.md, SECURITY.md, .github/workflows/site.yml]
+  pull_request:
+    paths: [site/**, .github/workflows/site.yml]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "preview (noindex, served under /modelsaar/ on github.io) or production (modelsaar.com)"
+        required: true
+        default: preview
+        type: choice
+        options: [preview, production]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - name: Install (the site reads docs and the CLI from the repository)
+        run: pip install -e . markdown
+      - name: Build
+        run: |
+          if [ "${{ github.event.inputs.target || 'preview' }}" = "production" ]; then
+            python site/build.py
+          else
+            python site/build.py --preview --base /modelsaar/
+          fi
+      - name: Static checks (links, headings, metadata, sitemap, installer pin, CLI commands)
+        run: |
+          if [ "${{ github.event.inputs.target || 'preview' }}" = "production" ]; then python site/check_site.py; else echo "preview build: path-prefixed, static checks run on production builds"; fi
+      - name: Installer syntax and pinned revision is public
+        run: |
+          sh -n site/dist/install.sh
+          SHA=$(sed -n 's/^REF="${MODELSAAR_REF:-\([0-9a-f]*\)}"/\1/p' site/dist/install.sh)
+          git fetch --depth=1 origin "$SHA" && echo "pinned $SHA is reachable on origin"
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: site/dist
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'production'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

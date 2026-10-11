@@ -1,0 +1,35 @@
+<section aria-labelledby="docs-title">
+  <h1 id="docs-title">Documentation</h1>
+  <p class="lede">Rendered from the repository at the commit this site was built from. The Markdown files in <a href="{{ facts.REPO_URL }}/tree/{{ site.commit }}/docs"><code>docs/</code></a> are authoritative; the pages here exist so that you can read and link to them without leaving the site.</p>
+  <h2>Using ModelSaar</h2>
+  <ul class="docs-list">
+    <li><a href="{{ href('/get-started/') }}">Get started</a><p>Prerequisites, install, first request, client connection.</p></li>
+    <li><a href="{{ href('/docs/installation/') }}">Installation, upgrade, rollback, uninstall</a><p>Source install, configuration essentials, Docker Compose, evidence scheme and upgrades.</p></li>
+    <li><a href="{{ href('/docs/troubleshooting/') }}">Troubleshooting</a><p>What <code>doctor</code> warnings mean and what to do.</p></li>
+    <li><a href="{{ href('/docs/privacy/') }}">Privacy and security of the gateway</a><p>Defaults table with the code path behind each guarantee.</p></li>
+  </ul>
+  <h2>Clients</h2>
+  <ul class="docs-list">
+    <li><a href="{{ href('/docs/clients/open-webui/') }}">Open WebUI</a><p>Connection settings, Docker addresses, session headers.</p></li>
+    <li><a href="{{ href('/docs/clients/opencode/') }}">OpenCode</a><p>V1 and V2 provider configuration.</p></li>
+    <li><a href="{{ href('/docs/clients/openclaw/') }}">OpenClaw</a><p>Provider configuration.</p></li>
+    <li><a href="{{ href('/docs/clients/hermes/') }}">Hermes Agent</a><p>YAML provider/model settings.</p></li>
+  </ul>
+  <h2>Design and evidence</h2>
+  <ul class="docs-list">
+    <li><a href="{{ href('/how-it-works/') }}">How it works</a><p>Plain-language and expert walk through the pipeline.</p></li>
+    <li><a href="{{ href('/docs/routing/') }}">Routing</a><p>Requirements, eligibility, ranking, embeddings, memory budgets, continuity and failover — the authoritative reference.</p></li>
+    <li><a href="{{ href('/docs/architecture/') }}">Architecture</a><p>Components and request flow.</p></li>
+    <li><a href="{{ href('/docs/evaluation/') }}">Evaluation harness</a><p>Policies, task set, scorers, running it on your hardware.</p></li>
+    <li><a href="{{ href('/docs/verification-report/') }}">Verification report</a><p>Everything executed, where, with what outcome; everything NOT RUN.</p></li>
+    <li><a href="{{ href('/docs/review-2026-10-11/') }}">Independent review F01–F18</a><p>Findings, fixes, regression tests and evidence.</p></li>
+    <li><a href="{{ href('/docs/extending/') }}">Extending</a><p>Adding backends, probes and clients.</p></li>
+  </ul>
+  <h2>Project</h2>
+  <ul class="docs-list">
+    <li><a href="{{ href('/docs/changelog/') }}">Changelog</a><p>What changed in each revision.</p></li>
+    <li><a href="{{ href('/docs/contributing/') }}">Contributing</a><p>Reporting problems, proposing changes, running the tests.</p></li>
+    <li><a href="{{ href('/docs/security-policy/') }}">Security policy</a><p>How to report a vulnerability.</p></li>
+    <li><a href="{{ href('/docs/roadmap-detail/') }}">Roadmap (repository)</a><p>Planned work as recorded in the repository.</p></li>
+  </ul>
+</section>
