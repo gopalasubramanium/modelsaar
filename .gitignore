@@ -6,7 +6,7 @@ build/
 dist/
 .pytest_cache/
 .ruff_cache/
-eval-*.json
+/eval-*.json
 live-check-*/
 live-*-console.log
 *.bak

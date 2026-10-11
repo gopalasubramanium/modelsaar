@@ -1,0 +1,1233 @@
+{
+ "generated_at": "2026-10-11T15:52:21",
+ "mode": "live",
+ "deployments": [
+  {
+   "id": "ollama/qwen3.6:latest",
+   "family": "qwen35moe",
+   "parameter_size": "35.5B",
+   "quantization": "Q4_K_M",
+   "runtime": "ollama",
+   "context_length": 4096,
+   "fingerprint": "57a54839803409d7"
+  },
+  {
+   "id": "ollama/gemma4:31b",
+   "family": "gemma4",
+   "parameter_size": "31.3B",
+   "quantization": "Q4_K_M",
+   "runtime": "ollama",
+   "context_length": 131072,
+   "fingerprint": "3193f29b78007007"
+  },
+  {
+   "id": "ollama/qwen3-coder:latest",
+   "family": "qwen3moe",
+   "parameter_size": "30.5B",
+   "quantization": "Q4_K_M",
+   "runtime": "ollama",
+   "context_length": 4096,
+   "fingerprint": "ad411b7922f42b0b"
+  }
+ ],
+ "n_calib": 15,
+ "n_test": 32,
+ "calibration": {
+  "per_deployment": {
+   "ollama/qwen3.6:latest": {
+    "n": 15,
+    "success": 0.4,
+    "ci95": [
+     0.198,
+     0.643
+    ],
+    "completion_rate": 0.867,
+    "capability_violations": 2,
+    "p50_ms": 4344.5,
+    "p95_ms": 4596.6,
+    "per_category": {
+     "agent": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "coding": {
+      "success": 0.0,
+      "n": 2,
+      "ci95": [
+       0.0,
+       0.658
+      ]
+     },
+     "conversation": {
+      "success": 0.0,
+      "n": 2,
+      "ci95": [
+       0.0,
+       0.658
+      ]
+     },
+     "decision": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "document_vision": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "extraction": {
+      "success": 0.0,
+      "n": 2,
+      "ci95": [
+       0.0,
+       0.658
+      ]
+     },
+     "math": {
+      "success": 0.5,
+      "n": 2,
+      "ci95": [
+       0.095,
+       0.905
+      ]
+     },
+     "rag": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "summarization": {
+      "success": 0.0,
+      "n": 1,
+      "ci95": [
+       0.0,
+       0.793
+      ]
+     },
+     "translation": {
+      "success": 0.0,
+      "n": 1,
+      "ci95": [
+       0.0,
+       0.793
+      ]
+     }
+    }
+   },
+   "ollama/gemma4:31b": {
+    "n": 15,
+    "success": 0.667,
+    "ci95": [
+     0.417,
+     0.848
+    ],
+    "completion_rate": 0.867,
+    "capability_violations": 2,
+    "p50_ms": 17737.7,
+    "p95_ms": 37878.8,
+    "per_category": {
+     "agent": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "coding": {
+      "success": 0.5,
+      "n": 2,
+      "ci95": [
+       0.095,
+       0.905
+      ]
+     },
+     "conversation": {
+      "success": 0.0,
+      "n": 2,
+      "ci95": [
+       0.0,
+       0.658
+      ]
+     },
+     "decision": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "document_vision": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "extraction": {
+      "success": 0.0,
+      "n": 2,
+      "ci95": [
+       0.0,
+       0.658
+      ]
+     },
+     "math": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "rag": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "summarization": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "translation": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     }
+    }
+   },
+   "ollama/qwen3-coder:latest": {
+    "n": 15,
+    "success": 0.933,
+    "ci95": [
+     0.702,
+     0.988
+    ],
+    "completion_rate": 0.933,
+    "capability_violations": 1,
+    "p50_ms": 686.7,
+    "p95_ms": 2738.4,
+    "per_category": {
+     "agent": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "coding": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "conversation": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "decision": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "document_vision": {
+      "success": 0.0,
+      "n": 1,
+      "ci95": [
+       0.0,
+       0.793
+      ]
+     },
+     "extraction": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "math": {
+      "success": 1.0,
+      "n": 2,
+      "ci95": [
+       0.342,
+       1.0
+      ]
+     },
+     "rag": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "summarization": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     },
+     "translation": {
+      "success": 1.0,
+      "n": 1,
+      "ci95": [
+       0.207,
+       1.0
+      ]
+     }
+    }
+   }
+  },
+  "fixed_strong": "ollama/qwen3-coder:latest",
+  "fixed_fast": "ollama/qwen3-coder:latest"
+ },
+ "results": {
+  "auto (live routing)": {
+   "n": 32,
+   "success": 0.875,
+   "ci95": [
+    0.719,
+    0.95
+   ],
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 692.5,
+   "p95_ms": 27135.7,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.6,
+     "n": 5,
+     "ci95": [
+      0.231,
+      0.882
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 0.667,
+     "n": 3,
+     "ci95": [
+      0.208,
+      0.939
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "fixed-strong (calibrated)": {
+   "n": 32,
+   "success": 0.906,
+   "ci95": [
+    0.758,
+    0.968
+   ],
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 645.8,
+   "p95_ms": 4848.5,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.8,
+     "n": 5,
+     "ci95": [
+      0.376,
+      0.964
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 0.0,
+     "n": 1,
+     "ci95": [
+      0.0,
+      0.793
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "fixed-fast (calibrated)": {
+   "n": 32,
+   "success": 0.906,
+   "ci95": [
+    0.758,
+    0.968
+   ],
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 645.8,
+   "p95_ms": 4848.5,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.8,
+     "n": 5,
+     "ci95": [
+      0.376,
+      0.964
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 0.0,
+     "n": 1,
+     "ci95": [
+      0.0,
+      0.793
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "rules (gold label, specialist tags)": {
+   "n": 32,
+   "success": 0.812,
+   "ci95": [
+    0.647,
+    0.911
+   ],
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 958.5,
+   "p95_ms": 4867.6,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.0,
+     "n": 5,
+     "ci95": [
+      0.0,
+      0.434
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "random (diagnostic)": {
+   "n": 32,
+   "success": 0.688,
+   "ci95": [
+    0.514,
+    0.82
+   ],
+   "completion_rate": 0.938,
+   "capability_violations": 2,
+   "p50_ms": 4188.9,
+   "p95_ms": 9826.1,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.4,
+     "n": 5,
+     "ci95": [
+      0.118,
+      0.769
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 0.0,
+     "n": 2,
+     "ci95": [
+      0.0,
+      0.658
+     ]
+    },
+    "math": {
+     "success": 0.667,
+     "n": 6,
+     "ci95": [
+      0.3,
+      0.903
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 0.667,
+     "n": 3,
+     "ci95": [
+      0.208,
+      0.939
+     ]
+    },
+    "translation": {
+     "success": 0.0,
+     "n": 2,
+     "ci95": [
+      0.0,
+      0.658
+     ]
+    }
+   }
+  },
+  "oracle (offline upper bound, not available at runtime)": {
+   "n": 32,
+   "success": 0.969,
+   "ci95": [
+    0.843,
+    0.994
+   ],
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 552.0,
+   "p95_ms": 4585.2,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.8,
+     "n": 5,
+     "ci95": [
+      0.376,
+      0.964
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  }
+ },
+ "per_deployment_test": {
+  "ollama/qwen3.6:latest": {
+   "n": 32,
+   "success": 0.5,
+   "ci95": [
+    0.336,
+    0.664
+   ],
+   "completion_rate": 0.938,
+   "capability_violations": 2,
+   "p50_ms": 4188.9,
+   "p95_ms": 4724.1,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.0,
+     "n": 5,
+     "ci95": [
+      0.0,
+      0.434
+     ]
+    },
+    "conversation": {
+     "success": 0.6,
+     "n": 5,
+     "ci95": [
+      0.231,
+      0.882
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 0.0,
+     "n": 2,
+     "ci95": [
+      0.0,
+      0.658
+     ]
+    },
+    "math": {
+     "success": 0.667,
+     "n": 6,
+     "ci95": [
+      0.3,
+      0.903
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 0.0,
+     "n": 3,
+     "ci95": [
+      0.0,
+      0.562
+     ]
+    },
+    "translation": {
+     "success": 0.0,
+     "n": 2,
+     "ci95": [
+      0.0,
+      0.658
+     ]
+    }
+   }
+  },
+  "ollama/gemma4:31b": {
+   "n": 32,
+   "success": 0.875,
+   "ci95": [
+    0.719,
+    0.95
+   ],
+   "completion_rate": 0.938,
+   "capability_violations": 2,
+   "p50_ms": 17494.9,
+   "p95_ms": 37799.9,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.6,
+     "n": 5,
+     "ci95": [
+      0.231,
+      0.882
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 0.0,
+     "n": 2,
+     "ci95": [
+      0.0,
+      0.658
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "ollama/qwen3-coder:latest": {
+   "n": 32,
+   "success": 0.906,
+   "ci95": [
+    0.758,
+    0.968
+   ],
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 645.8,
+   "p95_ms": 4848.5,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.8,
+     "n": 5,
+     "ci95": [
+      0.376,
+      0.964
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 0.0,
+     "n": 1,
+     "ci95": [
+      0.0,
+      0.793
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  }
+ },
+ "routing": {
+  "overhead_ms_mean": 0.53,
+  "overhead_ms_p95": 0.72,
+  "choices": {
+   "conv-03": "ollama/gemma4:31b",
+   "conv-04": "ollama/gemma4:31b",
+   "conv-05": "ollama/gemma4:31b",
+   "code-03": "ollama/gemma4:31b",
+   "code-04": "ollama/gemma4:31b",
+   "code-05": "ollama/qwen3-coder:latest",
+   "code-06": "ollama/qwen3-coder:latest",
+   "agent-03": "ollama/qwen3-coder:latest",
+   "agent-04": "ollama/qwen3-coder:latest",
+   "agent-05": "ollama/qwen3-coder:latest",
+   "math-03": "ollama/qwen3-coder:latest",
+   "math-04": "ollama/qwen3-coder:latest",
+   "math-05": "ollama/qwen3-coder:latest",
+   "math-06": "ollama/qwen3-coder:latest",
+   "extract-03": "ollama/qwen3-coder:latest",
+   "extract-04": "ollama/qwen3-coder:latest",
+   "sum-02": "ollama/qwen3-coder:latest",
+   "sum-03": "ollama/qwen3-coder:latest",
+   "trans-02": "ollama/qwen3-coder:latest",
+   "trans-03": "ollama/qwen3-coder:latest",
+   "multi-01": "ollama/qwen3-coder:latest",
+   "multi-02": "ollama/qwen3-coder:latest",
+   "ambig-01": "ollama/qwen3-coder:latest",
+   "ambig-02": "ollama/qwen3-coder:latest",
+   "ambig-03": "ollama/qwen3-coder:latest",
+   "rag-02": "ollama/qwen3-coder:latest",
+   "rag-03": "ollama/qwen3-coder:latest",
+   "dec-02": "ollama/qwen3-coder:latest",
+   "dec-03": "ollama/qwen3-coder:latest",
+   "vis-02": "ollama/qwen3.6:latest",
+   "cont-01": "ollama/gemma4:31b",
+   "long-01": "ollama/qwen3-coder:latest"
+  },
+  "evidence_levels": {
+   "measured:1": 7,
+   "measured:2": 20,
+   "uncalibrated:size-heuristic": 5
+  },
+  "task_label_accuracy": 0.844,
+  "routing_mistakes": [
+   "code-03",
+   "math-05",
+   "long-01"
+  ],
+  "classifier": {
+   "used": 0,
+   "timeouts": 0
+  }
+ },
+ "deployment_filter": [
+  "ollama/qwen3.6:latest",
+  "ollama/gemma4:31b",
+  "ollama/qwen3-coder:latest"
+ ],
+ "probes": [],
+ "note": "LIVE: real backends from your config; results are specific to the exact deployments/fingerprints listed."
+}
