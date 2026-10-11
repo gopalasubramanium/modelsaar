@@ -17,22 +17,33 @@ cannot.
 | Caches | No response cache, no prompt-derived cache. Affinity is scoped per caller and holds only a deployment id | `routing/affinity.py` |
 | Telemetry / learning | None. `security.telemetry_opt_in` exists for future opt-in features; nothing is sent anywhere | |
 | Request size | 32 MiB limit; unknown fields rejected rather than forwarded | `server.max_request_bytes` |
-| Untrusted content | Prompts, tool outputs, model cards and classifier output are data. Classifier output is validated against a closed label set and can only refine a task label | `routing/classifier.py` |
-| Code execution | The gateway never executes model-generated commands. The evaluation harness runs *model-written Python* only when you run `modelsaar eval` on code tasks, in a basic subprocess sandbox | `evaluation/scoring.py` |
+| Untrusted content | Prompts, tool outputs, model cards and classifier output are data. Classifier output is schema-validated against a closed label set and can only refine a task label | `routing/classifier.py` |
+| Payload-bearing operations | Nothing derived from a request leaves the gateway before policy filtering. Tokenizer counts (`/tokenize`) are requested only from deployments that already passed locality, enablement, health and capability filters; the optional classifier must be a local deployment unless `routing.classifier.allow_remote` **and** `security.locality_mode: allow_remote` are both set. Unknown content part types (`audio_url`, `video_url`, `file`, …) are rejected with `400 unsupported_content_type` before any dispatch | `routing/router.py`, `protocol/openai.py` |
+| Code execution | The gateway never executes model-generated commands. The evaluation harness runs *model-written Python* only inside bubblewrap (Linux), `sandbox-exec` (macOS) or a `--network none --read-only` Docker container with CPU/memory/output/time limits; when none is available the task is **skipped**. There is no unsandboxed fallback and no flag to enable one | `evaluation/sandbox.py` |
 | Dependencies | Five pinned-range runtime deps; CI runs `pip-audit` and secret scanning; workflow permissions are read-only | `.github/workflows/ci.yml` |
 
 ## LAN exposure
 
 Set `server.host: 0.0.0.0` **and** `security.allow_lan: true`. Keys then travel over plain HTTP:
 terminate TLS in front (Caddy/nginx) or use a trusted private tunnel (Tailscale/WireGuard). Rotate
-keys with `modelsaar keys rotate`. The admin key should never leave the host.
+keys with `modelsaar keys rotate`. The admin key should never leave the host. `modelsaar keys ensure`
+creates missing key files (idempotent, never rotates) and is what the container runs before `serve`.
+
+## File handling
+
+`client-config --apply` keeps the target file's permission bits (a `0600` file stays `0600`; new files
+are created `0600` because the snippet carries the gateway key), writes temp files and backups private
+from creation and never reuses a backup name. `modelsaar uninstall` removes only the files ModelSaar
+created (config and its backups, its key files, its state database), refuses symlinked `keys/`/`state/`
+boundaries and leaves anything else in place.
 
 ## Offline operation — scope of the claim
 
 What was tested: with the fake backend on loopback and `locality_mode: local_only`, no request,
 classification or telemetry leaves the host; cloud aliases are excluded even when requested
 explicitly (`tests/test_acceptance.py::test_local_only_blocks_cloud_even_when_explicit`,
-`test_prompt_injection_cannot_change_routing`).
+`test_prompt_injection_cannot_change_routing`); a remote-labelled backend with a `/tokenize` endpoint
+receives zero bytes of message text (`tests/test_hardening_2026_10_11.py::test_local_only_sends_no_message_text_to_remote_tokenizer`).
 
 What the gateway cannot prove: that an opaque backend is truly local. A localhost address can be a
 proxy; Ollama can forward `:cloud` models. ModelSaar records the evidence it has (`locality_evidence`

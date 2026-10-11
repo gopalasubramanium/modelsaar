@@ -1,5 +1,34 @@
 # Changelog
 
+## Unreleased — hardening pass (branch `hardening/review-2026-10-11`, 2026-10-11)
+
+Fixes for the eight findings of the independent review of commit `1122e1f`; each has a regression
+test in `tests/test_hardening_2026_10_11.py` (see docs/progress.md for the finding → fix → test table).
+
+* **Privacy:** policy filters run before any payload-bearing operation; `/tokenize` counts only for
+  policy-allowed deployments under one deadline, labelled `tokenize:<backend>+template-estimate`;
+  classifier must be local unless `routing.classifier.allow_remote` + `locality_mode: allow_remote`;
+  unknown content part types → `400 unsupported_content_type`.
+* **Dispatch contract:** no failover inside tool round trips, reasoning continuation or pinned sessions
+  (`failover_allowed`/`failover_note` in decisions); timeouts hold capacity as uncertain; circuit success
+  and session pinning only after validated completion; attribution per attempt; non-completion 200s →
+  `502 upstream_bad_response`.
+* **Resources:** `resource_pools[].memory_gb` enforced (`memory_margin_gb`, `unknown_memory_policy`);
+  `POST /admin/probe`; `modelsaar probe` coordinates through a running gateway (`--offline`,
+  `--allow-concurrent`); live eval refuses to run next to a listening gateway without `--allow-concurrent`.
+* **Embeddings:** deployment identity (digest / `backends[].models[].identity`); aliases bound to one
+  verified identity (`embeddings[].identity`); request `dimensions`/`encoding_format` guarded; output
+  validated (`502 embedding_contract_violation`); non-empty prefixes rejected.
+* **Evidence:** fingerprints include endpoint and identity; evidence scheme 2 (old rows kept, unused,
+  reported by `doctor`); measurements carry conditions.
+* **Evaluator:** sandbox-or-skip code execution, strict scorers, schema-validated classifier output,
+  `--checkpoint`/`--resume`, dataset/scorer revision recorded.
+* **Files/first run:** mode-preserving `client-config --apply` with private temp files and unique backups;
+  uninstall removes only owned files and refuses symlinks; `modelsaar keys ensure` + container CMD;
+  `init --profile` sets the `auto` alias profile; `scripts/compose-smoke.sh`, `scripts/install-check.sh`,
+  `scripts/live_verify.sh` (resumable live verification), `scripts/live_client_checks.py`.
+* `.gitignore` no longer hides `docs/live-runs/**/eval-*.json`; the GX10 artefacts are tracked.
+
 ## 0.1.0 (unreleased, 2026-10-11)
 
 First release: OpenAI-compatible gateway (`/v1/models`, `/v1/chat/completions` incl. SSE,

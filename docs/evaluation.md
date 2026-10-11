@@ -11,8 +11,13 @@ third-party data) across conversation, coding, agent/tools, math, extraction (st
 summarization, translation, RAG-style, decision, vision, a tool round trip, mixed-language and
 deliberately ambiguous prompts, plus a long-but-easy transformation. Splits: `calib` (15) and `test`
 (32) use different templates. Scorers: `nonempty`, `contains`, `contains_any`, `json_schema` (+field
-checks), `tool_call` (valid JSON arguments), `code_exec` (model code + harness in a disposable
-`python -I` subprocess with time/memory limits). No LLM judge is used.
+checks), `tool_call` (strict: non-empty id, expected name, JSON-object arguments containing every
+required parameter and the expected substrings), `code_exec` (model code + harness + completion
+sentinel, exit 0 and exact normalised stdout). `code_exec` runs **only** under bubblewrap (Linux),
+`sandbox-exec` (macOS) or Docker (`--network none --read-only`) with CPU/memory/output/time limits;
+without one of those the task is skipped and the report says so — there is no host-execution
+fallback. Scorer rules are versioned (`SCORER_VERSION`) and recorded in the report's `conditions`.
+No LLM judge is used. See `src/modelsaar/evaluation/fixtures/README.md` for the exact rules.
 
 ## Procedure
 
@@ -38,9 +43,16 @@ modelsaar eval --mode simulated                 # no models needed; validates me
 modelsaar eval --mode live --probe --save-measurements --out eval-$(date +%F).json
 ```
 
-Live mode starts an in-process gateway from your config on a free port (your running instance is
-untouched). The report records exact deployments (model, parameter size, quantization, runtime,
-context, fingerprint), date, sample counts and every request's outcome.
+Live mode starts an in-process gateway from your config on a free port. Because that gateway's
+admission cannot coordinate with another instance using the same backends, the run refuses to start
+while a gateway listens on the configured port unless you pass `--allow-concurrent`. Long runs are
+resumable: `--checkpoint PATH` (default `<out>.records.jsonl` with `--out`) appends one sanitised
+record per request (ids, status, latency, scorer detail — never prompts), and `--resume` skips
+recorded tasks whose deployment fingerprint is unchanged. The report records exact deployments
+(model, parameter size, quantization, runtime, context, fingerprint, endpoint), the conditions
+(`max_tokens`, temperature, seed, scorer version, git commit, sandbox backend, dataset revision),
+date, sample counts and every request's outcome. `scripts/live_verify.sh` wraps probes, wire-level
+client checks and this evaluation into one resumable command.
 
 ## Acceptance targets for a reference configuration
 

@@ -16,7 +16,7 @@ instructions inside prompts):
 * task labels (multi-label, 0..1): conversation, coding, agent, math, extraction, document_vision,
   translation, summarization, rag, decision; `ambiguous` when the top label is weak or contested
 * languages (script detection + light lexical hints) and a `multilingual` flag
-* token budget: `input_estimate` (chars/3 for Latin text, 1 token per CJK/other wide character, + per-message, per-tool and per-image overheads, +5 %; refined with the runtime's `/tokenize` for deployments where the estimate lands within ±50 % of their context),
+* token budget: `input_estimate` (chars/3 for Latin text, 1 token per CJK/other wide character, + per-message, per-tool and per-image overheads, +5 %; refined with the runtime's `/tokenize` for deployments that passed every policy/capability filter and whose estimate lands within ±50 % of their context, under one deadline `token_estimate.exact_count_deadline_s`; the result is labelled `tokenize:<backend>+template-estimate` because template/image overheads stay estimated),
   `output_allowance` (`max_tokens`/`max_completion_tokens` or default 1024), `reasoning_allowance`
   (applied only to deployments whose `thinking` capability is supported)
 
@@ -115,7 +115,39 @@ commentary is never injected into assistant content.
 
 ## Embeddings
 
-`/v1/embeddings` routes an alias defined under `embeddings:` to the contract's deployments only
-(same model revision, declared dimensions). If none is available the request fails with a
-re-indexing remedy — never a silent switch to a different embedding space. A concrete embedding
+`/v1/embeddings` routes an alias defined under `embeddings:` to the contract's deployments only.
+Members must be **one verified identity**: the Ollama digest, or `backends[].models[].identity` for
+generic endpoints. The alias's effective identity is `embeddings[].identity` when declared, else the
+identity recorded in the state DB on first successful use, else the first member's. A member with an
+unknown identity is never used as a replica (a model-name match is not an identity); a member whose
+identity differs is excluded with a re-indexing remedy — never a silent switch to a different space.
+After you change the model deliberately, re-index and set `embeddings[].identity` to the new value.
+Request-level `dimensions` that differ from the alias and `encoding_format` other than `float` are
+rejected (`400 unsupported_contract_option`). Every response is validated (vector count, indices,
+dimensions, finite values, unit norm when `normalized: true`); a violation is `502
+embedding_contract_violation`, never a 200. `query_prefix`/`document_prefix` are not applied by the
+gateway (inputs are forwarded verbatim) and are rejected when non-empty. A concrete embedding
 deployment id can also be requested directly.
+
+## Memory budgets
+
+A `resource_pools[].memory_gb` is a hard admission constraint: resident weights (deployments the
+runtime reports loaded), every distinct deployment currently reserved (incl. an uncertain hold after
+a timeout/disconnect and the classifier) and the candidate, plus `memory_margin_gb`, must fit. The
+estimates are weights-only (`memory_gb_estimate` with its provenance: Ollama size × 1.15, operator
+declaration or override); KV cache, workspace and runtime overhead are covered only by the margin, so
+this is a budget, not an OOM guarantee. Unified memory is counted once per pool; a deployment is
+counted once however many requests it serves. Deployments with an unknown estimate follow
+`unknown_memory_policy` (`allow`, counted as 0 and labelled in the decision, or `reject`). The check
+runs atomically with the pool slot; `/admin/status` shows `memory_reserved_gb` and the holders.
+
+## Continuity and failover
+
+Pre-commit failover (one attempt, same candidate list) is refused when the request is bound to the
+deployment that started the exchange: a tool-result turn whose tool-call ids were issued by that
+deployment, a conversation carrying `reasoning_content`, or a session pinned by affinity. The
+decision records `failover_allowed` and `failover_note`; the client gets the backend's error and
+decides. A timeout converts the reservation into an uncertain hold (`admission.uncertain_hold_s`)
+because the backend may still be generating. Circuit-breaker success and session pinning are
+recorded only after a validated completion (a parsed `choices[0].message`, or a stream that ended
+with a finish reason/`[DONE]`); an HTTP 200 that is not a completion is `502 upstream_bad_response`.
