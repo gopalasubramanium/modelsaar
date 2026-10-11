@@ -268,32 +268,47 @@ class Router:
         req = analyze_chat(body, self.cfg.routing.token_estimate, thinking_possible)
         request_fields = set(body.keys())
 
-        # --- exact token counts where the runtime offers them (bounded: borderline cases only) ---
-        exact = await self._exact_counts(body, req)
-        if exact:
-            dec.requirements_note = f"exact token counts used for {sorted(exact)}"
-
-        # --- hard filters --------------------------------------------------
+        # --- hard filters, pass 1: estimates only. No request content leaves the gateway here. ---
         deps = self.registry.all()
-        res = filter_deployments(
-            deps,
-            req,
-            self.cfg.security,
-            alias=alias,
-            explicit_model=explicit.id if explicit else None,
-            feasibility=self.admission.feasibility,
-            backend_unsupported_fields=lambda d: self.adapters[d.backend_id].unsupported_fields(),
-            request_fields=request_fields,
-            exact_input_tokens=exact or None,
-        )
+
+        def _filter(exact: dict[str, int] | None):
+            return filter_deployments(
+                deps,
+                req,
+                self.cfg.security,
+                alias=alias,
+                explicit_model=explicit.id if explicit else None,
+                feasibility=self.admission.feasibility,
+                backend_unsupported_fields=lambda d: self.adapters[d.backend_id].unsupported_fields(),
+                request_fields=request_fields,
+                exact_input_tokens=exact,
+            )
+
+        res = _filter(None)
+        # Pass 2: tokenizer-based counts, only for deployments that passed every policy and
+        # capability filter (eligible, or excluded by the context estimate alone). A deployment
+        # that is remote under local_only, disabled, unhealthy or lacks a capability never
+        # receives the prompt.
+        allowed = [d for d in res.eligible] + [
+            d
+            for d in deps
+            for e in res.exclusions
+            if e.deployment_id == d.id and e.reasons and all(r.startswith("effective context ") and "<" in r for r in e.reasons)
+        ]
+        exact = await self._exact_counts(body, req, allowed)
+        if exact:
+            dec.requirements_note = "tokenizer counts used: " + ", ".join(
+                f"{did}={exact[did]} (tokenize:{did.split('/', 1)[0]}+template-estimate)" for did in sorted(exact)
+            )
+            res = _filter(exact)
         dec.exclusions = res.blockers_summary()
         dec.remedies = sorted({r for e in res.exclusions for r in e.remedies})
 
         # --- optional classifier (only refines the task label) ------------
         if res.eligible and self.classifier.should_run(req):
-            cdep = self._classifier_deployment()
+            cdep, why = self._classifier_deployment()
             if cdep is None:
-                dec.classifier = {"used": False, "status": "unavailable", "note": "configured classifier deployment not found"}
+                dec.classifier = {"used": False, "status": "unavailable", "note": why}
             else:
                 try:
                     reservation = await self.admission.acquire(cdep, timeout=self.cfg.routing.classifier.timeout_s)
@@ -392,17 +407,21 @@ class Router:
         if sess:
             self.affinity.set(caller_id, sess[0], dep_id, sess[1])
 
-    async def _exact_counts(self, body: dict[str, Any], req: Requirements) -> dict[str, int]:
-        """Ask runtimes with a tokenizer endpoint (vLLM /tokenize) for exact input counts, only for
-        deployments where the estimate is within +-50% of the context limit (the cases where an
-        estimate could wrongly include or exclude them)."""
-        if not req.tokens:
+    async def _exact_counts(self, body: dict[str, Any], req: Requirements, candidates: list[Deployment]) -> dict[str, int]:
+        """Ask runtimes with a tokenizer endpoint (vLLM /tokenize) for text token counts, only for
+        ``candidates`` (already policy-filtered by the caller) whose estimate is within +-50% of the
+        context limit. All calls share one wall-clock deadline (routing.token_estimate.exact_count_deadline_s);
+        a deployment that is not counted in time keeps its estimate. The result is the tokenizer count
+        of the text plus the gateway's template/message/image overhead estimate, so it is labelled
+        ``tokenize:<backend>+template-estimate`` rather than exact."""
+        if not req.tokens or not candidates:
             return {}
         from .tokens import _text_of
 
         text: str | None = None
         out: dict[str, int] = {}
-        for d in self.registry.all():
+        deadline = time.monotonic() + self.cfg.routing.token_estimate.exact_count_deadline_s
+        for d in candidates:
             if not (d.enabled and d.healthy and d.role == "generative" and d.context_length):
                 continue
             est_total = req.tokens.input_estimate + req.tokens.output_allowance + (
@@ -414,32 +433,57 @@ class Router:
             if adapter is None or adapter.tokenize.__func__ is BaseAdapter.tokenize:  # type: ignore[attr-defined]
                 continue
             if text is None:
-                parts = []
-                for m in body.get("messages") or []:
-                    if isinstance(m, dict):
-                        t, _ = _text_of(m.get("content"))
-                        parts.append(t)
-                        if m.get("tool_calls"):
-                            parts.append(json.dumps(m["tool_calls"]))
-                for t in body.get("tools") or []:
-                    parts.append(json.dumps(t))
-                text = "\n".join(parts)
+                text = self._countable_text(body)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
             try:
-                n = await adapter.tokenize(d, text)
-            except Exception:  # noqa: BLE001 - exact counting is best effort; the estimate stands
+                n = await asyncio.wait_for(adapter.tokenize(d, text), timeout=remaining)
+            except Exception:  # noqa: BLE001 - counting is best effort; the estimate stands
                 n = None
             if isinstance(n, int) and n > 0:
-                # Keep the per-message/template/image overheads on top of the exact text count.
+                # Keep the per-message/template/image overheads on top of the tokenizer's text count.
                 overhead = req.tokens.input_estimate - math.ceil(len(text) / self.cfg.routing.token_estimate.chars_per_token)
                 out[d.id] = n + max(0, overhead)
         return out
 
-    def _classifier_deployment(self) -> Deployment | None:
+    @staticmethod
+    def _countable_text(body: dict[str, Any]) -> str:
+        """Everything in the request that reaches the model as text: message content, reasoning
+        content, tool calls, tool definitions and the response_format schema."""
+        from .tokens import _text_of
+
+        parts: list[str] = []
+        for m in body.get("messages") or []:
+            if isinstance(m, dict):
+                t, _ = _text_of(m.get("content"))
+                parts.append(t)
+                if isinstance(m.get("reasoning_content"), str):
+                    parts.append(m["reasoning_content"])
+                if m.get("tool_calls"):
+                    parts.append(json.dumps(m["tool_calls"]))
+        for t in body.get("tools") or []:
+            parts.append(json.dumps(t))
+        if isinstance(body.get("response_format"), dict):
+            parts.append(json.dumps(body["response_format"]))
+        return "\n".join(parts)
+
+    def _classifier_deployment(self) -> tuple[Deployment | None, str]:
+        """The classifier receives an excerpt of the user's message, so it must be a local
+        deployment unless the operator opted in twice: routing.classifier.allow_remote AND
+        security.locality_mode=allow_remote."""
         c = self.cfg.routing.classifier
         d = self.registry.get(f"{c.backend}/{c.model}")
-        if d and d.healthy and d.enabled and (self.cfg.security.locality_mode == "allow_remote" or d.locality == "local"):
-            return d
-        return None
+        if d is None:
+            return None, "configured classifier deployment not found"
+        if not (d.healthy and d.enabled):
+            return None, "configured classifier deployment is disabled or unhealthy"
+        if d.locality != "local" and not (c.allow_remote and self.cfg.security.locality_mode == "allow_remote"):
+            return None, (
+                f"classifier deployment {d.id} is not local ({d.locality_evidence[:60]}); message excerpts stay on the host"
+                " unless routing.classifier.allow_remote and security.locality_mode=allow_remote are both set"
+            )
+        return d, ""
 
     def _reasons(self, dec: Decision, chosen, n_eligible: int, n_excluded: int) -> list[str]:
         r = []

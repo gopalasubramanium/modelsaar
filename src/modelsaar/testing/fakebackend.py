@@ -116,6 +116,7 @@ class FakeBackend:
         self.active = 0
         self.max_active = 0
         self.requests: list[dict[str, Any]] = []  # metadata only (model, stream, has_tools)
+        self.tokenize_requests: list[dict[str, Any]] = []  # metadata only (model, chars)
         self._lock = threading.Lock()
         self.app = self._build()
         self._server: uvicorn.Server | None = None
@@ -390,6 +391,8 @@ class FakeBackend:
         """vLLM-style /tokenize: here 1 token per 4 characters (deterministic fake tokenizer)."""
         body = await request.json()
         n = len(str(body.get("prompt", ""))) // 4
+        # Metadata only: which model and how much text reached this backend's tokenizer.
+        self.tokenize_requests.append({"model": body.get("model"), "chars": len(str(body.get("prompt", "")))})
         return JSONResponse({"count": n, "max_model_len": 32768, "tokens": list(range(n))})
 
     async def v1_embeddings(self, request: Request) -> Response:

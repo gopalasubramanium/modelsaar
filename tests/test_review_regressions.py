@@ -51,7 +51,7 @@ def test_declared_models_keep_adapter_capabilities_and_exact_tokenize(fake):
         # ~7000 chars: estimate ~2450 tokens, exact (1 per 4 chars) ~1750 -> borderline for 8192 ctx with max_tokens 6000
         r = chat(g, "oai/small:1b", "word " * 1400, max_tokens=6000)
         dec = g.decision(r.headers["x-modelsaar-request-id"])
-        assert "exact token counts used" in dec.get("requirements_note", "")
+        assert "tokenize:oai+template-estimate" in dec.get("requirements_note", "")
         assert r.status_code == 200
     finally:
         g.gw.stop()

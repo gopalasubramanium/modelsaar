@@ -2,7 +2,7 @@
 
 Discovery via ``GET /models`` yields names only; capabilities stay ``unknown``
 until declared by the operator (``backends[].models``) or verified by probes.
-vLLM's ``/tokenize`` endpoint is used for exact token counts when present.
+vLLM's ``/tokenize`` endpoint is used for tokenizer-based text counts when present (template overhead stays estimated).
 """
 
 from __future__ import annotations
