@@ -1,0 +1,33 @@
+ModelSaar installer — Linux, commit 91f9e6c30b7431a5a09cc34f478f02c82ba62dc6
+installing with pipx (isolated environment)
+creating virtual environment...
+determining package name from 'modelsaar @ git+file:///home/claude/modelsaar@91f9e6c30b7431a5a09cc34f478f02c82ba62dc6'...
+creating virtual environment...
+installing modelsaar from spec 'modelsaar @ git+file:///home/claude/modelsaar@91f9e6c30b7431a5a09cc34f478f02c82ba62dc6'...
+⚠️  Note: '/tmp/tmp.74m89CwNaH/home/.local/bin' is not on your PATH
+    environment variable. These apps will not be globally accessible until
+    your PATH is updated. Run `pipx ensurepath` to automatically add it, or
+    manually modify your PATH in your shell's config file (i.e. ~/.bashrc).
+done! ✨ 🌟 ✨
+Installing to existing venv 'modelsaar'
+  installed package modelsaar 0.1.0, installed using Python 3.13.16
+  These apps are now globally available
+    - modelsaar
+installed: modelsaar 0.1.0 via pipx (/tmp/tmp.74m89CwNaH/home/.local/bin/modelsaar)
+existing configuration kept: /tmp/tmp.74m89CwNaH/home/.modelsaar/config.yaml (keys and state untouched)
+verification skipped (MODELSAAR_NO_CHECK=1)
+
+Gateway address:  http://127.0.0.1:8484/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)
+API key:          head -1 /tmp/tmp.74m89CwNaH/home/.modelsaar/keys/api_keys
+Config:           /tmp/tmp.74m89CwNaH/home/.modelsaar/config.yaml
+
+Next:
+  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)
+  2. check it:               modelsaar test         (in another terminal)
+  3. connect an app:         modelsaar client-config open-webui|opencode|opencode-v2|openclaw|hermes
+     or set Base URL http://127.0.0.1:8484/v1, model 'auto', and the API key above in any OpenAI-compatible app
+  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)
+  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m "…"
+  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar
+
+note: add /tmp/tmp.74m89CwNaH/home/.local/bin to your PATH to run 'modelsaar' from a new shell

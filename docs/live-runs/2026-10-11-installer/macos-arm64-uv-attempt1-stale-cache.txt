@@ -1,0 +1,75 @@
+host: Darwin Mac 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:02:59 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8142 arm64
+uv: uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)
+python3: Python 3.9.6
+source: git+file:///Users/sgopala/.modelsaar-live/repo @ 01727604726077fe70e7acef398427149e45c4c1
+started: Sun 11 Oct 2026 20:27:07 IST
+== first run (fresh home)
+ModelSaar installer — macOS, commit 01727604726077fe70e7acef398427149e45c4c1
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+Resolved 16 packages in 38ms
+Installed 16 packages in 7ms
+ + annotated-types==0.8.0
+ + anyio==4.15.1
+ + certifi==2026.7.22
+ + click==8.5.0
+ + h11==0.16.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + idna==3.20
+ + modelsaar==0.1.0 (from git+file:///Users/sgopala/.modelsaar-live/repo@01727604726077fe70e7acef398427149e45c4c1)
+ + pydantic==2.14.0
+ + pydantic-core==2.50.0
+ + pyyaml==6.0.3
+ + starlette==1.7.0
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + uvicorn==0.54.0
+Installed 1 executable: modelsaar
+warning: `/Users/sgopala/.modelsaar-install-test/bin` is not on your PATH. To use installed tools, run `export PATH="/Users/sgopala/.modelsaar-install-test/bin:$PATH"` or `uv tool update-shell`.
+installed: modelsaar 0.1.0 via uv (/Users/sgopala/.modelsaar-install-test/bin/modelsaar)
+wrote /Users/sgopala/.modelsaar-install-test/home/config.yaml
+API key:   /Users/sgopala/.modelsaar-install-test/home/keys/api_keys
+admin key: /Users/sgopala/.modelsaar-install-test/home/keys/admin_key
+Traceback (most recent call last):
+  File "/Users/sgopala/.modelsaar-install-test/bin/modelsaar", line 10, in <module>
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/modelsaar/cli.py", line 747, in main
+    args.fn(args)
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/modelsaar/cli.py", line 124, in cmd_init
+    deps = asyncio.run(_disc())
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/modelsaar/cli.py", line 115, in _disc
+    r = _router_with_evidence(cfg)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/modelsaar/cli.py", line 54, in _router_with_evidence
+    return Router(cfg, Store(db) if db.exists() else None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/modelsaar/routing/router.py", line 55, in __init__
+    self.adapters[b.id] = cls(b, allowed)
+                          ^^^^^^^^^^^^^exit=1
+== modes
+total 16
+drwx------@ 4 sgopala  staff  128 11 Oct 20:27 .
+drwx------@ 4 sgopala  staff  128 11 Oct 20:27 ..
+-rw-------@ 1 sgopala  staff   48 11 Oct 20:27 admin_key
+-rw-------@ 1 sgopala  staff   48 11 Oct 20:27 api_keys
+600 /Users/sgopala/.modelsaar-install-test/home/config.yaml
+600 /Users/sgopala/.modelsaar-install-test/home/keys/api_keys
+finished: Sun 11 Oct 2026 20:27:10 IST
+
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/httpx/_client.py", line 1445, in _init_transport
+    return AsyncHTTPTransport(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/httpx/_transports/default.py", line 294, in __init__
+    import httpcore
+  File "/Users/sgopala/.modelsaar-install-test/tools/modelsaar/lib/python3.12/site-packages/httpcore/__init__.py", line 18, in <module>
+ModuleNotFoundError: No module named 'httpcore._backends.mock'

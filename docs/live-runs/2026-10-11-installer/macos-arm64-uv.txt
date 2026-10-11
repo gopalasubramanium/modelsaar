@@ -1,0 +1,81 @@
+host: Darwin Mac 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:02:59 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T8142 arm64
+uv: uv 0.13.0 (4ecd0eff2 2026-10-09 aarch64-apple-darwin)
+python3: Python 3.9.6
+source: git+file:///Users/sgopala/.modelsaar-live/repo @ 01727604726077fe70e7acef398427149e45c4c1
+started: Sun 11 Oct 2026 20:30:53 IST
+== first run (fresh home: absent)
+ModelSaar installer — macOS, commit 01727604726077fe70e7acef398427149e45c4c1
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+   Updating file:///Users/sgopala/.modelsaar-live/repo (01727604726077fe70e7acef398427149e45c4c1)
+    Updated file:///Users/sgopala/.modelsaar-live/repo (01727604726077fe70e7acef398427149e45c4c1)
+Resolved 16 packages in 47.75s
+   Building modelsaar @ git+file:///Users/sgopala/.modelsaar-live/repo@01727604726077fe70e7acef398427149e45c4c1
+Downloading pydantic-core (1.9MiB)
+      Built modelsaar @ git+file:///Users/sgopala/.modelsaar-live/repo@01727604726077fe70e7acef398427149e45c4c1
+ Downloaded pydantic-core
+Prepared 16 packages in 1m 30s
+Installed 16 packages in 13ms
+ + annotated-types==0.8.0
+ + anyio==4.15.1
+ + certifi==2026.7.22
+ + click==8.5.0
+ + h11==0.16.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + idna==3.20
+ + modelsaar==0.1.0 (from git+file:///Users/sgopala/.modelsaar-live/repo@01727604726077fe70e7acef398427149e45c4c1)
+ + pydantic==2.14.0
+ + pydantic-core==2.50.0
+ + pyyaml==6.0.3
+ + starlette==1.7.0
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + uvicorn==0.54.0
+Installed 1 executable: modelsaar
+warning: `/Users/sgopala/.modelsaar-install-test/bin` is not on your PATH. To use installed tools, run `export PATH="/Users/sgopala/.modelsaar-install-test/bin:$PATH"` or `uv tool update-shell`.
+installed: modelsaar 0.1.0 via uv (/Users/sgopala/.modelsaar-install-test/bin/modelsaar)
+wrote /Users/sgopala/.modelsaar-install-test/home/config.yaml
+API key:   /Users/sgopala/.modelsaar-install-test/home/keys/api_keys
+admin key: /Users/sgopala/.modelsaar-install-test/home/keys/admin_key
+discovered 8 deployment(s):
+  ollama/muse-glimmer:latest               role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/qwen3.6:latest                    role=generative ctx=131072 tools=supported vision=supported locality=local
+  ollama/gemma4:31b                        role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/qwen3.8:latest                    role=generative ctx=131072 tools=supported vision=supported locality=local
+  ollama/qwen3-coder-next:latest           role=generative ctx=4096 tools=supported vision=unsupported locality=local
+  ollama/qwen3-coder:latest                role=generative ctx=4096 tools=supported vision=unsupported locality=local
+  ollama/qwen3.6-accurate:latest           role=generative ctx=131072 tools=supported vision=supported locality=local
+  ollama/qwen3.6-fast:latest               role=generative ctx=65536 tools=supported vision=supported locality=local
+
+next steps:
+  modelsaar doctor            # check reachability, context assumptions, unknown capabilities
+  modelsaar probe --all       # verify tools/json/vision/streaming on each model (uses local compute)
+  modelsaar serve             # start the gateway
+  modelsaar client-config open-webui|openclaw|opencode|opencode-v2|hermes
+starting a temporary gateway on http://127.0.0.1:28484 for the check …
+
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'auto-code', 'auto-vision', 'ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest']
+POST /v1/chat/completions -> 200 in 1192ms; deployment=ollama/qwen3.8:latest request=req_bdad2794e0ac48cf
+content: ready
+temporary gateway stopped
+
+verification: OK — a request went through 'auto' and came back from the deployment shown above
+
+Gateway address:  http://127.0.0.1:28484/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)
+API key:          head -1 /Users/sgopala/.modelsaar-install-test/home/keys/api_keys
+Config:           /Users/sgopala/.modelsaar-install-test/home/config.yaml
+
+Next:
+  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)
+  2. check it:               modelsaar test         (in another terminal)
+  3. connect an app:         modelsaar client-config open-webui|opencode|opencode-v2|openclaw|hermes
+     or set Base URL http://127.0.0.1:28484/v1, model 'auto', and the API key above in any OpenAI-compatible app
+  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)
+  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m "…"
+  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar
+
+note: add /Users/sgopala/.modelsaar-install-test/bin to your PATH to run 'modelsaar' from a new shell
+exit=0
+== second run (repeat; must keep config, skip check)
+ModelSaar installer — macOS, commit 01727604726077fe70e7acef398427149e45c4c1
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
