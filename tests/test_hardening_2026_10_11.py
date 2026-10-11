@@ -793,3 +793,14 @@ def test_init_profile_applies_to_auto_alias(tmp_path, fake):
     import json
 
     assert json.loads(r.stdout)["profile"] == "fast"
+
+
+def test_cli_test_explains_missing_gateway(tmp_path, fake):
+    """First-run UX: `modelsaar test` without a running gateway must say so instead of a traceback."""
+    home = tmp_path / "home"
+    env = {"MODELSAAR_HOME": str(home)}
+    assert _cli(["init", "--endpoint", f"http://127.0.0.1:{fake.port}", "--type", "ollama", "--port", "1"], env).returncode == 0
+    r = _cli(["test"], env)
+    assert r.returncode != 0
+    assert "no gateway is listening" in r.stderr and "modelsaar serve" in r.stderr
+    assert "Traceback" not in r.stderr

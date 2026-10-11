@@ -407,7 +407,15 @@ def cmd_decisions(args: argparse.Namespace) -> None:
 def cmd_test(args: argparse.Namespace) -> None:
     cfg = _load(args)
     with _api_client(cfg) as c:
-        r = c.get("/v1/models")
+        try:
+            r = c.get("/v1/models")
+        except httpx.ConnectError:
+            sys.exit(
+                f"no gateway is listening at http://{cfg.server.host}:{cfg.server.port} — start it with `modelsaar serve` "
+                "(in another terminal, or under launchd/systemd; see examples/) and run `modelsaar test` again"
+            )
+        if r.status_code == 401:
+            sys.exit(f"the gateway at http://{cfg.server.host}:{cfg.server.port} rejected the API key from {cfg.resolve(cfg.server.api_keys_file)}; restart the gateway after `modelsaar keys rotate`")
         print(f"GET /v1/models -> {r.status_code}: {[m['id'] for m in r.json().get('data', [])]}")
         body = {"model": args.model, "messages": [{"role": "user", "content": args.message}], "max_tokens": 64}
         t0 = time.monotonic()
