@@ -2,8 +2,9 @@ name: site
 
 # modelsaar.com — built from site/ with no framework. Every push to the website branch builds and checks
 # the site and keeps the result as an artifact; publishing to GitHub Pages happens only on an explicit
-# workflow_dispatch from a chosen ref, so production is always tied to a known commit. Rollback = dispatch
-# again from the previous good commit.
+# workflow_dispatch from a chosen ref (target=preview -> github.io project URL, noindex; target=production
+# -> modelsaar.com), so what is live is always tied to a known commit. Rollback = dispatch again from the
+# previous good commit.
 on:
   push:
     branches: [website/modelsaar-com, main]
@@ -52,7 +53,9 @@ jobs:
           path: site/dist
 
   deploy:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'production'
+    # Any workflow_dispatch deploys: target=preview publishes the noindex, path-prefixed build to the
+    # github.io project URL (for checking before DNS is connected); target=production publishes modelsaar.com.
+    if: github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     permissions:

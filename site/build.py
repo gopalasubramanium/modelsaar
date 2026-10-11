@@ -70,9 +70,10 @@ def md_to_html(text: str, link_rewrite) -> str:  # type: ignore[no-untyped-def]
 # page model
 # --------------------------------------------------------------------------- #
 class Site:
-    def __init__(self, base: str, preview: bool, out: Path) -> None:
+    def __init__(self, base: str, preview: bool, out: Path, relative: bool = False) -> None:
         self.base = base if base.endswith("/") else base + "/"
         self.preview = preview
+        self.relative = relative  # rewrite root-relative links to page-relative ones (hosts without a known base path)
         self.out = out
         self.url = PRODUCTION_URL
         self.pages: list[dict] = []
@@ -209,7 +210,19 @@ class Site:
             if p["path"].endswith("/"):
                 target = target / "index.html"
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(p["html"], encoding="utf-8")
+            html_out = p["html"]
+            if self.relative:
+                depth = p["path"].strip("/").count("/") + (1 if p["path"].strip("/") and p["path"].endswith("/") else 0)
+                up = "../" * depth if depth else "./"
+
+                def rel(m: re.Match) -> str:
+                    path = m.group(2)
+                    if path.endswith("/"):
+                        path += "index.html"
+                    return f'{m.group(1)}="{up}{path.lstrip("/")}"'
+
+                html_out = re.sub(r'\b(href|src)="(/[^"]*)"', rel, html_out)
+            target.write_text(html_out, encoding="utf-8")
         # 404 page as a top-level file (GitHub Pages and Cloudflare Pages both use /404.html)
         shutil.copytree(SITE / "static", self.out, dirs_exist_ok=True)
         inst = self.out / "install.sh"
@@ -335,8 +348,9 @@ def main() -> int:
     ap.add_argument("--base", default="/", help="path prefix the site is served under (preview builds on a project page)")
     ap.add_argument("--preview", action="store_true", help="mark the build noindex and omit CNAME")
     ap.add_argument("--out", default=str(SITE / "dist"))
+    ap.add_argument("--relative", action="store_true", help="page-relative links (for a preview host with an unknown base path)")
     a = ap.parse_args()
-    site = Site(a.base, a.preview, Path(a.out))
+    site = Site(a.base, a.preview, Path(a.out), relative=a.relative)
     build(site)
     n = len(site.pages)
     print(f"built {n} pages -> {site.out} (base {site.base!r}, preview={site.preview}, commit {site.commit[:12]})")
