@@ -1,4 +1,4 @@
-revision 2c3bc35fbea571f38ebd353b87da741a1423398f  worktree clean: yes
+revision 5cb7443e73e2b43e2cd2c1540096c2fe772e438a  worktree clean: yes
 python Python 3.13.16; isolation backend: none on PATH
 ....................................................                     [100%]
 =========================== short test summary info ============================
@@ -8,4 +8,4 @@ SKIPPED [1] tests/test_evaluation.py:318: no isolation backend (install bubblewr
 SKIPPED [1] tests/test_evaluation.py:327: no isolation backend (install bubblewrap on Linux; macOS sandbox-exec; or Docker); bwrap not installed; docker present but daemon not reachable:  if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory
 SKIPPED [1] tests/test_evaluation.py:333: no isolation backend (install bubblewrap on Linux; macOS sandbox-exec; or Docker); bwrap not installed; docker present but daemon not reachable:  if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory
 SKIPPED [1] tests/test_evaluation.py:362: no isolation backend (install bubblewrap on Linux; macOS sandbox-exec; or Docker); bwrap not installed; docker present but daemon not reachable:  if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory
-190 passed, 6 skipped in 75.00s (0:01:14)
+190 passed, 6 skipped in 77.21s (0:01:17)

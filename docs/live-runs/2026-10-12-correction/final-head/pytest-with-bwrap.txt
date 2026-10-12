@@ -1,4 +1,4 @@
-revision 2c3bc35fbea571f38ebd353b87da741a1423398f  worktree clean: yes
+revision 5cb7443e73e2b43e2cd2c1540096c2fe772e438a  worktree clean: yes
 python Python 3.13.16; isolation backend: bubblewrap 0.9.0 on PATH
 tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_flushed_marker_then_exit_does_not_count_as_executed_harness PASSED [  0%]
 tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_correct_function_still_passes PASSED [  1%]
@@ -41,4 +41,4 @@ tests/test_evaluation.py::test_sandbox_timeout_fails_cleanly PASSED      [ 64%]
 tests/test_evaluation.py::test_sandbox_cannot_read_a_synthetic_host_file_outside_the_work_directory PASSED [ 64%]
 tests/test_evaluation.py::test_sandbox_forged_completion_marker_does_not_score PASSED [ 65%]
 tests/test_evaluation.py::test_summarize_counts_skipped_separately PASSED [ 65%]
-======================== 196 passed in 77.34s (0:01:17) ========================
+======================== 196 passed in 78.88s (0:01:18) ========================

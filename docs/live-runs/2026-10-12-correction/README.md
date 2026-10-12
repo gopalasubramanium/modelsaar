@@ -32,6 +32,12 @@ review pack, not here. Scratch paths are replaced by `<scratch>`/`<archive>`; no
 CGNAT, 10/8, 172.16/12 (both ends), 192.168/16 and 169.254/16 rejected; 172.32/8, 8.8.8.8 and the
 CGNAT boundary addresses 100.63.x / 100.128.x accepted; `msk_…` key literals rejected (separate run).
 
+## Not run
+
+* macOS `sandbox-exec` at this revision (the Mac was not reachable from the session) — the rewritten
+  deny-by-default profile is untested on macOS; see the verification report for the owner step.
+* Real GX10 inference under the corrected code; real-model embeddings; real client UI.
+
 ## Also in the repository
 
 * `docs/live-runs/2026-10-12-installer-scenarios/` — real installer + real CLI, 10/10 scenarios.
