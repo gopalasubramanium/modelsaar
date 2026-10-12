@@ -1,0 +1,10 @@
+100.100.50.9   FAIL /: private host address or key literal in page (100.100.50.9)
+192.168.50.9   FAIL /: private host address or key literal in page (192.168.50.9)
+172.16.50.9    FAIL /: private host address or key literal in page (172.16.50.9)
+172.31.1.1     FAIL /: private host address or key literal in page (172.31.1.1)
+10.10.50.9     FAIL /: private host address or key literal in page (10.10.50.9)
+169.254.1.1    FAIL /: private host address or key literal in page (169.254.1.1)
+172.32.1.1     ok: 26 pages, sitemap/robots/404/llms.txt present, installer pinned to 80276bbeb
+8.8.8.8        ok: 26 pages, sitemap/robots/404/llms.txt present, installer pinned to 80276bbeb
+100.63.1.1     ok: 26 pages, sitemap/robots/404/llms.txt present, installer pinned to 80276bbeb
+100.128.1.1    ok: 26 pages, sitemap/robots/404/llms.txt present, installer pinned to 80276bbeb

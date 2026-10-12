@@ -1,0 +1,5 @@
+revision 2c3bc35fbea571f38ebd353b87da741a1423398f
+routing mistakes (auto failed, oracle succeeded): []
+classifier: {'used': 0, 'timeouts': 0}
+
+report written to <scratch>/after/final-head/eval-sim.json

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "foreign_healthz_accepted",
+    "result": "DEFECT REPRODUCED",
+    "installer_exit": 0,
+    "healthz_content": "plain text from unrelated service",
+    "saved_fake_api_key_sent_to_foreign_service": true,
+    "installer_claimed_verification_ok": true,
+    "scope": "real installer and real current CLI; package manager install action stubbed; loopback fixture only"
+  },
+  {
+    "id": "homepage_first_use_after_installer",
+    "result": "DEFECT REPRODUCED",
+    "command": "modelsaar init && modelsaar serve",
+    "exit_code": 1,
+    "outcome": "init refuses existing configuration; serve is not executed"
+  }
+]
