@@ -254,8 +254,17 @@ Transcripts: `docs/live-runs/2026-10-12-correction/before/` (website branch).
 Real GX10 inference under the corrected code (the benchmark result above is unchanged and still
 labelled scorer `2026.10.11-2`; a rerun under `2026.10.12-3` would be a new, separately labelled run);
 real-model embeddings; vLLM/llama.cpp; a real client UI (exact owner-run steps in `site/VALIDATION.md`);
-macOS `sandbox-exec` run of the new read-isolation test (recorded separately if the Mac run completes);
 Docker; live GitHub publication, DNS, TLS.
+
+**macOS `sandbox-exec` — NOT RUN at this revision, and material.** The owner's Mac was not reachable from
+this session, so the rewritten deny-by-default profile (`_macos_profile`) has only been inspected, not
+executed. If it is too strict for the Mac's Python installation, the 6 sandbox tests will *fail* there
+(not skip) and `code_exec` tasks will fail until the profile is widened; if it is too loose, the
+read-isolation test (`test_sandbox_cannot_read_a_synthetic_host_file_outside_the_work_directory`)
+will fail. Owner step: in the Model_Router checkout at this revision run
+`python -m pytest tests/test_evaluation.py -k sandbox -rs -v` and attach the transcript as
+`docs/live-runs/<date>-mac-tests/mac-tests-<commit>.txt`; the bubblewrap profile with the same
+allowlist idea was executed here (196 passed).
 
 ## NOT RUN (needs hardware, a daemon, or a real client) — status at 0.1.0 / 1122e1f
 
