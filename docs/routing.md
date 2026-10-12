@@ -144,7 +144,12 @@ residency are different events: when a response ends the slot is released but th
 loaded, so the pool keeps counting them until the runtime's residency observation (Ollama `/api/ps`
 on the periodic refresh or `/admin/refresh`) reconciles the registry. Runtimes that cannot report
 residency keep the assumption indefinitely unless `assumed_residency_ttl_s` is set — the gateway
-cannot see when such a runtime evicts a model, so the conservative choice is the default. The
+cannot see when such a runtime evicts a model, so the conservative choice is the default. A *failed*
+residency query (`/api/ps` errors while the runtime is otherwise healthy) is not an observation: known
+and assumed occupancy is kept until the query succeeds again. A reservation released because the
+connection was refused before the request was sent (`connect` failure) does not assume residency —
+nothing reached the runtime — so failover to another deployment is not blocked by phantom weights;
+any outcome where loading or computation may have started keeps the conservative assumption. The
 estimates are weights-only (`memory_gb_estimate` with its provenance: Ollama size × 1.15, operator
 declaration or override); KV cache, workspace and runtime overhead are covered only by the margin, so
 this is a budget, not an OOM guarantee, and nothing here measures physical memory. Unified memory is
@@ -171,4 +176,6 @@ success and session pinning are recorded only after a validated completion: a pa
 frame, and a finish reason or `[DONE]`. SSE comments and keepalives are ignored, usage-only frames
 are accepted; a data frame that is not a completion structure is not relayed, invalidates the
 stream (`stream_invalid_after_commit`, circuit failure, no pin) and is reported in the `error`
-frame. An HTTP 200 that is not a completion is `502 upstream_bad_response`.
+frame. The upstream terminal marker is held back: the client receives exactly one `data: [DONE]`,
+emitted by the gateway after validation, so an error frame always precedes it. An HTTP 200 that is
+not a completion is `502 upstream_bad_response`.

@@ -92,6 +92,14 @@ class Router:
                 apply_catalogue(d, self.catalogue)
                 d.compute_fingerprint()
                 self._apply_stored_evidence(d)
+                # A failed residency query must not turn a known-loaded model into "unloaded":
+                # carry the previous observation forward until the runtime answers again.
+                a = self.adapters.get(d.backend_id)
+                if a is not None and getattr(a, "reports_residency", False) and a.last_residency_observation_ok is False:
+                    prev = self.registry.get(d.id)
+                    if prev is not None:
+                        d.loaded = prev.loaded
+                        d.loaded_observed_at = prev.loaded_observed_at
             self.registry.replace(deps)
             self.last_refresh_error = "; ".join(errors)
             self._reconcile_residency(errors)
@@ -103,6 +111,7 @@ class Router:
         observed = {
             bid for bid, a in self.adapters.items()
             if getattr(a, "reports_residency", False) and bid not in failed
+            and a.last_residency_observation_ok is True  # the residency query itself succeeded
             and all(d.healthy for d in self.registry.by_backend(bid))
         }
         self.admission.reconcile_residency(self.registry.all(), observed)
@@ -159,11 +168,13 @@ class Router:
         """Cheap update of loaded/healthy flags without full discovery."""
         for bid, a in self.adapters.items():
             ok, msg = await a.health()
-            loaded = await a.loaded_models() if ok else {}
+            loaded = await a.loaded_models() if ok else None
             for d in self.registry.by_backend(bid):
                 d.healthy = ok
                 d.health_checked_at = time.time()
                 d.last_error = "" if ok else msg
+                if loaded is None:
+                    continue  # no observation (runtime down or /api/ps failed): keep the previous flags
                 d.loaded = d.model in loaded
                 if d.loaded:
                     d.loaded_observed_at = time.time()

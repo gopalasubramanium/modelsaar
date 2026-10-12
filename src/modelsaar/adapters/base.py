@@ -170,9 +170,14 @@ class BaseAdapter:
     # True when ``loaded_models`` is a real observation of the runtime (e.g. Ollama /api/ps). Pools
     # keep assumed residency for deployments of a backend that cannot report it.
     reports_residency: bool = False
+    # Outcome of the most recent residency query: True = observed, False = the query failed (the
+    # runtime is up but did not answer /api/ps), None = never asked / not a reporting runtime.
+    # A failed query is NOT an empty resident set; callers keep known/assumed occupancy.
+    last_residency_observation_ok: bool | None = None
 
-    async def loaded_models(self) -> dict[str, dict[str, Any]]:
-        """Return {model_name: info} for models currently resident in memory, if the runtime exposes it."""
+    async def loaded_models(self) -> dict[str, dict[str, Any]] | None:
+        """Return {model_name: info} for models currently resident in memory when the runtime exposes
+        it, ``{}`` when it does not report residency, and ``None`` when the query failed."""
         return {}
 
     async def chat(self, dep: Deployment, body: dict[str, Any], stream: bool, timeout: float | None = None):

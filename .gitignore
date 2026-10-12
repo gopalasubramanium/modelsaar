@@ -10,3 +10,5 @@ dist/
 live-check-*/
 live-*-console.log
 *.bak
+tests/independent_review_2026_10_12/probe-*.json
+gh-launcher/

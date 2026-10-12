@@ -236,6 +236,9 @@ async def chat_completions(request: Request) -> Response:
             if isinstance(e, AdapterError) and e.kind == "timeout":
                 # The backend did not answer in time but may still be generating: hold the slot.
                 await reservation.mark_uncertain()
+            elif isinstance(e, AdapterError) and e.kind == "connect":
+                # Proven pre-dispatch failure: nothing reached the runtime, so no weights were loaded.
+                await reservation.release(submitted=False)
             else:
                 await reservation.release()
             if not isinstance(e, AdapterError):
@@ -342,6 +345,10 @@ async def _relay(
                 if ev.kind == "malformed":
                     # Not forwarded: it is not a completion structure. The stream is invalidated below.
                     continue
+                if ev.kind == "done":
+                    # The upstream terminal marker is held back: the downstream [DONE] is emitted
+                    # exactly once, after validation, so any error frame precedes it.
+                    continue
                 obj = ev.json()
                 if obj:
                     for ch in obj.get("choices") or []:
@@ -351,15 +358,14 @@ async def _relay(
                 yield rewrite_model_field(ev, response_model)
         for ev in parser.flush():
             obs.observe(ev)
-            if ev.kind != "malformed":
+            if ev.kind not in ("malformed", "done"):
                 yield rewrite_model_field(ev, response_model)
         problem = obs.completion_problem()
         if problem:
             raise _UpstreamStreamError(problem)
         completed = True
-        if not obs.saw_done:
-            # Finish reason seen but no terminal sentinel: terminate the protocol so clients do not hang.
-            yield b"data: [DONE]\n\n"
+        # Exactly one terminal marker, after every validated event.
+        yield b"data: [DONE]\n\n"
     except (asyncio.CancelledError, GeneratorExit):
         # Client went away. The backend may still be generating: hold the slot as uncertain.
         dec.outcome = "client_disconnected"
@@ -462,7 +468,7 @@ async def embeddings(request: Request) -> Response:
             # The backend may still be computing: hold the slot/memory as uncertain, do not release.
             await reservation.mark_uncertain()
         else:
-            await reservation.release()
+            await reservation.release(submitted=e.kind != "connect")
         state.requests_failed += 1
         dec.outcome = "upstream_timeout" if e.kind == "timeout" else "upstream_error"
         dec.outcome_detail = redact(e.message)[:200]

@@ -18,15 +18,21 @@ harness with *its* stdout captured, and writes a result record keyed with a per-
 passes only when that record says the harness completed and the harness output equals the
 expectation — text the model prints, including any "completion marker", is never evidence). `code_exec`
 runs **only** under bubblewrap (Linux; only the Python runtime and system libraries are visible),
-`sandbox-exec` (macOS; deny-by-default profile with runtime read roots) or Docker (`--network none
---read-only`) with CPU/memory/output/time limits; without one of those the task is skipped and the
-report says so — there is no host-execution fallback. The sandbox is tested for writes, network,
+`sandbox-exec` (macOS; deny-by-default profile with runtime read roots — **unsupported in this alpha
+pending verification**: disabled unless `MODELSAAR_MACOS_SANDBOX=verify`, so on macOS `code_exec`
+tasks are skipped and the report says why) or Docker (`--network none --read-only`) with
+CPU/memory/output/time limits; without one of those the task is skipped and the report says so —
+there is no host-execution fallback. The sandbox is tested for writes, network,
 timeouts and reading a synthetic host file outside the work directory; it does not defend the
 evaluator against model code that targets the evaluator process itself. Scorer rules are versioned
 (`SCORER_VERSION`) and recorded in the report's `conditions`; checkpoint records (`--checkpoint`,
 `--resume`) are bound to the task content, the scorer version and request budgets, the routing
-configuration (for routed policies) and the deployment fingerprint, and anything that no longer
-matches is re-run and counted under `resume_rejected` instead of being attributed to the new run.
+configuration and the eligible deployment set (for routed policies: a new, removed or re-identified
+alternative re-runs the task) and the deployment fingerprint, and anything that no longer matches is
+re-run and counted under `resume_rejected` instead of being attributed to the new run. `--probe`
+runs the capability probes through the gateway's admission, one reservation per deployment; after an
+uncertain timeout the reservation is held and the remaining deployments are reported `deferred`
+rather than probed on top of work that may still be running.
 No LLM judge is used. See `src/modelsaar/evaluation/fixtures/README.md` for the exact rules.
 
 ## Procedure
@@ -80,7 +86,7 @@ Define before measuring; the harness reports against them.
 
 Every table below is tied to a scorer version and a source revision. The current scorer is
 `2026.10.12-3` (record-based `code_exec` completion evidence, tool-argument schema validation; see
-"Scorers" above). **No evaluation has been run under the current scorer yet.** The numbers below were
+"Scorers" above). **No live evaluation has been run under the current scorer yet** (only the simulated smoke, which validates mechanics, not model quality). The numbers below were
 produced by the scorer named next to them and are kept as recorded; they are not relabelled, and a
 rerun — when it happens — will be reported as a separate run with its own scorer version.
 

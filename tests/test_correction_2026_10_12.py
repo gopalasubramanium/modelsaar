@@ -342,6 +342,7 @@ def test_r7_resume_requires_same_task_conditions_and_eligible_deployment(tmp_pat
             "expected": {"type": "contains", "value": "a"}}
     seed = EvalRun("http://127.0.0.1:9", "k", "a", simulated=False, checkpoint=tmp_path / "seed.jsonl", resume=False)
     seed.routing_config_hash = "cfg-1"
+    seed.fingerprints = {"d": "fp-1"}  # the eligible set the routed record was produced from
     rec = seed._bind({"task": "t1", "category": "conversation", "split": "test", "policy": "auto", "model": "auto",
                       "deployment": "d", "fingerprint": "fp-1", "ok": True, "status": 200, "latency_ms": 1}, task, "auto")
     sweep = seed._bind({**rec, "policy": "sweep:d", "model": "d"}, task, "sweep:d")
@@ -359,10 +360,15 @@ def test_r7_resume_requires_same_task_conditions_and_eligible_deployment(tmp_pat
         assert run._resumable(task, "auto") is None and run.resume_rejected["conditions_changed"] == 1
         assert run._resumable(task, "sweep:d")["ok"] is True  # ...a fixed-deployment sweep does not depend on it
         run.routing_config_hash = "cfg-1"
-        run.fingerprints = {"e": "fp-9"}  # the deployment is no longer eligible in this run
-        assert run._resumable(task, "auto") is None and run.resume_rejected["deployment_not_eligible"] == 1
+        run.fingerprints = {"e": "fp-9"}  # the eligible set changed (and d is gone): routed record re-runs
+        assert run._resumable(task, "auto") is None and run.resume_rejected["conditions_changed"] == 2
+        run.fingerprints = {"d": "fp-2"}  # d re-identified: the eligible set changed too
+        assert run._resumable(task, "auto") is None and run.resume_rejected["conditions_changed"] == 3
+        run.fingerprints = {"d": "fp-1", "e": "fp-9"}  # a new alternative appeared: routed record re-runs,
+        assert run._resumable(task, "auto") is None and run.resume_rejected["conditions_changed"] == 4
+        assert run._resumable(task, "sweep:d")["ok"] is True  # ...the fixed sweep of d does not care
         run.fingerprints = {"d": "fp-2"}
-        assert run._resumable(task, "auto") is None and run.resume_rejected["deployment_changed"] == 1
+        assert run._resumable(task, "sweep:d") is None and run.resume_rejected["deployment_changed"] == 1
     finally:
         run.c.close()
         run.admin.close()

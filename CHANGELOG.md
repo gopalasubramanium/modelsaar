@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased — alpha closure pass, 2026-10-12 (correction review R1-C, R2-A/B, R4-C, R7-C)
+
+* **Residency (R2-A/B):** a failed `/api/ps` query is no longer an empty observation — known and
+  assumed occupancy is kept until the query succeeds (`loaded_models()` returns `None` on failure);
+  a connection refused before the request was sent releases the reservation without assuming
+  residency, so failover is not blocked by phantom weights.
+* **Streams (R4-C):** the upstream `[DONE]` is held back; the gateway emits exactly one terminal
+  marker after validation, so a client reading to the first `[DONE]` sees any error frame.
+* **Evaluator (R1-C, R7-C):** `--probe` goes through gateway admission, holds after an uncertain
+  timeout and reports deferred deployments; routed-policy checkpoints are bound to the eligible
+  deployment set (`eligible_set_key`) so changed alternatives re-run.
+* **macOS code execution:** `sandbox-exec` is disabled in this alpha pending verification
+  (`MODELSAAR_MACOS_SANDBOX=verify` enables it for the owner's verification run); `code_exec` tasks
+  are skipped on macOS otherwise.
+
 ## Unreleased — correction pass for the second independent review (R1–R8), 2026-10-12
 
 The reviewer's desired-contract tests are included verbatim (`tests/independent_review_2026_10_11/`).

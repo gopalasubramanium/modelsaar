@@ -48,11 +48,11 @@ class _Slot:
     def hold(self, dep_id: str) -> None:
         self.holders[dep_id] = self.holders.get(dep_id, 0) + 1
 
-    def unhold(self, dep_id: str) -> None:
+    def unhold(self, dep_id: str, assume_resident: bool = True) -> None:
         n = self.holders.get(dep_id, 0) - 1
         if n <= 0:
             self.holders.pop(dep_id, None)
-            if self.memory_gb is not None:
+            if self.memory_gb is not None and assume_resident:
                 # The slot is free; the weights are not. Keep them counted until reconciled.
                 self.assumed_resident[dep_id] = time.monotonic()
         else:
@@ -99,14 +99,18 @@ class Reservation:
         self._released = False
         self.acquired_at = time.monotonic()
 
-    async def release(self) -> None:
+    async def release(self, *, submitted: bool = True) -> None:
+        """Free the slot. ``submitted=False`` means no work ever reached the runtime (the connection
+        was refused before the request was sent), so nothing could have loaded: the weights are not
+        assumed resident. Any outcome where loading or computation may have started keeps the
+        conservative assumption."""
         if self._released:
             return
         self._released = True
         for s in self._slots:
             async with s.cond:
                 s.active = max(0, s.active - 1)
-                s.unhold(self.dep_id)
+                s.unhold(self.dep_id, assume_resident=submitted)
                 s.cond.notify_all()
 
     async def mark_uncertain(self) -> None:

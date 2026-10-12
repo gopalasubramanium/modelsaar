@@ -46,11 +46,13 @@ class OllamaAdapter(BaseAdapter):
         except AdapterError as e:
             return False, e.message
 
-    async def loaded_models(self) -> dict[str, dict[str, Any]]:
+    async def loaded_models(self) -> dict[str, dict[str, Any]] | None:
         try:
             ps = await self._get_json("/api/ps")
         except AdapterError:
-            return {}
+            self.last_residency_observation_ok = False
+            return None  # failed query: not an observation, never "nothing is resident"
+        self.last_residency_observation_ok = True
         out: dict[str, dict[str, Any]] = {}
         for m in ps.get("models", []) or []:
             name = m.get("name") or m.get("model")
@@ -66,7 +68,7 @@ class OllamaAdapter(BaseAdapter):
     async def discover(self) -> list[Deployment]:
         tags = await self._get_json("/api/tags")
         ok, _ = await self.health()
-        loaded = await self.loaded_models() if ok else {}
+        loaded = (await self.loaded_models() if ok else None) or {}
         deps: list[Deployment] = []
         for m in tags.get("models", []) or []:
             name = m.get("name") or m.get("model")

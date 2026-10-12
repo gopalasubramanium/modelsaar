@@ -9,7 +9,10 @@ backends is used, detected in this order:
    The rest of the host filesystem does not exist inside the sandbox.
 2. ``sandbox-exec`` (macOS): deny-by-default profile; reads allowed for the Python runtime, system
    libraries/frameworks and the work directory; writes only under the work directory (and
-   ``/dev``); no network. Host files outside those roots are not readable.
+   ``/dev``); no network. Host files outside those roots are not readable. **Alpha status:
+   unsupported pending verification** — the profile has not been executed on macOS, so the backend
+   is disabled unless ``MODELSAAR_MACOS_SANDBOX=verify`` is set (the owner's verification run);
+   without it ``code_exec`` tasks are skipped on macOS and the report says why.
 3. Docker: ``--network none --read-only --tmpfs /tmp -m 512m --pids-limit 64`` with the
    work directory mounted read-only at ``/work`` (image ``python:3.12-slim``); the container
    sees no host path other than that directory.
@@ -41,6 +44,7 @@ SENTINEL = "__MODELSAAR_HARNESS_OK__"  # former public completion marker; printi
 DOCKER_IMAGE = "python:3.12-slim"
 BWRAP_WORK = "/tmp/work"  # inside the sandbox; everything else is read-only or a private tmpfs
 NO_BACKEND_REASON = "no isolation backend (install bubblewrap on Linux; macOS sandbox-exec; or Docker)"
+MACOS_SANDBOX_ENV = "MODELSAAR_MACOS_SANDBOX"  # "verify" enables the macOS backend (unsupported in the alpha otherwise)
 
 MEMORY_BYTES = 512 * 1024 * 1024
 OUTPUT_CAP_BYTES = 1024 * 1024  # kernel-enforced via RLIMIT_FSIZE on the capture files
@@ -78,9 +82,15 @@ def available() -> tuple[str | None, str]:
             notes.append("bwrap not installed")
     if sys.platform == "darwin":
         se = shutil.which("sandbox-exec")
+        if se and os.environ.get(MACOS_SANDBOX_ENV) == "verify":
+            return "sandbox-exec", f"macOS sandbox-exec at {se} ({MACOS_SANDBOX_ENV}=verify)"
         if se:
-            return "sandbox-exec", f"macOS sandbox-exec at {se}"
-        notes.append("sandbox-exec not found")
+            # Alpha scope: the deny-by-default profile has not been executed on macOS yet, so the
+            # path is disabled and code_exec tasks are skipped there (reported as such). Setting
+            # MODELSAAR_MACOS_SANDBOX=verify enables it for the verification run only.
+            notes.append(f"macOS sandbox-exec is unsupported in this alpha pending verification (set {MACOS_SANDBOX_ENV}=verify to run the verification tests)")
+        else:
+            notes.append("sandbox-exec not found")
     dk = shutil.which("docker")
     if dk:
         ok, why = _probe([dk, "info"], timeout=15.0)

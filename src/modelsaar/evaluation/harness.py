@@ -126,18 +126,29 @@ def task_identity(task: dict[str, Any]) -> str:
     return hashlib.sha256(json.dumps(task, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
 
 
+def eligible_set_key(fingerprints: dict[str, str], simulated: bool = False) -> str:
+    """Canonical identity of the eligible deployment set a routed decision chose from: sorted
+    deployment ids with their fingerprints (ids only in simulated mode, whose fingerprints embed a
+    per-run loopback port). Adding, removing or re-identifying any alternative changes it."""
+    items = sorted((k, "" if simulated else v) for k, v in fingerprints.items())
+    return hashlib.sha256(json.dumps(items).encode("utf-8")).hexdigest()[:16]
+
+
 def conditions_key(policy: str, *, scorer_version: str = SCORER_VERSION, max_tokens: int = MAX_TOKENS, temperature: float = TEMPERATURE,
-                   seed: int | None = None, routing_config_hash: str | None = None) -> str:
+                   seed: int | None = None, routing_config_hash: str | None = None, eligible_key: str | None = None) -> str:
     """Stable identity of the experiment conditions a record depends on: scorer version, request
     budgets and, for routed policies (``auto`` and other aliases), the gateway's routing configuration
-    hash. Fixed-deployment sweeps do not depend on routing configuration. The seed matters only for
-    the random baseline. Ports, timestamps and paths are deliberately excluded so an unchanged run
-    stays resumable."""
+    hash **and the eligible deployment set** (``eligible_set_key``): a routed result depends on the
+    alternatives it could have chosen, so a new or re-identified candidate re-runs the task.
+    Fixed-deployment sweeps (``sweep:``/``calib:``/``test:``) depend only on their own deployment.
+    The seed matters only for the random baseline. Ports, timestamps and paths are deliberately
+    excluded so an unchanged run stays resumable."""
     parts: dict[str, Any] = {"format": CHECKPOINT_FORMAT, "scorer": scorer_version, "max_tokens": max_tokens, "temperature": temperature}
     if policy.startswith("random"):
         parts["seed"] = seed
-    if not policy.startswith(("sweep:", "calib:")):
+    if not policy.startswith(("sweep:", "calib:", "test:")):
         parts["routing_config_hash"] = routing_config_hash
+        parts["eligible_set"] = eligible_key
     return hashlib.sha256(json.dumps(parts, sort_keys=True).encode("utf-8")).hexdigest()[:24]
 
 
@@ -194,7 +205,8 @@ class EvalRun:
         return rec
 
     def _conditions_key(self, policy: str) -> str:
-        return conditions_key(policy, seed=self.seed, routing_config_hash=self.routing_config_hash)
+        return conditions_key(policy, seed=self.seed, routing_config_hash=self.routing_config_hash,
+                              eligible_key=eligible_set_key(self.fingerprints, self.simulated))
 
     def _reject(self, reason: str) -> None:
         self.resume_rejected[reason] = self.resume_rejected.get(reason, 0) + 1
@@ -384,16 +396,46 @@ def rules_policy(task: dict[str, Any], deps: list[dict[str, Any]], strong: str, 
 
 
 def probe_all(gw) -> list[dict[str, Any]]:  # type: ignore[no-untyped-def]
-    """Verify capabilities of every local generative deployment before evaluating (as `modelsaar probe --all` would)."""
+    """Verify capabilities of every local generative deployment before evaluating, through the
+    gateway's own admission (the same path as ``POST /admin/probe``): one reservation per deployment,
+    so probes never exceed the pool/backend limits. After an *uncertain* timeout the reservation is
+    held (the backend may still be computing) and the remaining deployments are NOT probed in this
+    run; they are reported with ``deferred: true`` so the caller can re-run `modelsaar probe` later.
+    The held reservation carries into the evaluation phase: the evaluator's requests go through the
+    gateway and wait for or are refused by the same admission."""
 
     from ..probes import run_probes
+    from ..routing.admission import AdmissionRejected
 
     async def _run() -> list[dict[str, Any]]:
         out = []
+        deferred_after: str | None = None
         for d in gw.router.registry.all():
-            if d.role == "generative" and d.healthy and d.locality == "local":
+            if not (d.role == "generative" and d.healthy and d.locality == "local"):
+                continue
+            if deferred_after is not None:
+                out.append({"deployment_id": d.id, "fingerprint": d.fingerprint, "results": [], "measurements": [], "errors": [
+                    f"not probed: a probe of {deferred_after} timed out and its backend may still be computing; the shared "
+                    "reservation is held as uncertain (re-run `modelsaar probe` later)"], "uncertain": False, "skipped": [], "deferred": True})
+                continue
+            try:
+                reservation = await gw.router.admission.acquire(d, timeout=None)
+            except AdmissionRejected as e:
+                out.append({"deployment_id": d.id, "fingerprint": d.fingerprint, "results": [], "measurements": [], "errors": [f"not probed: admission refused ({e.message})"], "uncertain": False, "skipped": [], "deferred": True})
+                continue
+            try:
                 rep = await run_probes(gw.router.adapters[d.backend_id], d, gw.store, ["streaming", "tools", "json_object", "json_schema", "vision"], timeout=120)
-                out.append(rep.as_dict())
+            except BaseException:
+                await reservation.release()
+                raise
+            if rep.uncertain:
+                await reservation.mark_uncertain()
+                deferred_after = d.id
+            else:
+                await reservation.release()
+            rec = rep.as_dict()
+            rec["deferred"] = False
+            out.append(rec)
         return out
 
     return gw.run(_run())
