@@ -276,6 +276,7 @@ DOC_PAGES = [
     ("docs/evaluation.md", "/docs/evaluation/", "Evaluation harness", "How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies."),
     ("docs/verification-report.md", "/docs/verification-report/", "Verification report", "What was executed, where, with what outcome — including the live runs on real hardware and everything still NOT RUN."),
     ("docs/review-2026-10-11-findings.md", "/docs/review-2026-10-11/", "Independent review findings F01–F18", "Findings of the 2026-10-11 review of commit 1122e1f, their fixes, regression tests and execution evidence."),
+    ("docs/backlog-post-alpha.md", "/docs/backlog-post-alpha/", "Post-alpha backlog", "What the public alpha deliberately leaves unverified or disabled, and the evidence that would close each item."),
     ("docs/troubleshooting.md", "/docs/troubleshooting/", "Troubleshooting", "Common failures when installing or running ModelSaar and what to do about them."),
     ("docs/extending.md", "/docs/extending/", "Extending ModelSaar", "Adding backends, probes and clients."),
     ("docs/roadmap.md", "/docs/roadmap-detail/", "Roadmap (repository)", "Planned work as recorded in the repository."),

@@ -2,7 +2,7 @@
 
 > ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.
 
-ModelSaar is Apache-2.0-licensed open source (https://github.com/gopalasubramanium/modelsaar). Status: development preview; no release has been tagged and no package is published. It is an OpenAI-compatible HTTP gateway (Chat Completions incl. streaming, /v1/models, /v1/embeddings) that routes each request to one of the model deployments you run (Ollama first; any OpenAI-compatible server with declared models) using the request's requirements, verified capability evidence, locality/privacy policy, health and capacity, and records a decision you can inspect. It never downloads models and never executes a client's tools.
+ModelSaar is Apache-2.0-licensed open source (https://github.com/gopalasubramanium/modelsaar). Status: public alpha; no release has been tagged and no package is published. It is an OpenAI-compatible HTTP gateway (Chat Completions incl. streaming, /v1/models, /v1/embeddings) that routes each request to one of the model deployments you run (Ollama first; any OpenAI-compatible server with declared models) using the request's requirements, verified capability evidence, locality/privacy policy, health and capacity, and records a decision you can inspect. It never downloads models and never executes a client's tools.
 
 ## Pages
 
@@ -21,6 +21,7 @@ ModelSaar is Apache-2.0-licensed open source (https://github.com/gopalasubramani
 - [Evaluation harness](https://modelsaar.com/docs/evaluation/): How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies.
 - [Verification report](https://modelsaar.com/docs/verification-report/): What was executed, where, with what outcome — including the live runs on real hardware and everything still NOT RUN.
 - [Independent review findings F01–F18](https://modelsaar.com/docs/review-2026-10-11/): Findings of the 2026-10-11 review of commit 1122e1f, their fixes, regression tests and execution evidence.
+- [Post-alpha backlog](https://modelsaar.com/docs/backlog-post-alpha/): What the public alpha deliberately leaves unverified or disabled, and the evidence that would close each item.
 - [Troubleshooting](https://modelsaar.com/docs/troubleshooting/): Common failures when installing or running ModelSaar and what to do about them.
 - [Extending ModelSaar](https://modelsaar.com/docs/extending/): Adding backends, probes and clients.
 - [Roadmap (repository)](https://modelsaar.com/docs/roadmap-detail/): Planned work as recorded in the repository.
