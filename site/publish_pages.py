@@ -12,8 +12,12 @@ whose message names the source commit, so the branch history is the deployment h
 build can be restored verbatim by `rollback` (which checks out that commit's tree into a NEW commit — the
 history is never rewritten and no branch is force-pushed). Pushing `gh-pages` is what deploys.
 
-Safety: refuses to run with a dirty working tree; the source revision recorded is the exact HEAD built;
-`rollback` verifies the target commit is on gh-pages and carries a BUILD-INFO.json.
+Safety: the build consumes ONLY the committed tree of HEAD — `git archive HEAD` is exported to a
+temporary directory and the generator runs from there, so an untracked, ignored or modified file in
+the working tree (e.g. a stray file under site/static/) can never enter an output that claims an
+exact source commit. A dirty tree (tracked modifications) is refused so the operator does not build
+a revision they did not mean to. `rollback` verifies the target commit is on gh-pages and carries a
+BUILD-INFO.json.
 """
 
 from __future__ import annotations
@@ -62,28 +66,47 @@ def commit_tree(workdir: Path, message: str) -> str:
     return commit
 
 
+def export_commit(commit: str, dest: Path) -> None:
+    """Materialise the committed tree of ``commit`` under ``dest`` (nothing from the working tree)."""
+    tar = subprocess.run(["git", "archive", "--format=tar", commit], cwd=ROOT, capture_output=True, check=True).stdout
+    subprocess.run(["tar", "-x", "-C", str(dest)], input=tar, check=True)
+
+
 def build() -> int:
     if git("status", "--porcelain", "--untracked-files=no"):
-        print("refusing: working tree has uncommitted changes (the recorded source revision must be exact)")
+        print("refusing: working tree has uncommitted changes to tracked files (commit them, or stash; the build uses the committed tree only)")
         return 2
     src = git("rev-parse", "HEAD")
+    untracked = git("status", "--porcelain", "--untracked-files=all", "--", "site")
+    if untracked:
+        print(f"note: {len(untracked.splitlines())} untracked file(s) under site/ are NOT part of this build (it uses the committed tree only)")
+    export = Path(tempfile.mkdtemp(prefix="modelsaar-site-src-"))
     out = Path(tempfile.mkdtemp(prefix="modelsaar-pages-"))
-    subprocess.run([sys.executable, str(ROOT / "site/build.py"), "--out", str(out)], check=True)
-    subprocess.run([sys.executable, str(ROOT / "site/check_site.py"), str(out)], check=True)
-    (out / ".nojekyll").write_text("")
-    (out / "CNAME").write_text(DOMAIN + "\n")
-    info = {
-        "source_commit": src,
-        "source_branch": git("rev-parse", "--abbrev-ref", "HEAD"),
-        "generator": "site/build.py",
-        "built_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
-        "output_sha256": tree_hash(out),
-        "installer_pin": next((ln.split(":-")[1].rstrip('}"') for ln in (out / "install.sh").read_text().splitlines() if ln.startswith('REF="')), None),
-        "canonical": f"https://{DOMAIN}",
-    }
-    (out / "BUILD-INFO.json").write_text(json.dumps(info, indent=2) + "\n")
-    commit = commit_tree(out, f"site build from {src[:12]} ({info['built_at']})\n\nsource_commit: {src}\noutput_sha256: {info['output_sha256']}")
-    shutil.rmtree(out, ignore_errors=True)
+    try:
+        export_commit(src, export)
+        # The generator records the commit and per-page lastmod from git; point it at this repository's
+        # history while its files come from the immutable export.
+        env = {**os.environ, "GIT_DIR": str(ROOT / ".git"), "GIT_WORK_TREE": str(export)}
+        subprocess.run([sys.executable, str(export / "site/build.py"), "--out", str(out)], check=True, env=env, cwd=export)
+        subprocess.run([sys.executable, str(export / "site/check_site.py"), str(out)], check=True, env=env, cwd=export)
+        (out / ".nojekyll").write_text("")
+        (out / "CNAME").write_text(DOMAIN + "\n")
+        info = {
+            "source_commit": src,
+            "source_branch": git("rev-parse", "--abbrev-ref", "HEAD"),
+            "source_tree": git("rev-parse", f"{src}^{{tree}}"),
+            "inputs": "git archive of source_commit (committed files only)",
+            "generator": "site/build.py",
+            "built_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+            "output_sha256": tree_hash(out),
+            "installer_pin": next((ln.split(":-")[1].rstrip('}"') for ln in (out / "install.sh").read_text().splitlines() if ln.startswith('REF="')), None),
+            "canonical": f"https://{DOMAIN}",
+        }
+        (out / "BUILD-INFO.json").write_text(json.dumps(info, indent=2) + "\n")
+        commit = commit_tree(out, f"site build from {src[:12]} ({info['built_at']})\n\nsource_commit: {src}\noutput_sha256: {info['output_sha256']}")
+    finally:
+        shutil.rmtree(out, ignore_errors=True)
+        shutil.rmtree(export, ignore_errors=True)
     print(f"gh-pages {commit[:12]} <- source {src[:12]} output {info['output_sha256'][:12]}")
     return 0
 
