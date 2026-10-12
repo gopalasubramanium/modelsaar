@@ -319,3 +319,75 @@ def test_r3_same_identity_replicas_share_an_alias_and_anchor_is_persisted_before
     finally:
         g.gw.stop()
         fake.stop()
+
+
+# --------------------------------------------------------------------------- #
+# R7: checkpoint records are bound to the experiment identity
+
+
+def _eval_run(tmp_path, records):
+    import json as _json
+
+    from modelsaar.evaluation.harness import EvalRun
+
+    ck = tmp_path / "ck.jsonl"
+    ck.write_text("".join(_json.dumps(r) + "\n" for r in records), encoding="utf-8")
+    return EvalRun("http://127.0.0.1:9", "k", "a", simulated=False, checkpoint=ck, resume=True)
+
+
+def test_r7_resume_requires_same_task_conditions_and_eligible_deployment(tmp_path):
+    from modelsaar.evaluation.harness import EvalRun
+
+    task = {"id": "t1", "category": "conversation", "split": "test", "messages": [{"role": "user", "content": "q"}],
+            "expected": {"type": "contains", "value": "a"}}
+    seed = EvalRun("http://127.0.0.1:9", "k", "a", simulated=False, checkpoint=tmp_path / "seed.jsonl", resume=False)
+    seed.routing_config_hash = "cfg-1"
+    rec = seed._bind({"task": "t1", "category": "conversation", "split": "test", "policy": "auto", "model": "auto",
+                      "deployment": "d", "fingerprint": "fp-1", "ok": True, "status": 200, "latency_ms": 1}, task, "auto")
+    sweep = seed._bind({**rec, "policy": "sweep:d", "model": "d"}, task, "sweep:d")
+    seed.c.close()
+    seed.admin.close()
+
+    run = _eval_run(tmp_path, [rec, sweep])
+    try:
+        run.routing_config_hash = "cfg-1"
+        run.fingerprints = {"d": "fp-1"}
+        assert run._resumable(task, "auto")["ok"] is True  # unchanged run resumes
+        changed = {**task, "messages": [{"role": "user", "content": "a different question"}]}
+        assert run._resumable(changed, "auto") is None and run.resume_rejected["task_changed"] == 1
+        run.routing_config_hash = "cfg-2"  # routing configuration changed: routed policy re-runs,
+        assert run._resumable(task, "auto") is None and run.resume_rejected["conditions_changed"] == 1
+        assert run._resumable(task, "sweep:d")["ok"] is True  # ...a fixed-deployment sweep does not depend on it
+        run.routing_config_hash = "cfg-1"
+        run.fingerprints = {"e": "fp-9"}  # the deployment is no longer eligible in this run
+        assert run._resumable(task, "auto") is None and run.resume_rejected["deployment_not_eligible"] == 1
+        run.fingerprints = {"d": "fp-2"}
+        assert run._resumable(task, "auto") is None and run.resume_rejected["deployment_changed"] == 1
+    finally:
+        run.c.close()
+        run.admin.close()
+
+
+def test_r7_legacy_format_1_records_are_never_resumed(tmp_path):
+    legacy = {"task": "t1", "category": "conversation", "split": "test", "policy": "auto", "model": "auto",
+              "deployment": "d", "fingerprint": "fp-1", "ok": True, "status": 200, "latency_ms": 1}
+    run = _eval_run(tmp_path, [legacy])
+    try:
+        run.fingerprints = {"d": "fp-1"}
+        assert run._resumable("t1", "auto") is None
+        assert run.resume_rejected == {"legacy_record_format": 1}
+    finally:
+        run.c.close()
+        run.admin.close()
+
+
+def test_r7_conditions_key_ignores_ephemeral_details_and_tracks_scorer():
+    from modelsaar.evaluation.harness import conditions_key
+
+    a = conditions_key("auto", routing_config_hash="h")
+    assert a == conditions_key("auto", routing_config_hash="h")
+    assert a != conditions_key("auto", routing_config_hash="h", scorer_version="other")
+    assert a != conditions_key("auto", routing_config_hash="h", max_tokens=401)
+    assert conditions_key("sweep:x", routing_config_hash="h") == conditions_key("sweep:x", routing_config_hash="other")
+    assert conditions_key("random", seed=1) != conditions_key("random", seed=2)
+    assert conditions_key("auto", seed=1, routing_config_hash="h") == conditions_key("auto", seed=2, routing_config_hash="h")

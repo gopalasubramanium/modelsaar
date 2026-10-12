@@ -3,17 +3,22 @@
 The evaluator never runs generated code with ordinary host authority. Exactly one of these
 backends is used, detected in this order:
 
-1. ``bwrap`` (bubblewrap, Linux): new user/pid/net/ipc/uts namespaces, the host filesystem
-   bound read-only, a private tmpfs ``/tmp``, the work directory bound at ``/tmp/work`` (a
-   mount point under the private tmpfs: with ``--ro-bind / /`` bwrap cannot create a new
-   top-level ``/work`` on the read-only root).
-2. ``sandbox-exec`` (macOS): profile that denies all network access and allows writes only
-   under the work directory (and ``/dev``).
+1. ``bwrap`` (bubblewrap, Linux): new user/pid/net/ipc/uts namespaces; **only** the Python
+   runtime and the system library directories are bound read-only (input allowlist, see
+   ``_bwrap_read_roots``), a private tmpfs ``/tmp``, the work directory bound at ``/tmp/work``.
+   The rest of the host filesystem does not exist inside the sandbox.
+2. ``sandbox-exec`` (macOS): deny-by-default profile; reads allowed for the Python runtime, system
+   libraries/frameworks and the work directory; writes only under the work directory (and
+   ``/dev``); no network. Host files outside those roots are not readable.
 3. Docker: ``--network none --read-only --tmpfs /tmp -m 512m --pids-limit 64`` with the
-   work directory mounted read-only at ``/work`` (image ``python:3.12-slim``).
+   work directory mounted read-only at ``/work`` (image ``python:3.12-slim``); the container
+   sees no host path other than that directory.
 
 In all cases: wall-clock timeout, CPU/address-space/file-size rlimits (host side for bwrap and
-sandbox-exec, ``--ulimit``/``-m`` for Docker) and a hard cap on captured output.
+sandbox-exec, ``--ulimit``/``-m`` for Docker) and a hard cap on captured output. Completion is
+evidenced by the trusted runner's nonce-keyed result record (``_program``), not by text the model
+code prints. What the sandbox does NOT provide: protection against model code that targets the
+evaluator process itself (same interpreter), or against resource use below the rlimits.
 
 When no backend is available ``code_exec`` tasks are *skipped* (reported with their own
 denominator); there is deliberately no unsandboxed fallback and no opt-in flag for one.
@@ -22,7 +27,9 @@ denominator); there is deliberately no unsandboxed fallback and no opt-in flag f
 from __future__ import annotations
 
 import functools
+import json
 import os
+import secrets
 import shutil
 import subprocess
 import sys
@@ -30,7 +37,7 @@ import tempfile
 import uuid
 from pathlib import Path
 
-SENTINEL = "__MODELSAAR_HARNESS_OK__"
+SENTINEL = "__MODELSAAR_HARNESS_OK__"  # former public completion marker; printing it proves nothing (see _program)
 DOCKER_IMAGE = "python:3.12-slim"
 BWRAP_WORK = "/tmp/work"  # inside the sandbox; everything else is read-only or a private tmpfs
 NO_BACKEND_REASON = "no isolation backend (install bubblewrap on Linux; macOS sandbox-exec; or Docker)"
@@ -63,7 +70,7 @@ def available() -> tuple[str | None, str]:
         bw = shutil.which("bwrap")
         if bw:
             true = shutil.which("true") or "/bin/true"
-            ok, why = _probe([bw, "--unshare-all", "--die-with-parent", "--ro-bind", "/", "/", "--tmpfs", "/tmp", "--", true])
+            ok, why = _probe([bw, "--unshare-all", "--die-with-parent", "--ro-bind", "/usr", "/usr", "--ro-bind-try", "/lib", "/lib", "--ro-bind-try", "/lib64", "/lib64", "--ro-bind-try", "/bin", "/bin", "--tmpfs", "/tmp", "--", true])
             if ok:
                 return "bwrap", f"bubblewrap at {bw}"
             notes.append(f"bwrap present but unusable: {why}")
@@ -110,31 +117,140 @@ def _rlimits(timeout_s: float):  # type: ignore[no-untyped-def]
     return _apply
 
 
-def _program(code: str, harness: str) -> str:
-    """Model code, then the harness, then the completion sentinel.
+RESULT_BEGIN = "__MODELSAAR_RESULT_BEGIN__"
+RESULT_END = "__MODELSAAR_RESULT_END__"
 
-    The sentinel is printed *last*: if the model code or the harness raises, calls ``sys.exit``
-    or ``os._exit`` before the checks finish, it is missing and the scorer fails the task.
-    """
-    return code + "\n\n" + harness + "\n" + f"print({SENTINEL!r})\n"
+_RUNNER = r'''
+import io as __ms_io, json as __ms_json, sys as __ms_sys
+# The nonce arrives on stdin from the evaluator and is never written to disk or the environment;
+# stdin is closed before any model code runs.
+try:
+    __ms_nonce = "" if (__ms_sys.stdin is None or __ms_sys.stdin.isatty()) else __ms_sys.stdin.readline().strip()
+except Exception:
+    __ms_nonce = ""
+try:
+    __ms_sys.stdin.close()
+except Exception:
+    pass
+__ms_real_stdout = __ms_sys.stdout
+__ms_record = {"nonce": __ms_nonce, "model_ran": False, "harness_completed": False, "harness_stdout": "", "error": None}
+__ms_model_out = __ms_io.StringIO()
+__ms_sys.stdout = __ms_model_out  # model-controlled output is captured, never counted as harness output
+try:
+    exec(compile(__MS_MODEL_CODE__, "model.py", "exec"), globals())
+    __ms_record["model_ran"] = True
+except BaseException as __ms_e:  # noqa: BLE001 - the record must say why the harness never ran
+    __ms_record["error"] = "model code raised " + __ms_e.__class__.__name__ + ": " + str(__ms_e)[:200]
+__ms_sys.stdout = __ms_real_stdout
+__ms_record["model_stdout_chars"] = len(__ms_model_out.getvalue())
+if __ms_record["model_ran"]:
+    __ms_harness_out = __ms_io.StringIO()
+    __ms_sys.stdout = __ms_harness_out
+    try:
+        exec(compile(__MS_HARNESS_CODE__, "harness.py", "exec"), globals())
+        __ms_record["harness_completed"] = True
+    except BaseException as __ms_e:  # noqa: BLE001
+        __ms_record["error"] = "harness raised " + __ms_e.__class__.__name__ + ": " + str(__ms_e)[:200]
+    __ms_sys.stdout = __ms_real_stdout
+    __ms_record["harness_stdout"] = __ms_harness_out.getvalue()[:65536]
+__ms_real_stdout.write("\n" + __MS_BEGIN__ + "\n" + __ms_json.dumps(__ms_record) + "\n" + __MS_END__ + "\n")
+__ms_real_stdout.flush()
+'''
+
+
+def _program(code: str, harness: str) -> str:
+    """The trusted runner: it reads a per-run nonce from stdin, executes the model code with its
+    stdout captured, then executes the task harness (trusted, task-authored) with *its* stdout
+    captured separately, and finally writes a result record framed by RESULT_BEGIN/RESULT_END and
+    keyed with the nonce. The scorer accepts a task only from that record: the harness's own output
+    (the externally checked behaviour) must match the expectation and ``harness_completed`` must be
+    true. Model code that prints the expected text or the public sentinel, exits early (``sys.exit``,
+    ``os._exit``) or raises therefore never scores: there is no record, or the record says the
+    harness did not complete.
+
+    Limit (documented): everything runs in one interpreter, so model code that deliberately
+    inspects the runner's frames could recover the nonce; the protocol defeats marker echo and
+    early exit, not an adversary targeting the evaluator itself."""
+    return (
+        _RUNNER.replace("__MS_MODEL_CODE__", repr(code))
+        .replace("__MS_HARNESS_CODE__", repr(harness))
+        .replace("__MS_BEGIN__", repr(RESULT_BEGIN))
+        .replace("__MS_END__", repr(RESULT_END))
+    )
+
+
+def parse_result(stdout: str, nonce: str) -> dict | None:
+    """Return the runner's result record when the framed record carries ``nonce``; else None."""
+    start = stdout.rfind(RESULT_BEGIN)
+    if start == -1:
+        return None
+    end = stdout.find(RESULT_END, start)
+    if end == -1:
+        return None
+    body = stdout[start + len(RESULT_BEGIN):end].strip()
+    try:
+        rec = json.loads(body)
+    except ValueError:
+        return None
+    if not isinstance(rec, dict) or rec.get("nonce") != nonce:
+        return None
+    return rec
+
+
+def _runtime_read_roots() -> list[str]:
+    """Paths the interpreter needs readable: the Python installation (prefix/base_prefix, the
+    executable's real location) and the system libraries. The user's files are not among them."""
+    roots = {os.path.realpath(sys.prefix), os.path.realpath(sys.base_prefix), os.path.realpath(sys.exec_prefix)}
+    exe = os.path.realpath(sys.executable)
+    roots.add(os.path.dirname(os.path.dirname(exe)))
+    return sorted(roots)
 
 
 def _macos_profile(workdir: str) -> str:
+    """Deny by default. Allowed: process basics, reads of the Python runtime, system libraries and
+    frameworks, the work directory; writes only under the work directory and /dev; no network.
+    Host files outside those roots (the user's home, other projects) are not readable."""
+    reads = "".join(f'  (subpath "{r}")\n' for r in _runtime_read_roots())
     return (
         "(version 1)\n"
-        "(allow default)\n"
-        "(deny network*)\n"
-        "(deny file-write*)\n"
+        "(deny default)\n"
+        "(allow process*)\n"
+        "(allow sysctl-read)\n"
+        "(allow mach-lookup)\n"
+        "(allow signal (target self))\n"
+        '(allow file-read* (literal "/") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random") (literal "/dev/zero") (literal "/dev/tty"))\n'
+        '(allow file-read-metadata)\n'
+        '(allow file-read* (subpath "/usr/lib") (subpath "/usr/share") (subpath "/System") (subpath "/Library/Frameworks")\n'
+        '  (subpath "/opt/homebrew") (subpath "/usr/local") (subpath "/private/etc") (subpath "/etc") (subpath "/private/var/db")\n'
+        '  (subpath "/var/db") (subpath "/Library/Preferences") (subpath "/private/var/select") (subpath "/usr/bin") (subpath "/bin"))\n'
+        f"(allow file-read* (subpath \"{workdir}\")\n{reads})\n"
         f'(allow file-write* (subpath "{workdir}") (subpath "/dev"))\n'
+        "(allow file-ioctl (subpath \"/dev\"))\n"
+        "(deny network*)\n"
     )
+
+
+def _bwrap_read_roots() -> list[str]:
+    """Directories bound read-only into the bubblewrap sandbox: shared libraries, the Python
+    installation (and the venv's base) and the directories ``sys.executable`` lives in."""
+    roots = {"/usr/lib", "/usr/lib64", "/lib", "/lib64", "/usr/local/lib", "/etc/ld.so.cache", "/etc/alternatives"}
+    roots |= set(_runtime_read_roots())
+    exe = os.path.realpath(sys.executable)
+    roots.add(os.path.dirname(exe))
+    return sorted(roots)
 
 
 def _command(backend: str, workdir: str, capdir: str, name: str, timeout_s: float) -> list[str]:
     py = sys.executable
     if backend == "bwrap":
+        # Input allowlist: only the Python runtime and the system library directories are bound
+        # (read-only). The rest of the host filesystem does not exist inside the sandbox.
+        binds: list[str] = []
+        for r in _bwrap_read_roots():
+            binds += ["--ro-bind-try", r, r]
         return [
             "bwrap", "--unshare-all", "--die-with-parent",
-            "--ro-bind", "/", "/",
+            *binds,
             "--tmpfs", "/tmp",
             "--bind", workdir, BWRAP_WORK,
             "--chdir", BWRAP_WORK,
@@ -148,7 +264,7 @@ def _command(backend: str, workdir: str, capdir: str, name: str, timeout_s: floa
         return ["sandbox-exec", "-f", str(prof), py, "-I", "-B", os.path.join(workdir, "prog.py")]
     if backend == "docker":
         return [
-            "docker", "run", "--rm", "--name", name,
+            "docker", "run", "--rm", "-i", "--name", name,
             "--network", "none", "--read-only", "--tmpfs", "/tmp",
             "-m", "512m", "--pids-limit", str(PIDS_LIMIT),
             "--ulimit", f"cpu={int(timeout_s) + 1}", "--ulimit", f"fsize={OUTPUT_CAP_BYTES}",
@@ -163,13 +279,17 @@ def _command(backend: str, workdir: str, capdir: str, name: str, timeout_s: floa
 def run(code: str, harness: str, timeout_s: float = 10.0) -> tuple[str, str, int, str]:
     """Execute ``code`` + ``harness`` in the detected sandbox.
 
-    Returns ``(stdout, stderr, returncode, backend)``. Raises ``RuntimeError`` when no backend is
-    available (callers must check :func:`available` and skip; there is no unsandboxed path).
+    Returns ``(stdout, stderr, returncode, backend)``; ``stdout`` carries the runner's framed result
+    record (see :func:`_program`), which the scorer extracts with :func:`parse_result` using the
+    nonce stored in ``run.last_nonce``. Raises ``RuntimeError`` when no backend is available
+    (callers must check :func:`available` and skip; there is no unsandboxed path).
     ``returncode`` is 124 on wall-clock timeout.
     """
     backend, reason = available()
     if backend is None:
         raise RuntimeError(reason)
+    nonce = secrets.token_hex(16)
+    run.last_nonce = nonce  # type: ignore[attr-defined]
     with tempfile.TemporaryDirectory(prefix="modelsaar-eval-work-") as work, tempfile.TemporaryDirectory(prefix="modelsaar-eval-cap-") as cap:
         workdir = os.path.realpath(work)  # macOS: /var -> /private/var for the sandbox profile
         Path(workdir, "prog.py").write_text(_program(code, harness), encoding="utf-8")
@@ -193,7 +313,7 @@ def run(code: str, harness: str, timeout_s: float = 10.0) -> tuple[str, str, int
         with open(out_path, "wb") as fo, open(err_path, "wb") as fe:
             try:
                 p = subprocess.run(
-                    cmd, stdin=subprocess.DEVNULL, stdout=fo, stderr=fe, timeout=timeout_s, cwd=cap, env=env,
+                    cmd, input=(nonce + "\n").encode(), stdout=fo, stderr=fe, timeout=timeout_s, cwd=cap, env=env,
                     preexec_fn=_rlimits(timeout_s) if backend != "docker" and sys.platform != "win32" else None,
                 )
                 rc = p.returncode

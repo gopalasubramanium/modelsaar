@@ -117,13 +117,41 @@ def _wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
     return (max(0.0, centre - half), min(1.0, centre + half))
 
 
+CHECKPOINT_FORMAT = 2  # records carry task_sha256 + conditions_key; format-1 records are never resumed
+
+
+def task_identity(task: dict[str, Any]) -> str:
+    """sha256 of the task content that determines a result: messages, expected (type, values,
+    harness, schema), tools, category/split. Ephemeral fields are not part of a task."""
+    return hashlib.sha256(json.dumps(task, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
+
+
+def conditions_key(policy: str, *, scorer_version: str = SCORER_VERSION, max_tokens: int = MAX_TOKENS, temperature: float = TEMPERATURE,
+                   seed: int | None = None, routing_config_hash: str | None = None) -> str:
+    """Stable identity of the experiment conditions a record depends on: scorer version, request
+    budgets and, for routed policies (``auto`` and other aliases), the gateway's routing configuration
+    hash. Fixed-deployment sweeps do not depend on routing configuration. The seed matters only for
+    the random baseline. Ports, timestamps and paths are deliberately excluded so an unchanged run
+    stays resumable."""
+    parts: dict[str, Any] = {"format": CHECKPOINT_FORMAT, "scorer": scorer_version, "max_tokens": max_tokens, "temperature": temperature}
+    if policy.startswith("random"):
+        parts["seed"] = seed
+    if not policy.startswith(("sweep:", "calib:")):
+        parts["routing_config_hash"] = routing_config_hash
+    return hashlib.sha256(json.dumps(parts, sort_keys=True).encode("utf-8")).hexdigest()[:24]
+
+
 class EvalRun:
     """Issues requests, scores them and keeps per-request records.
 
     Records are sanitized (ids, status, latency, scorer detail; never prompt text). With a
     ``checkpoint`` path every record is appended as one JSON line immediately; with
-    ``resume=True`` records already in that file (same ``(policy, task)`` key and, when known,
-    the same deployment fingerprint) are reused instead of re-run.
+    ``resume=True`` a record already in that file is reused only when it is bound to the same
+    experiment: same ``(policy, task)`` key, same task content (``task_sha256``), same conditions
+    (``conditions_key``: scorer version, budgets, routing configuration for routed policies) and,
+    for records that name a deployment, that deployment is still eligible in this run with the
+    same fingerprint. Anything else — a changed task or scorer, a removed or changed deployment,
+    a format-1 (legacy) record — is re-run and counted in ``resume_rejected``.
     """
 
     def __init__(self, gateway_url: str, api_key: str, admin_key: str, simulated: bool, seed: int = 7, checkpoint: Path | None = None, resume: bool = False) -> None:
@@ -134,8 +162,10 @@ class EvalRun:
         self.rng = random.Random(seed)
         self.records: list[dict[str, Any]] = []
         self.fingerprints: dict[str, str] = {}
+        self.routing_config_hash: str | None = None  # set from /admin/status by run_live/run_simulated
         self.checkpoint = Path(checkpoint) if checkpoint else None
         self.resumed = 0
+        self.resume_rejected: dict[str, int] = {}
         self._done: dict[tuple[str, str], dict[str, Any]] = {}
         if resume:
             if not self.checkpoint:
@@ -163,21 +193,52 @@ class EvalRun:
                 f.flush()
         return rec
 
-    def _resumable(self, task_id: str, policy: str) -> dict[str, Any] | None:
+    def _conditions_key(self, policy: str) -> str:
+        return conditions_key(policy, seed=self.seed, routing_config_hash=self.routing_config_hash)
+
+    def _reject(self, reason: str) -> None:
+        self.resume_rejected[reason] = self.resume_rejected.get(reason, 0) + 1
+
+    def _resumable(self, task: dict[str, Any] | str, policy: str) -> dict[str, Any] | None:
+        """Return the checkpoint record to reuse for ``(policy, task)`` or None (re-run). ``task`` is
+        the task dict; a bare task id (legacy callers/tests) can only match on the id and the
+        deployment conditions, and a format-2 record then still requires the task hash."""
+        task_id = task if isinstance(task, str) else task["id"]
         prev = self._done.get((policy, task_id))
         if not prev:
             return None
+        if prev.get("checkpoint_format") != CHECKPOINT_FORMAT or not prev.get("task_sha256"):
+            self._reject("legacy_record_format")
+            return None
+        if not isinstance(task, str) and prev.get("task_sha256") != task_identity(task):
+            self._reject("task_changed")
+            return None
+        if prev.get("conditions_key") != self._conditions_key(policy):
+            self._reject("conditions_changed")
+            return None
         dep, fp = prev.get("deployment"), prev.get("fingerprint")
-        if self.simulated:
-            # The simulated backend is deterministic by construction and is started on a fresh
-            # loopback port per run, so its endpoint (part of the fingerprint) differs every time.
-            return prev
-        if dep and fp and self.fingerprints.get(dep) not in (None, fp):
-            return None  # the deployment changed since the checkpoint: re-run
+        if dep:
+            if self.simulated:
+                # The simulated backend is deterministic by construction and is started on a fresh
+                # loopback port per run, so its endpoint (part of the fingerprint) differs every time;
+                # the deployment must still exist in this run.
+                if dep not in self.fingerprints:
+                    self._reject("deployment_not_eligible")
+                    return None
+                return prev
+            if dep not in self.fingerprints:
+                self._reject("deployment_not_eligible")
+                return None
+            if fp and self.fingerprints[dep] != fp:
+                self._reject("deployment_changed")
+                return None
+            if not fp:
+                self._reject("record_without_fingerprint")
+                return None
         return prev
 
     def run_one(self, task: dict[str, Any], model: str, policy: str, enrich: Callable[[dict[str, Any]], None] | None = None) -> dict[str, Any]:
-        prev = self._resumable(task["id"], policy)
+        prev = self._resumable(task, policy)
         if prev is not None:
             self.resumed += 1
             rec = dict(prev)
@@ -190,7 +251,7 @@ class EvalRun:
             r = self.c.post("/v1/chat/completions", json=body)
         except httpx.HTTPError as e:
             rec = {"task": task["id"], "category": task["category"], "split": task["split"], "policy": policy, "model": model, "status": 0, "ok": False, "detail": f"transport: {e}", "latency_ms": (time.monotonic() - t0) * 1000}
-            return self._finish(rec)
+            return self._finish(self._bind(rec, task, policy))
         ms = (time.monotonic() - t0) * 1000
         print(f"[eval] {policy:40s} {task['id']:12s} HTTP {r.status_code} {ms/1000:6.1f}s", file=sys.stderr, flush=True)
         rec: dict[str, Any] = {
@@ -221,7 +282,15 @@ class EvalRun:
                 rec["detail"] = f"HTTP {r.status_code}"
         if enrich is not None:
             enrich(rec)
-        return self._finish(rec)
+        return self._finish(self._bind(rec, task, policy))
+
+    def _bind(self, rec: dict[str, Any], task: dict[str, Any], policy: str) -> dict[str, Any]:
+        """Attach the experiment identity a later --resume must match."""
+        rec["checkpoint_format"] = CHECKPOINT_FORMAT
+        rec["task_sha256"] = task_identity(task)
+        rec["conditions_key"] = self._conditions_key(policy)
+        rec["scorer_version"] = SCORER_VERSION
+        return rec
 
     def sweep(self, tasks: list[dict[str, Any]], dep_ids: list[str], policy_prefix: str = "sweep") -> dict[str, dict[str, dict[str, Any]]]:
         """Return results[dep_id][task_id] = record."""
@@ -347,6 +416,10 @@ def evaluate(
         deps = [d for d in deps if d["id"] in only]
     dep_ids = [d["id"] for d in deps]
     run.fingerprints = {d["id"]: d["fingerprint"] for d in deps}
+    try:
+        run.routing_config_hash = run.admin.get("/admin/status").json().get("config_hash")
+    except Exception:  # pragma: no cover - status is required anyway above
+        run.routing_config_hash = None
     calib = [t for t in tasks if t["split"] == "calib"]
     test = [t for t in tasks if t["split"] == "test"]
     backend, backend_reason = sandbox.available()
@@ -378,6 +451,8 @@ def evaluate(
             "temperature": TEMPERATURE,
             "seed": run.seed,
             "scorer_version": SCORER_VERSION,
+            "checkpoint_format": CHECKPOINT_FORMAT,
+            "routing_config_hash": run.routing_config_hash,
             "git_commit": _git_commit(),
             "sandbox_backend": backend,
             "deployment_fingerprints": dict(run.fingerprints),
@@ -456,6 +531,7 @@ def evaluate(
         "classifier": {"used": sum(1 for r in auto.values() if (r.get("classifier") or {}).get("used")), "timeouts": sum(1 for r in auto.values() if (r.get("classifier") or {}).get("status") == "timeout")},
     }
     report["resumed_records"] = run.resumed
+    report["resume_rejected"] = dict(run.resume_rejected)
     report["records"] = run.records
     return report
 
@@ -484,7 +560,9 @@ def render_report(rep: dict[str, Any]) -> str:
         f"scorer={cond.get('scorer_version')} tasks_sha256={str(cond.get('tasks_file_sha256') or cond.get('tasks_run_sha256') or '')[:12]} git={str(cond.get('git_commit') or 'unknown')[:12]}"
     )
     if rep.get("checkpoint"):
-        lines.append(f"checkpoint: {rep['checkpoint']} (resumed {rep.get('resumed_records', 0)} record(s))")
+        rej = rep.get("resume_rejected") or {}
+        lines.append(f"checkpoint: {rep['checkpoint']} (resumed {rep.get('resumed_records', 0)} record(s)"
+                     + (f"; re-run instead of resumed: {', '.join(f'{k}={v}' for k, v in sorted(rej.items()))}" if rej else "") + ")")
     lines.append("")
     lines.append(f"{'policy':55s} {'success':>9s} {'95% CI':>15s} {'scored':>7s} {'skip':>5s} {'complete':>9s} {'viol':>5s} {'p50 ms':>8s} {'p95 ms':>8s}")
     for name, s in rep["results"].items():

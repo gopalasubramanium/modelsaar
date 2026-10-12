@@ -16,7 +16,7 @@ from typing import Any
 from . import sandbox
 
 # Bump whenever a scorer's acceptance rule changes so reports are not compared across rules.
-SCORER_VERSION = "2026.10.11-2"
+SCORER_VERSION = "2026.10.12-3"
 
 _CODE_BLOCK = re.compile(r"```(?:python|py)?\s*\n(.*?)```", re.DOTALL)
 # Standalone numeric tokens: optional sign (not glued to a preceding word/number, so "25-7"
@@ -131,7 +131,13 @@ def _score_tool_call(task: dict[str, Any], msg: dict[str, Any], exp: dict[str, A
         if missing:
             reasons.append(f"missing required argument(s) {missing}")
             continue
-        bad = [k for k, sub in args_contains.items() if str(sub) not in str(args.get(k, ""))]
+        params = tool_def.get("parameters")
+        if isinstance(params, dict) and not _basic_schema_check(args, params):
+            # Declared schema is the contract: a list where a string is required is a wrong call
+            # even if its text representation contains the expected substring.
+            reasons.append("arguments do not conform to the tool's declared parameter schema")
+            continue
+        bad = [k for k, sub in args_contains.items() if not isinstance(args.get(k), (str, int, float)) or str(sub) not in str(args.get(k, ""))]
         if bad:
             reasons.append(f"argument(s) {bad} do not contain expected substring(s) {[args_contains[k] for k in bad]}")
             continue
@@ -142,6 +148,9 @@ def _score_tool_call(task: dict[str, Any], msg: dict[str, Any], exp: dict[str, A
 
 
 def _score_code_exec(task: dict[str, Any], text: str, exp: dict[str, Any], runner: Runner | None) -> tuple[bool | None, str]:
+    """Scored from the trusted runner's result record (see ``sandbox._program``): the harness must
+    have completed and *its* captured output must equal the expectation. Text the model code
+    prints, including the public sentinel, is never evidence; a missing or foreign record fails."""
     m = _CODE_BLOCK.search(text)
     code = m.group(1) if m else text
     if runner is None:
@@ -150,20 +159,25 @@ def _score_code_exec(task: dict[str, Any], text: str, exp: dict[str, Any], runne
             return None, f"skipped: {reason}"
         runner = sandbox.run
     out, err, rc, backend = runner(code, exp["harness"], float(exp.get("timeout_s", 10.0)))
-    lines = normalise_stdout(out).split("\n")
-    sentinel_ok = lines and lines[-1] == sandbox.SENTINEL and sandbox.SENTINEL not in lines[:-1]
-    body = normalise_stdout("\n".join(lines[:-1])) if sentinel_ok else normalise_stdout(out)
+    rec = sandbox.parse_result(out, getattr(runner, "last_nonce", ""))
     want = normalise_stdout(str(exp["stdout"]))
     problems = []
     if rc != 0:
         problems.append(f"exit code {rc}")
-    if not sentinel_ok:
-        problems.append("harness did not complete (sentinel missing)")
-    if body != want:
-        problems.append(f"stdout {body[:200]!r} != expected {want[:200]!r}")
+    if rec is None:
+        problems.append("no result record from the runner (model code exited or crashed before the harness ran)")
+        body = ""
+    else:
+        if not rec.get("model_ran"):
+            problems.append(rec.get("error") or "model code did not run")
+        elif not rec.get("harness_completed"):
+            problems.append(rec.get("error") or "harness did not complete")
+        body = normalise_stdout(str(rec.get("harness_stdout", "")))
+        if body != want:
+            problems.append(f"harness output {body[:200]!r} != expected {want[:200]!r}")
     if problems:
         return False, f"[{backend}] " + "; ".join(problems) + (f" err={err[-300:]!r}" if err else "")
-    return True, f"[{backend}] stdout matches, harness completed, exit 0"
+    return True, f"[{backend}] harness completed with expected output, exit 0"
 
 
 def score(task: dict[str, Any], response: dict[str, Any], runner: Runner | None = None) -> tuple[bool | None, str]:

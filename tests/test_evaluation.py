@@ -35,7 +35,15 @@ def _resp(content=None, tool_calls=None):
     return {"choices": [{"message": msg}]}
 
 
+def _record(harness_stdout: str, completed: bool = True, model_ran: bool = True, error=None, nonce: str = "") -> str:
+    """A runner result record as the trusted runner frames it (see sandbox._program)."""
+    rec = {"nonce": nonce, "model_ran": model_ran, "harness_completed": completed, "harness_stdout": harness_stdout, "error": error}
+    return f"\n{sandbox.RESULT_BEGIN}\n{json.dumps(rec)}\n{sandbox.RESULT_END}\n"
+
+
 def _runner_returning(stdout: str, stderr: str = "", rc: int = 0):
+    """Fabricated runner output: ``stdout`` is what the process printed (model text, sentinel, and
+    optionally a result record from :func:`_record`)."""
     def runner(code, harness, timeout_s):
         return stdout, stderr, rc, "fake"
 
@@ -74,45 +82,65 @@ def test_code05_gold_rle_passes_with_trailing_space_output():
 def test_code_exec_trailing_whitespace_on_expected_side_is_also_ignored():
     task = json.loads(json.dumps(TASKS["code-05"]))
     task["expected"]["stdout"] = "a3b1c2 \n"
-    ok, _ = score(task, _resp(f"```python\n{_gold_code('rle')}\n```"), runner=_runner_returning(f"a3b1c2\n{OK}\n"))
+    ok, _ = score(task, _resp(f"```python\n{_gold_code('rle')}\n```"), runner=_runner_returning(_record("a3b1c2\n") + f"{OK}\n"))
     assert ok is True
 
 
 def test_code_exec_wrong_output_fails():
-    ok, detail = score(TASKS["code-05"], _resp("```python\ndef rle(s): return 'nope'\n```"), runner=_runner_returning(f"nope nope\n{OK}\n"))
-    assert ok is False and "stdout" in detail
+    ok, detail = score(TASKS["code-05"], _resp("```python\ndef rle(s): return 'nope'\n```"), runner=_runner_returning(_record("nope nope\n") + f"{OK}\n"))
+    assert ok is False and "harness output" in detail
 
 
-# 1b. completion sentinel + exit code
+# 1b. completion evidence: the runner's result record (not stdout text) + exit code
 
 
-def test_code_exec_requires_sentinel():
+def test_code_exec_requires_result_record():
+    # Expected text and even the public sentinel in stdout are not evidence without the record.
     ok, detail = score(TASKS["code-01"], _resp("x"), runner=_runner_returning("True False\n", rc=0))
-    assert ok is False and "sentinel" in detail
+    assert ok is False and "no result record" in detail
+    ok, detail = score(TASKS["code-01"], _resp("x"), runner=_runner_returning(f"True False\n{OK}\n", rc=0))
+    assert ok is False and "no result record" in detail
 
 
 def test_code_exec_requires_exit_code_zero():
-    ok, detail = score(TASKS["code-01"], _resp("x"), runner=_runner_returning(f"True False\n{OK}\n", rc=1))
+    ok, detail = score(TASKS["code-01"], _resp("x"), runner=_runner_returning(_record("True False\n") + f"{OK}\n", rc=1))
     assert ok is False and "exit code 1" in detail
 
 
-def test_code_exec_sentinel_must_be_last_and_unique():
-    ok, _ = score(TASKS["code-01"], _resp("x"), runner=_runner_returning(f"{OK}\nTrue False\n", rc=0))
-    assert ok is False
-    ok, _ = score(TASKS["code-01"], _resp("x"), runner=_runner_returning(f"{OK}\nTrue False\n{OK}\n", rc=0))
-    assert ok is False
+def test_code_exec_record_must_say_harness_completed():
+    ok, detail = score(TASKS["code-01"], _resp("x"), runner=_runner_returning(_record("True False\n", completed=False, error="harness raised X")))
+    assert ok is False and "harness raised X" in detail
+    ok, detail = score(TASKS["code-01"], _resp("x"), runner=_runner_returning(_record("", model_ran=False, completed=False, error="model code raised SyntaxError")))
+    assert ok is False and "model code raised" in detail
+
+
+def test_code_exec_record_with_foreign_nonce_is_ignored():
+    def runner(code, harness, timeout_s):
+        return _record("True False\n", nonce="attacker") + f"{OK}\n", "", 0, "fake"
+
+    runner.last_nonce = "real-nonce"
+    ok, detail = score(TASKS["code-01"], _resp("x"), runner=runner)
+    assert ok is False and "no result record" in detail
 
 
 def test_code_exec_print_then_raise_fails():
     code = "```python\ndef is_palindrome(s):\n    print('True False')\n    raise RuntimeError('boom')\n```"
     ok, detail = score(TASKS["code-01"], _resp(code), runner=_local_python_runner)
-    assert ok is False and "exit code" in detail and "sentinel" in detail
+    assert ok is False and "harness raised RuntimeError" in detail
 
 
 def test_code_exec_print_then_exit_zero_fails():
     code = "```python\nimport sys\ndef is_palindrome(s):\n    sys.stdout.write('True False\\n'); sys.stdout.flush(); sys.exit(0)\n```"
     ok, detail = score(TASKS["code-01"], _resp(code), runner=_local_python_runner)
-    assert ok is False and "sentinel" in detail
+    assert ok is False and "harness raised SystemExit" in detail
+
+
+def test_code_exec_flushed_expected_output_and_marker_then_os_exit_fails():
+    """The independent review's forged-completion case: expected text + public marker, flushed,
+    os._exit(0) before defining the function. No record is produced, so it cannot score."""
+    code = "```python\nimport os, sys\nsys.stdout.write('True False\\n" + OK + "\\n')\nsys.stdout.flush()\nos._exit(0)\n```"
+    ok, detail = score(TASKS["code-01"], _resp(code), runner=_local_python_runner)
+    assert ok is False and "no result record" in detail
 
 
 def test_code_exec_self_printed_sentinel_fails():
@@ -280,8 +308,11 @@ def test_sandbox_blocks_writes_outside_work(tmp_path):
 @needs_sandbox
 def test_sandbox_blocks_network():
     code = "import socket\ns = socket.create_connection(('1.1.1.1', 80), timeout=3)\nprint('connected')\n"
-    out, err, rc, backend = sandbox.run(code, "", 15.0)
-    assert rc != 0 and "connected" not in out and sandbox.SENTINEL not in out, (out, err, rc)
+    out, err, rc, backend = sandbox.run(code, "print('harness ran')", 15.0)
+    rec = sandbox.parse_result(out, sandbox.run.last_nonce)
+    assert "connected" not in out, (out, err, rc)
+    assert rec is not None and not rec["model_ran"] and not rec["harness_completed"], rec
+    assert "OSError" in rec["error"] or "unreachable" in rec["error"].lower() or "Timeout" in rec["error"], rec["error"]
 
 
 @needs_sandbox
@@ -297,6 +328,42 @@ def test_sandbox_reference_solution_passes():
 def test_sandbox_timeout_fails_cleanly():
     out, err, rc, _ = sandbox.run("while True: pass", "", 2.0)
     assert rc == 124 and "timeout" in err
+
+
+@needs_sandbox
+def test_sandbox_cannot_read_a_synthetic_host_file_outside_the_work_directory():
+    """Review R7: the sandbox must not grant ordinary host read authority. A harmless synthetic file
+    is created outside the sandbox (in the home directory, which is not an allowlisted runtime root;
+    /tmp is a private tmpfs inside the sandbox so it would not prove anything)."""
+    import os
+    import tempfile
+
+    home = Path(os.path.expanduser("~"))
+    base = home if os.access(home, os.W_OK) else Path(tempfile.gettempdir())
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", dir=base, delete=False, prefix="modelsaar-synthetic-") as f:
+        f.write("synthetic-marker-7f3a")
+        name = f.name
+    try:
+        code = (
+            "def peek(p):\n"
+            "    try:\n        return open(p).read()\n"
+            "    except OSError as e:\n        return 'unreadable:' + e.__class__.__name__\n"
+        )
+        out, err, rc, backend = sandbox.run(code, f"print(peek({name!r}))\nprint(peek('/etc/passwd' if __import__('sys').platform != 'darwin' else {str(home)!r}))", 10.0)
+        rec = sandbox.parse_result(out, sandbox.run.last_nonce)
+        assert rec is not None and rec["harness_completed"], (out, err, rc)
+        lines = rec["harness_stdout"].splitlines()
+        assert lines and lines[0].startswith("unreadable:"), f"sandbox {backend} let generated code read a host file: {lines}"
+        assert "synthetic-marker-7f3a" not in out
+    finally:
+        os.unlink(name)
+
+
+@needs_sandbox
+def test_sandbox_forged_completion_marker_does_not_score():
+    code = f"import os, sys\nsys.stdout.write('True False\\n{OK}\\n')\nsys.stdout.flush()\nos._exit(0)\n"
+    ok, detail = score(TASKS["code-01"], _resp(f"```python\n{code}```"))
+    assert ok is False and "no result record" in detail
 
 
 # --------------------------------------------------------------------------- #
@@ -458,11 +525,16 @@ def test_checkpoint_written_and_resumed(tmp_path):
 
 
 def test_resume_ignores_records_from_other_fingerprint(tmp_path):
+    from modelsaar.evaluation.harness import CHECKPOINT_FORMAT, conditions_key
+
     ck = tmp_path / "ck.jsonl"
-    ck.write_text(json.dumps({"task": "t1", "policy": "calib:d", "deployment": "d", "fingerprint": "old", "ok": True, "status": 200, "latency_ms": 1}) + "\n", encoding="utf-8")
+    rec = {"task": "t1", "policy": "calib:d", "deployment": "d", "fingerprint": "old", "ok": True, "status": 200, "latency_ms": 1,
+           "checkpoint_format": CHECKPOINT_FORMAT, "task_sha256": "x" * 64, "conditions_key": conditions_key("calib:d")}
+    ck.write_text(json.dumps(rec) + "\n", encoding="utf-8")
     run = EvalRun("http://127.0.0.1:9", "k", "a", simulated=False, checkpoint=ck, resume=True)
     run.fingerprints = {"d": "new"}
     assert run._resumable("t1", "calib:d") is None
+    assert run.resume_rejected == {"deployment_changed": 1}
     run.fingerprints = {"d": "old"}
     assert run._resumable("t1", "calib:d")["ok"] is True
     assert run._resumable("t1", "test:d") is None
