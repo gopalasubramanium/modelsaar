@@ -120,7 +120,16 @@ for page in pages:
         err(f"{rel}: placeholder text left in page")
     # The public site must not expose the owner's inference host or any key: Tailscale CGNAT addresses
     # (100.64.0.0/10), LAN addresses and ModelSaar/OpenAI-style key literals are refused.
-    leak = re.search(r"\b100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}\b|\b(192\.168|10)\.\d{1,3}\.\d{1,3}\.\d{1,3}\b|\b(ms|sk)-[A-Za-z0-9]{24,}", text)
+    leak = re.search(
+        r"\b(?:100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}"  # 100.64.0.0/10 (Tailscale CGNAT)
+        r"|10\.\d{1,3}\.\d{1,3}"  # 10.0.0.0/8
+        r"|192\.168\.\d{1,3}"  # 192.168.0.0/16
+        r"|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}"  # 172.16.0.0/12
+        r"|169\.254\.\d{1,3})"  # 169.254.0.0/16 (link-local)
+        r"\.\d{1,3}\b"
+        r"|\b(ms[ka]|sk)-[A-Za-z0-9]{24,}\b|\bmsk_[A-Za-z0-9]{16,}\b|\bmsa_[A-Za-z0-9]{16,}\b",
+        text,
+    )
     if leak:
         err(f"{rel}: private host address or key literal in page ({leak.group(0)})")
     if s.imgs_without_alt:
@@ -202,6 +211,21 @@ subs = set(re.findall(r"\{([a-z0-9,-]+)\}", help_out)[0].split(",")) if "{" in h
 mentioned = set(re.findall(r"modelsaar (init|serve|test|doctor|probe|discover|explain|decisions|status|client-config|keys|config|eval|demo|uninstall)\b", home + gs))
 for m in mentioned - subs:
     err(f"copy mentions `modelsaar {m}` which the CLI does not have")
+# a literal shell substitution is not a value a person can paste into a GUI field
+for name, page in (("home", home), ("get-started", gs)):
+    if re.search(r"API key:\s*\$\(", _html.unescape(page)):
+        err(f"{name}: an API key field shows a shell substitution instead of the printed value")
+if "client-config open-webui | " in _html.unescape(home + gs):
+    err("client-config alternatives are written as a shell pipeline")
+for c in facts.CLIENT_CONFIG_COMMANDS.values():
+    if not shown(c, gs):
+        err(f"client command not shown on get-started: {c}")
+# test counts quoted on the site must equal what pytest collects at this revision
+collect = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "-m", "not live", "-p", "no:cacheprovider", "-o", "addopts="],
+                         capture_output=True, text=True, cwd=ROOT)
+m_total = re.search(r"(\d+) tests? collected", collect.stdout + collect.stderr)
+if not m_total or int(m_total.group(1)) != facts.TEST_COUNTS.total:
+    err(f"facts.TEST_COUNTS.total={facts.TEST_COUNTS.total} but pytest collects {m_total.group(1) if m_total else '?'} tests")
 
 if errors:
     print("\n".join(f"FAIL {e}" for e in errors))

@@ -23,6 +23,6 @@ Draft ads (RSA headlines ≤30, descriptions ≤90):
 - H: "One address for local AI" · "Route to the right local model" · "Open source, Apache-2.0" · "Works with Ollama today"
 - D: "Apps connect once and ask for auto. Verified capabilities, local-only by default, decisions you can inspect." · "Development preview. Python 3.10+ and your own models required. No cloud, no telemetry."
 
-Measurement: landing-page views by ad group, `install.sh` fetch count (server logs), outbound GitHub
+Measurement: ad-platform click counts by ad group (the platform's own numbers), outbound GitHub
 clicks (no tracking script; use UTM-free referrer counts from GitHub's traffic page), issues opened.
-Stop rule: no install.sh fetch from paid traffic in 7 days → pause.
+Stop rule: no GitHub referral from the ad landing page and no issue or first-request report in 7 days → pause (installer fetches are not observable on GitHub Pages).

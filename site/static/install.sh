@@ -105,9 +105,17 @@ GW_URL="http://127.0.0.1:${GW_PORT}"
 if [ "${MODELSAAR_NO_CHECK:-0}" = "1" ]; then
   say "verification skipped (MODELSAAR_NO_CHECK=1)"
 else
-  if curl -fsS -m 3 "$GW_URL/healthz" >/dev/null 2>&1; then
-    say "a gateway is already listening on $GW_URL; using it for the check"
+  # Identify what listens on the port BEFORE anything is sent to it. Only the ModelSaar health
+  # contract (unauthenticated GET /healthz returning JSON with "service":"modelsaar") counts as a
+  # gateway; any other listener is a port collision. This is collision detection, not authentication.
+  HEALTH="$(curl -sS -m 3 -o - -w '\n%{http_code}' -H 'Accept: application/json' "$GW_URL/healthz" 2>/dev/null || true)"
+  HEALTH_CODE="$(printf '%s' "$HEALTH" | tail -n 1)"
+  HEALTH_BODY="$(printf '%s' "$HEALTH" | sed '$d')"
+  if [ "$HEALTH_CODE" = "200" ] && printf '%s' "$HEALTH_BODY" | grep -q '"service"[[:space:]]*:[[:space:]]*"modelsaar"'; then
+    say "a ModelSaar gateway is already listening on $GW_URL (identified by its health contract); using it for the check"
     STARTED=""
+  elif [ -n "$HEALTH_CODE" ] && [ "$HEALTH_CODE" != "000" ]; then
+    die "port $GW_PORT is in use by something that is not a ModelSaar gateway (GET $GW_URL/healthz answered HTTP $HEALTH_CODE without the ModelSaar health contract). Nothing was sent to it. Choose another port: MODELSAAR_PORT=8585 sh install.sh (new config), or edit server.port in $HOME_DIR/config.yaml"
   elif (command -v nc >/dev/null 2>&1 && nc -z 127.0.0.1 "$GW_PORT" 2>/dev/null); then
     die "port $GW_PORT is in use by something that is not a ModelSaar gateway. Choose another port: MODELSAAR_PORT=8585 sh install.sh (new config), or edit server.port in $HOME_DIR/config.yaml"
   else
@@ -115,16 +123,18 @@ else
     modelsaar serve >"$HOME_DIR/install-check.log" 2>&1 &
     STARTED=$!
     i=0
-    until curl -fsS -m 2 "$GW_URL/healthz" >/dev/null 2>&1; do
+    until curl -fsS -m 2 "$GW_URL/healthz" 2>/dev/null | grep -q '"service"[[:space:]]*:[[:space:]]*"modelsaar"'; do
       i=$((i+1)); if [ "$i" -gt 40 ]; then kill "$STARTED" 2>/dev/null; die "gateway did not start; see $HOME_DIR/install-check.log"; fi
       sleep 0.5
     done
   fi
   say ""
-  if modelsaar test; then
-    RESULT="OK — a request went through 'auto' and came back from the deployment shown above"
+  # `modelsaar test` re-identifies the gateway, sends the key only to it, and succeeds only when the
+  # response carries ModelSaar routing attribution (request id + deployment) for the `auto` request.
+  if modelsaar test --model auto; then
+    RESULT="OK — 'auto' was routed by ModelSaar to the deployment shown above (request id printed)"
   else
-    RESULT="the gateway answered but no deployment could serve the request (see the blockers above; 'modelsaar doctor' explains the remedies)"
+    RESULT="the check did not pass (see the message above: no deployment qualified, or the listener is not a ModelSaar gateway); 'modelsaar doctor' explains the remedies"
   fi
   if [ -n "${STARTED:-}" ]; then kill "$STARTED" 2>/dev/null || true; wait "$STARTED" 2>/dev/null || true; say "temporary gateway stopped"; fi
   say ""
@@ -139,9 +149,13 @@ say "Config:           $HOME_DIR/config.yaml"
 say ""
 say "Next:"
 say "  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)"
+say "                             (init has already run; do not run 'modelsaar init' again — it keeps your existing config)"
 say "  2. check it:               modelsaar test         (in another terminal)"
-say "  3. connect an app:         modelsaar client-config open-webui|opencode|opencode-v2|openclaw|hermes"
-say "     or set Base URL ${GW_URL}/v1, model 'auto', and the API key above in any OpenAI-compatible app"
+say "  3. connect an app, one command per app:"
+say "       modelsaar client-config open-webui     modelsaar client-config opencode   (or opencode-v2)"
+say "       modelsaar client-config openclaw       modelsaar client-config hermes"
+say "     or set Base URL ${GW_URL}/v1, model 'auto', and the API key in any OpenAI-compatible app:"
+say "     run 'head -1 $HOME_DIR/keys/api_keys' and paste the printed msk_… line into the key field"
 say "  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)"
 say "  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m \"…\""
 say "  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar"

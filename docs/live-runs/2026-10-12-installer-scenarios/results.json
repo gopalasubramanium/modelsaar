@@ -1,0 +1,64 @@
+[
+  {
+    "scenario": "fresh_install",
+    "result": "PASS",
+    "exit": 0,
+    "config_created": true
+  },
+  {
+    "scenario": "repeat_install_keeps_config",
+    "result": "PASS",
+    "exit": 0
+  },
+  {
+    "scenario": "unrelated_listener_is_a_collision",
+    "result": "PASS",
+    "exit": 1,
+    "requests_seen": [
+      {
+        "method": "GET",
+        "path": "/healthz",
+        "authorization": null
+      },
+      {
+        "method": "GET",
+        "path": "/healthz",
+        "authorization": null
+      }
+    ],
+    "key_sent": false
+  },
+  {
+    "scenario": "test_refuses_unrelated_listener",
+    "result": "PASS",
+    "exit": 1
+  },
+  {
+    "scenario": "serve_starts_and_identifies_itself",
+    "result": "PASS"
+  },
+  {
+    "scenario": "init_refuses_existing_config_so_the_site_must_not_chain_it",
+    "result": "PASS",
+    "exit": 1
+  },
+  {
+    "scenario": "test_passes_with_attribution",
+    "result": "PASS",
+    "exit": 0
+  },
+  {
+    "scenario": "installer_reuses_running_gateway",
+    "result": "PASS",
+    "exit": 0
+  },
+  {
+    "scenario": "client_config_open_webui_renders_from_running_gateway",
+    "result": "PASS",
+    "exit": 0
+  },
+  {
+    "scenario": "key_command_prints_a_pasteable_value",
+    "result": "PASS"
+  }
+]

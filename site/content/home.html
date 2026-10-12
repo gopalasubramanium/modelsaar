@@ -51,24 +51,27 @@
       {{ cmd(facts.INSTALL_ONE_LINER) }}
     </li>
     <li>
-      <h3>Connect a backend you already run</h3>
-      <p><code>modelsaar init</code> finds Ollama on <code>127.0.0.1:11434</code> (or takes <code>--endpoint</code> for any OpenAI-compatible server), writes a private config and keys, and lists the models it discovered. Then start the gateway.</p>
+      <h3>Start the gateway</h3>
+      <p>The installer has already run <code>modelsaar init</code>: it found Ollama on <code>127.0.0.1:11434</code> (an inference server with at least one model must already be running), wrote a private config and keys, and listed the models it discovered. Now start the gateway and leave it running.</p>
       {{ cmd(facts.FIRST_USE) }}
+      <p class="small">Installed from source instead? Run <code>modelsaar init</code> first (once; it refuses to overwrite an existing config), then <code>modelsaar serve</code>.</p>
     </li>
     <li>
       <h3>Connect an app</h3>
-      <p>Point the app at the gateway and pick <code>auto</code> as the model. <code>modelsaar client-config open-webui | opencode | openclaw | hermes</code> prints the exact settings.</p>
-      {{ cmd('Base URL:  ' + facts.GATEWAY_URL + '\nModel:     auto\nAPI key:   $(' + facts.KEY_COMMAND + ')', lang='text') }}
+      <p>Point the app at the gateway and pick <code>auto</code> as the model. Print the API key in a terminal, then paste the printed line (it starts with <code>msk_</code>) into the app's key field:</p>
+      {{ cmd(facts.KEY_COMMAND) }}
+      {{ cmd('Base URL:  ' + facts.GATEWAY_URL + '\nModel:     auto\nAPI key:   ' + facts.KEY_PLACEHOLDER, lang='text') }}
+      <p class="small">One command per app prints its exact settings: <code>modelsaar client-config open-webui</code>, <code>modelsaar client-config opencode</code>, <code>modelsaar client-config openclaw</code> or <code>modelsaar client-config hermes</code>.</p>
     </li>
   </ol>
-  <p>Verify from a second terminal with <code>{{ facts.FIRST_USE_CHECK }}</code>: it lists the models the gateway advertises and sends one chat completion through <code>auto</code>, printing which deployment answered. Full details, including Docker and remote hosts, in <a href="{{ href('/get-started/') }}">Get started</a>.</p>
+  <p>Verify from a second terminal with <code>{{ facts.FIRST_USE_CHECK }}</code>: it first identifies the gateway on the configured port (an unrelated service there is reported as a collision and receives no key), lists the models the gateway advertises and sends one chat completion through <code>auto</code>, printing which deployment answered and the request id — the routing attribution that shows ModelSaar handled it. Full details, including Docker and remote hosts, in <a href="{{ href('/get-started/') }}">Get started</a>.</p>
 </section>
 
 <section aria-labelledby="compat-title">
   <h2 id="compat-title">What works today, and how we know</h2>
   <p class="lede">Compatibility is a tested property of an exact client, protocol and backend combination. Each row says what kind of evidence backs it.</p>
   {{ c.support_matrix(site) }}
-  <p><span class="evidence live">live</span> ran against a real backend; <span class="evidence fixture">fixture tests</span> run in CI against a controlled fake backend; <span class="evidence docs">documented</span> means the configuration was written from the client's own documentation and has not been exercised. Product names identify compatible software; no partnership or endorsement is implied. Details per client and backend: <a href="{{ href('/integrations/') }}">Integrations</a>.</p>
+  <p><span class="evidence live">live</span> ran against a real backend; <span class="evidence fixture">fixture tests</span> are the repository's test suite against a controlled fake backend (run locally for every number on this site; the same suite runs in CI on push, and a CI run is reported only once one exists for the revision); <span class="evidence docs">documented</span> means the configuration was written from the client's own documentation and has not been exercised. Product names identify compatible software; no partnership or endorsement is implied. Details per client and backend: <a href="{{ href('/integrations/') }}">Integrations</a>.</p>
 </section>
 
 <section aria-labelledby="evidence-title">
