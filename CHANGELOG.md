@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased — correction pass for the second independent review (R1–R8), 2026-10-12
+
+The reviewer's desired-contract tests are included verbatim (`tests/independent_review_2026_10_11/`).
+
+* **Inference occupancy (R1):** a read timeout *while streaming*, an embedding timeout and a probe
+  timeout hold the slot and pool memory as uncertain (`admission.uncertain_hold_s`) like non-stream
+  timeouts; a probe run stops after the first uncertain timeout and reports `skipped`. New decision
+  outcomes `stream_timeout_after_commit`, `stream_invalid_after_commit`, `upstream_timeout`.
+* **Memory accounting (R2):** completed dispatches leave their weights counted as assumed resident
+  until a residency observation reconciles them; `ResourcePool.assumed_residency_ttl_s` for runtimes
+  that cannot report residency; `unknown_memory_policy: reject` applies to every counted member;
+  `/admin/status` shows `memory_assumed_resident`.
+* **Embedding identity (R3):** the alias identity is anchored before dispatch (declared > recorded >
+  first member in contract order with a verified identity) and recorded synchronously.
+* **Deadlines and stream validation (R4):** every upstream call uses the tighter of the server and
+  backend deadlines (an explicit `None` never disables the timeout); SSE data frames that are not a
+  completion structure invalidate the stream and are not relayed; comments, keepalives and usage-only
+  frames are fine.
+* **First use (R5):** `GET /healthz` returns `service: modelsaar`; `modelsaar test` identifies the
+  listener before sending the API key and requires ModelSaar routing attribution; an unrelated
+  listener is reported as a port collision.
+* **Evaluator (R7):** `code_exec` completion evidence is a nonce-keyed record written by the trusted
+  runner (model stdout captured separately); tool arguments must conform to the declared schema;
+  checkpoint records are bound to task content, scorer version, budgets, routing configuration and
+  deployment fingerprint (format 2; legacy records are re-run and counted in `resume_rejected`);
+  bubblewrap binds only the Python runtime and system libraries; the macOS profile is
+  deny-by-default. `SCORER_VERSION` is `2026.10.12-3`; saved results keep their own scorer label.
+
 ## Unreleased — hardening pass (branch `hardening/review-2026-10-11`, 2026-10-11)
 
 Fixes for the eight findings of the independent review of commit `1122e1f`; each has a regression
