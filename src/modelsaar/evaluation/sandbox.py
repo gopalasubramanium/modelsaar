@@ -221,8 +221,9 @@ def _macos_profile(workdir: str) -> str:
         '(allow file-read* (literal "/") (literal "/dev/null") (literal "/dev/urandom") (literal "/dev/random") (literal "/dev/zero") (literal "/dev/tty"))\n'
         '(allow file-read-metadata)\n'
         '(allow file-read* (subpath "/usr/lib") (subpath "/usr/share") (subpath "/System") (subpath "/Library/Frameworks")\n'
-        '  (subpath "/opt/homebrew") (subpath "/usr/local") (subpath "/private/etc") (subpath "/etc") (subpath "/private/var/db")\n'
-        '  (subpath "/var/db") (subpath "/Library/Preferences") (subpath "/private/var/select") (subpath "/usr/bin") (subpath "/bin"))\n'
+        '  (subpath "/Library/Apple") (subpath "/opt/homebrew") (subpath "/usr/local") (subpath "/private/etc") (subpath "/etc")\n'
+        '  (subpath "/private/var/db") (subpath "/var/db") (subpath "/Library/Preferences") (subpath "/private/var/select")\n'
+        '  (subpath "/usr/bin") (subpath "/bin") (subpath "/usr/sbin") (subpath "/sbin"))\n'
         f"(allow file-read* (subpath \"{workdir}\")\n{reads})\n"
         f'(allow file-write* (subpath "{workdir}") (subpath "/dev"))\n'
         "(allow file-ioctl (subpath \"/dev\"))\n"
