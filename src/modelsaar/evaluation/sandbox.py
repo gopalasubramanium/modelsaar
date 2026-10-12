@@ -245,13 +245,15 @@ def _command(backend: str, workdir: str, capdir: str, name: str, timeout_s: floa
     if backend == "bwrap":
         # Input allowlist: only the Python runtime and the system library directories are bound
         # (read-only). The rest of the host filesystem does not exist inside the sandbox.
+        # Order matters: the private /tmp first, then the read-only runtime roots (so a Python
+        # installation that itself lives under /tmp is still visible), then the work directory.
         binds: list[str] = []
         for r in _bwrap_read_roots():
             binds += ["--ro-bind-try", r, r]
         return [
             "bwrap", "--unshare-all", "--die-with-parent",
-            *binds,
             "--tmpfs", "/tmp",
+            *binds,
             "--bind", workdir, BWRAP_WORK,
             "--chdir", BWRAP_WORK,
             "--dev", "/dev", "--proc", "/proc",
