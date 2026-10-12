@@ -123,12 +123,17 @@ class Site:
             else ""
         )
         return f"""<!doctype html>
+<!--
+ModelSaar. Created by {esc(facts.CREATOR_NAME)}: {esc(facts.CREATOR_URL)}
+Source: {esc(facts.REPO_URL)}. Licence: {esc(facts.LICENSE)}.
+-->
 <html lang="en" data-theme="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(full_title)}</title>
 <meta name="description" content="{esc(desc)}">
+<meta name="author" content="{esc(facts.CREATOR_NAME)}">
 <link rel="canonical" href="{canonical}">
 {robots}
 <meta property="og:type" content="website">
@@ -174,6 +179,7 @@ class Site:
   <div class="foot-grid">
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Created by <a href="{esc(facts.CREATOR_URL)}">{esc(facts.CREATOR_NAME)}</a> · <a href="{self.href('/thanks/')}">Say thanks</a></p>
       <p class="small">Site built from <a href="{facts.REPO_URL}/commit/{self.commit}">{self.commit[:12]}</a> on {self.built}. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
@@ -324,6 +330,27 @@ def build(site: Site) -> None:
     ]
     for path, title, desc, frag in pages:
         site.add(path, title, desc, render_fragment(site, frag), crumbs=[("/", "Home"), (path, title)], jsonld=facts.jsonld_page(site.url, path, title, desc), lastmod=git_lastmod(SITE / "content" / frag))
+    thanks_path = "/thanks/"
+    thanks_title = "Say thanks"
+    thanks_desc = "Meet ModelSaar's creator, share useful feedback, or offer optional appreciation via PayPal."
+    thanks_body = f"""
+<section aria-labelledby="thanks-title">
+  <h1 id="thanks-title">Say thanks</h1>
+  <p class="lede">ModelSaar is an independent open-source project created by <a href="{esc(facts.CREATOR_URL)}">{esc(facts.CREATOR_NAME)}</a>.</p>
+  <p>Sharing the project with someone who could use it or sending <a href="{facts.REPO_URL}/issues">useful feedback</a> is appreciated.</p>
+  <h2>Optional appreciation</h2>
+  <p>If you would like to offer monetary appreciation, you can send it via PayPal. This is entirely optional.</p>
+  <p>In <a href="https://www.paypal.com/">PayPal</a>, choose <strong>Send</strong> and enter this email address:</p>
+  <p><code>{esc(facts.PAYPAL_EMAIL)}</code></p>
+  <p class="small">PayPal handles the payment on its own website.</p>
+</section>
+"""
+    site.add(
+        thanks_path, thanks_title, thanks_desc, thanks_body,
+        crumbs=[("/", "Home"), (thanks_path, thanks_title)],
+        jsonld=facts.jsonld_page(site.url, thanks_path, thanks_title, thanks_desc),
+        lastmod=git_lastmod(SITE / "build.py"),
+    )
     site.add("/404.html", "Page not found", "This page does not exist on modelsaar.com.", render_fragment(site, "404.html"), noindex=True)
     # ---- documentation rendered from the repository -------------------------------
     for repo_path, site_path, title, desc in DOC_PAGES:

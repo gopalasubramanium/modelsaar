@@ -165,6 +165,11 @@ against real models (owner's GX10 via Tailscale, 2026-10-11); **D** documented f
 * [Evaluation](docs/evaluation.md) · [Verification report](docs/verification-report.md) · [Release process](docs/release.md) · [Roadmap](docs/roadmap.md)
 * [Progress & decision log](docs/progress.md)
 
+## Creator
+
+Created by [Gopala Subramanium](https://me.sgopala.com). An independent open-source project.
+[Say thanks](https://modelsaar.com/thanks/) if ModelSaar has been useful to you.
+
 ## Licence
 
 Apache-2.0 for the gateway code (see `LICENSE`, `NOTICE`). Model weights are licensed by their

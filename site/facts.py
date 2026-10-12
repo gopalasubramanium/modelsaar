@@ -12,6 +12,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 REPO_URL = "https://github.com/gopalasubramanium/modelsaar"
+CREATOR_NAME = "Gopala Subramanium"
+CREATOR_URL = "https://me.sgopala.com"
+PAYPAL_EMAIL = "gopalasubramanium@gmail.com"
 LICENSE = "Apache-2.0"
 STATUS = "public alpha"  # clearly labelled alpha; no git tag, no PyPI package, no container image published
 VERSION_STRING = "0.1.0 (unreleased public alpha)"
@@ -155,6 +158,7 @@ def jsonld_home(site_url: str, commit: str) -> list[dict]:
             "name": "ModelSaar",
             "description": TAGLINE_LONG,
             "codeRepository": REPO_URL,
+            "author": {"@type": "Person", "name": CREATOR_NAME, "url": CREATOR_URL},
             "programmingLanguage": "Python",
             "runtimePlatform": "Python 3.10+",
             "license": "https://www.apache.org/licenses/LICENSE-2.0",
