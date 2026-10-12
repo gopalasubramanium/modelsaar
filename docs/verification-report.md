@@ -229,7 +229,7 @@ reviewer's test files byte-for-byte in `tests/independent_review_2026_10_11/`.
 | launcher reproducer (`reproduce_launcher.py`, path constants adapted; stub `gh`, local bare origin) | positive resume PASS; skip-domain, build-query-failure, origin-prefix: **DEFECT REPRODUCED** | matches `launcher_results.json` |
 | installer reproducer (`reproduce_installer.py`) | foreign `/healthz` accepted, saved fixture key sent, `verification: OK`; `init && serve` exit 1 | **DEFECT REPRODUCED** ×2 |
 | publication-tree reproducer | untracked file entered gh-pages with BUILD-INFO claiming the clean commit | **DEFECT REPRODUCED**; rollback control PASS |
-| address guard at website `840b068` | 192.168.50.9 and 172.16.50.9 accepted; CGNAT and 10/8 rejected | reproduced |
+| address guard at website `840b068` | synthetic 192.168/16 and 172.16/12 examples accepted (misses); CGNAT and 10/8 rejected | reproduced |
 
 Transcripts: `docs/live-runs/2026-10-12-correction/before/` (website branch).
 
