@@ -47,13 +47,18 @@ therefore only builds and checks on push/PR (artifact `site-dist-<sha>`); it nev
 
 ```bash
 git checkout website/modelsaar-com            # the verified website revision (clean tree required)
-python site/publish_pages.py build            # builds production, runs check_site.py, commits to gh-pages
+python site/publish_pages.py build            # exports `git archive HEAD`, builds + check_site from that export only, commits to gh-pages
 python site/publish_pages.py log              # gh-pages history: output commit -> source commit
 git push origin gh-pages                      # this is the deployment
 ```
 
 The Mac launcher `gh/gh_run.command publish` does all of this from the git bundle (see `gh/README.md`),
 then configures Pages through the API: source branch `gh-pages`, path `/`, custom domain `modelsaar.com`.
+It reports four distinct states — *source published* (branches + draft PRs), *Pages configured*, *build
+unknown/pending/failed/built* (asynchronous on GitHub's side) and *confirmed serving* — and the last one is
+written only by `gh/gh_run.command verify-serving`, which requires the served `BUILD-INFO.json` to carry the
+expected `output_sha256`. The launcher refuses an `origin` whose host/owner/name is not exactly
+`github.com/gopalasubramanium/modelsaar`, and has no option to skip the domain-verification pause.
 One-time equivalent by hand:
 
 ```bash
@@ -91,8 +96,10 @@ visible only in the Cloudflare dashboard — check it before adding records and 
    | AAAA | `modelsaar.com` | `2606:50c0:8003::153` |
    | CNAME | `www` | `gopalasubramanium.github.io` |
 
-4. **Verify resolution and the certificate**: `dig +short modelsaar.com A`, `dig +short www.modelsaar.com CNAME`,
-   then `gh/gh_run.command status` until `.https_certificate.state` is `approved` (up to 24 h).
+4. **Verify resolution, the certificate and the served build**: `dig +short modelsaar.com A`, `dig +short www.modelsaar.com CNAME`,
+   then `gh/gh_run.command status` until `.https_certificate.state` is `approved` (up to 24 h) and the build is `built`;
+   then `gh/gh_run.command verify-serving https://modelsaar.com` — serving counts as confirmed only when the served
+   `BUILD-INFO.json` names the expected `output_sha256` (an HTTP 200 is not confirmation).
 5. **Enforce HTTPS and check redirects**: `gh/gh_run.command https` (sets `https_enforced=true`), then
    `curl -sI http://modelsaar.com/` → 301 to https, `curl -sI https://www.modelsaar.com/` → 301 to the apex,
    `curl -sI https://gopalasubramanium.github.io/modelsaar/` → 301 to the apex, `curl -fsS https://modelsaar.com/install.sh | sha256sum` equals the `install.sh` in the served `gh-pages` commit.
