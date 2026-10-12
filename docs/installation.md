@@ -17,6 +17,13 @@ modelsaar serve
 With `uv`: `uv venv && . .venv/bin/activate && uv pip install -e .` (or `uv tool install .` to get a
 global `modelsaar` command).
 
+`modelsaar init` is for a first installation: it refuses to overwrite an existing `config.yaml`
+(`--force` replaces it; keys and state are kept). If you installed with the website's one-line
+installer, `init` has already run — continue with `modelsaar serve` and, in another terminal,
+`modelsaar test`. `modelsaar test` first identifies the listener on the configured port
+(unauthenticated `GET /healthz` must return the ModelSaar health contract) and sends the API key only
+to a ModelSaar gateway; an unrelated service on that port is reported as a collision.
+
 Files created by `init` (default `~/.modelsaar`, override with `MODELSAAR_HOME` or `--config`):
 
 ```

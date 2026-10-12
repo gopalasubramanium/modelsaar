@@ -414,29 +414,68 @@ def cmd_decisions(args: argparse.Namespace) -> None:
                 print(f"{d['request_id']} {d['requested_model']:14s} -> {d.get('chosen')!s:40s} {d.get('outcome'):14s} {d['overhead_ms']:6.1f}ms {(d.get('requirements') or {}).get('primary_task')}")
 
 
+HEALTH_SERVICE = "modelsaar"
+
+
+def gateway_identity(base_url: str, timeout: float = 5.0) -> tuple[str, dict[str, Any] | None]:
+    """Identify what listens at ``base_url`` WITHOUT sending a key: ``("modelsaar", health)`` when
+    GET /healthz returns the ModelSaar health contract (JSON with service=modelsaar); ``("none",
+    None)`` when nothing accepts connections; ``("other", None)`` for any other listener (a plain
+    200 is not enough — an unrelated service must be treated as a port collision)."""
+    try:
+        r = httpx.get(base_url.rstrip("/") + "/healthz", timeout=timeout, headers={"Accept": "application/json"})
+    except httpx.ConnectError:
+        return "none", None
+    except httpx.HTTPError:
+        return "other", None
+    try:
+        body = r.json()
+    except ValueError:
+        return "other", None
+    if r.status_code == 200 and isinstance(body, dict) and body.get("service") == HEALTH_SERVICE:
+        return "modelsaar", body
+    return "other", None
+
+
 def cmd_test(args: argparse.Namespace) -> None:
     cfg = _load(args)
+    base = f"http://{cfg.server.host}:{cfg.server.port}"
+    kind, health = gateway_identity(base)
+    if kind == "none":
+        sys.exit(
+            f"no gateway is listening at {base} — start it with `modelsaar serve` "
+            "(in another terminal, or under launchd/systemd; see examples/) and run `modelsaar test` again"
+        )
+    if kind == "other":
+        sys.exit(
+            f"something that is not a ModelSaar gateway is listening at {base} (GET /healthz did not return the "
+            "ModelSaar health contract). No key was sent. Port collision: stop that service or set server.port to "
+            "a free port in the config and restart `modelsaar serve`."
+        )
+    print(f"GET /healthz -> modelsaar {health.get('version', '?')}")
     with _api_client(cfg) as c:
-        try:
-            r = c.get("/v1/models")
-        except httpx.ConnectError:
-            sys.exit(
-                f"no gateway is listening at http://{cfg.server.host}:{cfg.server.port} — start it with `modelsaar serve` "
-                "(in another terminal, or under launchd/systemd; see examples/) and run `modelsaar test` again"
-            )
+        r = c.get("/v1/models")
         if r.status_code == 401:
-            sys.exit(f"the gateway at http://{cfg.server.host}:{cfg.server.port} rejected the API key from {cfg.resolve(cfg.server.api_keys_file)}; restart the gateway after `modelsaar keys rotate`")
+            sys.exit(f"the gateway at {base} rejected the API key from {cfg.resolve(cfg.server.api_keys_file)}; restart the gateway after `modelsaar keys rotate`")
         print(f"GET /v1/models -> {r.status_code}: {[m['id'] for m in r.json().get('data', [])]}")
         body = {"model": args.model, "messages": [{"role": "user", "content": args.message}], "max_tokens": 64}
         t0 = time.monotonic()
         r = c.post("/v1/chat/completions", json=body)
         ms = (time.monotonic() - t0) * 1000
-        print(f"POST /v1/chat/completions -> {r.status_code} in {ms:.0f}ms; deployment={r.headers.get('x-modelsaar-deployment')} request={r.headers.get('x-modelsaar-request-id')}")
-        if r.status_code == 200:
-            print("content:", (r.json()["choices"][0]["message"].get("content") or "")[:300])
-        else:
+        dep, rid = r.headers.get("x-modelsaar-deployment"), r.headers.get("x-modelsaar-request-id")
+        print(f"POST /v1/chat/completions -> {r.status_code} in {ms:.0f}ms; deployment={dep} request={rid}")
+        if r.status_code != 200:
             _out(r.json(), True)
             sys.exit(1)
+        if not rid or not dep:
+            # A 200 without ModelSaar attribution did not come from this gateway's router.
+            sys.exit("the response carries no ModelSaar routing attribution (X-ModelSaar-Request-Id / X-ModelSaar-Deployment); this is not a ModelSaar-routed completion")
+        try:
+            content = r.json()["choices"][0]["message"].get("content") or ""
+        except (KeyError, IndexError, TypeError, ValueError):
+            sys.exit("the response is not a chat completion envelope")
+        print(f"routed: {args.model!r} -> {dep} (request {rid})")
+        print("content:", content[:300])
 
 
 def cmd_client_config(args: argparse.Namespace) -> None:

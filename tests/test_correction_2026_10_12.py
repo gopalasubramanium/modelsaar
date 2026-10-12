@@ -391,3 +391,85 @@ def test_r7_conditions_key_ignores_ephemeral_details_and_tracks_scorer():
     assert conditions_key("sweep:x", routing_config_hash="h") == conditions_key("sweep:x", routing_config_hash="other")
     assert conditions_key("random", seed=1) != conditions_key("random", seed=2)
     assert conditions_key("auto", seed=1, routing_config_hash="h") == conditions_key("auto", seed=2, routing_config_hash="h")
+
+
+# --------------------------------------------------------------------------- #
+# R5: `modelsaar test` identifies the listener before sending a key, and requires attribution
+
+
+def _cli(args, env):
+    import os
+    import subprocess
+    import sys
+
+    e = {**os.environ, **env}
+    for k in list(e):
+        if k.upper().endswith("_PROXY"):
+            e.pop(k)
+    return subprocess.run([sys.executable, "-m", "modelsaar.cli", *args], env=e, capture_output=True, text=True, timeout=60)
+
+
+def test_r5_test_refuses_an_unrelated_listener_without_sending_the_key(tmp_path):
+    """An unrelated HTTP service answering 200 on /healthz is a port collision, not a gateway."""
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    seen = []
+
+    class Foreign(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def do_GET(self):
+            seen.append((self.path, self.headers.get("Authorization")))
+            body = b"Foreign service alive. This is not ModelSaar." if self.path == "/healthz" else b'{"data":[]}'
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain" if self.path == "/healthz" else "application/json")
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_POST(self):
+            seen.append((self.path, self.headers.get("Authorization")))
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(b'{"choices":[{"message":{"content":"from an unrelated service"}}]}')
+
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), Foreign)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        home = tmp_path / "home"
+        env = {"MODELSAAR_HOME": str(home)}
+        assert _cli(["init", "--endpoint", "http://127.0.0.1:1", "--type", "ollama", "--port", str(srv.server_port)], env).returncode == 0
+        r = _cli(["test"], env)
+        assert r.returncode != 0
+        assert "not a ModelSaar gateway" in r.stderr and "No key was sent" in r.stderr and "collision" in r.stderr
+        assert all(auth is None for _, auth in seen), seen  # the saved key never left the machine
+        assert [p for p, _ in seen] == ["/healthz"]
+    finally:
+        srv.shutdown()
+        srv.server_close()
+
+
+def test_r5_health_contract_identifies_a_real_gateway_and_test_reports_attribution(fake):
+    import pathlib
+
+    import yaml
+
+    from modelsaar.cli import gateway_identity
+
+    g = build_gateway(f"http://127.0.0.1:{fake.port}")
+    try:
+        kind, health = gateway_identity(g.url)
+        assert kind == "modelsaar" and health["service"] == "modelsaar"
+        assert gateway_identity(f"http://127.0.0.1:{fake.port}")[0] == "other"  # the fake backend is not a gateway
+        home = pathlib.Path(g.tmp)  # already holds keys/api_keys for this gateway
+        cfg = {"server": {"host": "127.0.0.1", "port": int(g.url.rsplit(":", 1)[1])},
+               "backends": [{"id": "ollama", "type": "ollama", "base_url": f"http://127.0.0.1:{fake.port}"}]}
+        (home / "config.yaml").write_text(yaml.safe_dump(cfg))
+        r = _cli(["test", "--model", "auto"], {"MODELSAAR_HOME": str(home)})
+        assert r.returncode == 0, r.stderr + r.stdout
+        assert "GET /healthz -> modelsaar" in r.stdout
+        assert "routed: 'auto' -> ollama/" in r.stdout and "request req_" in r.stdout
+    finally:
+        g.gw.stop()

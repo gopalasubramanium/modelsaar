@@ -11,12 +11,22 @@ third-party data) across conversation, coding, agent/tools, math, extraction (st
 summarization, translation, RAG-style, decision, vision, a tool round trip, mixed-language and
 deliberately ambiguous prompts, plus a long-but-easy transformation. Splits: `calib` (15) and `test`
 (32) use different templates. Scorers: `nonempty`, `contains`, `contains_any`, `json_schema` (+field
-checks), `tool_call` (strict: non-empty id, expected name, JSON-object arguments containing every
-required parameter and the expected substrings), `code_exec` (model code + harness + completion
-sentinel, exit 0 and exact normalised stdout). `code_exec` runs **only** under bubblewrap (Linux),
-`sandbox-exec` (macOS) or Docker (`--network none --read-only`) with CPU/memory/output/time limits;
-without one of those the task is skipped and the report says so — there is no host-execution
-fallback. Scorer rules are versioned (`SCORER_VERSION`) and recorded in the report's `conditions`.
+checks), `tool_call` (strict: non-empty id, expected name, JSON-object arguments that conform to the
+tool's declared parameter schema, contain every required parameter and the expected substrings),
+`code_exec` (a trusted runner executes the model code with its stdout captured, then the task
+harness with *its* stdout captured, and writes a result record keyed with a per-run nonce; the task
+passes only when that record says the harness completed and the harness output equals the
+expectation — text the model prints, including any "completion marker", is never evidence). `code_exec`
+runs **only** under bubblewrap (Linux; only the Python runtime and system libraries are visible),
+`sandbox-exec` (macOS; deny-by-default profile with runtime read roots) or Docker (`--network none
+--read-only`) with CPU/memory/output/time limits; without one of those the task is skipped and the
+report says so — there is no host-execution fallback. The sandbox is tested for writes, network,
+timeouts and reading a synthetic host file outside the work directory; it does not defend the
+evaluator against model code that targets the evaluator process itself. Scorer rules are versioned
+(`SCORER_VERSION`) and recorded in the report's `conditions`; checkpoint records (`--checkpoint`,
+`--resume`) are bound to the task content, the scorer version and request budgets, the routing
+configuration (for routed policies) and the deployment fingerprint, and anything that no longer
+matches is re-run and counted under `resume_rejected` instead of being attributed to the new run.
 No LLM judge is used. See `src/modelsaar/evaluation/fixtures/README.md` for the exact rules.
 
 ## Procedure

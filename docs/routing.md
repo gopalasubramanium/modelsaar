@@ -117,10 +117,15 @@ commentary is never injected into assistant content.
 
 `/v1/embeddings` routes an alias defined under `embeddings:` to the contract's deployments only.
 Members must be **one verified identity**: the Ollama digest, or `backends[].models[].identity` for
-generic endpoints. The alias's effective identity is `embeddings[].identity` when declared, else the
-identity recorded in the state DB on first successful use, else the first member's. A member with an
-unknown identity is never used as a replica (a model-name match is not an identity); a member whose
-identity differs is excluded with a re-indexing remedy — never a silent switch to a different space.
+generic endpoints. The alias's identity is established **before any request is dispatched**:
+`embeddings[].identity` when declared, else the identity recorded for the alias, else the verified
+identity of the first member *in contract order* whose identity is known — recorded synchronously
+at that moment, so two concurrent first requests see the same anchor and cannot bind two embedding
+spaces (nothing learned from a response ever becomes the anchor). A member with an unknown identity
+is never used as a replica (a model-name match is not an identity); a member whose identity differs
+is excluded with a re-indexing remedy, whatever its dimensions — never a silent switch to a different
+space. When members declare several identities the decision says which one was anchored and asks
+for an explicit `embeddings[].identity`.
 After you change the model deliberately, re-index and set `embeddings[].identity` to the new value.
 Request-level `dimensions` that differ from the alias and `encoding_format` other than `float` are
 rejected (`400 unsupported_contract_option`). Every response is validated (vector count, indices,
@@ -133,13 +138,22 @@ deployment id can also be requested directly.
 
 A `resource_pools[].memory_gb` is a hard admission constraint: resident weights (deployments the
 runtime reports loaded), every distinct deployment currently reserved (incl. an uncertain hold after
-a timeout/disconnect and the classifier) and the candidate, plus `memory_margin_gb`, must fit. The
+a timeout/disconnect and the classifier), every deployment **assumed resident** since its last
+completed dispatch, and the candidate, plus `memory_margin_gb`, must fit. A request slot and weight
+residency are different events: when a response ends the slot is released but the weights stay
+loaded, so the pool keeps counting them until the runtime's residency observation (Ollama `/api/ps`
+on the periodic refresh or `/admin/refresh`) reconciles the registry. Runtimes that cannot report
+residency keep the assumption indefinitely unless `assumed_residency_ttl_s` is set — the gateway
+cannot see when such a runtime evicts a model, so the conservative choice is the default. The
 estimates are weights-only (`memory_gb_estimate` with its provenance: Ollama size × 1.15, operator
 declaration or override); KV cache, workspace and runtime overhead are covered only by the margin, so
-this is a budget, not an OOM guarantee. Unified memory is counted once per pool; a deployment is
-counted once however many requests it serves. Deployments with an unknown estimate follow
-`unknown_memory_policy` (`allow`, counted as 0 and labelled in the decision, or `reject`). The check
-runs atomically with the pool slot; `/admin/status` shows `memory_reserved_gb` and the holders.
+this is a budget, not an OOM guarantee, and nothing here measures physical memory. Unified memory is
+counted once per pool; a deployment is counted once however many requests it serves. Unknown
+estimates follow `unknown_memory_policy`: `allow` counts them as 0 and labels the decision; `reject`
+refuses admission whenever *any* counted member — the candidate, a resident or a reservation — has an
+unknown estimate, because one unknown model makes the budget unverifiable. The check runs atomically
+with the pool slot; `/admin/status` shows `memory_reserved_gb`, the holders and
+`memory_assumed_resident`.
 
 ## Continuity and failover
 
@@ -147,7 +161,14 @@ Pre-commit failover (one attempt, same candidate list) is refused when the reque
 deployment that started the exchange: a tool-result turn whose tool-call ids were issued by that
 deployment, a conversation carrying `reasoning_content`, or a session pinned by affinity. The
 decision records `failover_allowed` and `failover_note`; the client gets the backend's error and
-decides. A timeout converts the reservation into an uncertain hold (`admission.uncertain_hold_s`)
-because the backend may still be generating. Circuit-breaker success and session pinning are
-recorded only after a validated completion (a parsed `choices[0].message`, or a stream that ended
-with a finish reason/`[DONE]`); an HTTP 200 that is not a completion is `502 upstream_bad_response`.
+decides. A timeout — before the first byte, **while streaming**, on an embedding request or inside a
+capability probe — converts the reservation into an uncertain hold (`admission.uncertain_hold_s`)
+because the backend may still be generating; a probe run stops at the first uncertain timeout and
+reports the probes it skipped. Every upstream call has a deadline: the tighter of
+`server.request_timeout_s` and the backend's `timeout_s` (never "no timeout"). Circuit-breaker
+success and session pinning are recorded only after a validated completion: a parsed
+`choices[0].message`, or a stream that contained at least one completion chunk, no malformed data
+frame, and a finish reason or `[DONE]`. SSE comments and keepalives are ignored, usage-only frames
+are accepted; a data frame that is not a completion structure is not relayed, invalidates the
+stream (`stream_invalid_after_commit`, circuit failure, no pin) and is reported in the `error`
+frame. An HTTP 200 that is not a completion is `502 upstream_bad_response`.

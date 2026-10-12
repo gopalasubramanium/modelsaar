@@ -562,7 +562,10 @@ async def list_models(request: Request) -> Response:
 
 
 async def healthz(request: Request) -> Response:
-    return _json(200, {"status": "ok", "version": __version__})
+    # Unauthenticated identification contract used by `modelsaar test` and the installer to tell a
+    # ModelSaar gateway from another service on the same port before any key is sent. It is a
+    # collision check, not authentication: anything can imitate it.
+    return _json(200, {"status": "ok", "service": "modelsaar", "version": __version__, "api": "openai-compatible"})
 
 
 async def readyz(request: Request) -> Response:

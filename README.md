@@ -60,7 +60,7 @@ modelsaar probe --all       # live checks: streaming, tools, JSON schema, vision
 modelsaar serve             # http://127.0.0.1:8484/v1 ; keys in ~/.modelsaar/keys/
 
 # 5. first request (in another shell)
-modelsaar test              # GET /v1/models + one chat completion through `auto`
+modelsaar test              # identifies the gateway (GET /healthz), GET /v1/models, one routed completion through `auto`
 ```
 
 Example request:
@@ -73,8 +73,12 @@ curl -s http://127.0.0.1:8484/v1/chat/completions \
   -D - | grep -i x-modelsaar      # X-ModelSaar-Deployment tells you what was selected
 ```
 
-Then connect a client: `modelsaar client-config open-webui | openclaw | opencode | opencode-v2 | hermes`
-prints verified configuration; `--apply` merges file-based configs with a backup. See
+Then connect a client. One command per client (pick yours; these are separate commands, not a
+pipeline): `modelsaar client-config open-webui`, `modelsaar client-config openclaw`,
+`modelsaar client-config opencode` (or `opencode-v2`), `modelsaar client-config hermes`. Each prints
+verified configuration; `--apply` merges file-based configs with a backup. For a GUI field that asks
+for an API key, print the key in a terminal with `head -1 ~/.modelsaar/keys/api_keys` and paste the
+value it prints (a line starting with `msk_`) — the `$(...)` form above is shell syntax, not a key. See
 [docs/clients/](docs/clients/).
 
 No models yet? `modelsaar demo` starts a clearly labelled **simulated** backend so you can try the
