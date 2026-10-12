@@ -1,5 +1,7 @@
 # ModelSaar
 
+**Status: public alpha** — pinned candidate commits, no tagged release, no PyPI package or container image; see `docs/verification-report.md` for what has and has not been executed and `docs/roadmap.md` for scope.
+
 [![ci](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml/badge.svg)](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml)
 
 **Intelligent routing for local AI models.** One endpoint. Intelligent model selection.

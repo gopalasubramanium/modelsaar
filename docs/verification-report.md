@@ -266,6 +266,30 @@ will fail. Owner step: in the Model_Router checkout at this revision run
 `docs/live-runs/<date>-mac-tests/mac-tests-<commit>.txt`; the bubblewrap profile with the same
 allowlist idea was executed here (196 passed).
 
+## Alpha closure pass 2026-10-12 (third independent review of `5cb7443`: R1-C, R2-A, R2-B, R4-C, R6-A, R6-B, R7-C, R8-D)
+
+The review reproduced the existing suite (190 passed, 6 skipped, ruff clean, the 17 earlier reviewer tests
+passing) and obtained 6 further behavioural failures with 6 controls, plus two launcher residuals and one
+editorial list. This pass reproduced the 12 cases at `5cb7443` (6 failed / 6 passed), corrected them, and
+kept the reviewer's three files verbatim under `tests/independent_review_2026_10_12/`.
+
+| id | correction | status |
+|---|---|---|
+| R2-A | `loaded_models()` returns `None` when `/api/ps` fails; the router keeps previous `loaded` flags and the admission layer keeps assumed residency until a successful observation (`last_residency_observation_ok`) | **fixed** |
+| R2-B | `Reservation.release(submitted=False)` for a `connect` failure (nothing reached the runtime): no assumed residency, failover proceeds | **fixed** |
+| R4-C | the upstream `[DONE]` is held; the gateway emits exactly one terminal marker after validation, so an error frame precedes it | **fixed** |
+| R1-C | `probe_all` acquires the gateway reservation per deployment, holds it after an uncertain timeout and reports the remaining deployments `deferred` | **fixed** (evaluator `--probe`) |
+| R7-C | routed-policy checkpoints include `eligible_set_key` (sorted ids + fingerprints; ids only in simulated mode); fixed sweeps unchanged | **fixed** |
+| macOS code execution | `sandbox-exec` backend **disabled in the alpha** unless `MODELSAAR_MACOS_SANDBOX=verify` (owner verification run); `code_exec` tasks are skipped on macOS with that reason | **disabled pending verification** |
+| R6-A / R6-B | launcher: all push URLs enumerated (`--get-all`, `--push --all`), multiple destinations refused; `verify-serving` requires HTTPS 200 + matching BUILD-INFO + served `install.sh` byte-identical to the gh-pages commit; Mac runner refuses dirty checkouts, requires `sandbox-exec`, fails on skips, writes PASSED/FAILED | **fixed** (launcher is outside the repository; mocked outcomes in the archive) |
+| R8-D | website copy: installer evidence by pin, candidate status, launch measures, OpenCode commands, roadmap summary | **fixed** (website branch) |
+
+Executed after the pass: the exact-head transcripts are in `docs/live-runs/2026-10-12-alpha/` on the website
+branch (suite without/with bubblewrap, lint, both reviewer test sets, simulated eval, real `pip install` from
+the pinned commit plus one routed request against the fixture backend). Not run: macOS `sandbox-exec`
+(disabled for the alpha; owner `run_mac_tests.command`), real GX10 inference under the corrected code, real
+client UI, live publication/DNS/TLS.
+
 ## NOT RUN (needs hardware, a daemon, or a real client) — status at 0.1.0 / 1122e1f
 
 | item | why not here | how to run |
