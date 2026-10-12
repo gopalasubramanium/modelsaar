@@ -82,6 +82,9 @@ Deployments discovered (all Q4_K_M GGUF, declared locality `local` = owner's pri
 
 ### Live evaluation (3-deployment subset; 15 calib / 32 test tasks; temperature 0; max_tokens 400)
 
+**Historical** — source `1122e1f`, evaluator before scorer versioning; superseded by the hardening-pass
+run below (scorer `2026.10.11-2`), which the website quotes. Kept as recorded.
+
 | policy | success | 95 % CI | completion | violations | p50 ms | p95 ms |
 |---|---|---|---|---|---|---|
 | auto (live routing) | 0.875 | [0.72, 0.95] | **1.000** | **0** | 693 | 27 136 |
@@ -120,10 +123,10 @@ section was produced by the repaired code.
 | check | command | outcome |
 |---|---|---|
 | Lint | `ruff check src tests` | pass |
-| Full test suite (cloud container) | `python -m pytest` — CPython 3.13.16, Linux x86_64, no isolation backend; revision `0172760`…`91f9e6c` (same test files) | **156 passed, 4 skipped** in 70 s. The 4 skips are `tests/test_evaluation.py::test_sandbox_blocks_writes_outside_work`, `::test_sandbox_blocks_network`, `::test_sandbox_reference_solution_passes`, `::test_sandbox_timeout_fails_cleanly` — skip reason "no isolation backend (bwrap not installed; docker present but daemon not reachable)". |
-| Full test suite (owner's Mac) | `python -m pytest -rs -v --durations=5` — macOS Darwin 27.0.0 arm64, CPython 3.12.15, isolation backend **`sandbox-exec`** (`/usr/bin/sandbox-exec`; bwrap and docker absent); revision `01727604726077fe70e7acef398427149e45c4c1`; run 2026-10-11 19:55 IST via `run_mac_tests.command` | **160 passed, 0 skipped** in 48 s, exit 0 — the four isolation tests executed under `sandbox-exec` (`test_sandbox_timeout_fails_cleanly` 2.01 s). Log: `docs/live-runs/mac-tests-0172760.txt`. |
+| Full test suite (cloud container) — superseded by the 2026-10-12 pass below | `python -m pytest` — CPython 3.13.16, Linux x86_64, no isolation backend; revision `0172760`…`91f9e6c` (same test files) | **156 passed, 4 skipped** in 70 s. The 4 skips are `tests/test_evaluation.py::test_sandbox_blocks_writes_outside_work`, `::test_sandbox_blocks_network`, `::test_sandbox_reference_solution_passes`, `::test_sandbox_timeout_fails_cleanly` — skip reason "no isolation backend (bwrap not installed; docker present but daemon not reachable)". |
+| Full test suite (owner's Mac) — superseded by the run at `80276bb` (161 passed) and by the 2026-10-12 pass below | `python -m pytest -rs -v --durations=5` — macOS Darwin 27.0.0 arm64, CPython 3.12.15, isolation backend **`sandbox-exec`** (`/usr/bin/sandbox-exec`; bwrap and docker absent); revision `01727604726077fe70e7acef398427149e45c4c1`; run 2026-10-11 19:55 IST via `run_mac_tests.command` | **160 passed, 0 skipped** in 48 s, exit 0 — the four isolation tests executed under `sandbox-exec` (`test_sandbox_timeout_fails_cleanly` 2.01 s). Log: `docs/live-runs/mac-tests-0172760.txt`. |
 | Regression tests for the review findings | `python -m pytest tests/test_hardening_2026_10_11.py` | 27 passed; each one reproduced its defect against `1122e1f` before the fix (finding → fix → test table in docs/progress.md) |
-| Evaluator tests | `python -m pytest tests/test_evaluation.py tests/test_classifier_schema.py` | 65 passed, 4 skipped (sandbox) of 69 |
+| Evaluator tests — superseded by the 2026-10-12 pass below | `python -m pytest tests/test_evaluation.py tests/test_classifier_schema.py` | 65 passed, 4 skipped (sandbox) of 69 at that revision |
 | Clean wheel install, loopback default, private keys, one routed request, scheme-1 state DB migration | `scripts/install-check.sh` | **PASS** (`modelsaar 0.1.0` wheel into a fresh venv; `server.host: 127.0.0.1`; `keys/api_keys` mode 600; chat via `auto` ok; `doctor` reports the 1 probe + 1 measurement written under evidence scheme 1; `meta.evidence_scheme = 2`; old rows kept) |
 | Fresh-volume container start (Compose-equivalent: empty volume, read-only config mount, non-root, keys created once, unchanged after restart) | `scripts/compose-smoke.sh` | **NOT RUN here** (no Docker daemon in the build container); the script is a CI step (`container` job) and runs on the next push |
 | Live verification script, dry run against the fake backend (SIMULATED models) | `scripts/live_verify.sh http://127.0.0.1:23111 small:1b big:27b`, then the same command again | all steps exit 0; second run skipped every finished step and resumed the evaluation from its checkpoint (`resumed_records: 126`); no key material in any output file |
@@ -202,6 +205,57 @@ latency, scorer detail; no prompts); machine-readable aggregates: `eval-live.jso
 | Evaluation with a thinking-matched budget / all 8 deployments | `run_live_verify.command` with `DEPS` widened; raise `MAX_TOKENS` in `evaluation/harness.py` for a separately labelled run |
 | Embeddings contract against a real embedding model (identity binding, output validation) | `ollama pull qwen3-embedding:0.6b`, declare `embeddings:`, `curl /v1/embeddings` |
 | Generic OpenAI-compatible backend (vLLM / llama.cpp) incl. `/tokenize` and `identity` declarations | `modelsaar init --endpoint http://127.0.0.1:8000/v1 --type openai_compatible`, declare models, `scripts/live_verify.sh` |
+
+## Correction pass 2026-10-12 (second independent review, R1–R8, of hardening `80276bb`)
+
+The review pack (`ModelSaar_Independent_Review_2026-10-11`) reproduced the existing suite (157 passed,
+4 skipped, ruff clean) and then obtained **11 failing desired-contract checks** (7 gateway/resource/
+embedding + 4 evaluator) with 6 passing positive controls, plus 6 launcher/installer observations.
+This pass reproduced every one of them before changing anything, corrected them, and kept the
+reviewer's test files byte-for-byte in `tests/independent_review_2026_10_11/`.
+
+### Reproduced before correction (isolated worktree at exactly `80276bb`, fresh venv, CPython 3.13.16)
+
+| what | command | result |
+|---|---|---|
+| reviewer's contract tests | `pytest evidence/hardening/test_remaining_contracts.py evidence/test_evaluator_remaining_contracts.py` with `PYTHONPATH=<80276bb>/src:<80276bb>/tests` | **11 failed, 6 passed** — the same 11 ids as the review |
+| launcher reproducer (`reproduce_launcher.py`, path constants adapted; stub `gh`, local bare origin) | positive resume PASS; skip-domain, build-query-failure, origin-prefix: **DEFECT REPRODUCED** | matches `launcher_results.json` |
+| installer reproducer (`reproduce_installer.py`) | foreign `/healthz` accepted, saved fixture key sent, `verification: OK`; `init && serve` exit 1 | **DEFECT REPRODUCED** ×2 |
+| publication-tree reproducer | untracked file entered gh-pages with BUILD-INFO claiming the clean commit | **DEFECT REPRODUCED**; rollback control PASS |
+| address guard at website `840b068` | 192.168.50.9 and 172.16.50.9 accepted; CGNAT and 10/8 rejected | reproduced |
+
+Transcripts: `docs/live-runs/2026-10-12-correction/before/` (website branch).
+
+### Corrections (source)
+
+| id | change | files |
+|---|---|---|
+| R1 | typed stream read timeout → uncertain hold (same rule as non-stream); probe runner stops after an uncertain timeout, reports `skipped`, and the admin/CLI paths hold the reservation | `adapters/base.py`, `server.py` (`_relay`, `admin_probe`), `probes.py`, `cli.py` |
+| R2 | pools count a completed deployment's weights as *assumed resident* until a residency observation reconciles them (Ollama `/api/ps`; `assumed_residency_ttl_s` for runtimes without one); `unknown_memory_policy=reject` applies to every counted member; status shows `memory_assumed_resident` | `routing/admission.py`, `routing/router.py`, `config.py` |
+| R3 | alias identity established before dispatch (declared > recorded > first member in contract order with a verified identity), recorded synchronously; differing known identity excluded regardless of dimensions | `routing/router.py` |
+| R4 | embeddings carry the server deadline; an explicit `None` never disables the httpx timeout (tighter of server/backend deadlines everywhere); SSE frames classified comment/done/chunk/malformed; completion requires ≥1 chunk, no malformed frame, finish or `[DONE]`; malformed frames not relayed, invalidate the stream | `adapters/base.py`, `adapters/*.py`, `protocol/sse.py`, `server.py` |
+| R5 | `/healthz` carries `service: modelsaar`; `modelsaar test` identifies the listener before sending a key and requires routing attribution; installer (website branch) does the same and prints `serve`, the key value vs the key command, one `client-config` command per app | `server.py`, `cli.py`, `site/static/install.sh`, site content |
+| R7 | `code_exec` scored from a nonce-keyed runner record (harness output captured separately from model output); tool arguments validated against the declared schema; checkpoint records bound to task content, scorer version, budgets, routing config hash and deployment fingerprint (format 2; legacy records re-run); bwrap input allowlist and deny-by-default macOS profile; `SCORER_VERSION 2026.10.12-3` | `evaluation/scoring.py`, `evaluation/sandbox.py`, `evaluation/harness.py` |
+
+### Executed after correction (this tree; the final hardening head differs from the executed tree only by this documentation commit — the exact-head rerun is recorded in `docs/live-runs/2026-10-12-correction/`)
+
+| check | command | outcome |
+|---|---|---|
+| reviewer's 17 contract checks | `pytest tests/independent_review_2026_10_11/` | **17 passed** (11 formerly failing + 6 controls) |
+| author regression tests for R1–R5, R7 | `pytest tests/test_correction_2026_10_12.py` | 14 passed (recovery after hold, reconciliation by observation, same-identity replicas, keepalive/usage frames, malformed-amid-valid, legacy/changed/removed checkpoint cases, listener identification) |
+| full suite, no isolation backend | `python -m pytest -m "not live"` — CPython 3.13.16, Linux x86_64 | **190 passed, 6 skipped** (the 6 sandbox tests; skip reason printed) |
+| full suite, bubblewrap on PATH | same, with `bwrap` 0.9 available | **196 passed, 0 skipped** — the sandbox tests executed: writes, network, timeout, reference solutions, **synthetic host file outside the work directory unreadable**, forged completion marker rejected |
+| lint | `ruff check src tests` | pass (the verbatim reviewer files are excluded from ruff, not from pytest) |
+| simulated evaluation smoke | `modelsaar eval --mode simulated --limit 12` | runs end to end under the new scorer |
+| installer scenarios (real installer + real CLI, loopback fixtures) | `scripts/installer_scenarios.py` (website branch) | 10/10: fresh, repeat, unrelated listener (no key sent), running gateway reused, `serve`, `test` with attribution, `client-config open-webui`, key value — `docs/live-runs/2026-10-12-installer-scenarios/` |
+
+### Not run in this pass
+
+Real GX10 inference under the corrected code (the benchmark result above is unchanged and still
+labelled scorer `2026.10.11-2`; a rerun under `2026.10.12-3` would be a new, separately labelled run);
+real-model embeddings; vLLM/llama.cpp; a real client UI (exact owner-run steps in `site/VALIDATION.md`);
+macOS `sandbox-exec` run of the new read-isolation test (recorded separately if the Mac run completes);
+Docker; live GitHub publication, DNS, TLS.
 
 ## NOT RUN (needs hardware, a daemon, or a real client) — status at 0.1.0 / 1122e1f
 

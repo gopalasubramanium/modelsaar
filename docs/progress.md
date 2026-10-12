@@ -17,9 +17,9 @@ Compact state so another session can continue without repeating finished work.
 
 The reviewer's 18 grouped findings (F01–F18) are reconciled with the eight workstreams below in
 [docs/review-2026-10-11-findings.md](review-2026-10-11-findings.md) (disposition, implementation, regression
-test, execution evidence; `scripts/reproduce_review_baseline.sh` shows 25/27 regression tests failing at `1122e1f`).
+test, execution evidence; `scripts/reproduce_review_baseline.sh` shows 26/28 regression tests failing at `1122e1f`: 22 on the behavioural assertion, 4 on a field or symbol the fix introduced; 2 positive controls pass — `docs/live-runs/2026-10-11-baseline/`).
 
-Every regression test failed against 1122e1f for the observed defect and passes on the branch
+Each regression test fails against 1122e1f (22 for the observed defect, 4 on a field/symbol the fix introduced) except the two positive controls, and all 28 pass on the branch
 (`tests/test_hardening_2026_10_11.py` unless noted; run `python -m pytest tests/test_hardening_2026_10_11.py -q`).
 
 | # | finding (confirmed at 1122e1f) | fix (files) | regression test |
@@ -84,6 +84,7 @@ scripts/live_verify.sh http://127.0.0.1:23111 small:1b big:27b   # dry run again
 | 2026-10-11 | Tokenizer counts only after policy filtering, only for policy-allowed deployments, one deadline, labelled as partly estimated | hardening finding 1; privacy before payload operations |
 | 2026-10-11 | No failover inside a tool round trip, with reasoning continuation, or on a pinned session | hardening finding 2a; continuity beats availability, the client decides |
 | 2026-10-11 | Timeouts hold capacity as uncertain; success = validated completion only | hardening finding 2b/2c |
+| 2026-10-12 | Uncertainty carried through streams, probes and embeddings; assumed residency counted until observed; embedding identity anchored before dispatch; SSE completion requires valid chunks; evaluator completion evidence from a nonce-keyed record; checkpoint identity; sandbox input allowlists; listener identification before any key is sent | second independent review R1–R8 (`tests/independent_review_2026_10_11/`) |
 | 2026-10-11 | Pool `memory_gb` is a hard admission constraint on weights-only estimates + margin; unknown estimates follow an explicit policy; no OOM-prevention claim | hardening finding 3a |
 | 2026-10-11 | Online probes go through `POST /admin/probe`; direct probing/eval next to a listening gateway needs `--allow-concurrent` | hardening finding 3b |
 | 2026-10-11 | Embedding alias = one verified identity; name match is not identity; changed identity needs an explicit re-index decision | hardening finding 4 |
