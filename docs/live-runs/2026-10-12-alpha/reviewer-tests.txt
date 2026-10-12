@@ -1,0 +1,35 @@
+revision d6e09e770da6e8bd560da7132cb263eb02ec7151
+plugins: platformdirs-4.13.0, anyio-4.15.1
+collecting ... collected 29 items
+
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_flushed_marker_then_exit_does_not_count_as_executed_harness PASSED [  3%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_correct_function_still_passes PASSED [  6%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_tool_argument_wrong_schema_type_does_not_pass PASSED [ 10%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_tool_argument_correct_type_still_passes PASSED [ 13%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_changed_task_cannot_reuse_old_score PASSED [ 17%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_removed_deployment_cannot_resume PASSED [ 20%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_changed_fingerprint_is_rejected_positive_control PASSED [ 24%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_stream_read_timeout_holds_capacity_until_recovery[streaming-regression] PASSED [ 27%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_stream_read_timeout_holds_capacity_until_recovery[nonstream-positive-control] PASSED [ 31%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_probe_timeout_stops_later_probe_inference PASSED [ 34%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_embedding_backend_timeout_is_enforced PASSED [ 37%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_unknown_first_embedding_member_cannot_allow_distinct_spaces[unanchored-regression] PASSED [ 41%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_unknown_first_embedding_member_cannot_allow_distinct_spaces[declared-anchor-positive-control] PASSED [ 44%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_completed_dispatch_keeps_loaded_weights_in_memory_budget[between-polls-regression] PASSED [ 48%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_completed_dispatch_keeps_loaded_weights_in_memory_budget[refresh-positive-control] PASSED [ 51%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_reject_unknown_memory_applies_to_existing_residents PASSED [ 55%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_invalid_sse_is_not_validated_success_or_session_pin PASSED [ 58%]
+tests/independent_review_2026_10_12/test_checkpoint_closure.py::test_resume_tracks_eligible_alternatives[added-candidate-regression] PASSED [ 62%]
+tests/independent_review_2026_10_12/test_checkpoint_closure.py::test_resume_tracks_eligible_alternatives[alternative-identity-regression] PASSED [ 65%]
+tests/independent_review_2026_10_12/test_checkpoint_closure.py::test_resume_tracks_eligible_alternatives[unchanged-resume-control] PASSED [ 68%]
+tests/independent_review_2026_10_12/test_checkpoint_closure.py::test_resume_tracks_eligible_alternatives[fixed-sweep-control] PASSED [ 72%]
+tests/independent_review_2026_10_12/test_closure_edges.py::test_r2_failed_residency_query_cannot_erase_loaded_weights[failed-observation-regression] PASSED [ 75%]
+tests/independent_review_2026_10_12/test_closure_edges.py::test_r2_failed_residency_query_cannot_erase_loaded_weights[successful-observation-control] PASSED [ 79%]
+tests/independent_review_2026_10_12/test_closure_edges.py::test_r2_refused_connection_does_not_create_phantom_residency[connect-failure-regression] PASSED [ 82%]
+tests/independent_review_2026_10_12/test_closure_edges.py::test_r2_refused_connection_does_not_create_phantom_residency[successful-dispatch-control] PASSED [ 86%]
+tests/independent_review_2026_10_12/test_closure_edges.py::test_r4_stream_error_reaches_client_before_terminal_done[terminal-order-regression] PASSED [ 89%]
+tests/independent_review_2026_10_12/test_closure_edges.py::test_r4_stream_error_reaches_client_before_terminal_done[valid-stream-control] PASSED [ 93%]
+tests/independent_review_2026_10_12/test_probe_caller_closure.py::test_r1_evaluation_probes_respect_shared_pool_after_timeout[uncertain-cross-deployment-regression] PASSED [ 96%]
+tests/independent_review_2026_10_12/test_probe_caller_closure.py::test_r1_evaluation_probes_respect_shared_pool_after_timeout[completed-probes-control] PASSED [100%]
+
+============================= 29 passed in 13.15s ==============================

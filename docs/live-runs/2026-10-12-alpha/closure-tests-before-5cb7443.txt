@@ -1,0 +1,268 @@
+F.F.F.F.FF..                                                             [100%]
+=================================== FAILURES ===================================
+_ test_r2_failed_residency_query_cannot_erase_loaded_weights[failed-observation-regression] _
+
+fail_ps = True
+
+    @pytest.mark.parametrize("fail_ps", [True, False], ids=["failed-observation-regression", "successful-observation-control"])
+    def test_r2_failed_residency_query_cannot_erase_loaded_weights(fail_ps):
+        models = make_models()
+        for m in models:
+            m.loaded = False
+        fake = ResidencyBackend(models)
+        fake.start()
+        g = build_gateway(
+            f"http://127.0.0.1:{fake.port}",
+            resource_pools=(ResourcePool(id="pool", max_concurrent=1, memory_gb=5.0),),
+            deployments=(DeploymentOverride(backend="ollama", model="small:1b", memory_gb_estimate=3.0),
+                         DeploymentOverride(backend="ollama", model="plain:3b", memory_gb_estimate=3.0)),
+        )
+        try:
+            first = chat(g, "ollama/small:1b", "hello")
+            assert first.status_code == 200
+            before = g.admin.get("/admin/status").json()["admission"]["pool:pool"]
+            assert before["memory_assumed_resident"] == ["ollama/small:1b"]
+            fake.fail_ps = fail_ps
+            refresh = g.admin.post("/admin/refresh")
+            candidate = g.router.registry.get("ollama/plain:3b")
+            view = g.router.admission.memory_view(candidate)
+            second = chat(g, "ollama/plain:3b", "hello")
+            observe("r2_failed_residency", fail_ps=fail_ps, refresh_status=refresh.status_code,
+                    refresh_body=refresh.json(), first_status=first.status_code, second_status=second.status_code,
+                    memory_before_second=view,
+                    router_first_loaded=g.router.registry.get("ollama/small:1b").loaded,
+                    backend_residents=[m.name for m in fake.models.values() if m.loaded],
+                    backend_dispatches=len(fake.requests), budget_gb=5, per_model_gb=3)
+>           assert second.status_code != 200, "failed /api/ps was treated as a verified empty resident set and over-budget dispatch proceeded"
+E           AssertionError: failed /api/ps was treated as a verified empty resident set and over-budget dispatch proceeded
+E           assert 200 != 200
+E            +  where 200 = <Response [200 OK]>.status_code
+
+../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_closure_edges.py:66: AssertionError
+----------------------------- Captured stdout call -----------------------------
+OBSERVATION {"backend_dispatches": 2, "backend_residents": ["small:1b", "plain:3b"], "budget_gb": 5, "case": "r2_failed_residency", "fail_ps": true, "first_status": 200, "memory_before_second": {"assumed_resident": [], "counted": ["ollama/plain:3b"], "estimated_gb": 3.0, "fits": true, "margin_gb": 0.0, "memory_gb": 5.0, "policy_unknown": "allow", "pool": "pool", "unknown": []}, "per_model_gb": 3, "refresh_body": {"error": "", "registry_version": 2}, "refresh_status": 200, "router_first_loaded": false, "second_status": 200}
+_ test_r2_refused_connection_does_not_create_phantom_residency[connect-failure-regression] _
+
+first_backend_online = False
+
+    @pytest.mark.parametrize("first_backend_online", [False, True], ids=["connect-failure-regression", "successful-dispatch-control"])
+    def test_r2_refused_connection_does_not_create_phantom_residency(first_backend_online):
+        a = FakeBackend(make_models())
+        b = FakeBackend(make_models())
+        a.start()
+        b.start()
+        g = build_gateway(
+            f"http://127.0.0.1:{a.port}",
+            resource_pools=(ResourcePool(id="pool", max_concurrent=2, memory_gb=5.0),),
+            backends=(
+                BackendConfig(id="a", type="openai_compatible", base_url=f"http://127.0.0.1:{a.port}", discover=False,
+                              resource_pool="pool", models=(DeclaredModel(name="small:1b", context_length=8192, memory_gb_estimate=3.0),)),
+                BackendConfig(id="b", type="openai_compatible", base_url=f"http://127.0.0.1:{b.port}", discover=False,
+                              resource_pool="pool", models=(DeclaredModel(name="small:1b", context_length=8192, memory_gb_estimate=3.0),)),
+            ),
+            deployments=(),
+        )
+        try:
+            if not first_backend_online:
+                a.stop()
+            response = chat(g, "auto", "hello")
+            admission = g.admin.get("/admin/status").json()["admission"]["pool:pool"]
+            dec = g.decision(response.headers["x-modelsaar-request-id"])
+            observe("r2_connect_failure", first_backend_online=first_backend_online, response_status=response.status_code,
+                    first_backend_dispatches=len(a.requests), second_backend_dispatches=len(b.requests),
+                    admission=admission, decision_outcome=dec["outcome"], failover=dec["failover"], chosen=dec["chosen"])
+>           assert response.status_code == 200, "a refused connection created phantom model weights and blocked otherwise feasible failover"
+E           AssertionError: a refused connection created phantom model weights and blocked otherwise feasible failover
+E           assert 503 == 200
+E            +  where 503 = <Response [503 Service Unavailable]>.status_code
+
+../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_closure_edges.py:99: AssertionError
+----------------------------- Captured stdout call -----------------------------
+OBSERVATION {"admission": {"active": 0, "limit": 2, "memory_assumed_resident": ["a/small:1b"], "memory_gb": 5.0, "memory_holders": [], "memory_margin_gb": 0.0, "memory_reserved_gb": 0, "uncertain": 0, "unknown_memory_policy": "allow", "waiting": 0}, "case": "r2_connect_failure", "chosen": "b/small:1b", "decision_outcome": "admission_rejected", "failover": [{"deployment": "a/small:1b", "error": "a: connection failed: All connection attempts failed", "retryable": true}], "first_backend_dispatches": 0, "first_backend_online": false, "response_status": 503, "second_backend_dispatches": 0}
+_ test_r4_stream_error_reaches_client_before_terminal_done[terminal-order-regression] _
+
+malformed = True
+
+    @pytest.mark.parametrize("malformed", [True, False], ids=["terminal-order-regression", "valid-stream-control"])
+    def test_r4_stream_error_reaches_client_before_terminal_done(malformed):
+        fake = StreamBackend(make_models())
+        fake.malformed = malformed
+        fake.start()
+        g = build_gateway(f"http://127.0.0.1:{fake.port}")
+        try:
+            response = chat(g, "ollama/small:1b", "hello", stream=True)
+            frames = [s.strip() for s in response.text.split("\n\n") if s.strip()]
+            first_done = frames.index("data: [DONE]")
+            client_visible = frames[:first_done + 1]
+            dec = g.decision(response.headers["x-modelsaar-request-id"])
+            observe("r4_terminal_order", malformed=malformed, response_status=response.status_code,
+                    all_frames=frames, client_visible_until_done=client_visible,
+                    decision_outcome=dec["outcome"])
+            has_visible_error = any("upstream_stream_error" in frame for frame in client_visible)
+>           assert has_visible_error is malformed, "malformed-stream error was emitted after [DONE], where a correctly terminating client never reads it"
+E           AssertionError: malformed-stream error was emitted after [DONE], where a correctly terminating client never reads it
+E           assert False is True
+
+../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_closure_edges.py:143: AssertionError
+----------------------------- Captured stdout call -----------------------------
+OBSERVATION {"all_frames": ["data: {\"id\":\"c\",\"object\":\"chat.completion.chunk\",\"model\":\"ollama/small:1b\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"partial\"},\"finish_reason\":null}]}", "data: [DONE]", "data: {\"error\":{\"message\":\"upstream stream failed after the response was committed; the gateway does not switch models mid-response (upstream emitted 1 malformed SSE data frame(s) (first: 'not-json'))\",\"type\":\"upstream_stream_error\",\"param\":null,\"code\":\"upstream_stream_error\",\"modelsaar\":{\"request_id\":\"req_1f705890e6fa4983\",\"deployment\":\"ollama/small:1b\",\"events_delivered\":3,\"outcome\":\"stream_invalid_after_commit\"}}}", "data: [DONE]"], "case": "r4_terminal_order", "client_visible_until_done": ["data: {\"id\":\"c\",\"object\":\"chat.completion.chunk\",\"model\":\"ollama/small:1b\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"partial\"},\"finish_reason\":null}]}", "data: [DONE]"], "decision_outcome": "stream_invalid_after_commit", "malformed": true, "response_status": 200}
+_ test_r1_evaluation_probes_respect_shared_pool_after_timeout[uncertain-cross-deployment-regression] _
+
+times_out = True
+
+    @pytest.mark.parametrize("times_out", [True, False], ids=["uncertain-cross-deployment-regression", "completed-probes-control"])
+    def test_r1_evaluation_probes_respect_shared_pool_after_timeout(times_out):
+        # The actual backend timeout is the meaningful short deadline. probe_all's120s
+        # argument is bounded by the corrected adapter's min(server, backend) rule.
+        fake = ContinuingBackend(make_models()[:2], duration=0.5 if times_out else 0.005)
+        fake.start()
+        g = build_gateway(
+            f"http://127.0.0.1:{fake.port}",
+            backends=(BackendConfig(id="ollama", type="ollama", base_url=f"http://127.0.0.1:{fake.port}",
+                                    resource_pool="pool", timeout_s=0.08),),
+            resource_pools=(ResourcePool(id="pool", max_concurrent=1, max_queue=0),),
+            admission=AdmissionConfig(uncertain_hold_s=1.0, max_queue=0),
+        )
+        try:
+            eligible = [d for d in g.router.registry.all()
+                        if d.role == "generative" and d.healthy and d.locality == "local"]
+            assert len(eligible) == 2, "fixture must offer two eligible deployments before probing"
+            results = probe_all(g.gw)
+            admission = g.admin.get("/admin/status").json()["admission"]["pool:pool"]
+            observation = {
+                "case": "r1_eval_probe_all", "times_out": times_out,
+                "eligible_before_probe": [d.id for d in eligible],
+                "configured_pool_concurrency": 1, "configured_backend_timeout_s": 0.08,
+                "backend_max_active": fake.max_active, "backend_active_after_probes": fake.active,
+                "backend_requests": fake.requests, "admission": admission,
+                "probe_results": [{"deployment": r["deployment_id"], "uncertain": r["uncertain"],
+                                   "skipped": r["skipped"]} for r in results],
+            }
+            Path(__file__).with_name("probe-timeout.json" if times_out else "probe-completed-control.json").write_text(json.dumps(observation, indent=2) + "\n")
+            print("OBSERVATION " + json.dumps(observation, sort_keys=True))
+>           assert fake.max_active <= 1, "evaluation probe_all started a second deployment while the timed-out first deployment still computed in the same one-slot pool"
+E           AssertionError: evaluation probe_all started a second deployment while the timed-out first deployment still computed in the same one-slot pool
+E           assert 2 <= 1
+E            +  where 2 = <test_correction_2026_10_12.ContinuingBackend object at 0x7f361a0cbb60>.max_active
+
+../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_probe_caller_closure.py:46: AssertionError
+----------------------------- Captured stdout call -----------------------------
+OBSERVATION {"admission": {"active": 0, "limit": 1, "uncertain": 0, "waiting": 0}, "backend_active_after_probes": 2, "backend_max_active": 2, "backend_requests": [{"model": "small:1b", "stream": true}, {"model": "big:27b", "stream": true}], "case": "r1_eval_probe_all", "configured_backend_timeout_s": 0.08, "configured_pool_concurrency": 1, "eligible_before_probe": ["ollama/small:1b", "ollama/big:27b"], "probe_results": [{"deployment": "ollama/small:1b", "skipped": ["tools", "json_object", "json_schema", "vision"], "uncertain": true}, {"deployment": "ollama/big:27b", "skipped": ["tools", "json_object", "json_schema", "vision"], "uncertain": true}], "times_out": true}
+_____ test_resume_tracks_eligible_alternatives[added-candidate-regression] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-84/test_resume_tracks_eligible_al0')
+change = 'add_candidate', policy = 'auto', expected_requests = 1
+
+    @pytest.mark.parametrize("change,policy,expected_requests", [
+        ("add_candidate", "auto", 1),
+        ("change_alternative_identity", "auto", 1),
+        ("unchanged", "auto", 0),
+        ("add_candidate", "test:local/a", 0),
+    ], ids=["added-candidate-regression", "alternative-identity-regression", "unchanged-resume-control", "fixed-sweep-control"])
+    def test_resume_tracks_eligible_alternatives(tmp_path, change, policy, expected_requests):
+        checkpoint = tmp_path / "checkpoint.jsonl"
+        model = "auto" if policy == "auto" else "local/a"
+        initial = {"local/a": "identity-a", "local/b": "identity-b"}
+        first = EvalRun("http://127.0.0.1:9", "fake-key", "fake-admin", simulated=False, checkpoint=checkpoint)
+        first.fingerprints = initial.copy()
+        first.routing_config_hash = "unchanged-config-file"
+        original_requests = []
+        attach_transport(first, "local/a", original_requests)
+        try:
+            original = first.run_one(TASK, model, policy)
+            assert original["ok"] and len(original_requests) == 1
+            assert original["checkpoint_format"] == 2
+        finally:
+            first.c.close()
+            first.admin.close()
+    
+        updated = initial.copy()
+        if change == "add_candidate":
+            updated["local/c"] = "identity-c"
+        elif change == "change_alternative_identity":
+            updated["local/b"] = "identity-b-replaced"
+        resumed = EvalRun("http://127.0.0.1:10", "fake-key", "fake-admin", simulated=False,
+                          checkpoint=checkpoint, resume=True)
+        resumed.fingerprints = updated
+        resumed.routing_config_hash = "unchanged-config-file"
+        requests = []
+        attach_transport(resumed, "local/c" if change == "add_candidate" else "local/b", requests)
+        try:
+            result = resumed.run_one(TASK, model, policy)
+            print(json.dumps({"case": change, "policy": policy, "old_eligible": initial,
+                              "new_eligible": updated, "requests_sent": len(requests),
+                              "resumed": result.get("resumed", False), "deployment": result.get("deployment"),
+                              "resume_rejected": resumed.resume_rejected}, sort_keys=True))
+>           assert len(requests) == expected_requests, "routed format-2 checkpoint ignored changed eligible alternative identities"
+E           AssertionError: routed format-2 checkpoint ignored changed eligible alternative identities
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/test_checkpoint_closure.py:73: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"case": "add_candidate", "deployment": "local/a", "new_eligible": {"local/a": "identity-a", "local/b": "identity-b", "local/c": "identity-c"}, "old_eligible": {"local/a": "identity-a", "local/b": "identity-b"}, "policy": "auto", "requests_sent": 0, "resume_rejected": {}, "resumed": true}
+----------------------------- Captured stderr call -----------------------------
+[eval] auto                                     eligible-set-check HTTP 200    0.0s
+__ test_resume_tracks_eligible_alternatives[alternative-identity-regression] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-84/test_resume_tracks_eligible_al1')
+change = 'change_alternative_identity', policy = 'auto', expected_requests = 1
+
+    @pytest.mark.parametrize("change,policy,expected_requests", [
+        ("add_candidate", "auto", 1),
+        ("change_alternative_identity", "auto", 1),
+        ("unchanged", "auto", 0),
+        ("add_candidate", "test:local/a", 0),
+    ], ids=["added-candidate-regression", "alternative-identity-regression", "unchanged-resume-control", "fixed-sweep-control"])
+    def test_resume_tracks_eligible_alternatives(tmp_path, change, policy, expected_requests):
+        checkpoint = tmp_path / "checkpoint.jsonl"
+        model = "auto" if policy == "auto" else "local/a"
+        initial = {"local/a": "identity-a", "local/b": "identity-b"}
+        first = EvalRun("http://127.0.0.1:9", "fake-key", "fake-admin", simulated=False, checkpoint=checkpoint)
+        first.fingerprints = initial.copy()
+        first.routing_config_hash = "unchanged-config-file"
+        original_requests = []
+        attach_transport(first, "local/a", original_requests)
+        try:
+            original = first.run_one(TASK, model, policy)
+            assert original["ok"] and len(original_requests) == 1
+            assert original["checkpoint_format"] == 2
+        finally:
+            first.c.close()
+            first.admin.close()
+    
+        updated = initial.copy()
+        if change == "add_candidate":
+            updated["local/c"] = "identity-c"
+        elif change == "change_alternative_identity":
+            updated["local/b"] = "identity-b-replaced"
+        resumed = EvalRun("http://127.0.0.1:10", "fake-key", "fake-admin", simulated=False,
+                          checkpoint=checkpoint, resume=True)
+        resumed.fingerprints = updated
+        resumed.routing_config_hash = "unchanged-config-file"
+        requests = []
+        attach_transport(resumed, "local/c" if change == "add_candidate" else "local/b", requests)
+        try:
+            result = resumed.run_one(TASK, model, policy)
+            print(json.dumps({"case": change, "policy": policy, "old_eligible": initial,
+                              "new_eligible": updated, "requests_sent": len(requests),
+                              "resumed": result.get("resumed", False), "deployment": result.get("deployment"),
+                              "resume_rejected": resumed.resume_rejected}, sort_keys=True))
+>           assert len(requests) == expected_requests, "routed format-2 checkpoint ignored changed eligible alternative identities"
+E           AssertionError: routed format-2 checkpoint ignored changed eligible alternative identities
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/test_checkpoint_closure.py:73: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"case": "change_alternative_identity", "deployment": "local/a", "new_eligible": {"local/a": "identity-a", "local/b": "identity-b-replaced"}, "old_eligible": {"local/a": "identity-a", "local/b": "identity-b"}, "policy": "auto", "requests_sent": 0, "resume_rejected": {}, "resumed": true}
+----------------------------- Captured stderr call -----------------------------
+[eval] auto                                     eligible-set-check HTTP 200    0.0s
+=========================== short test summary info ============================
+FAILED ../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_closure_edges.py::test_r2_failed_residency_query_cannot_erase_loaded_weights[failed-observation-regression]
+FAILED ../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_closure_edges.py::test_r2_refused_connection_does_not_create_phantom_residency[connect-failure-regression]
+FAILED ../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_closure_edges.py::test_r4_stream_error_reaches_client_before_terminal_done[terminal-order-regression]
+FAILED ../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/hardening/test_probe_caller_closure.py::test_r1_evaluation_probes_respect_shared_pool_after_timeout[uncertain-cross-deployment-regression]
+FAILED ../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/test_checkpoint_closure.py::test_resume_tracks_eligible_alternatives[added-candidate-regression]
+FAILED ../../review-pack2/ModelSaar_Correction_Review_2026-10-12/evidence/test_checkpoint_closure.py::test_resume_tracks_eligible_alternatives[alternative-identity-regression]
+6 failed, 6 passed in 7.22s

@@ -1,0 +1,31 @@
+real installation from the pinned commit d6e09e770da6e8bd560da7132cb263eb02ec7151 (pip, fresh venv, local git clone as the source; GitHub is not public yet) + one routed request against the repository's fixture backend
+host: Linux 6.18.44-fc-v114 x86_64; Python 3.13.16
+modelsaar 0.1.0
+Version: 0.1.0
+$ modelsaar init --endpoint http://127.0.0.1:34221 --type ollama --port 44537
+wrote <scratch>/realinstall/home/config.yaml
+API key:   <scratch>/realinstall/home/keys/api_keys
+admin key: <scratch>/realinstall/home/keys/admin_key
+discovered 2 deployment(s):
+  ollama/small:1b                          role=generative ctx=8192 tools=supported vision=unsupported locality=local
+  ollama/plain:3b                          role=generative ctx=4096 tools=unsupported vision=unsupported locality=local
+
+next steps:
+  modelsaar doctor            # check reachability, context assumptions, unknown capabilities
+  modelsaar probe --all       # verify tools/json/vision/streaming on each model (uses local compute)
+  modelsaar serve             # start the gateway
+  modelsaar client-config open-webui|openclaw|opencode|opencode-v2|hermes
+
+$ modelsaar test --model auto
+GET /healthz -> modelsaar 0.1.0
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'ollama/small:1b', 'ollama/plain:3b']
+POST /v1/chat/completions -> 200 in 6ms; deployment=ollama/small:1b request=req_db4876b52e444e92
+routed: 'auto' -> ollama/small:1b (request req_db4876b52e444e92)
+content: Hello from small:1b: you said 'Reply with one word: ready' — ünïcødé ✓
+
+test exit 0
+$ modelsaar decisions --limit 1
+req_db4876b52e444e92 auto           -> ollama/small:1b                          ok                0.7ms conversation
+
+installed package path (serve/test ran with this environment, PYTHONPATH unset): <scratch>/realinstall/venv/lib/python3.13/site-packages/modelsaar/__init__.py
+note: the fixture backend was imported from the source tree only to serve as the fake Ollama; the gateway and CLI were the pip-installed package
