@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · ModelSaar</title>
+<meta name="description" content="How ModelSaar turns a chat request into a routing decision: requirements, hard filters, evidence-based ranking, continuity and the decision record.">
+<link rel="canonical" href="https://modelsaar.com/how-it-works/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="How it works · ModelSaar">
+<meta property="og:description" content="How ModelSaar turns a chat request into a routing decision: requirements, hard filters, evidence-based ranking, continuity and the decision record.">
+<meta property="og:url" content="https://modelsaar.com/how-it-works/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How it works · ModelSaar">
+<meta name="twitter:description" content="How ModelSaar turns a chat request into a routing decision: requirements, hard filters, evidence-based ranking, continuity and the decision record.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "How it works", "description": "How ModelSaar turns a chat request into a routing decision: requirements, hard filters, evidence-based ranking, continuity and the decision record.", "url": "https://modelsaar.com/how-it-works/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "How it works", "item": "https://modelsaar.com/how-it-works/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/" aria-current="page">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">How it works</li></ol></nav>
+<section aria-labelledby="hiw-title">
+  <h1 id="hiw-title">How it works</h1>
+  <p class="lede">ModelSaar is one Python process that speaks the OpenAI Chat Completions API on one side and talks to your inference backends on the other. In between, every request passes through the same deterministic pipeline, and every outcome is written down.</p>
+  <figure>
+    <div class="diagram">
+      <img src="/assets/where-it-fits.svg" width="1100" height="420" alt="Diagram: apps (Open WebUI, OpenCode, scripts) send OpenAI-compatible requests to one ModelSaar address; ModelSaar runs requirements, hard filters, ranking and a decision record; it forwards the request unchanged to one of the configured backends (Ollama, vLLM/llama.cpp) which serve the model weights.">
+    </div>
+    <figcaption>Where ModelSaar fits. Apps keep their tools, memory and loops; backends keep the weights and the hardware; ModelSaar selects, forwards and explains.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="plain-title">
+  <h2 id="plain-title">In plain language</h2>
+  <ol>
+    <li><strong>Read the request.</strong> Does it carry tools, an image, a required output schema, a long history, a half-finished tool call? Roughly how many tokens will it need, including the answer?</li>
+    <li><strong>Cross out what cannot do the job.</strong> Each configured model is checked against those needs and against your policy: is it healthy, local (if you require local), able to call tools, able to read images, big enough in context, allowed by the alias, not over capacity? A model with an <em>unknown</em> capability is crossed out for requests that need it — unknown never counts as yes.</li>
+    <li><strong>Rank what is left.</strong> Measured task success where you have run the evaluation, otherwise labelled priors, minus costs for latency, loading an unloaded model and switching away from the model a conversation is already on.</li>
+    <li><strong>Send the request unchanged</strong> to the winner, stream the answer back, and keep the conversation and its tool calls on that model.</li>
+    <li><strong>Write the decision down</strong> — which models were excluded and why, who won and on what evidence, how long the decision took — without the prompt.</li>
+  </ol>
+  <p>Below, the same thing for people evaluating the design. Terms link to the repository documentation, which is authoritative.</p>
+</section>
+
+<section aria-labelledby="req-title">
+  <h2 id="req-title">1. Requirements</h2>
+  <p>The whole request body is analysed structurally (<code>routing/requirements.py</code>): message roles; text, image and audio parts (typed — unknown part types such as <code>audio_url</code>, <code>video_url</code> or <code>file</code> are rejected with <code>400 unsupported_content_type</code> before anything is sent anywhere); tools and <code>tool_choice</code>; <code>response_format</code> (JSON object or strict schema); outstanding tool-call ids from the last assistant turn; <code>reasoning_content</code> that implies continuation state; and a conservative token budget — input estimate (chars/3 for Latin text, 1 token per CJK character, plus per-message, per-tool and per-image overheads, +5 %), the requested output allowance, and a reasoning allowance for deployments that can think.</p>
+  <p>Deterministic multi-label task signals (conversation, coding, agent, math, extraction, summarization, translation, rag, decision, document_vision) give a primary task label. An <em>optional</em> local classifier can refine the label when the deterministic result is ambiguous; it has bounded input, a strict JSON schema, a timeout and a deterministic fallback, and it must be a local deployment unless you opt in twice (<code>routing.classifier.allow_remote</code> and <code>security.locality_mode: allow_remote</code>). It can only change the task label — never policy, endpoints or eligibility.</p>
+</section>
+
+<section aria-labelledby="filter-title">
+  <h2 id="filter-title">2. Hard eligibility filters</h2>
+  <p>A failed filter can never be outscored (<code>routing/eligibility.py</code>). In order: role (generative vs embedding), enabled, healthy, locality policy, alias restrictions (required tags, vision, explicit deployment list), capability tri-state for everything the request needs (tools, parallel tools, <code>tool_choice=required</code>, JSON object, strict schema, streaming, image input, audio, continuation), remote image URLs (never fetched), effective context (unknown context ⇒ not eligible), <code>max_output_tokens</code>, request fields the backend path cannot honour (on Ollama: <code>tool_choice=required/named</code>, <code>logit_bias</code>, <code>n</code>, <code>logprobs</code>), and admission feasibility (open circuit, full queue, pool memory budget).</p>
+  <p>Capabilities are three-state — <code>supported</code>, <code>unsupported</code>, <code>unknown</code> — with provenance: the backend's own metadata (<code>/api/show</code> for Ollama), the adapter path, a probe (<code>modelsaar probe</code> runs short real requests for streaming, tools, parallel tools, JSON object, strict schema, image input and latency), or an operator override declared in the config. Evidence is keyed by a fingerprint of the deployment's identity and serving configuration (backend id, <strong>endpoint</strong>, model name, digest/identity, runtime and version, template, quantisation, pool); change any of those and the stored evidence no longer applies, while loading or unloading a model does not change it.</p>
+  <p>Token accounting is a two-pass affair for privacy: estimates first; only deployments that already passed every policy and capability filter may be asked for a tokenizer count (vLLM <code>/tokenize</code>), under one deadline, and the result is labelled <code>tokenize:&lt;backend&gt;+template-estimate</code> because template and image overheads remain estimates.</p>
+</section>
+
+<section aria-labelledby="rank-title">
+  <h2 id="rank-title">3. Ranking, profiles and aliases</h2>
+  <p>Each eligible candidate gets a transparent score (<code>routing/scoring.py</code>): quality for the task — <em>measured</em> success from the evaluation harness (with sample count), else a <em>prior</em> from the catalogue or operator, else an <em>uncalibrated</em> prior (0.5 plus a small, capped size heuristic) — minus weighted costs for measured latency, residency/loading and overhead, plus a switching penalty when a session is already on another deployment. Effectively tied candidates resolve to the lower-overhead one. The decision record shows every candidate's breakdown and the evidence level used.</p>
+  <p>Profiles weight those terms: <code>quality</code> (default), <code>balanced</code>, <code>fast</code>. Aliases are the virtual models an app selects: <code>auto</code>, <code>auto-quality</code>, <code>auto-balanced</code>, <code>auto-fast</code>, <code>auto-code</code> (deployments tagged <code>code</code>), <code>auto-vision</code> (verified image input). An alias is advertised in <code>GET /v1/models</code> only when at least one usable deployment backs it, with a truthful contract (minimum context, tools/vision/schema = supported, partial or unsupported). A concrete deployment id can always be requested directly and still passes the same hard checks.</p>
+</section>
+
+<section aria-labelledby="cont-title">
+  <h2 id="cont-title">4. Continuity, capacity and failure</h2>
+  <ul>
+    <li><strong>Sessions.</strong> With a session key (<code>X-ModelSaar-Session</code>, <code>X-OpenWebUI-Chat-Id</code>, or <code>prompt_cache_key</code> in the body) a conversation is pinned to the deployment that answered it, scoped per API key. A pinned deployment that no longer qualifies is re-routed, and the record says so.</li>
+    <li><strong>Tool round trips.</strong> The deployment that issued a tool call's ids receives the tool-result turn. If it cannot, the request fails (<code>affinity_broken</code>) rather than handing a tool history to a model that never saw it.</li>
+    <li><strong>Failover</strong> happens at most once, only before any byte has reached the client, only on retryable transport errors, and never inside a tool round trip, with reasoning-continuation state, or on a pinned session (<code>failover_allowed: false</code> with the reason). After the response is committed a failing stream is terminated with an error frame — the gateway never switches models mid-answer.</li>
+    <li><strong>Admission.</strong> Per-backend and per-pool concurrency slots with bounded queues; a client that disconnects mid-stream, or a backend that times out, leaves an <em>uncertain</em> hold on the slot for a bounded time because the backend may still be generating. A pool <code>memory_gb</code> is a hard budget on weights-only estimates plus a margin (it prevents clearly oversized dispatches; it is not an OOM guarantee). Per-backend circuit breakers count only validated completions as success.</li>
+    <li><strong>Completion contract.</strong> An upstream HTTP 200 that is not a completion envelope (a proxy's HTML page, a JSON error) is a <code>502 upstream_bad_response</code>, never relayed as success; a stream must end with a finish reason or <code>[DONE]</code> to count.</li>
+    <li><strong>Probes under admission.</strong> <code>modelsaar probe</code> goes through <code>POST /admin/probe</code> while a gateway runs, so verification never races your traffic; direct probing next to a listening gateway is refused unless you accept it explicitly.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="emb-title">
+  <h2 id="emb-title">5. Embeddings</h2>
+  <p><code>/v1/embeddings</code> routes an alias to the deployments of its contract only. Members must be one verified identity (the Ollama digest, or a declared <code>identity</code> for generic servers); a model-name match is not an identity, and a changed identity requires an explicit re-indexing decision. Request options that would change the vector space (<code>dimensions</code>, non-float <code>encoding_format</code>) are rejected; every response's vector count, indices, dimensions, finiteness and (when declared) unit norm are validated, and a violation is a <code>502 embedding_contract_violation</code>, never a 200.</p>
+</section>
+
+<section aria-labelledby="rec-title">
+  <h2 id="rec-title">6. The decision record</h2>
+  <p>Every request — routed or refused — produces a record: request id, config hash, requested alias, profile, inferred task and requirements, exclusions with reasons and remedies, candidate scores and evidence levels, the chosen deployment, affinity and failover state, translation notes (what the backend path changed, e.g. dropping tools for <code>tool_choice=none</code>), outcome and overhead in milliseconds. It contains no prompt text. Reach it through the response headers (<code>X-ModelSaar-Request-Id</code>, <code>X-ModelSaar-Deployment</code>, <code>X-ModelSaar-Profile</code>), <code>GET /admin/decisions/&lt;id&gt;</code>, <code>modelsaar decisions</code>, <code>modelsaar explain</code> (dry run) or the status page at <code>/admin/ui</code>. Records are kept in a local SQLite file for a configurable number of days.</p>
+</section>
+
+<section aria-labelledby="api-title">
+  <h2 id="api-title">7. Supported endpoints and limits</h2>
+  <div class="table-wrap" tabindex="0"><table>
+    <thead><tr><th scope="col">endpoint</th><th scope="col">status</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST /v1/chat/completions</code> (non-streaming and SSE)</td><td>supported; the request is forwarded unchanged except typed, recorded translations</td></tr>
+      <tr><td><code>GET /v1/models</code></td><td>supported; aliases advertised only when backed, plus concrete deployment ids</td></tr>
+      <tr><td><code>POST /v1/embeddings</code></td><td>supported with the contract above</td></tr>
+      <tr><td><code>/healthz</code>, <code>/readyz</code></td><td>supported (ready = at least one healthy deployment)</td></tr>
+      <tr><td><code>/admin/status</code>, <code>/admin/decisions</code>, <code>/admin/explain</code>, <code>/admin/refresh</code>, <code>/admin/probe</code>, <code>/admin/ui</code></td><td>admin key only</td></tr>
+      <tr><td>Responses API, Anthropic Messages, audio/video input, OCR and decision-model pipelines</td><td>not implemented (explicit 501 / 400)</td></tr>
+      <tr><td>Ollama path: <code>tool_choice=required/named</code>, remote image URLs, <code>logit_bias</code>, <code>n</code>, <code>logprobs</code></td><td>rejected with blockers (documented Ollama limits), never silently altered</td></tr>
+    </tbody>
+  </table></div>
+  <p>Reproduce an evaluation with <code>modelsaar eval --mode live --save-measurements</code> (see <a href="/benchmarks/">Benchmarks</a>); read the authoritative documentation in <a href="/docs/routing/">Routing</a>, <a href="/docs/architecture/">Architecture</a> and <a href="/docs/privacy/">Privacy and security</a>.</p>
+</section>
+
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

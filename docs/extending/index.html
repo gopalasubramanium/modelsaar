@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Extending ModelSaar · ModelSaar</title>
+<meta name="description" content="Adding backends, probes and clients.">
+<link rel="canonical" href="https://modelsaar.com/docs/extending/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Extending ModelSaar · ModelSaar">
+<meta property="og:description" content="Adding backends, probes and clients.">
+<meta property="og:url" content="https://modelsaar.com/docs/extending/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Extending ModelSaar · ModelSaar">
+<meta name="twitter:description" content="Adding backends, probes and clients.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Extending ModelSaar", "description": "Adding backends, probes and clients.", "url": "https://modelsaar.com/docs/extending/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Extending ModelSaar", "item": "https://modelsaar.com/docs/extending/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Extending ModelSaar</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Extending ModelSaar</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/extending.md"><code>docs/extending.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>See <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/catalogue.md">catalogue.md</a> for adding deployments, catalogue entries and adapters.</p>
+<h2 id="aliases">Aliases</h2>
+<pre tabindex="0"><code class="language-yaml">aliases:
+  auto-reasoning:
+    profile: quality
+    require_tags: [reasoning]
+    description: &quot;deployments tagged reasoning&quot;
+  auto-small:
+    profile: fast
+    deployments: [&quot;ollama/gemma4:e4b&quot;, &quot;ollama/granite4.2:3b&quot;]
+</code></pre>
+<p>Alias names must start with <code>auto</code>. An alias is advertised only when at least one usable deployment
+satisfies its constraints; its <code>/v1/models</code> contract reports the minimum context and whether tools,
+vision and json_schema are supported by every member (<code>supported</code>), some (<code>partial</code>) or none.</p>
+<h2 id="profiles">Profiles</h2>
+<p><code>routing.profiles.{quality,balanced,fast}</code> hold the weights <code>quality</code>, <code>latency</code>, <code>residency</code>,
+<code>overhead</code>. <code>routing.switching_penalty</code> controls session hysteresis.</p>
+<h2 id="per-request-hints">Per-request hints</h2>
+<p>Clients may add a <code>modelsaar</code> object to the request body (never forwarded to backends):</p>
+<pre tabindex="0"><code class="language-json">{&quot;model&quot;: &quot;auto&quot;, &quot;messages&quot;: [...], &quot;modelsaar&quot;: {&quot;session&quot;: &quot;run-42&quot;, &quot;profile&quot;: &quot;fast&quot;}}
+</code></pre>
+<h2 id="optional-classifier">Optional classifier</h2>
+<pre tabindex="0"><code class="language-yaml">routing:
+  classifier:
+    enabled: true
+    backend: ollama
+    model: &quot;gemma4:e4b&quot;       # a small local model that honours response_format
+    timeout_s: 2.0
+    only_when_ambiguous: true
+</code></pre>
+<p>Its calls, timeouts and failures are visible in <code>/admin/status</code> → <code>classifier</code>. If it does not
+improve routing in <code>modelsaar eval</code>, leave it disabled: the deterministic path is the simple mode.</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post-alpha backlog · ModelSaar</title>
+<meta name="description" content="What the public alpha deliberately leaves unverified or disabled, and the evidence that would close each item.">
+<link rel="canonical" href="https://modelsaar.com/docs/backlog-post-alpha/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Post-alpha backlog · ModelSaar">
+<meta property="og:description" content="What the public alpha deliberately leaves unverified or disabled, and the evidence that would close each item.">
+<meta property="og:url" content="https://modelsaar.com/docs/backlog-post-alpha/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Post-alpha backlog · ModelSaar">
+<meta name="twitter:description" content="What the public alpha deliberately leaves unverified or disabled, and the evidence that would close each item.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Post-alpha backlog", "description": "What the public alpha deliberately leaves unverified or disabled, and the evidence that would close each item.", "url": "https://modelsaar.com/docs/backlog-post-alpha/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Post-alpha backlog", "item": "https://modelsaar.com/docs/backlog-post-alpha/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Post-alpha backlog</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Post-alpha backlog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/backlog-post-alpha.md"><code>docs/backlog-post-alpha.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>Items deliberately left out of the public alpha (2026-10-12). None of these is claimed fixed or
+verified; each names the gate that would close it.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>item</th>
+<th>status in the alpha</th>
+<th>closing evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS code-execution sandbox (<code>sandbox-exec</code> deny-by-default profile)</td>
+<td><strong>disabled pending verification</strong> — <code>code_exec</code> tasks are skipped on macOS unless <code>MODELSAAR_MACOS_SANDBOX=verify</code></td>
+<td><code>run_mac_tests.command</code> → <code>mac-tests-PASSED</code> (sandbox tests executed under <code>sandbox-exec</code>, no skips); then re-enable by default</td>
+</tr>
+<tr>
+<td>real-client walkthrough (Open WebUI, OpenClaw, OpenCode, Hermes)</td>
+<td>NOT RUN; owner steps in <code>site/VALIDATION.md</code></td>
+<td>one recorded workflow per client (<code>modelsaar decisions</code> showing the request)</td>
+</tr>
+<tr>
+<td>live evaluation under scorer <code>2026.10.12-3</code></td>
+<td>NOT RUN; the quoted result keeps scorer <code>2026.10.11-2</code></td>
+<td>a separately labelled GX10 run (<code>run_live_verify.command</code>)</td>
+</tr>
+<tr>
+<td>real-model embeddings; vLLM / llama.cpp backends; <code>/tokenize</code></td>
+<td>NOT RUN (fixture-only)</td>
+<td>live run with a declared <code>embeddings:</code> contract / a generic server</td>
+</tr>
+<tr>
+<td>assumed residency for runtimes that cannot report it</td>
+<td>conservative indefinite assumption unless <code>assumed_residency_ttl_s</code> is set</td>
+<td>a residency signal for those runtimes, or operator guidance per runtime</td>
+</tr>
+<tr>
+<td>CI run at the published revision</td>
+<td>definition only; no run exists until the branches are pushed</td>
+<td>green run on the PR revision</td>
+</tr>
+<tr>
+<td>evaluation with a reasoning-matched budget and all eight GX10 models</td>
+<td>not run</td>
+<td>separately labelled run</td>
+</tr>
+<tr>
+<td>website copy refinement, SEO, launch optimisation</td>
+<td>out of scope for the alpha</td>
+<td>after real-user feedback (<code>site/launch/feedback-log.md</code>)</td>
+</tr>
+</tbody>
+</table></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

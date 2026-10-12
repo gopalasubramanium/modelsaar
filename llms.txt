@@ -1,0 +1,40 @@
+# ModelSaar
+
+> ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.
+
+ModelSaar is Apache-2.0-licensed open source (https://github.com/gopalasubramanium/modelsaar). Status: public alpha; no release has been tagged and no package is published. It is an OpenAI-compatible HTTP gateway (Chat Completions incl. streaming, /v1/models, /v1/embeddings) that routes each request to one of the model deployments you run (Ollama first; any OpenAI-compatible server with declared models) using the request's requirements, verified capability evidence, locality/privacy policy, health and capacity, and records a decision you can inspect. It never downloads models and never executes a client's tools.
+
+## Pages
+
+- [ModelSaar — one address for your local AI](https://modelsaar.com/): ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.
+- [Get started](https://modelsaar.com/get-started/): Prerequisites, installation, first request and client connection for ModelSaar on macOS, Linux and WSL.
+- [How it works](https://modelsaar.com/how-it-works/): How ModelSaar turns a chat request into a routing decision: requirements, hard filters, evidence-based ranking, continuity and the decision record.
+- [Integrations](https://modelsaar.com/integrations/): Which clients and inference backends ModelSaar supports, and what kind of evidence backs each claim.
+- [Benchmarks and evidence](https://modelsaar.com/benchmarks/): Methodology, actual results and limitations of the ModelSaar evaluation, with links to the raw per-request records.
+- [Privacy](https://modelsaar.com/privacy/): What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host's access logs).
+- [Roadmap and status](https://modelsaar.com/roadmap/): Current status of ModelSaar and clearly identified future work.
+- [Documentation](https://modelsaar.com/docs/): ModelSaar documentation: installation, configuration, routing, API, operations, evaluation, clients.
+- [Installation, upgrade, rollback, uninstall](https://modelsaar.com/docs/installation/): Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.
+- [Routing: requirements, eligibility, ranking](https://modelsaar.com/docs/routing/): How ModelSaar analyses a request, which hard filters apply, how candidates are ranked and how embeddings, memory budgets and failover behave.
+- [Architecture](https://modelsaar.com/docs/architecture/): Components of the ModelSaar gateway and how a request flows through them.
+- [Privacy and security of the gateway](https://modelsaar.com/docs/privacy/): Defaults and guarantees of the gateway: binding, keys, locality, payload handling, logging, code execution.
+- [Evaluation harness](https://modelsaar.com/docs/evaluation/): How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies.
+- [Verification report](https://modelsaar.com/docs/verification-report/): What was executed, where, with what outcome — including the live runs on real hardware and everything still NOT RUN.
+- [Independent review findings F01–F18](https://modelsaar.com/docs/review-2026-10-11/): Findings of the 2026-10-11 review of commit 1122e1f, their fixes, regression tests and execution evidence.
+- [Post-alpha backlog](https://modelsaar.com/docs/backlog-post-alpha/): What the public alpha deliberately leaves unverified or disabled, and the evidence that would close each item.
+- [Troubleshooting](https://modelsaar.com/docs/troubleshooting/): Common failures when installing or running ModelSaar and what to do about them.
+- [Extending ModelSaar](https://modelsaar.com/docs/extending/): Adding backends, probes and clients.
+- [Roadmap (repository)](https://modelsaar.com/docs/roadmap-detail/): Planned work as recorded in the repository.
+- [Open WebUI](https://modelsaar.com/docs/clients/open-webui/): Connecting Open WebUI to ModelSaar.
+- [OpenClaw](https://modelsaar.com/docs/clients/openclaw/): Connecting OpenClaw to ModelSaar.
+- [OpenCode](https://modelsaar.com/docs/clients/opencode/): Connecting OpenCode (V1 and V2 config schemas) to ModelSaar.
+- [Hermes Agent](https://modelsaar.com/docs/clients/hermes/): Connecting NousResearch Hermes Agent to ModelSaar.
+- [Changelog](https://modelsaar.com/docs/changelog/): What changed in each ModelSaar revision.
+- [Contributing](https://modelsaar.com/docs/contributing/): How to report problems, propose changes and run the test suite.
+- [Security policy](https://modelsaar.com/docs/security-policy/): How to report a vulnerability in ModelSaar.
+
+## Source documentation (authoritative)
+
+- [README](https://github.com/gopalasubramanium/modelsaar#readme)
+- [docs/](https://github.com/gopalasubramanium/modelsaar/tree/main/docs)
+- [Verification report](https://github.com/gopalasubramanium/modelsaar/blob/main/docs/verification-report.md)

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troubleshooting · ModelSaar</title>
+<meta name="description" content="Common failures when installing or running ModelSaar and what to do about them.">
+<link rel="canonical" href="https://modelsaar.com/docs/troubleshooting/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Troubleshooting · ModelSaar">
+<meta property="og:description" content="Common failures when installing or running ModelSaar and what to do about them.">
+<meta property="og:url" content="https://modelsaar.com/docs/troubleshooting/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Troubleshooting · ModelSaar">
+<meta name="twitter:description" content="Common failures when installing or running ModelSaar and what to do about them.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Troubleshooting", "description": "Common failures when installing or running ModelSaar and what to do about them.", "url": "https://modelsaar.com/docs/troubleshooting/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Troubleshooting", "item": "https://modelsaar.com/docs/troubleshooting/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Troubleshooting</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Troubleshooting</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/troubleshooting.md"><code>docs/troubleshooting.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>Start with <code>modelsaar doctor</code> — it checks most of the items below and prints a remedy per finding.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>symptom</th>
+<th>cause</th>
+<th>fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>doctor</code>: cannot reach backend</td>
+<td>runtime not running or wrong URL</td>
+<td><code>ollama serve</code>; <code>curl http://127.0.0.1:11434/api/version</code>; fix <code>backends[].base_url</code></td>
+</tr>
+<tr>
+<td><code>doctor</code>: base_url points at the container's own loopback</td>
+<td>gateway runs in Docker with <code>127.0.0.1</code> backend</td>
+<td>use <code>http://host.docker.internal:11434</code>; on Linux add <code>extra_hosts: ["host.docker.internal:host-gateway"]</code>; Ollama must listen on <code>0.0.0.0</code></td>
+</tr>
+<tr>
+<td><code>401 missing or invalid API key</code></td>
+<td>client sends no/old key</td>
+<td>copy <code>head -1 ~/.modelsaar/keys/api_keys</code> into the client; after <code>keys rotate</code>, restart <code>serve</code> and update clients</td>
+</tr>
+<tr>
+<td><code>403 admin key required</code></td>
+<td>inference key used on <code>/admin/*</code></td>
+<td>use <code>keys/admin_key</code> (CLI <code>status</code>/<code>decisions</code> do this automatically)</td>
+</tr>
+<tr>
+<td><code>404 model_not_found</code></td>
+<td>alias not advertised or deployment id misspelled</td>
+<td><code>modelsaar discover</code>; aliases appear only when a usable deployment backs them</td>
+</tr>
+<tr>
+<td><code>422 no_eligible_deployment</code> with <code>capability tools is unknown</code></td>
+<td>the runtime did not report the capability and no probe/override exists</td>
+<td><code>modelsaar probe &lt;deployment&gt;</code>; or add <code>deployments[] … capabilities: {tools: supported}</code> (operator provenance)</td>
+</tr>
+<tr>
+<td><code>422 … effective context 4096 &lt; required …</code></td>
+<td>Ollama's served context is assumed 4096</td>
+<td>set <code>PARAMETER num_ctx 32768</code> in a Modelfile, <code>OLLAMA_CONTEXT_LENGTH</code>, or an override <code>context_length:</code>; verify with <code>/api/ps</code> while loaded</td>
+</tr>
+<tr>
+<td><code>422 … tool_choice=required/named</code></td>
+<td>Ollama's OpenAI layer ignores <code>tool_choice</code></td>
+<td>use a backend that supports it (vLLM with a tool parser), or let the client use <code>tool_choice: auto</code></td>
+</tr>
+<tr>
+<td><code>422 … remote image URL</code></td>
+<td>gateway does not fetch media</td>
+<td>send images as base64 <code>data:</code> URLs (Open WebUI does this)</td>
+</tr>
+<tr>
+<td><code>422 … locality policy local_only</code></td>
+<td>model is cloud-forwarded (<code>:cloud</code>) or backend declared remote</td>
+<td>pull a local model, or deliberately set <code>security.locality_mode: allow_remote</code></td>
+</tr>
+<tr>
+<td><code>503 admission_rejected</code> / <code>429</code></td>
+<td>pool/backend at capacity and queue full or timed out</td>
+<td>raise <code>resource_pools[].max_concurrent</code> only if memory allows; clients should retry after <code>Retry-After</code></td>
+</tr>
+<tr>
+<td>Stream ends with an <code>error</code> frame</td>
+<td>backend failed after the response started</td>
+<td>the gateway never switches mid-stream; check <code>modelsaar decisions &lt;id&gt;</code>; client-side retries need their own safeguards</td>
+</tr>
+<tr>
+<td>Tool calls fail on small models</td>
+<td>model emits malformed tool JSON (known for sub-30B models)</td>
+<td>prefer a tool-probed larger model; <code>auto-code</code>; check <code>probe</code> results</td>
+</tr>
+<tr>
+<td>Open WebUI "connection failed"</td>
+<td>URL missing <code>/v1</code>, trailing slash, or Docker networking</td>
+<td>URL must be <code>http://host:8484/v1</code> (no trailing slash); see clients/open-webui.md</td>
+</tr>
+<tr>
+<td>OpenCode cannot find model</td>
+<td>V1/V2 config mixed, or model not declared</td>
+<td><code>modelsaar client-config opencode</code> vs <code>opencode-v2</code>; never mix <code>provider</code> and <code>providers</code></td>
+</tr>
+<tr>
+<td>Hermes ignores the endpoint</td>
+<td>relying on <code>OPENAI_BASE_URL</code></td>
+<td>use <code>providers.&lt;name&gt;</code> with <code>key_env</code> in <code>~/.hermes/config.yaml</code></td>
+</tr>
+<tr>
+<td>Port already in use</td>
+<td>another gateway or service on 8484</td>
+<td>change <code>server.port</code>; <code>doctor</code> reports it</td>
+</tr>
+<tr>
+<td>Missing tool/reasoning parser (vLLM)</td>
+<td>server started without <code>--enable-auto-tool-choice --tool-call-parser</code></td>
+<td>restart vLLM with the flags; probe reports <code>tools unsupported</code> until then</td>
+</tr>
+<tr>
+<td><code>config version N is not supported</code></td>
+<td>config written by a newer/older build</td>
+<td><code>modelsaar config migrate</code> or upgrade the package</td>
+</tr>
+<tr>
+<td><code>modelsaar test</code>: <code>no gateway is listening at …</code></td>
+<td>the gateway is not running on the configured port</td>
+<td><code>modelsaar serve</code> in another terminal (or under launchd/systemd), then <code>modelsaar test</code></td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'httpcore…'</code> (or another dependency) right after a <code>uv tool install</code></td>
+<td>a corrupt entry in uv's wheel cache (seen on macOS)</td>
+<td><code>uv cache clean httpcore</code> (or <code>UV_NO_CACHE=1 uv tool install --force …</code>), then re-run the installer</td>
+</tr>
+</tbody>
+</table>
+<p>Logs: <code>modelsaar serve</code> prints warnings only; set <code>observability.log_level: DEBUG</code> for more (still no
+prompt content unless <code>security.log_prompts: true</code>, which is for debugging only).</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security policy · ModelSaar</title>
+<meta name="description" content="How to report a vulnerability in ModelSaar.">
+<link rel="canonical" href="https://modelsaar.com/docs/security-policy/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Security policy · ModelSaar">
+<meta property="og:description" content="How to report a vulnerability in ModelSaar.">
+<meta property="og:url" content="https://modelsaar.com/docs/security-policy/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Security policy · ModelSaar">
+<meta name="twitter:description" content="How to report a vulnerability in ModelSaar.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Security policy", "description": "How to report a vulnerability in ModelSaar.", "url": "https://modelsaar.com/docs/security-policy/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Security policy", "item": "https://modelsaar.com/docs/security-policy/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Security policy</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Security policy</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/SECURITY.md"><code>SECURITY.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>ModelSaar is a local gateway that handles API keys and forwards prompts to inference backends.</p>
+<p><strong>Reporting.</strong> Please report vulnerabilities privately to the maintainer, Gopala Subramanium
+(gopalasubramanium@gmail.com), or via GitHub's private vulnerability reporting on this repository,
+rather than in public issues. Include version, configuration shape (no keys), and
+reproduction steps. Expect an acknowledgement within 7 days.</p>
+<p><strong>Scope.</strong> Authentication bypass, admin/inference privilege confusion, backend destination
+confusion (SSRF), prompt/secret leakage into logs or decision records, failover that violates hard
+constraints, and anything that lets request content control routing policy.</p>
+<p><strong>Defaults</strong> are documented in <code>docs/privacy.md</code>. Dependency auditing (<code>pip-audit</code>) and secret
+scanning run in CI; workflow permissions are read-only and CI contains no credentials or private
+prompts.</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

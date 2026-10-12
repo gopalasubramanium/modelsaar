@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · ModelSaar</title>
+<meta name="description" content="What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host&#x27;s access logs).">
+<link rel="canonical" href="https://modelsaar.com/privacy/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Privacy · ModelSaar">
+<meta property="og:description" content="What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host&#x27;s access logs).">
+<meta property="og:url" content="https://modelsaar.com/privacy/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy · ModelSaar">
+<meta name="twitter:description" content="What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host&#x27;s access logs).">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Privacy", "description": "What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host's access logs).", "url": "https://modelsaar.com/privacy/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Privacy", "item": "https://modelsaar.com/privacy/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/" aria-current="page">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Privacy</li></ol></nav>
+<section aria-labelledby="pv-title">
+  <h1 id="pv-title">Privacy</h1>
+  <p class="lede">Two separate things: what the ModelSaar gateway does with your requests on your machine, and what this website does when you visit it.</p>
+</section>
+
+<section aria-labelledby="gw-title">
+  <h2 id="gw-title">The gateway</h2>
+  <p>ModelSaar runs where you install it. By default it binds to <code>127.0.0.1</code>, authenticates every request with keys it generated into files with mode 600, and talks only to the backend addresses in your configuration. It sends no telemetry, keeps no response cache and logs no prompts; decision records hold metadata (task labels, token counts, capability flags, outcome) and at most a short, redacted upstream error excerpt.</p>
+  <ul>
+    <li><strong>Local-only by default.</strong> <code>security.locality_mode: local_only</code> makes only deployments with locality <code>local</code> eligible or advertised. Ollama's cloud-forwarded models are detected and excluded; a generic endpoint's locality is whatever you declared, recorded as a trust assumption. Nothing derived from a request leaves the gateway before policy filtering: tokenizer counts are requested only from deployments that already passed locality, enablement, health and capability filters, and the optional classifier must be a local deployment unless you opt in twice.</li>
+    <li><strong>Remote media is never fetched.</strong> Image URLs must be inline <code>data:</code> URLs; unknown content types are rejected before dispatch.</li>
+    <li><strong>No model-generated code is executed by the gateway.</strong> The evaluation harness runs model-written Python only inside an isolation sandbox, or skips the task.</li>
+    <li><strong>Exposure beyond your machine is explicit.</strong> Binding to a LAN address requires <code>security.allow_lan: true</code>; keys then travel over plain HTTP, so put TLS or a private network (Tailscale, WireGuard) in front and never send the admin key off the host.</li>
+    <li><strong>What it cannot prove.</strong> That an opaque backend is truly local, or what your backend does with the request after it arrives. ModelSaar records the evidence it has (<code>locality_evidence</code> in the status output) and nothing more.</li>
+  </ul>
+  <p>The full defaults table, with the code path for each guarantee, is in <a href="/docs/privacy/">Privacy and security of the gateway</a>.</p>
+</section>
+
+<section aria-labelledby="site-title">
+  <h2 id="site-title">This website</h2>
+  <p>modelsaar.com is a static site. It uses no analytics scripts, no cookies, no forms, no accounts, no newsletter and no third-party embeds; its fonts are served from this site. The hosting provider keeps standard access logs (IP address, user agent, requested URL, time) for operating the service — see the hosting section below for who that is. We do not combine those logs with anything else. The <code>install.sh</code> script served here downloads the ModelSaar source from GitHub at a pinned commit; GitHub's own privacy terms apply to that request.</p>
+  <p>If this changes (for example, if we add privacy-respecting aggregate analytics), this page will say so and describe exactly what is collected and for how long.</p>
+  <h3>Hosting</h3>
+  <p id="hosting">The site is published as static files from the project repository through GitHub Pages (GitHub, Inc.), whose servers keep the access logs described above. The domain's DNS is managed at Cloudflare; no Cloudflare proxy or analytics feature is enabled for this site.</p>
+</section>
+
+<section aria-labelledby="contact-title">
+  <h2 id="contact-title">Security reports</h2>
+  <p>Report a vulnerability in the gateway as described in the <a href="/docs/security-policy/">security policy</a>. Please do not file security reports as public issues.</p>
+</section>
+
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

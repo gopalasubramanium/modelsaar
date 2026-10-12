@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changelog · ModelSaar</title>
+<meta name="description" content="What changed in each ModelSaar revision.">
+<link rel="canonical" href="https://modelsaar.com/docs/changelog/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Changelog · ModelSaar">
+<meta property="og:description" content="What changed in each ModelSaar revision.">
+<meta property="og:url" content="https://modelsaar.com/docs/changelog/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Changelog · ModelSaar">
+<meta name="twitter:description" content="What changed in each ModelSaar revision.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Changelog", "description": "What changed in each ModelSaar revision.", "url": "https://modelsaar.com/docs/changelog/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Changelog", "item": "https://modelsaar.com/docs/changelog/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Changelog</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><h2 id="unreleased-alpha-closure-pass-2026-10-12-correction-review-r1-c-r2-ab-r4-c-r7-c">Unreleased — alpha closure pass, 2026-10-12 (correction review R1-C, R2-A/B, R4-C, R7-C)</h2>
+<ul>
+<li><strong>Residency (R2-A/B):</strong> a failed <code>/api/ps</code> query is no longer an empty observation — known and
+  assumed occupancy is kept until the query succeeds (<code>loaded_models()</code> returns <code>None</code> on failure);
+  a connection refused before the request was sent releases the reservation without assuming
+  residency, so failover is not blocked by phantom weights.</li>
+<li><strong>Streams (R4-C):</strong> the upstream <code>[DONE]</code> is held back; the gateway emits exactly one terminal
+  marker after validation, so a client reading to the first <code>[DONE]</code> sees any error frame.</li>
+<li><strong>Evaluator (R1-C, R7-C):</strong> <code>--probe</code> goes through gateway admission, holds after an uncertain
+  timeout and reports deferred deployments; routed-policy checkpoints are bound to the eligible
+  deployment set (<code>eligible_set_key</code>) so changed alternatives re-run.</li>
+<li><strong>macOS code execution:</strong> <code>sandbox-exec</code> is disabled in this alpha pending verification
+  (<code>MODELSAAR_MACOS_SANDBOX=verify</code> enables it for the owner's verification run); <code>code_exec</code> tasks
+  are skipped on macOS otherwise.</li>
+</ul>
+<h2 id="unreleased-correction-pass-for-the-second-independent-review-r1r8-2026-10-12">Unreleased — correction pass for the second independent review (R1–R8), 2026-10-12</h2>
+<p>The reviewer's desired-contract tests are included verbatim (<code>tests/independent_review_2026_10_11/</code>).</p>
+<ul>
+<li><strong>Inference occupancy (R1):</strong> a read timeout <em>while streaming</em>, an embedding timeout and a probe
+  timeout hold the slot and pool memory as uncertain (<code>admission.uncertain_hold_s</code>) like non-stream
+  timeouts; a probe run stops after the first uncertain timeout and reports <code>skipped</code>. New decision
+  outcomes <code>stream_timeout_after_commit</code>, <code>stream_invalid_after_commit</code>, <code>upstream_timeout</code>.</li>
+<li><strong>Memory accounting (R2):</strong> completed dispatches leave their weights counted as assumed resident
+  until a residency observation reconciles them; <code>ResourcePool.assumed_residency_ttl_s</code> for runtimes
+  that cannot report residency; <code>unknown_memory_policy: reject</code> applies to every counted member;
+  <code>/admin/status</code> shows <code>memory_assumed_resident</code>.</li>
+<li><strong>Embedding identity (R3):</strong> the alias identity is anchored before dispatch (declared &gt; recorded &gt;
+  first member in contract order with a verified identity) and recorded synchronously.</li>
+<li><strong>Deadlines and stream validation (R4):</strong> every upstream call uses the tighter of the server and
+  backend deadlines (an explicit <code>None</code> never disables the timeout); SSE data frames that are not a
+  completion structure invalidate the stream and are not relayed; comments, keepalives and usage-only
+  frames are fine.</li>
+<li><strong>First use (R5):</strong> <code>GET /healthz</code> returns <code>service: modelsaar</code>; <code>modelsaar test</code> identifies the
+  listener before sending the API key and requires ModelSaar routing attribution; an unrelated
+  listener is reported as a port collision.</li>
+<li><strong>Evaluator (R7):</strong> <code>code_exec</code> completion evidence is a nonce-keyed record written by the trusted
+  runner (model stdout captured separately); tool arguments must conform to the declared schema;
+  checkpoint records are bound to task content, scorer version, budgets, routing configuration and
+  deployment fingerprint (format 2; legacy records are re-run and counted in <code>resume_rejected</code>);
+  bubblewrap binds only the Python runtime and system libraries; the macOS profile is
+  deny-by-default. <code>SCORER_VERSION</code> is <code>2026.10.12-3</code>; saved results keep their own scorer label.</li>
+</ul>
+<h2 id="unreleased-hardening-pass-branch-hardeningreview-2026-10-11-2026-10-11">Unreleased — hardening pass (branch <code>hardening/review-2026-10-11</code>, 2026-10-11)</h2>
+<p>Fixes for the eight findings of the independent review of commit <code>1122e1f</code>; each has a regression
+test in <code>tests/test_hardening_2026_10_11.py</code> (see docs/progress.md for the finding → fix → test table).</p>
+<ul>
+<li><strong>Privacy:</strong> policy filters run before any payload-bearing operation; <code>/tokenize</code> counts only for
+  policy-allowed deployments under one deadline, labelled <code>tokenize:&lt;backend&gt;+template-estimate</code>;
+  classifier must be local unless <code>routing.classifier.allow_remote</code> + <code>locality_mode: allow_remote</code>;
+  unknown content part types → <code>400 unsupported_content_type</code>.</li>
+<li><strong>Dispatch contract:</strong> no failover inside tool round trips, reasoning continuation or pinned sessions
+  (<code>failover_allowed</code>/<code>failover_note</code> in decisions); timeouts hold capacity as uncertain; circuit success
+  and session pinning only after validated completion; attribution per attempt; non-completion 200s →
+  <code>502 upstream_bad_response</code>.</li>
+<li><strong>Resources:</strong> <code>resource_pools[].memory_gb</code> enforced (<code>memory_margin_gb</code>, <code>unknown_memory_policy</code>);
+  <code>POST /admin/probe</code>; <code>modelsaar probe</code> coordinates through a running gateway (<code>--offline</code>,
+  <code>--allow-concurrent</code>); live eval refuses to run next to a listening gateway without <code>--allow-concurrent</code>.</li>
+<li><strong>Embeddings:</strong> deployment identity (digest / <code>backends[].models[].identity</code>); aliases bound to one
+  verified identity (<code>embeddings[].identity</code>); request <code>dimensions</code>/<code>encoding_format</code> guarded; output
+  validated (<code>502 embedding_contract_violation</code>); non-empty prefixes rejected.</li>
+<li><strong>Evidence:</strong> fingerprints include endpoint and identity; evidence scheme 2 (old rows kept, unused,
+  reported by <code>doctor</code>); measurements carry conditions.</li>
+<li><strong>Evaluator:</strong> sandbox-or-skip code execution, strict scorers, schema-validated classifier output,
+  <code>--checkpoint</code>/<code>--resume</code>, dataset/scorer revision recorded.</li>
+<li><strong>Files/first run:</strong> mode-preserving <code>client-config --apply</code> with private temp files and unique backups;
+  uninstall removes only owned files and refuses symlinks; <code>modelsaar keys ensure</code> + container CMD;
+  <code>init --profile</code> sets the <code>auto</code> alias profile; <code>scripts/compose-smoke.sh</code>, <code>scripts/install-check.sh</code>,
+  <code>scripts/live_verify.sh</code> (resumable live verification), <code>scripts/live_client_checks.py</code>.</li>
+<li><code>.gitignore</code> no longer hides <code>docs/live-runs/**/eval-*.json</code>; the GX10 artefacts are tracked.</li>
+</ul>
+<h2 id="010-unreleased-2026-10-11">0.1.0 (unreleased, 2026-10-11)</h2>
+<p>First release: OpenAI-compatible gateway (<code>/v1/models</code>, <code>/v1/chat/completions</code> incl. SSE,
+<code>/v1/embeddings</code>, health/readiness), Ollama + generic OpenAI-compatible adapters, deployment
+registry with three-state capabilities and fingerprints, deterministic requirements/eligibility/
+ranking pipeline with optional local classifier, affinity (sessions + tool round trips), admission
+control, pre-commit-only failover, decision records and inspection API/status page, probes,
+verified starter catalogue, CLI (<code>init discover probe serve status doctor explain decisions test
+client-config keys config eval demo uninstall</code>), client configuration generators for Open WebUI,
+OpenClaw, OpenCode V1/V2 and Hermes Agent, evaluation harness with baselines, fault-injection test
+suite, CI, Dockerfile/compose. Verified live against Ollama 0.32.13 on an ASUS GX10 (8 models);
+fixes from that run: thinking-aware probes, discover/doctor read stored evidence, fingerprint excludes
+served context, <code>eval --deployments</code> subset filter.</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

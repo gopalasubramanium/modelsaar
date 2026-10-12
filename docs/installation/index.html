@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installation, upgrade, rollback, uninstall · ModelSaar</title>
+<meta name="description" content="Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.">
+<link rel="canonical" href="https://modelsaar.com/docs/installation/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Installation, upgrade, rollback, uninstall · ModelSaar">
+<meta property="og:description" content="Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.">
+<meta property="og:url" content="https://modelsaar.com/docs/installation/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Installation, upgrade, rollback, uninstall · ModelSaar">
+<meta name="twitter:description" content="Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Installation, upgrade, rollback, uninstall", "description": "Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.", "url": "https://modelsaar.com/docs/installation/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Installation, upgrade, rollback, uninstall", "item": "https://modelsaar.com/docs/installation/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Installation, upgrade, rollback, uninstall</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Installation, upgrade, rollback, uninstall</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/installation.md"><code>docs/installation.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><h2 id="native-recommended">Native (recommended)</h2>
+<p>Prerequisites: Python 3.10+ (<code>python3 --version</code>), <code>git</code>, and a running inference server with at
+least one model (e.g. <code>ollama serve</code> + <code>ollama pull gemma4:e4b</code>). ModelSaar never downloads models.</p>
+<pre tabindex="0"><code class="language-bash">git clone &lt;repository&gt; modelsaar &amp;&amp; cd modelsaar
+python3 -m venv .venv &amp;&amp; . .venv/bin/activate
+pip install -e .            # editable install from source; `pip install .` for a plain install
+modelsaar init              # discovers Ollama on 127.0.0.1:11434 or pass --endpoint/--type
+modelsaar doctor
+modelsaar serve
+</code></pre>
+<p>With <code>uv</code>: <code>uv venv &amp;&amp; . .venv/bin/activate &amp;&amp; uv pip install -e .</code> (or <code>uv tool install .</code> to get a
+global <code>modelsaar</code> command).</p>
+<p><code>modelsaar init</code> is for a first installation: it refuses to overwrite an existing <code>config.yaml</code>
+(<code>--force</code> replaces it; keys and state are kept). If you installed with the website's one-line
+installer, <code>init</code> has already run — continue with <code>modelsaar serve</code> and, in another terminal,
+<code>modelsaar test</code>. <code>modelsaar test</code> first identifies the listener on the configured port
+(unauthenticated <code>GET /healthz</code> must return the ModelSaar health contract) and sends the API key only
+to a ModelSaar gateway; an unrelated service on that port is reported as a collision.</p>
+<p>Files created by <code>init</code> (default <code>~/.modelsaar</code>, override with <code>MODELSAAR_HOME</code> or <code>--config</code>):</p>
+<pre tabindex="0"><code>~/.modelsaar/config.yaml      versioned configuration (version: 1), mode 600
+~/.modelsaar/keys/api_keys    generated inference key(s), one per line, mode 600
+~/.modelsaar/keys/admin_key   generated admin key, mode 600
+~/.modelsaar/state/modelsaar.db   probe evidence, measurements, decision log (metadata only)
+</code></pre>
+<p>No PyPI package or container image is published; the commands above are the supported path.</p>
+<h2 id="configuration-essentials">Configuration essentials</h2>
+<pre tabindex="0"><code class="language-yaml">version: 1
+server: { host: 127.0.0.1, port: 8484 }
+security: { allow_lan: false, locality_mode: local_only, log_prompts: false }
+resource_pools:
+  - { id: local-machine, kind: unified, max_concurrent: 1 }    # one inference at a time on this box
+backends:
+  - { id: ollama, type: ollama, base_url: http://127.0.0.1:11434, resource_pool: local-machine }
+  # - id: vllm
+  #   type: openai_compatible
+  #   base_url: http://127.0.0.1:8000/v1
+  #   resource_pool: local-machine
+  #   models:                                   # declare what discovery cannot tell
+  #     - name: Qwen/Qwen3.8-27B
+  #       context_length: 65536
+  #       capabilities: { tools: supported, json_schema: supported }
+  #       tags: [code]
+deployments:                                     # operator overrides with visible provenance
+  - { backend: ollama, model: &quot;qwen3.8:27b&quot;, context_length: 32768, tags: [code] }
+routing:
+  default_profile: quality
+  classifier: { enabled: false }                 # optional local classifier (see routing.md)
+affinity: { mode: session, session_headers: [X-ModelSaar-Session, X-OpenWebUI-Chat-Id] }
+embeddings:
+  - { alias: docs-index, deployments: [&quot;ollama/embeddinggemma-2:latest&quot;], dimensions: 768 }
+</code></pre>
+<p><code>modelsaar config validate|show|example</code>. Reload by restarting <code>serve</code> (in-flight requests keep
+their snapshot).</p>
+<h2 id="docker-compose-optional">Docker Compose (optional)</h2>
+<p><code>docker compose up --build</code> builds a local image from <code>Dockerfile</code> (no published image). The
+container needs to reach your inference server <strong>on the host</strong>:</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>host OS</th>
+<th>backend URL inside the container</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>macOS / Windows (Docker Desktop)</td>
+<td><code>http://host.docker.internal:11434</code></td>
+<td>works out of the box</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td><code>http://host.docker.internal:11434</code></td>
+<td>requires <code>extra_hosts: ["host.docker.internal:host-gateway"]</code> (already in <code>docker-compose.yml</code>)</td>
+</tr>
+<tr>
+<td>WSL2</td>
+<td><code>http://host.docker.internal:11434</code> if Ollama runs in Windows; <code>http://&lt;wsl-ip&gt;:11434</code> if Ollama runs inside WSL</td>
+<td>Ollama must listen beyond loopback (<code>OLLAMA_HOST=0.0.0.0</code>) for a container to reach it</td>
+</tr>
+</tbody>
+</table>
+<p>Inside a container the gateway binds <code>0.0.0.0</code> (<code>security.allow_lan: true</code> in <code>examples/config.docker.yaml</code>)
+so Docker can publish the port; publish it to <code>127.0.0.1:8484</code> only unless you intend LAN exposure.
+The container provides the <strong>gateway</strong> only; model execution and hardware acceleration remain with
+your runtime on the host.</p>
+<h2 id="upgrade">Upgrade</h2>
+<pre tabindex="0"><code class="language-bash">cd modelsaar &amp;&amp; git pull &amp;&amp; pip install -e .      # or uv pip install -e .
+modelsaar config validate                          # fails loudly if the config version is unsupported
+modelsaar config migrate                           # applies migrations when a newer config version exists
+modelsaar doctor
+</code></pre>
+<p>Config files carry <code>version: 1</code>. A build that cannot read your version refuses to start with a
+message instead of guessing. Keys and state are untouched by upgrades.</p>
+<h2 id="rollback">Rollback</h2>
+<p><code>git checkout &lt;previous tag&gt;</code> then <code>pip install -e .</code>. Configuration is forward-compatible within a
+major version; if a migration changed your file, restore <code>config.yaml.bak-*</code> written by <code>migrate</code>.</p>
+<h2 id="service-management-optional">Service management (optional)</h2>
+<p>Run <code>modelsaar serve</code> under your service manager. A minimal <code>launchd</code> plist (macOS) and <code>systemd</code>
+unit (Linux) are in <code>examples/</code>. Remove the unit/plist to stop auto-starting.</p>
+<h2 id="uninstall">Uninstall</h2>
+<pre tabindex="0"><code class="language-bash">modelsaar uninstall        # removes ModelSaar's own files under ~/.modelsaar after confirmation
+pip uninstall modelsaar    # or: uv tool uninstall modelsaar
+</code></pre>
+<p>Uninstall removes only the files ModelSaar created (<code>config.yaml</code> and its backups, its key files, its
+state database) and then the directories if they are empty; anything else under <code>~/.modelsaar</code> is
+left in place and listed. It refuses to operate through symlinked <code>keys/</code> or <code>state/</code> directories. It
+never touches models in your runtime or client configuration files. Client configs changed with
+<code>client-config --apply</code> have <code>.bak-&lt;timestamp&gt;</code> copies next to them (same permission bits as the
+original); restore those to undo the change.</p>
+<h2 id="evidence-scheme-and-upgrades">Evidence scheme and upgrades</h2>
+<p>The state database records an evidence scheme (currently 2). Probes and measurements written under
+an older scheme (0.1.0: fingerprints without endpoint/identity, lenient evaluator) are kept for audit
+but never used for routing; <code>modelsaar doctor</code> reports how many such rows exist and the remedy
+(<code>modelsaar probe --all</code>, <code>modelsaar eval --mode live --save-measurements</code>). <code>scripts/install-check.sh</code>
+reproduces a clean wheel install, the loopback default, private key files and this migration.</p>
+<h2 id="container-first-start">Container first start</h2>
+<p><code>docker compose up</code> with an empty volume works without a pre-created key: the image's command is
+<code>modelsaar keys ensure &amp;&amp; exec modelsaar serve</code>, which creates <code>/data/keys/*</code> once (never rotating
+existing keys) and leaves the read-only <code>config.yaml</code> mount untouched. <code>scripts/compose-smoke.sh</code>
+checks exactly this (empty volume, non-root user, read-only config, keys unchanged across a restart)
+and runs in CI.</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

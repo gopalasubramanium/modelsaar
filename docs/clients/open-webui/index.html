@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open WebUI · ModelSaar</title>
+<meta name="description" content="Connecting Open WebUI to ModelSaar.">
+<link rel="canonical" href="https://modelsaar.com/docs/clients/open-webui/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Open WebUI · ModelSaar">
+<meta property="og:description" content="Connecting Open WebUI to ModelSaar.">
+<meta property="og:url" content="https://modelsaar.com/docs/clients/open-webui/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Open WebUI · ModelSaar">
+<meta name="twitter:description" content="Connecting Open WebUI to ModelSaar.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Open WebUI", "description": "Connecting Open WebUI to ModelSaar.", "url": "https://modelsaar.com/docs/clients/open-webui/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "clients", "item": "https://modelsaar.com/docs/clients/"}, {"@type": "ListItem", "position": 4, "name": "Open WebUI", "item": "https://modelsaar.com/docs/clients/open-webui/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Open WebUI</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Open WebUI</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/clients/open-webui.md"><code>docs/clients/open-webui.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>Verified against the Open WebUI docs and <code>main</code> source on 2026-10-11 (sources in
+<a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/research/clients-2026-10-11.md">research/clients-2026-10-11.md</a>, §1). Test status: configuration
+keys <strong>documented</strong>; a live Open WebUI tool round trip through ModelSaar is <strong>NOT RUN</strong> in this build.</p>
+<p>Generate the current snippet: <code>modelsaar client-config open-webui [--docker]</code>.</p>
+<h2 id="protocol-and-url">Protocol and URL</h2>
+<p>Open WebUI sends <strong>Chat Completions</strong> and string-concatenates paths onto the connection URL
+(<code>{url}/chat/completions</code>, <code>{url}/models</code>). Therefore the URL <strong>must include <code>/v1</code></strong> and must not end
+with a slash: <code>http://127.0.0.1:8484/v1</code>. Models are <strong>auto-listed</strong> from <code>GET /v1/models</code>, which
+ModelSaar serves truthfully (aliases only when backed by a usable deployment).</p>
+<h2 id="steps-ui">Steps (UI)</h2>
+<ol>
+<li>Admin Panel → Settings → Connections → <em>Manage OpenAI API Connections</em> → Add.</li>
+<li>URL <code>http://127.0.0.1:8484/v1</code> (from Docker: <code>http://host.docker.internal:8484/v1</code>).</li>
+<li>API Key: contents of <code>~/.modelsaar/keys/api_keys</code> (first line).</li>
+<li>Save → <em>Verify Connection</em> (this is <code>GET /models</code> with the Bearer key).</li>
+<li>Pick <code>auto</code> (or <code>auto-code</code>, <code>auto-vision</code>, a concrete <code>ollama/...</code> id) in the chat model selector.</li>
+</ol>
+<h2 id="environment-variables-docker-compose">Environment variables (Docker / compose)</h2>
+<pre tabindex="0"><code class="language-env">ENABLE_OPENAI_API=true
+OPENAI_API_BASE_URLS=http://host.docker.internal:8484/v1
+OPENAI_API_KEYS=&lt;modelsaar api key&gt;
+TASK_MODEL_EXTERNAL=auto-fast
+ENABLE_FORWARD_USER_INFO_HEADERS=true
+</code></pre>
+<ul>
+<li><code>TASK_MODEL_EXTERNAL</code> sends Open WebUI's background tasks (title, tags, follow-ups, query
+  generation — non-streaming) to <code>auto-fast</code> instead of the current chat model.</li>
+<li><code>ENABLE_FORWARD_USER_INFO_HEADERS=true</code> makes Open WebUI add <code>X-OpenWebUI-Chat-Id</code> (plus user
+  headers). ModelSaar reads it by default (<code>affinity.session_headers</code>) to keep a conversation on one
+  deployment. Alternatively add a per-connection custom header <code>X-ModelSaar-Session: {{CHAT_ID}}</code>
+  without forwarding user info. Without either, chats are request-routed (stateless).</li>
+</ul>
+<h2 id="container-networking">Container networking</h2>
+<p>Open WebUI in Docker cannot reach the host's <code>127.0.0.1</code>. Use <code>host.docker.internal</code>; on Linux add
+<code>--add-host=host.docker.internal:host-gateway</code> (compose: <code>extra_hosts</code>). ModelSaar must then listen
+beyond loopback: <code>server.host: 0.0.0.0</code> + <code>security.allow_lan: true</code> — do this only on a trusted
+machine/network, or run ModelSaar in the same compose network (<code>docker-compose.yml</code> in this repo).
+Podman: <code>host.containers.internal</code>.</p>
+<h2 id="tools-images-context">Tools, images, context</h2>
+<ul>
+<li>Native function calling (default) sends <code>tools</code>; Open WebUI does not send <code>tool_choice</code> or
+  <code>parallel_tool_calls</code>. ModelSaar routes tool requests only to tool-verified deployments.</li>
+<li>Images are sent as base64 data URLs → routed to vision-verified deployments (<code>auto-vision</code>).</li>
+<li>Per-model context/capability toggles in Admin → Models are UI-side; ModelSaar enforces the real
+  limits server-side and returns a 422 with blockers when nothing fits.</li>
+</ul>
+<h2 id="verify">Verify</h2>
+<pre tabindex="0"><code class="language-bash">modelsaar test                       # gateway alone
+# in Open WebUI: new chat with model `auto`, ask something; then
+modelsaar decisions                  # shows the request and the chosen deployment
+</code></pre></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

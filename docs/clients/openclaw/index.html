@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenClaw · ModelSaar</title>
+<meta name="description" content="Connecting OpenClaw to ModelSaar.">
+<link rel="canonical" href="https://modelsaar.com/docs/clients/openclaw/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="OpenClaw · ModelSaar">
+<meta property="og:description" content="Connecting OpenClaw to ModelSaar.">
+<meta property="og:url" content="https://modelsaar.com/docs/clients/openclaw/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OpenClaw · ModelSaar">
+<meta name="twitter:description" content="Connecting OpenClaw to ModelSaar.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "OpenClaw", "description": "Connecting OpenClaw to ModelSaar.", "url": "https://modelsaar.com/docs/clients/openclaw/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "clients", "item": "https://modelsaar.com/docs/clients/"}, {"@type": "ListItem", "position": 4, "name": "OpenClaw", "item": "https://modelsaar.com/docs/clients/openclaw/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">OpenClaw</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>OpenClaw</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/clients/openclaw.md"><code>docs/clients/openclaw.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>Verified against docs.openclaw.ai on 2026-10-11 (sidebar release v2026.9.9; sources in
+<a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/research/clients-2026-10-11.md">research/clients-2026-10-11.md</a>, §2). OpenClaw is the project
+formerly released as Warelay → Clawdbot → Moltbot (renamed OpenClaw 2026-01-30). Test status:
+configuration keys <strong>documented</strong>; live OpenClaw tool round trip <strong>NOT RUN</strong> in this build.</p>
+<p>Generate the snippet: <code>modelsaar client-config openclaw</code> (<code>--apply</code> merges into
+<code>~/.openclaw/openclaw.json</code> with a backup when the file is plain JSON; JSON5 files with comments must
+be merged by hand).</p>
+<h2 id="key-facts">Key facts</h2>
+<ul>
+<li>Config file <code>~/.openclaw/openclaw.json</code> (JSON5). Provider block <code>models.providers.&lt;id&gt;</code> with
+  <code>baseUrl</code> (<strong>include <code>/v1</code></strong>), <code>apiKey</code> (<code>${ENV_VAR}</code> substitution), <code>api: "openai-completions"</code>
+  (Chat Completions — the default when omitted; do <strong>not</strong> use <code>openai-responses</code>, ModelSaar returns
+  501 for <code>/v1/responses</code>).</li>
+<li>Custom provider models are <strong>not auto-discovered</strong>: declare each alias under <code>models[]</code> with
+  <code>id</code>, <code>name</code>, <code>reasoning</code>, <code>input</code> (<code>["text"]</code> or <code>["text","image"]</code>), <code>contextWindow</code>, <code>maxTokens</code>,
+  <code>cost {input, output, cacheRead, cacheWrite}</code> (zeros for local).</li>
+<li><code>compat.supportsPromptCacheKey: true</code> makes OpenClaw send <code>prompt_cache_key</code> (session id +
+  boundary count) to a custom endpoint; ModelSaar reads it (<code>affinity.body_fields</code>) to keep a run on
+  one deployment. <code>compat.supportsTools</code> should mirror the alias contract.</li>
+<li>Default model: <code>agents.defaults.model.primary: "modelsaar/auto"</code>; aliases via
+  <code>agents.defaults.models."modelsaar/auto".alias</code>.</li>
+<li><code>request.allowPrivateNetwork</code> defaults to false but a custom <code>baseUrl</code> origin is trusted exactly.</li>
+</ul>
+<pre tabindex="0"><code class="language-json5">{
+  agents: { defaults: { model: { primary: &quot;modelsaar/auto&quot; } } },
+  models: {
+    mode: &quot;merge&quot;,
+    providers: {
+      modelsaar: {
+        baseUrl: &quot;http://127.0.0.1:8484/v1&quot;,
+        apiKey: &quot;${MODELSAAR_API_KEY}&quot;,
+        api: &quot;openai-completions&quot;,
+        timeoutSeconds: 300,
+        models: [
+          { id: &quot;auto&quot;, name: &quot;ModelSaar auto&quot;, reasoning: false, input: [&quot;text&quot;],
+            contextWindow: 32768, maxTokens: 8192,
+            cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+            compat: { supportsTools: true, supportsPromptCacheKey: true } },
+          { id: &quot;auto-code&quot;, name: &quot;ModelSaar auto-code&quot;, reasoning: false, input: [&quot;text&quot;],
+            contextWindow: 32768, maxTokens: 8192,
+            cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+            compat: { supportsTools: true, supportsPromptCacheKey: true } }
+        ]
+      }
+    }
+  }
+}
+</code></pre>
+<p><code>export MODELSAAR_API_KEY=$(head -1 ~/.modelsaar/keys/api_keys)</code> in the shell that runs OpenClaw.</p>
+<p>Use the <code>contextWindow</code> printed by <code>client-config</code> (the alias contract's minimum across members) so
+OpenClaw's own context management stays within what every eligible deployment can serve.</p>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>OpenClaw streams and uses a 300 s first-response budget for local endpoints; <code>timeoutSeconds</code>
+  above matches it.</li>
+<li><code>utilityModel</code> (OpenClaw's cheap internal-task model) can point at <code>modelsaar/auto-fast</code>.</li>
+<li>Whether OpenClaw sends <code>tool_choice</code>/<code>parallel_tool_calls</code> is not documented; if it does send
+  <code>tool_choice: required</code>, Ollama-backed deployments are ineligible and ModelSaar returns 422 with
+  that blocker.</li>
+</ul></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

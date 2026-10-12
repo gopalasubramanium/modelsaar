@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verification report · ModelSaar</title>
+<meta name="description" content="What was executed, where, with what outcome — including the live runs on real hardware and everything still NOT RUN.">
+<link rel="canonical" href="https://modelsaar.com/docs/verification-report/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Verification report · ModelSaar">
+<meta property="og:description" content="What was executed, where, with what outcome — including the live runs on real hardware and everything still NOT RUN.">
+<meta property="og:url" content="https://modelsaar.com/docs/verification-report/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Verification report · ModelSaar">
+<meta name="twitter:description" content="What was executed, where, with what outcome — including the live runs on real hardware and everything still NOT RUN.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Verification report", "description": "What was executed, where, with what outcome — including the live runs on real hardware and everything still NOT RUN.", "url": "https://modelsaar.com/docs/verification-report/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Verification report", "item": "https://modelsaar.com/docs/verification-report/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Verification report</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Verification report</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/verification-report.md"><code>docs/verification-report.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>This report lists what was actually executed, where, with what outcome. Anything not executed is
+marked <strong>NOT RUN</strong> with the exact procedure to run it. Nothing below is a mocked result presented as
+real; simulated runs are labelled as such.</p>
+<h2 id="environments-used">Environments used</h2>
+<table tabindex="0">
+<thead>
+<tr>
+<th>environment</th>
+<th>details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Build/test container (cloud)</td>
+<td>Linux x86_64, CPython 3.13.16, starlette 1.7.0, uvicorn 0.54.0, httpx 0.28.1, pydantic 2.14.0, PyYAML 6.0.3, pytest 9.1.1. No GPU. Network: PyPI reachable; Hugging Face, Ollama registry and Docker daemon <strong>not</strong> available.</td>
+</tr>
+<tr>
+<td>Independent review venv</td>
+<td>CPython 3.10.20 (uv), same dependency versions — full test suite passed (reviewer's run).</td>
+</tr>
+<tr>
+<td>Owner's Linux VM bridge</td>
+<td>aarch64, CPython 3.10.12: <code>pytest</code> → <strong>61 passed</strong> at that commit (64 at HEAD); <code>modelsaar eval --mode simulated --limit 10</code> ran (Python 3.10/aarch64 compatibility).</td>
+</tr>
+<tr>
+<td><strong>Owner's MacBook Air M5 (macOS, Darwin 27.0.0 arm64) → ASUS GX10 (NVIDIA GB10) over Tailscale</strong></td>
+<td>Real run on 2026-10-11 14:17–16:25 IST: uv-managed CPython 3.12.15, ModelSaar 0.1.0, <strong>Ollama 0.32.13</strong> at <code>http://&lt;gx10-tailscale-address&gt;:11434</code> serving 8 models. Outputs: <code>live-check-20261011-141721/</code> (committed next to the report). Driven from this session by double-clicking <code>run_live_check.command</code>, <code>run_live_eval.command</code>, <code>run_reprobe.command</code> in Finder.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="executed">Executed</h2>
+<table tabindex="0">
+<thead>
+<tr>
+<th>check</th>
+<th>command</th>
+<th>outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lint</td>
+<td><code>ruff check src tests</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Unit + contract + fault-injection tests</td>
+<td><code>python -m pytest -q</code></td>
+<td><strong>64 passed</strong> (36 acceptance cases over real HTTP against the controlled fake backend, 12 unit/CLI tests, 16 regression tests for the adversarial-review and live-run findings)</td>
+</tr>
+<tr>
+<td>Python 3.10 compatibility</td>
+<td>full suite in a 3.10.20 venv (independent reviewer)</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Simulated evaluation</td>
+<td><code>modelsaar eval --mode simulated</code></td>
+<td>runs end-to-end; see docs/evaluation.md for the numbers (SIMULATED — scripted fake backends)</td>
+</tr>
+<tr>
+<td>CLI end-to-end</td>
+<td><code>init</code>, <code>discover</code>, <code>doctor</code>, <code>explain</code>, <code>config validate</code>, <code>client-config --dry-run</code>, <code>uninstall</code> against the fake backend (tests/test_units.py)</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Probes</td>
+<td>streaming/tools/parallel_tools/json_object/json_schema/vision/latency against the fake backend; fingerprint invalidation</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Independent adversarial review</td>
+<td>separate agent, read + executed ad-hoc attacks (see docs/research/adversarial-review-2026-10-11.md)</td>
+<td>28 findings; 3 high, 8 medium and 9 low fixed with regression tests; remaining INFO items documented</td>
+</tr>
+<tr>
+<td>GitHub Actions CI on the public repository</td>
+<td>https://github.com/gopalasubramanium/modelsaar/actions, run #2 (commit 7e2948c)</td>
+<td><strong>green</strong>: tests on 3.10/3.12/3.13, ruff, pip-audit (runtime deps, no known vulnerabilities), gitleaks, Docker image built and <code>modelsaar --version</code> smoked inside it. Run #1 failed only because pip-audit tried to resolve the local package on PyPI (fixed).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="acceptance-cases-spec-15-tests">Acceptance cases (spec §15) → tests</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>case</th>
+<th>test</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One healthy model → minimal overhead</td>
+<td><code>test_single_eligible_model_minimal_overhead</code> (overhead &lt; 50 ms, measured ~0.4 ms)</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>No eligible model → structured error, no hidden fallback</td>
+<td><code>test_no_eligible_model_structured_error</code>, <code>test_unknown_model_is_404</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Tool-enabled code task → tool-capable only</td>
+<td><code>test_tool_task_only_routes_to_tool_capable</code>, <code>test_tool_choice_required_rejected_on_ollama_path</code>, <code>test_auto_code_alias_requires_code_tag</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Image input → preserved / compatible / clear rejection</td>
+<td><code>test_image_preserved_and_routed_to_vision</code>, <code>test_remote_image_url_rejected_not_fetched</code>, <code>test_any_non_data_image_url_is_external</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Strict schema → enforced contract, no downgrade</td>
+<td><code>test_strict_schema_routes_only_to_verified</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Large conversation + tools → full accounting, no truncation</td>
+<td><code>test_large_context_counts_everything_no_truncation</code>, <code>test_unknown_context_length_is_a_hard_exclusion</code>, <code>test_cjk_token_estimate_is_conservative</code>, <code>test_negative_or_zero_max_tokens_rejected</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Ambiguous / multilingual → evidence-aware, conservative</td>
+<td><code>test_ambiguous_and_multilingual_classification</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Classifier unavailable / malformed / injected → deterministic continues</td>
+<td><code>test_classifier_failures_fall_back_deterministically</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Outstanding tool results → ids, state, affinity</td>
+<td><code>test_tool_round_trip_affinity_without_session_id</code>, <code>test_tool_round_trip_refuses_cross_model_handover_when_pinned_unhealthy</code>, <code>test_tool_round_trip_pins_to_latest_issuer</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>No session id → documented stateless/fixed policy</td>
+<td><code>test_session_affinity_header_and_stateless_default</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Backend fails before commitment → bounded same-constraint failover</td>
+<td><code>test_failover_before_commit_same_constraints</code>, <code>test_streaming_failover_before_first_byte</code>, <code>test_failover_pins_session_to_answering_deployment</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Backend fails during streaming → terminate, no duplicate</td>
+<td><code>test_stream_failure_after_commit_terminates_without_switch</code>, <code>test_stream_tool_call_failure_no_duplicate_tool_call</code>, <code>test_truncated_stream_is_reported_not_completed</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Concurrent requests sharing one pool → limits, cancellation</td>
+<td><code>test_admission_limits_and_queue_rejection</code>, <code>test_client_disconnect_marks_uncertain_occupancy</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Model/template/config change → evidence invalidated</td>
+<td><code>test_fingerprint_change_invalidates_probe_evidence</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Embedding fallback → contract preserved or fail</td>
+<td><code>test_embeddings_contract_no_incompatible_fallback</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Offline/local-only → no unauthorized external inference</td>
+<td><code>test_local_only_blocks_cloud_even_when_explicit</code>, <code>test_allow_remote_is_explicit_opt_in</code> (fixture-scoped claim)</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Malicious destination/media → not a proxy</td>
+<td><code>test_backend_host_allowlist_enforced</code>, <code>test_prompt_injection_cannot_change_routing</code>, <code>test_any_non_data_image_url_is_external</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Two clients, similar prompts → no mixing</td>
+<td><code>test_two_callers_same_session_key_do_not_mix</code>, <code>test_decision_log_has_no_prompt_content</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Fresh installation and uninstall preserve unrelated files</td>
+<td><code>test_cli_init_discover_explain_doctor</code>, <code>test_cli_uninstall_removes_only_own_files</code>, <code>test_uninstall_refuses_foreign_files</code></td>
+<td>pass</td>
+</tr>
+</tbody>
+</table>
+<p>Streaming contract: partial frames, CRLF, UTF-8 split mid-character, indexed interleaved tool-call
+deltas, usage events, terminal <code>[DONE]</code>, model-field rewrite — <code>test_streaming_relay_contract</code>,
+<code>test_streaming_interleaved_tool_deltas</code>, <code>test_sse_parser_partial_frames_crlf_and_unicode_boundary</code>.</p>
+<h2 id="live-results-on-real-hardware-gx10-ollama-03213-2026-10-11">Live results on real hardware (GX10 / Ollama 0.32.13, 2026-10-11)</h2>
+<p>Deployments discovered (all Q4_K_M GGUF, declared locality <code>local</code> = owner's private tailnet host):
+<code>muse-glimmer:latest</code> 27.9B, <code>qwen3.6:latest</code> 35.5B MoE, <code>gemma4:31b</code> 31.3B, <code>qwen3.8:latest</code> 27.3B,
+<code>qwen3-coder-next:latest</code> 79.7B MoE, <code>qwen3-coder:latest</code> 30.5B MoE, <code>qwen3.6-accurate:latest</code> and
+<code>qwen3.6-fast:latest</code> (custom Modelfiles, num_ctx 131072 / 65536).</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>check</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>init --endpoint http://&lt;gx10-tailscale-address&gt;:11434</code></td>
+<td>wrote config + keys; discovered 8 deployments</td>
+</tr>
+<tr>
+<td><code>discover</code></td>
+<td>capabilities from <code>/api/show</code> (tools/vision/thinking), residency + served context from <code>/api/ps</code> (131072 while loaded), locality evidence recorded; cloud-alias detection exercised negatively (none present)</td>
+</tr>
+<tr>
+<td><code>doctor</code></td>
+<td>0 failures; warnings only for assumed served context (4096) on unloaded models without Modelfile <code>num_ctx</code></td>
+</tr>
+<tr>
+<td><code>probe --all</code> (first pass, probe budgets 40/200 tokens)</td>
+<td><strong>exposed bug</strong>: thinking models (muse-glimmer, qwen3.6*, gemma4) exhausted the budget on reasoning → streaming/JSON/vision recorded <code>unsupported</code> (false negatives). Fixed in commit <code>dadd377</code> (larger budgets, reasoning deltas counted, exhausted budget → <code>unknown</code>).</td>
+</tr>
+<tr>
+<td><code>probe --all</code> (re-run with fix, <code>40-reprobe-all.txt</code>)</td>
+<td>all 8: streaming ✔, tools ✔ (tool call with id + JSON args), parallel tools ✔, json_object ✔, json_schema ✔ (schema-conformant); vision ✔ on 6, <code>unsupported</code> for the two text-only coders (metadata) and for muse-glimmer (answered "white" to the 1-px red probe — probe limitation noted). TTFT cold 6–13 s, warm p50 0.25–7.6 s.</td>
+</tr>
+<tr>
+<td><code>discover</code>/<code>doctor</code> after probing</td>
+<td><strong>exposed bug</strong>: they ignored the state DB (showed <code>json_schema=unknown</code>). Fixed in <code>dadd377</code>; <code>41-discover-after-reprobe.txt</code> shows the probed values.</td>
+</tr>
+<tr>
+<td><code>GET /v1/models</code>, <code>modelsaar test</code></td>
+<td>200; aliases <code>auto</code>, <code>auto-quality</code>, <code>auto-balanced</code>, <code>auto-fast</code>, <code>auto-code</code> (3 members), <code>auto-vision</code> (6 members) advertised</td>
+</tr>
+<tr>
+<td><code>auto</code> chat ("Reply with one word: ready")</td>
+<td>→ <code>ollama/qwen3.6:latest</code>, 200</td>
+</tr>
+<tr>
+<td><code>auto</code> code request</td>
+<td>→ <code>ollama/qwen3-coder:latest</code>; returned a correct <code>is_palindrome</code> implementation</td>
+</tr>
+<tr>
+<td><code>auto-fast</code> streaming</td>
+<td>SSE relayed, <code>model</code> field rewritten to <code>auto-fast</code>, <code>[DONE]</code> terminal</td>
+</tr>
+<tr>
+<td><code>auto</code> + tool definition</td>
+<td>→ <code>ollama/qwen3-coder:latest</code>; real tool call <code>get_current_time({"city":"Paris"})</code> with id <code>call_stec6jyt</code></td>
+</tr>
+<tr>
+<td><code>explain</code> (code+tools / strict schema / image)</td>
+<td>after evidence: → resident <code>qwen3.8:latest</code> (ranked on catalogue prior + residency); image request excluded 5 deployments by hard filters, 3 eligible</td>
+</tr>
+<tr>
+<td><strong>Routing between real deployments</strong></td>
+<td>demonstrated: the same <code>auto</code> alias sent chat to <code>qwen3.6</code>, code/tools to <code>qwen3-coder</code>, vision to <code>qwen3.6</code>, agent tool round trips to <code>gemma4:31b</code> (<code>27-decisions.txt</code>, <code>eval-live.json</code>)</td>
+</tr>
+<tr>
+<td><code>eval --mode live --save-measurements --deployments qwen3.6 gemma4:31b qwen3-coder</code></td>
+<td>completed (<code>eval-live.json</code>); see table below. A first full 8-model run was killed when its Terminal window was closed; the subset run executes detached.</td>
+</tr>
+<tr>
+<td><strong>exposed design bug</strong></td>
+<td>the deployment fingerprint included the served context, which flips between 4096 (assumed, unloaded) and 131072 (observed, loaded) on every Ollama load/unload — invalidating probe evidence mid-run (gemma4 extraction tasks hit 422 despite a passed <code>json_schema</code> probe). Fixed in commit after <code>dadd377</code> (fingerprint = intrinsic identity only); measurements saved during this eval were therefore stored under the old fingerprints and must be regenerated with another <code>eval --save-measurements</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="live-evaluation-3-deployment-subset-15-calib-32-test-tasks-temperature-0-max_tokens-400">Live evaluation (3-deployment subset; 15 calib / 32 test tasks; temperature 0; max_tokens 400)</h3>
+<p><strong>Historical</strong> — source <code>1122e1f</code>, evaluator before scorer versioning; superseded by the hardening-pass
+run below (scorer <code>2026.10.11-2</code>), which the website quotes. Kept as recorded.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>policy</th>
+<th>success</th>
+<th>95 % CI</th>
+<th>completion</th>
+<th>violations</th>
+<th>p50 ms</th>
+<th>p95 ms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auto (live routing)</td>
+<td>0.875</td>
+<td>[0.72, 0.95]</td>
+<td><strong>1.000</strong></td>
+<td><strong>0</strong></td>
+<td>693</td>
+<td>27 136</td>
+</tr>
+<tr>
+<td>fixed-strong (calibrated: qwen3-coder)</td>
+<td><strong>0.906</strong></td>
+<td>[0.76, 0.97]</td>
+<td>0.969</td>
+<td>1</td>
+<td>646</td>
+<td>4 849</td>
+</tr>
+<tr>
+<td>fixed-fast (calibrated: qwen3-coder)</td>
+<td>0.906</td>
+<td>[0.76, 0.97]</td>
+<td>0.969</td>
+<td>1</td>
+<td>646</td>
+<td>4 849</td>
+</tr>
+<tr>
+<td>rules (gold label + specialist tags)</td>
+<td>0.812</td>
+<td>[0.65, 0.91]</td>
+<td>1.000</td>
+<td>0</td>
+<td>959</td>
+<td>4 868</td>
+</tr>
+<tr>
+<td>random</td>
+<td>0.688</td>
+<td>[0.51, 0.82]</td>
+<td>0.938</td>
+<td>2</td>
+<td>4 189</td>
+<td>9 826</td>
+</tr>
+<tr>
+<td>oracle (offline upper bound)</td>
+<td>0.969</td>
+<td>[0.84, 0.99]</td>
+<td>1.000</td>
+<td>0</td>
+<td>552</td>
+<td>4 585</td>
+</tr>
+</tbody>
+</table>
+<p>Per deployment on the test split: qwen3-coder 0.906 (p50 0.65 s), gemma4:31b 0.875 (p50 17.5 s —
+thinking), qwen3.6 0.500 (thinking budget exhausted by <code>max_tokens 400</code> on many tasks; its probes
+were also wrongly <code>unsupported</code> at eval time, see above). Routing overhead mean 0.53 ms, p95 0.72 ms;
+deterministic task-label accuracy 0.84; evidence levels used by <code>auto</code>: measured 27/32, uncalibrated 5/32.
+Routing mistakes (auto failed, oracle succeeded): <code>code-03</code> (sent to gemma4 under an uncalibrated
+prior), <code>math-05</code>, <code>long-01</code>.</p>
+<p><strong>Honest reading.</strong> On this task set and hardware, <code>auto</code> did <strong>not</strong> outperform the best single
+model: <code>qwen3-coder:latest</code> was both the strongest and the fastest deployment, and <code>auto</code> chose it
+25/32 times anyway. The measurable benefits of routing here are capability coverage (0 violations and
+100 % completion — the fixed model cannot take images) and transparency; the cost is a higher p95
+latency whenever a task is sent to a slow thinking model. Acceptance targets from docs/evaluation.md:
+violations 0 ✔; completion ≥ fixed-strong ✔; success ≥ fixed-strong − 0.05 ✔ (0.875 vs 0.906);
+overhead p95 &lt; 5 ms ✔. The simple mode (request a concrete deployment id) remains available.</p>
+<p>Caveats: small n (CIs overlap everywhere); <code>max_tokens 400</code> penalises thinking models; served context
+for unloaded models was assumed 4096 during the run; only 3 of 8 deployments were swept.</p>
+<h2 id="hardening-pass-branch-hardeningreview-2026-10-11-commit-0f8af84-docs">Hardening pass (branch <code>hardening/review-2026-10-11</code>, commit <code>0f8af84</code> + docs)</h2>
+<p>The numbers above are the <strong>historical 2026-10-11 results of the 0.1.0 evaluator</strong> and are left as they
+were reported (that evaluator had lenient scorers; see docs/progress.md finding 6). Everything in this
+section was produced by the repaired code.</p>
+<h3 id="executed-deterministic">Executed (deterministic)</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>check</th>
+<th>command</th>
+<th>outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lint</td>
+<td><code>ruff check src tests</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>Full test suite (cloud container) — superseded by the 2026-10-12 pass below</td>
+<td><code>python -m pytest</code> — CPython 3.13.16, Linux x86_64, no isolation backend; revision <code>80276bb</code></td>
+<td><strong>157 passed, 4 skipped</strong> in 70 s. The 4 skips are <code>tests/test_evaluation.py::test_sandbox_blocks_writes_outside_work</code>, <code>::test_sandbox_blocks_network</code>, <code>::test_sandbox_reference_solution_passes</code>, <code>::test_sandbox_timeout_fails_cleanly</code> — skip reason "no isolation backend (bwrap not installed; docker present but daemon not reachable)".</td>
+</tr>
+<tr>
+<td>Full test suite (owner's Mac) — superseded by the 2026-10-12 pass below</td>
+<td><code>python -m pytest -rs -v --durations=5</code> — macOS Darwin 27.0.0 arm64, CPython 3.12.15, isolation backend <strong><code>sandbox-exec</code></strong> (<code>/usr/bin/sandbox-exec</code>; bwrap and docker absent); revision <strong><code>80276bbeb9e6cbe3297c6b32bd73df48d389b238</code></strong> (the hardening head; an earlier run on <code>0172760</code> gave 160 passed and was superseded after <code>91f9e6c</code> changed <code>modelsaar test</code>); run 2026-10-11 21:04 IST via <code>run_mac_tests.command</code></td>
+<td><strong>161 passed, 0 skipped</strong> in 48 s, exit 0 — the four isolation tests executed under <code>sandbox-exec</code> (<code>test_sandbox_timeout_fails_cleanly</code> 2.0 s). Logs and commit classification: <code>docs/live-runs/2026-10-11-mac-tests/</code>.</td>
+</tr>
+<tr>
+<td>Regression tests for the review findings</td>
+<td><code>python -m pytest tests/test_hardening_2026_10_11.py</code></td>
+<td>28 passed; run against <code>1122e1f</code> 26 fail (22 behavioural, 4 on a field/symbol the fix introduced) and 2 positive controls pass — <code>docs/live-runs/2026-10-11-baseline/</code> (finding → fix → test table in docs/progress.md)</td>
+</tr>
+<tr>
+<td>Evaluator tests — superseded by the 2026-10-12 pass below</td>
+<td><code>python -m pytest tests/test_evaluation.py tests/test_classifier_schema.py</code></td>
+<td>65 passed, 4 skipped (sandbox) of 69 at that revision</td>
+</tr>
+<tr>
+<td>Clean wheel install, loopback default, private keys, one routed request, scheme-1 state DB migration</td>
+<td><code>scripts/install-check.sh</code></td>
+<td><strong>PASS</strong> (<code>modelsaar 0.1.0</code> wheel into a fresh venv; <code>server.host: 127.0.0.1</code>; <code>keys/api_keys</code> mode 600; chat via <code>auto</code> ok; <code>doctor</code> reports the 1 probe + 1 measurement written under evidence scheme 1; <code>meta.evidence_scheme = 2</code>; old rows kept)</td>
+</tr>
+<tr>
+<td>Fresh-volume container start (Compose-equivalent: empty volume, read-only config mount, non-root, keys created once, unchanged after restart)</td>
+<td><code>scripts/compose-smoke.sh</code></td>
+<td><strong>NOT RUN here</strong> (no Docker daemon in the build container); the script is a CI step (<code>container</code> job) and runs on the next push</td>
+</tr>
+<tr>
+<td>Live verification script, dry run against the fake backend (SIMULATED models)</td>
+<td><code>scripts/live_verify.sh http://127.0.0.1:23111 small:1b big:27b</code>, then the same command again</td>
+<td>all steps exit 0; second run skipped every finished step and resumed the evaluation from its checkpoint (<code>resumed_records: 126</code>); no key material in any output file</td>
+</tr>
+</tbody>
+</table>
+<h3 id="executed-live-owners-mac-gx10-2026-10-11-18321902-ist-docslive-runs2026-10-11-gx10-hardening">Executed live — owner's Mac → GX10, 2026-10-11 18:32–19:02 IST (<code>docs/live-runs/2026-10-11-gx10-hardening/</code>)</h3>
+<p>Driven by double-clicking <code>run_live_verify.command</code> in Finder from this session; the script ran
+detached (<code>nohup caffeinate</code>) and copied its folder back. Environment (<code>00-env.txt</code>): macOS Darwin
+27.0.0 arm64, CPython 3.12.15, ModelSaar 0.1.0 at commit <code>0f8af84b66df</code>, <strong>Ollama 0.32.13</strong> at
+<code>http://&lt;gx10-tailscale-address&gt;:11434</code>; <code>sandbox-exec</code> available, so <code>code_exec</code> tasks were scored in isolation.
+Config is in <code>10b-config-redacted.txt</code>; model digests in <code>02-backend-tags.txt</code> (qwen3.6 <code>096fdbd02fe6…</code>,
+gemma4:31b <code>6316f0629137…</code>, qwen3-coder <code>06c1097efce0…</code>, all Q4_K_M); these digests are the deployments'
+identities and part of their fingerprints.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>step</th>
+<th>outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>init</code> (fresh home), <code>discover</code>, <code>doctor</code></td>
+<td>8 deployments; <code>doctor</code> 0 failures, warnings: assumed served context 4096 for unloaded models, <code>json_schema</code> unknown until probed</td>
+</tr>
+<tr>
+<td><code>probe --all</code> (offline path: no gateway listening yet)</td>
+<td>all 8 probed with evidence (<code>13-probe-all.txt</code>): streaming/tools/parallel_tools/json_object/json_schema <strong>supported on all 8</strong>; vision supported on 6, <code>unsupported</code> on muse-glimmer (answered but did not identify the colour) and on the two coder models (backend metadata)</td>
+</tr>
+<tr>
+<td><code>explain</code> dry runs (chat / code+tools / vision / strict schema)</td>
+<td>code+tools → qwen3-coder (catalogue prior 0.77, blend shown), vision → a vision-capable model, schema → json_schema-verified model (<code>15-18-*.txt</code>)</td>
+</tr>
+<tr>
+<td>gateway started; <code>/v1/models</code>, <code>modelsaar test</code></td>
+<td>ok</td>
+</tr>
+<tr>
+<td><strong><code>POST /admin/probe</code></strong> (streaming probe of qwen3.6 through the running gateway's admission)</td>
+<td>200 in 11.0 s; evidence visible without restart (<code>23-admin-probe-via-gateway.txt</code>)</td>
+</tr>
+<tr>
+<td><strong>Wire-level client checks</strong> (<code>scripts/live_client_checks.py</code>, <code>client-checks.json</code>)</td>
+<td>chat 200 → qwen3.8, <code>model</code> field = <code>auto</code> (attribution ok); stream 200 → qwen3-coder, 12 frames, <code>finish=stop</code>, <code>[DONE]</code>, every frame's <code>model</code> = <code>auto-fast</code>, <code>content-type: text/event-stream</code>; <strong>tool emission</strong> 200 → qwen3-coder, 1 tool call, <code>finish=tool_calls</code>; <strong>tool-result continuation</strong> 200 on the same deployment, decision <code>affinity.tool_round_trip = ollama/qwen3-coder:latest</code>, <code>failover_allowed = false</code>; <strong>session header</strong> (<code>X-ModelSaar-Session</code>) pinned the second request to the first's deployment, decision <code>affinity.status = found</code>, <code>session_source = header:X-ModelSaar-Session</code>; <code>video_url</code> part → <strong>400 <code>unsupported_content_type</code></strong> with no backend dispatch</td>
+</tr>
+<tr>
+<td><code>decisions</code>, <code>status</code></td>
+<td><code>27-decisions.txt</code>: the same <code>auto</code> alias sent conversation to qwen3.8 and agent/tool traffic to qwen3-coder; overhead 0.2–0.8 ms</td>
+</tr>
+<tr>
+<td>Real clients</td>
+<td><strong>NOT RUN</strong> — none installed on the Mac (<code>50-real-clients.txt</code> lists the exact commands per client)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="live-evaluation-with-the-repaired-evaluator-3-deployments-15-calib-32-test-max_tokens-400-temperature-0-seed-7-scorer-20261011-2-tasks-sha256-84c34596cb64-sandbox-sandbox-exec">Live evaluation with the repaired evaluator (3 deployments; 15 calib / 32 test; <code>max_tokens 400</code>, temperature 0, seed 7, scorer <code>2026.10.11-2</code>, tasks sha256 <code>84c34596cb64…</code>, sandbox <code>sandbox-exec</code>)</h3>
+<p>Deployments: qwen3.6:latest (35.5B, ctx assumed 4096), gemma4:31b (31.3B, ctx assumed 4096),
+qwen3-coder:latest (30.5B, ctx 131072). Calibration picked qwen3-coder as both fixed-strong and
+fixed-fast (calib success 0.933 / p50 0.68 s; gemma4 0.80 / 17.8 s; qwen3.6 0.467 / 4.3 s).</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>policy</th>
+<th>success</th>
+<th>95 % CI</th>
+<th>completion</th>
+<th>violations</th>
+<th>p50 ms</th>
+<th>p95 ms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>auto (live routing)</strong></td>
+<td><strong>0.938</strong></td>
+<td>[0.80, 0.98]</td>
+<td><strong>1.000</strong></td>
+<td><strong>0</strong></td>
+<td>598</td>
+<td>7 958</td>
+</tr>
+<tr>
+<td>fixed-strong (calibrated: qwen3-coder)</td>
+<td>0.938</td>
+<td>[0.80, 0.98]</td>
+<td>0.969</td>
+<td>1</td>
+<td>639</td>
+<td>4 760</td>
+</tr>
+<tr>
+<td>fixed-fast (calibrated: qwen3-coder)</td>
+<td>0.938</td>
+<td>[0.80, 0.98]</td>
+<td>0.969</td>
+<td>1</td>
+<td>639</td>
+<td>4 760</td>
+</tr>
+<tr>
+<td>rules (gold label + specialist tags)</td>
+<td>0.812</td>
+<td>[0.65, 0.91]</td>
+<td>1.000</td>
+<td>0</td>
+<td>963</td>
+<td>4 859</td>
+</tr>
+<tr>
+<td>random (diagnostic)</td>
+<td>0.719</td>
+<td>[0.55, 0.84]</td>
+<td>1.000</td>
+<td>0</td>
+<td>4 320</td>
+<td>24 356</td>
+</tr>
+<tr>
+<td>oracle (offline upper bound, not available at runtime)</td>
+<td>1.000</td>
+<td>[0.89, 1.00]</td>
+<td>1.000</td>
+<td>0</td>
+<td>639</td>
+<td>4 671</td>
+</tr>
+</tbody>
+</table>
+<p>Per deployment on the test split: qwen3-coder 0.938 (p50 0.64 s, 1 violation = the vision task it
+cannot take), gemma4:31b 0.938 (p50 20.3 s, thinking), qwen3.6 0.500 (p50 4.3 s; 0/5 coding, 0/3
+summarization, 0/2 translation under the 400-token budget — its reasoning consumes the budget).
+Routing overhead mean 0.67 ms, p95 0.98 ms; task-label accuracy 0.844; evidence levels used by <code>auto</code>:
+measured for all 32 requests (<code>measured:2</code> 25, <code>measured:1</code> 7); classifier not enabled. <code>auto</code> sent 30/32
+tasks to qwen3-coder and the vision task plus the tool round trip (<code>cont-01</code>) to gemma4. Routing
+mistakes (auto failed, oracle succeeded): <code>math-05</code> (qwen3-coder answered 100 for 50), <code>long-01</code>
+(qwen3-coder dropped a required line). The rules baseline scored 0/5 on coding because it follows the
+catalogue's <code>code</code> tag to qwen3.6 in deployment order, which fails coding under this budget — a
+reminder that tags are hypotheses and measured evidence is what <code>auto</code> uses.</p>
+<p><strong>Reading.</strong> On this task set and hardware, <code>auto</code> and fixed-strong each scored 30/32; <code>auto</code>
+completed 32 versus 31 requests, recorded zero versus one capability violation (the fixed model cannot
+take the image task), and had a p95 end-to-end latency of 7.958 s versus 4.760 s because the two tasks it
+sent to gemma4 took 16.6 s and 21.6 s. Routing overhead (0.98 ms p95) is separate from end-to-end
+latency. The two policies differ on exactly two tasks: <code>vis-02</code> (solved by <code>auto</code>) and <code>long-01</code>, whose
+result differed despite selection of the same model; the cause has not been isolated. Equal point
+estimates with overlapping intervals establish neither equivalence nor general superiority, and nothing
+here shows faster answers. Acceptance targets (docs/evaluation.md): violations 0 ✔;
+completion ≥ fixed-strong ✔; success ≥ fixed-strong − 0.05 ✔; overhead p95 &lt; 5 ms ✔. The explicit
+option (request a concrete deployment id, or <code>auto-fast</code>) remains the right choice when one model is
+known to be best for a workload.</p>
+<p>Caveats: n = 32 (CIs overlap everywhere); <code>max_tokens 400</code> systematically penalises thinking
+models (qwen3.6, gemma4) — a matched larger budget was not run in this pass; served context for
+unloaded models was assumed 4096; 3 of 8 deployments swept; one hardware/runtime; synthetic tasks.
+Complete sanitised per-request records: <code>eval-live.json.records.jsonl</code> (173 records: ids, status,
+latency, scorer detail; no prompts); machine-readable aggregates: <code>eval-live.json</code>.</p>
+<h3 id="installer-and-website-branch-websitemodelsaar-com">Installer and website (branch <code>website/modelsaar-com</code>)</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>check</th>
+<th>outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>https://modelsaar.com/install.sh</code> (source <code>site/static/install.sh</code>, pinned to the hardening branch head)</td>
+<td>executed on <strong>Linux x86_64</strong> through all three paths (pipx, uv, <code>pip --user</code>), a repeat run, an unreachable backend and an occupied port, against the fixture backend on port 11434; and on the <strong>owner's Mac (arm64, uv, system Python 3.9 too old → uv fetched 3.12)</strong> against the GX10: <code>modelsaar test</code> 200 from <code>ollama/qwen3.8:latest</code>. Transcripts: <code>docs/live-runs/2026-10-11-installer/</code>. The first Mac attempt failed on a corrupt uv cache entry (documented, troubleshooting entry added). The served URL itself could not be exercised before the domain is connected.</td>
+</tr>
+<tr>
+<td>Website</td>
+<td>built from the repository; static checks, Playwright/axe checks and Lighthouse lab runs recorded in <code>site/VALIDATION.md</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="still-not-run-after-this-pass">Still NOT RUN after this pass</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>item</th>
+<th>how to run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Real clients (Open WebUI, OpenClaw, OpenCode, Hermes)</td>
+<td>see <code>50-real-clients.txt</code> in the run folder: install/start the client, <code>modelsaar client-config &lt;client&gt; --apply</code>, chat, <code>modelsaar decisions --limit 10</code></td>
+</tr>
+<tr>
+<td>Fresh-volume container start</td>
+<td><code>scripts/compose-smoke.sh</code> on a host with Docker (also runs in CI)</td>
+</tr>
+<tr>
+<td>Evaluation with a thinking-matched budget / all 8 deployments</td>
+<td><code>run_live_verify.command</code> with <code>DEPS</code> widened; raise <code>MAX_TOKENS</code> in <code>evaluation/harness.py</code> for a separately labelled run</td>
+</tr>
+<tr>
+<td>Embeddings contract against a real embedding model (identity binding, output validation)</td>
+<td><code>ollama pull qwen3-embedding:0.6b</code>, declare <code>embeddings:</code>, <code>curl /v1/embeddings</code></td>
+</tr>
+<tr>
+<td>Generic OpenAI-compatible backend (vLLM / llama.cpp) incl. <code>/tokenize</code> and <code>identity</code> declarations</td>
+<td><code>modelsaar init --endpoint http://127.0.0.1:8000/v1 --type openai_compatible</code>, declare models, <code>scripts/live_verify.sh</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="correction-pass-2026-10-12-second-independent-review-r1r8-of-hardening-80276bb">Correction pass 2026-10-12 (second independent review, R1–R8, of hardening <code>80276bb</code>)</h2>
+<p>The review pack (<code>ModelSaar_Independent_Review_2026-10-11</code>) reproduced the existing suite (157 passed,
+4 skipped, ruff clean) and then obtained <strong>11 failing desired-contract checks</strong> (7 gateway/resource/
+embedding + 4 evaluator) with 6 passing positive controls, plus 6 launcher/installer observations.
+This pass reproduced every one of them before changing anything, corrected them, and kept the
+reviewer's test files byte-for-byte in <code>tests/independent_review_2026_10_11/</code>.</p>
+<h3 id="reproduced-before-correction-isolated-worktree-at-exactly-80276bb-fresh-venv-cpython-31316">Reproduced before correction (isolated worktree at exactly <code>80276bb</code>, fresh venv, CPython 3.13.16)</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>what</th>
+<th>command</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reviewer's contract tests</td>
+<td><code>pytest evidence/hardening/test_remaining_contracts.py evidence/test_evaluator_remaining_contracts.py</code> with <code>PYTHONPATH=&lt;80276bb&gt;/src:&lt;80276bb&gt;/tests</code></td>
+<td><strong>11 failed, 6 passed</strong> — the same 11 ids as the review</td>
+</tr>
+<tr>
+<td>launcher reproducer (<code>reproduce_launcher.py</code>, path constants adapted; stub <code>gh</code>, local bare origin)</td>
+<td>positive resume PASS; skip-domain, build-query-failure, origin-prefix: <strong>DEFECT REPRODUCED</strong></td>
+<td>matches <code>launcher_results.json</code></td>
+</tr>
+<tr>
+<td>installer reproducer (<code>reproduce_installer.py</code>)</td>
+<td>foreign <code>/healthz</code> accepted, saved fixture key sent, <code>verification: OK</code>; <code>init &amp;&amp; serve</code> exit 1</td>
+<td><strong>DEFECT REPRODUCED</strong> ×2</td>
+</tr>
+<tr>
+<td>publication-tree reproducer</td>
+<td>untracked file entered gh-pages with BUILD-INFO claiming the clean commit</td>
+<td><strong>DEFECT REPRODUCED</strong>; rollback control PASS</td>
+</tr>
+<tr>
+<td>address guard at website <code>840b068</code></td>
+<td>synthetic 192.168/16 and 172.16/12 examples accepted (misses); CGNAT and 10/8 rejected</td>
+<td>reproduced</td>
+</tr>
+</tbody>
+</table>
+<p>Transcripts: <code>docs/live-runs/2026-10-12-correction/before/</code> (website branch).</p>
+<h3 id="corrections-source">Corrections (source)</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>id</th>
+<th>change</th>
+<th>files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1</td>
+<td>typed stream read timeout → uncertain hold (same rule as non-stream); probe runner stops after an uncertain timeout, reports <code>skipped</code>, and the admin/CLI paths hold the reservation</td>
+<td><code>adapters/base.py</code>, <code>server.py</code> (<code>_relay</code>, <code>admin_probe</code>), <code>probes.py</code>, <code>cli.py</code></td>
+</tr>
+<tr>
+<td>R2</td>
+<td>pools count a completed deployment's weights as <em>assumed resident</em> until a residency observation reconciles them (Ollama <code>/api/ps</code>; <code>assumed_residency_ttl_s</code> for runtimes without one); <code>unknown_memory_policy=reject</code> applies to every counted member; status shows <code>memory_assumed_resident</code></td>
+<td><code>routing/admission.py</code>, <code>routing/router.py</code>, <code>config.py</code></td>
+</tr>
+<tr>
+<td>R3</td>
+<td>alias identity established before dispatch (declared &gt; recorded &gt; first member in contract order with a verified identity), recorded synchronously; differing known identity excluded regardless of dimensions</td>
+<td><code>routing/router.py</code></td>
+</tr>
+<tr>
+<td>R4</td>
+<td>embeddings carry the server deadline; an explicit <code>None</code> never disables the httpx timeout (tighter of server/backend deadlines everywhere); SSE frames classified comment/done/chunk/malformed; completion requires ≥1 chunk, no malformed frame, finish or <code>[DONE]</code>; malformed frames not relayed, invalidate the stream</td>
+<td><code>adapters/base.py</code>, <code>adapters/*.py</code>, <code>protocol/sse.py</code>, <code>server.py</code></td>
+</tr>
+<tr>
+<td>R5</td>
+<td><code>/healthz</code> carries <code>service: modelsaar</code>; <code>modelsaar test</code> identifies the listener before sending a key and requires routing attribution; installer (website branch) does the same and prints <code>serve</code>, the key value vs the key command, one <code>client-config</code> command per app</td>
+<td><code>server.py</code>, <code>cli.py</code>, <code>site/static/install.sh</code>, site content</td>
+</tr>
+<tr>
+<td>R7</td>
+<td><code>code_exec</code> scored from a nonce-keyed runner record (harness output captured separately from model output); tool arguments validated against the declared schema; checkpoint records bound to task content, scorer version, budgets, routing config hash and deployment fingerprint (format 2; legacy records re-run); bwrap input allowlist and deny-by-default macOS profile; <code>SCORER_VERSION 2026.10.12-3</code></td>
+<td><code>evaluation/scoring.py</code>, <code>evaluation/sandbox.py</code>, <code>evaluation/harness.py</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="executed-after-correction-at-the-final-hardening-head-the-first-line-of-every-transcript-in-docslive-runs2026-10-12-correctionfinal-head-on-the-website-branch-names-the-exact-revision-worktree-clean-fresh-venv">Executed after correction (at the final hardening head: the first line of every transcript in <code>docs/live-runs/2026-10-12-correction/final-head/</code> on the website branch names the exact revision; worktree clean, fresh venv)</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>check</th>
+<th>command</th>
+<th>outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>reviewer's 17 contract checks</td>
+<td><code>pytest tests/independent_review_2026_10_11/</code></td>
+<td><strong>17 passed</strong> (11 formerly failing + 6 controls)</td>
+</tr>
+<tr>
+<td>author regression tests for R1–R5, R7</td>
+<td><code>pytest tests/test_correction_2026_10_12.py</code></td>
+<td>14 passed (recovery after hold, reconciliation by observation, same-identity replicas, keepalive/usage frames, malformed-amid-valid, legacy/changed/removed checkpoint cases, listener identification)</td>
+</tr>
+<tr>
+<td>full suite, no isolation backend</td>
+<td><code>python -m pytest -m "not live"</code> — CPython 3.13.16, Linux x86_64</td>
+<td><strong>190 passed, 6 skipped</strong> (the 6 sandbox tests; skip reason printed)</td>
+</tr>
+<tr>
+<td>full suite, bubblewrap on PATH</td>
+<td>same, with <code>bwrap</code> 0.9 available</td>
+<td><strong>196 passed, 0 skipped</strong> — the sandbox tests executed: writes, network, timeout, reference solutions, <strong>synthetic host file outside the work directory unreadable</strong>, forged completion marker rejected. (The first exact-head rerun in a venv under <code>/tmp</code> found that the private <code>/tmp</code> mount hid such a venv inside bubblewrap; fixed by mount order and rerun.)</td>
+</tr>
+<tr>
+<td>lint</td>
+<td><code>ruff check src tests</code></td>
+<td>pass (the verbatim reviewer files are excluded from ruff, not from pytest)</td>
+</tr>
+<tr>
+<td>simulated evaluation smoke</td>
+<td><code>modelsaar eval --mode simulated --limit 12</code></td>
+<td>runs end to end under the new scorer</td>
+</tr>
+<tr>
+<td>installer scenarios (real installer + real CLI, loopback fixtures)</td>
+<td><code>scripts/installer_scenarios.py</code> (website branch)</td>
+<td>10/10: fresh, repeat, unrelated listener (no key sent), running gateway reused, <code>serve</code>, <code>test</code> with attribution, <code>client-config open-webui</code>, key value — <code>docs/live-runs/2026-10-12-installer-scenarios/</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="not-run-in-this-pass">Not run in this pass</h3>
+<p>Real GX10 inference under the corrected code (the benchmark result above is unchanged and still
+labelled scorer <code>2026.10.11-2</code>; a rerun under <code>2026.10.12-3</code> would be a new, separately labelled run);
+real-model embeddings; vLLM/llama.cpp; a real client UI (exact owner-run steps in <code>site/VALIDATION.md</code>);
+Docker; live GitHub publication, DNS, TLS.</p>
+<p><strong>macOS <code>sandbox-exec</code> — NOT RUN at this revision, and material.</strong> The owner's Mac was not reachable from
+this session, so the rewritten deny-by-default profile (<code>_macos_profile</code>) has only been inspected, not
+executed. If it is too strict for the Mac's Python installation, the 6 sandbox tests will <em>fail</em> there
+(not skip) and <code>code_exec</code> tasks will fail until the profile is widened; if it is too loose, the
+read-isolation test (<code>test_sandbox_cannot_read_a_synthetic_host_file_outside_the_work_directory</code>)
+will fail. Owner step: in the Model_Router checkout at this revision run
+<code>python -m pytest tests/test_evaluation.py -k sandbox -rs -v</code> and attach the transcript as
+<code>docs/live-runs/&lt;date&gt;-mac-tests/mac-tests-&lt;commit&gt;.txt</code>; the bubblewrap profile with the same
+allowlist idea was executed here (196 passed).</p>
+<h2 id="alpha-closure-pass-2026-10-12-third-independent-review-of-5cb7443-r1-c-r2-a-r2-b-r4-c-r6-a-r6-b-r7-c-r8-d">Alpha closure pass 2026-10-12 (third independent review of <code>5cb7443</code>: R1-C, R2-A, R2-B, R4-C, R6-A, R6-B, R7-C, R8-D)</h2>
+<p>The review reproduced the existing suite (190 passed, 6 skipped, ruff clean, the 17 earlier reviewer tests
+passing) and obtained 6 further behavioural failures with 6 controls, plus two launcher residuals and one
+editorial list. This pass reproduced the 12 cases at <code>5cb7443</code> (6 failed / 6 passed), corrected them, and
+kept the reviewer's three files verbatim under <code>tests/independent_review_2026_10_12/</code>.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>id</th>
+<th>correction</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R2-A</td>
+<td><code>loaded_models()</code> returns <code>None</code> when <code>/api/ps</code> fails; the router keeps previous <code>loaded</code> flags and the admission layer keeps assumed residency until a successful observation (<code>last_residency_observation_ok</code>)</td>
+<td><strong>fixed</strong></td>
+</tr>
+<tr>
+<td>R2-B</td>
+<td><code>Reservation.release(submitted=False)</code> for a <code>connect</code> failure (nothing reached the runtime): no assumed residency, failover proceeds</td>
+<td><strong>fixed</strong></td>
+</tr>
+<tr>
+<td>R4-C</td>
+<td>the upstream <code>[DONE]</code> is held; the gateway emits exactly one terminal marker after validation, so an error frame precedes it</td>
+<td><strong>fixed</strong></td>
+</tr>
+<tr>
+<td>R1-C</td>
+<td><code>probe_all</code> acquires the gateway reservation per deployment, holds it after an uncertain timeout and reports the remaining deployments <code>deferred</code></td>
+<td><strong>fixed</strong> (evaluator <code>--probe</code>)</td>
+</tr>
+<tr>
+<td>R7-C</td>
+<td>routed-policy checkpoints include <code>eligible_set_key</code> (sorted ids + fingerprints; ids only in simulated mode); fixed sweeps unchanged</td>
+<td><strong>fixed</strong></td>
+</tr>
+<tr>
+<td>macOS code execution</td>
+<td><code>sandbox-exec</code> backend <strong>disabled in the alpha</strong> unless <code>MODELSAAR_MACOS_SANDBOX=verify</code> (owner verification run); <code>code_exec</code> tasks are skipped on macOS with that reason</td>
+<td><strong>disabled pending verification</strong></td>
+</tr>
+<tr>
+<td>R6-A / R6-B</td>
+<td>launcher: all push URLs enumerated (<code>--get-all</code>, <code>--push --all</code>), multiple destinations refused; <code>verify-serving</code> requires HTTPS 200 + matching BUILD-INFO + served <code>install.sh</code> byte-identical to the gh-pages commit; Mac runner refuses dirty checkouts, requires <code>sandbox-exec</code>, fails on skips, writes PASSED/FAILED</td>
+<td><strong>fixed</strong> (launcher is outside the repository; mocked outcomes in the archive)</td>
+</tr>
+<tr>
+<td>R8-D</td>
+<td>website copy: installer evidence by pin, candidate status, launch measures, OpenCode commands, roadmap summary</td>
+<td><strong>fixed</strong> (website branch)</td>
+</tr>
+</tbody>
+</table>
+<p>Executed after the pass: the exact-head transcripts are in <code>docs/live-runs/2026-10-12-alpha/</code> on the website
+branch (suite without/with bubblewrap, lint, both reviewer test sets, simulated eval, real <code>pip install</code> from
+the pinned commit plus one routed request against the fixture backend). Not run: macOS <code>sandbox-exec</code>
+(disabled for the alpha; owner <code>run_mac_tests.command</code>), real GX10 inference under the corrected code, real
+client UI, live publication/DNS/TLS.</p>
+<h2 id="not-run-needs-hardware-a-daemon-or-a-real-client-status-at-010-1122e1f">NOT RUN (needs hardware, a daemon, or a real client) — status at 0.1.0 / 1122e1f</h2>
+<table tabindex="0">
+<thead>
+<tr>
+<th>item</th>
+<th>why not here</th>
+<th>how to run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Embeddings against a real Ollama</td>
+<td>no embedding model is pulled on the GX10</td>
+<td><code>ollama pull qwen3-embedding:0.6b</code>, declare an <code>embeddings:</code> contract, <code>curl /v1/embeddings</code></td>
+</tr>
+<tr>
+<td>Live evaluation over all 8 deployments (full sweep)</td>
+<td>the full run (~2 h) was interrupted; the 3-deployment subset completed</td>
+<td><code>modelsaar eval --mode live --save-measurements --out eval.json</code> detached (<code>run_live_eval.command</code> without <code>--deployments</code>)</td>
+</tr>
+<tr>
+<td>Generic OpenAI-compatible adapter against vLLM / llama.cpp server / LM Studio, incl. <code>/tokenize</code></td>
+<td>no such server available</td>
+<td><code>modelsaar init --endpoint http://127.0.0.1:8000/v1 --type openai_compatible</code>, declare models, <code>probe --all</code>, <code>live_check.sh</code></td>
+</tr>
+<tr>
+<td>Open WebUI, OpenClaw, OpenCode, Hermes Agent: real client tool round trip</td>
+<td>no client installed in the build environment</td>
+<td>Apply <code>modelsaar client-config &lt;client&gt;</code>; in the client ask for something that needs a tool; confirm with <code>modelsaar decisions</code> that the follow-up (tool result) stayed on the same deployment</td>
+</tr>
+<tr>
+<td>Docker Compose against a real backend</td>
+<td>not exercised</td>
+<td><code>docker compose up --build</code> with <code>examples/config.docker.yaml</code> pointing at the GX10</td>
+</tr>
+<tr>
+<td>Offline operation with host-level network block</td>
+<td>requires the owner's firewall</td>
+<td>Block outbound traffic, run <code>modelsaar serve</code> + a client, confirm chat completes</td>
+</tr>
+<tr>
+<td>Classifier benefit on real models</td>
+<td>no real classifier model</td>
+<td>enable <code>routing.classifier</code> with a small local model and compare <code>modelsaar eval --mode live</code> with/without</td>
+</tr>
+<tr>
+<td>Memory/residency measurements on specific hardware</td>
+<td>no GPU/unified memory host here</td>
+<td><code>live_check.sh</code> records <code>/api/ps</code> sizes; eval records latency; add observations to docs/catalogue.md</td>
+</tr>
+</tbody>
+</table>
+<h2 id="known-limitations-observed-during-verification">Known limitations observed during verification</h2>
+<ul>
+<li>Served Ollama context is assumed 4096 unless Modelfile/<code>/api/ps</code>/override says otherwise (doctor warns).</li>
+<li>Token estimate is conservative by design; borderline cases use <code>/tokenize</code> only on runtimes that have it.</li>
+<li>With no measurements, <code>auto</code> prefers the cheaper of effectively tied candidates; after <code>eval --save-measurements</code>
+  quality evidence dominates (shown in the simulated run: evidence levels <code>measured:*</code> for all test requests).</li>
+<li>(0.1.0) The evaluation code sandbox was basic (subprocess + rlimits); since the hardening pass code
+  tasks run only under bubblewrap / <code>sandbox-exec</code> / Docker or are skipped.</li>
+<li>Admin key is also valid for inference (one-way separation).</li>
+</ul>
+<h2 id="publication-actions-requiring-separate-authorization">Publication actions requiring separate authorization</h2>
+<p>Creating a public repository, publishing to PyPI, pushing a container image, and adding the project
+to any registry were <strong>not</strong> performed. The repository is complete for a source install.</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

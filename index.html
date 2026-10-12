@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ModelSaar — one address for your local AI</title>
+<meta name="description" content="ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.">
+<link rel="canonical" href="https://modelsaar.com/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="ModelSaar — one address for your local AI">
+<meta property="og:description" content="ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.">
+<meta property="og:url" content="https://modelsaar.com/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ModelSaar — one address for your local AI">
+<meta name="twitter:description" content="ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect."}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "ModelSaar", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.", "codeRepository": "https://github.com/gopalasubramanium/modelsaar", "programmingLanguage": "Python", "runtimePlatform": "Python 3.10+", "license": "https://www.apache.org/licenses/LICENSE-2.0", "url": "https://modelsaar.com", "version": "0.1.0 (unreleased public alpha)"}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="home">
+
+<section class="hero" aria-labelledby="hero-title">
+  <div>
+    <p class="status">Development preview — open source, no release tagged yet</p>
+    <h1 id="hero-title">One address for your local AI.</h1>
+    <p class="lede">Connect the AI apps you already use. ModelSaar sends each request to a suitable available model, chosen from the task, verified model capabilities and the limits you set.</p>
+    <p>Spend less time switching models and configuring apps. Keep control of where your requests run.</p>
+    <div class="actions">
+      <a class="btn primary" href="/get-started/">Get started locally</a>
+      <a class="btn" href="/how-it-works/">See how it works</a>
+    </div>
+    <p class="small">Needs Python 3.10+ and an inference server you already run (Ollama is detected automatically). The installer pins one candidate commit (see the roadmap for its review status) and never downloads models.</p>
+    <div class="cmd"><pre tabindex="0"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh | sh</code></pre></div>
+    <p class="cmd-note">Prefer to read it first? <a href="/get-started/#inspect">Inspect the installer</a> or <a href="/get-started/#manual">install by hand</a>.</p>
+  </div>
+  <div>
+    
+<div class="decision" aria-label="Decision record (illustration)">
+  <div class="decision-head"><span>decision req_02…</span><span>auto → <strong>ollama/qwen3-coder:latest</strong></span></div>
+  <div class="decision-req"><p>“Fix the failing pytest in src/app.py” + tools: [bash]</p><ul class="facts"><li>task: coding</li><li>needs: tool calling</li><li>context: ~3 200 tokens</li></ul></div>
+  <table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody><tr class="chosen"><td>qwen3-coder (30B) — selected</td><td><span class="yes">✓</span> tools verified by probe</td></tr><tr><td>gemma4 (31B, thinking)</td><td><span class="yes">✓</span> tools verified by probe</td></tr><tr><td>qwen3.6 (35B, thinking)</td><td><span class="yes">✓</span> tools verified by probe</td></tr></tbody></table>
+  <div class="decision-why"><p>Tool calling is a hard requirement; every candidate passed the tools probe, so none is excluded. On coding tasks the measured calibration success favours qwen3-coder (2/2, versus 1/2 and 0/2 within the run's 400-token budget), and the request is forwarded unchanged — the client keeps its own agent loop and runs the tool itself.</p></div>
+  <div class="decision-foot">Evidence: measured (calibration run). Illustration based on the three models of the 2026-10-11 run; not a live result.</div>
+</div>
+  </div>
+</section>
+
+<section aria-labelledby="problem-title">
+  <h2 id="problem-title">Several good models, one app at a time</h2>
+  <div class="two">
+    <div>
+      <p>Once you run more than one local model, every app needs its own model setting, and every task needs you to remember which model handles code, which one can read an image, which one is fast enough for chat. Change a model in Ollama and you change it in four places.</p>
+      <p>ModelSaar sits between your apps and your inference servers. Apps connect once, to one address, and ask for a virtual model called <code>auto</code>. For each request the gateway checks which of your deployments can actually do the job, picks one on evidence, forwards the request unchanged and records why.</p>
+    </div>
+    <div>
+      <p>Three things stay distinct:</p>
+      <dl class="kv">
+        <dt>Apps</dt><dd>Open WebUI, OpenCode, agents, scripts — anything that speaks the OpenAI Chat Completions API. They keep their own tools, memory and loops.</dd>
+        <dt>Inference backends</dt><dd>Ollama, vLLM, llama.cpp server and similar. They load weights and run on your hardware. ModelSaar does not replace them.</dd>
+        <dt>Models</dt><dd>The weights those backends serve, with their own licences. ModelSaar does not ship models or lower their hardware requirements.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="walk-title">
+  <h2 id="walk-title">What a routing decision looks like</h2>
+  <p class="lede">Every request produces a record like these. The scenarios below are scripted illustrations using the three models of a recorded test run — not live inference.</p>
+  <div class="walkthrough">
+<details class="scenario" id="scenario-0" open><summary>General chat <span class="small">a short question, no tools, no images</span></summary>
+<div class="decision" aria-label="Decision record (illustration)">
+  <div class="decision-head"><span>decision req_01…</span><span>auto → <strong>ollama/qwen3-coder:latest</strong></span></div>
+  <div class="decision-req"><p>“Give me one sentence of encouragement before an exam.”</p><ul class="facts"><li>task: conversation</li><li>needs: nothing special</li><li>context: ~40 tokens</li></ul></div>
+  <table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody><tr class="chosen"><td>qwen3-coder (30B) — selected</td><td><span class="yes">✓</span> eligible</td></tr><tr><td>gemma4 (31B, thinking)</td><td><span class="yes">✓</span> eligible</td></tr><tr><td>qwen3.6 (35B, thinking)</td><td><span class="yes">✓</span> eligible</td></tr></tbody></table>
+  <div class="decision-why"><p>All three can answer. Measured evidence from the calibration run gives qwen3-coder the best conversation success at the lowest latency, so the <em>quality</em> profile picks it. Had the evidence been missing, the tie would resolve to the lowest-overhead deployment and the record would say <code>uncalibrated</code>.</p></div>
+  <div class="decision-foot">Evidence: measured (calibration run). Illustration based on the three models of the 2026-10-11 run; not a live result.</div>
+</div></details>
+<details class="scenario" id="scenario-1"><summary>Coding with tools <span class="small">an agent asks to fix a test and offers a shell tool</span></summary>
+<div class="decision" aria-label="Decision record (illustration)">
+  <div class="decision-head"><span>decision req_02…</span><span>auto → <strong>ollama/qwen3-coder:latest</strong></span></div>
+  <div class="decision-req"><p>“Fix the failing pytest in src/app.py” + tools: [bash]</p><ul class="facts"><li>task: coding</li><li>needs: tool calling</li><li>context: ~3 200 tokens</li></ul></div>
+  <table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody><tr class="chosen"><td>qwen3-coder (30B) — selected</td><td><span class="yes">✓</span> tools verified by probe</td></tr><tr><td>gemma4 (31B, thinking)</td><td><span class="yes">✓</span> tools verified by probe</td></tr><tr><td>qwen3.6 (35B, thinking)</td><td><span class="yes">✓</span> tools verified by probe</td></tr></tbody></table>
+  <div class="decision-why"><p>Tool calling is a hard requirement; every candidate passed the tools probe, so none is excluded. On coding tasks the measured calibration success favours qwen3-coder (2/2, versus 1/2 and 0/2 within the run's 400-token budget), and the request is forwarded unchanged — the client keeps its own agent loop and runs the tool itself.</p></div>
+  <div class="decision-foot">Evidence: measured (calibration run). Illustration based on the three models of the 2026-10-11 run; not a live result.</div>
+</div></details>
+<details class="scenario" id="scenario-2"><summary>Question about an image <span class="small">the message carries a base64 image</span></summary>
+<div class="decision" aria-label="Decision record (illustration)">
+  <div class="decision-head"><span>decision req_03…</span><span>auto → <strong>ollama/gemma4:31b</strong></span></div>
+  <div class="decision-req"><p>“What is in this picture?” + image</p><ul class="facts"><li>task: document_vision</li><li>needs: image input</li><li>context: ~1 250 tokens</li></ul></div>
+  <table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody><tr><td>qwen3-coder (30B)</td><td><span class="nope">✗</span> image input unsupported (backend metadata)</td></tr><tr class="chosen"><td>gemma4 (31B, thinking) — selected</td><td><span class="yes">✓</span> vision verified by probe</td></tr><tr><td>qwen3.6 (35B, thinking)</td><td><span class="yes">✓</span> vision verified by probe</td></tr></tbody></table>
+  <div class="decision-why"><p>A failed capability check can never be outscored: qwen3-coder is excluded with the reason recorded. Between the two vision-capable models the recorded run picked gemma4 on its measured evidence (calibration success 0.80 versus 0.47 overall). The image is never dropped or described away — if no deployment could take it, the request would fail with blockers and remedies instead.</p></div>
+  <div class="decision-foot">Evidence: measured (calibration run). Illustration based on the three models of the 2026-10-11 run; not a live result.</div>
+</div></details>
+<details class="scenario" id="scenario-3"><summary>Tool result comes back <span class="small">the second turn of a tool call issued by gemma4</span></summary>
+<div class="decision" aria-label="Decision record (illustration)">
+  <div class="decision-head"><span>decision req_04…</span><span>auto → <strong>ollama/gemma4:31b</strong></span></div>
+  <div class="decision-req"><p>assistant: tool_call(id=call_7f2…) → tool: “14:05” → continue</p><ul class="facts"><li>task: agent</li><li>needs: tool calling + continuity</li><li>tool round trip: call_7f2…</li></ul></div>
+  <table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody><tr><td>qwen3-coder (30B)</td><td><span class="nope">✗</span> would hand the tool history to another model</td></tr><tr class="chosen"><td>gemma4 (31B, thinking) — selected</td><td><span class="yes">✓</span> issued the tool call</td></tr><tr><td>qwen3.6 (35B, thinking)</td><td><span class="nope">✗</span> would hand the tool history to another model</td></tr></tbody></table>
+  <div class="decision-why"><p>The gateway remembers which deployment issued the tool-call ids. The follow-up turn stays on it even when another candidate would score higher, and the record marks <code>failover_allowed: false</code>: if gemma4 fails now, the client gets the error rather than a silent switch to a model that never saw the tool call.</p></div>
+  <div class="decision-foot">Evidence: continuity rule. Illustration based on the three models of the 2026-10-11 run; not a live result.</div>
+</div></details>
+<details class="scenario" id="scenario-4"><summary>Nothing qualifies <span class="small">an image question when only qwen3-coder is configured</span></summary>
+<div class="decision" aria-label="Decision record (illustration)">
+  <div class="decision-head"><span>decision req_05…</span><span>auto → <strong class="nope">no eligible deployment (HTTP 422)</strong></span></div>
+  <div class="decision-req"><p>“What is in this picture?” + image — with one deployment</p><ul class="facts"><li>task: document_vision</li><li>needs: image input</li><li>deployments: 1</li></ul></div>
+  <table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody><tr><td>qwen3-coder (30B)</td><td><span class="nope">✗</span> image input unsupported (backend metadata)</td></tr></tbody></table>
+  <div class="decision-why"><p>Automatic routing with one model simply uses that model whenever it qualifies. When it does not, the answer is an HTTP 422 with the blocker (<em>image input required; capability vision is unsupported</em>) and a remedy (<em>use a deployment whose vision capability is supported</em>) — never a degraded answer that pretends the image was read.</p></div>
+  <div class="decision-foot">Evidence: hard filter. Illustration based on the three models of the 2026-10-11 run; not a live result.</div>
+</div></details>
+</div>
+  <p>Read the full pipeline — requirements, hard filters, ranking, continuity — in <a href="/how-it-works/">How it works</a>.</p>
+</section>
+
+<section aria-labelledby="setup-title">
+  <h2 id="setup-title">Three steps to a first routed request</h2>
+  <ol class="steps">
+    <li>
+      <h3>Install ModelSaar</h3>
+      <p>Python 3.10 or newer on macOS, Linux or WSL2. The one-line installer uses <code>uv</code>, <code>pipx</code> or <code>pip --user</code> — whichever you have — and pins one candidate commit.</p>
+      <div class="cmd"><pre tabindex="0"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh | sh</code></pre></div>
+    </li>
+    <li>
+      <h3>Start the gateway</h3>
+      <p>The installer has already run <code>modelsaar init</code>: it found Ollama on <code>127.0.0.1:11434</code> (an inference server with at least one model must already be running), wrote a private config and keys, and listed the models it discovered. Now start the gateway and leave it running.</p>
+      <div class="cmd"><pre tabindex="0"><code class="language-bash">modelsaar serve</code></pre></div>
+      <p class="small">Installed from source instead? Run <code>modelsaar init</code> first (once; it refuses to overwrite an existing config), then <code>modelsaar serve</code>.</p>
+    </li>
+    <li>
+      <h3>Connect an app</h3>
+      <p>Point the app at the gateway and pick <code>auto</code> as the model. Print the API key in a terminal, then paste the printed line (it starts with <code>msk_</code>) into the app's key field:</p>
+      <div class="cmd"><pre tabindex="0"><code class="language-bash">head -1 ~/.modelsaar/keys/api_keys</code></pre></div>
+      <div class="cmd"><pre tabindex="0"><code class="language-text">Base URL:  http://127.0.0.1:8484/v1
+Model:     auto
+API key:   msk_…  (the line printed by the command above)</code></pre></div>
+      <p class="small">One command per app prints its exact settings: <code>modelsaar client-config open-webui</code>, <code>modelsaar client-config opencode</code>, <code>modelsaar client-config openclaw</code> or <code>modelsaar client-config hermes</code>.</p>
+    </li>
+  </ol>
+  <p>Verify from a second terminal with <code>modelsaar test</code>: it first identifies the gateway on the configured port (an unrelated service there is reported as a collision and receives no key), lists the models the gateway advertises and sends one chat completion through <code>auto</code>, printing which deployment answered and the request id — the routing attribution that shows ModelSaar handled it. Full details, including Docker and remote hosts, in <a href="/get-started/">Get started</a>.</p>
+</section>
+
+<section aria-labelledby="compat-title">
+  <h2 id="compat-title">What works today, and how we know</h2>
+  <p class="lede">Compatibility is a tested property of an exact client, protocol and backend combination. Each row says what kind of evidence backs it.</p>
+  <div class="table-wrap" tabindex="0"><table><thead><tr><th scope="col">area</th><th scope="col">what</th><th scope="col">evidence</th><th scope="col">notes</th></tr></thead><tbody><tr><td>Interface</td><td>OpenAI-compatible Chat Completions (<code>/v1/chat/completions</code>, streaming SSE), <code>/v1/models</code>, <code>/healthz</code>, <code>/readyz</code></td><td><span class="evidence fixture">fixture tests</span> <span class="evidence live">live</span></td><td>Responses API and Anthropic Messages return an explicit 501.</td></tr><tr><td>Interface</td><td><code>/v1/embeddings</code> with identity-anchored alias contracts</td><td><span class="evidence fixture">fixture tests</span></td><td>Real-model embeddings NOT RUN; contract, identity anchoring, deadlines and output validation are fixture-tested only.</td></tr><tr><td>Backend</td><td>Ollama (discovery via <code>/api/tags</code>, <code>/api/show</code>, <code>/api/ps</code>; inference via its OpenAI-compatible layer)</td><td><span class="evidence fixture">fixture tests</span> <span class="evidence live">live</span></td><td>Ollama 0.32.13 with 8 models on an ASUS GX10, 2026-10-11.</td></tr><tr><td>Backend</td><td>Generic OpenAI-compatible server (vLLM, llama.cpp server, LM Studio, …) with declared models; vLLM <code>/tokenize</code> used for token counts</td><td><span class="evidence fixture">fixture tests</span></td><td>Not run against a real vLLM/llama.cpp server yet.</td></tr><tr><td>Client</td><td>Open WebUI</td><td><span class="evidence docs">documented</span></td><td>Configuration generated by <code>modelsaar client-config open-webui</code>; real client workflow not run.</td></tr><tr><td>Client</td><td>OpenClaw</td><td><span class="evidence docs">documented</span></td><td><code>modelsaar client-config openclaw</code>; real client workflow not run.</td></tr><tr><td>Client</td><td>OpenCode (V1 and V2 config schemas)</td><td><span class="evidence docs">documented</span></td><td><code>modelsaar client-config opencode</code> (V1) or <code>modelsaar client-config opencode-v2</code> (V2); real client workflow not run.</td></tr><tr><td>Client</td><td>Hermes Agent</td><td><span class="evidence docs">documented</span></td><td><code>modelsaar client-config hermes</code>; real client workflow not run.</td></tr><tr><td>Behaviour</td><td>Tool calls and tool-result continuation on the same deployment; session pinning via <code>X-ModelSaar-Session</code> / <code>X-OpenWebUI-Chat-Id</code></td><td><span class="evidence fixture">fixture tests</span> <span class="evidence live">live</span></td><td>Live: direct HTTP checks (<code>scripts/live_client_checks.py</code>), not a client&#x27;s own workflow.</td></tr><tr><td>Behaviour</td><td>Strict JSON schema, image input and context-size routing; unsupported media rejected before dispatch</td><td><span class="evidence fixture">fixture tests</span> <span class="evidence live">live</span></td><td></td></tr><tr><td>Behaviour</td><td>Pool memory budgets (incl. assumed residency between polls), uncertain-occupancy holds on stream/probe/embedding timeouts, probes under gateway admission</td><td><span class="evidence fixture">fixture tests</span></td><td>Not exercised on real hardware; the live run predates the 2026-10-12 corrections.</td></tr><tr><td>Platform</td><td>macOS (arm64) and Linux (x86_64): source install, gateway, probes, evaluation</td><td><span class="evidence live">live</span></td><td>Windows: use WSL2; native Windows is untested.</td></tr><tr><td>Platform</td><td>Docker Compose (gateway only; models stay with your runtime)</td><td><span class="evidence fixture">fixture tests</span></td><td>Fresh-volume start is checked by <code>scripts/compose-smoke.sh</code> (defined in CI; no CI run exists yet for the current revision).</td></tr></tbody></table></div>
+  <p><span class="evidence live">live</span> ran against a real backend; <span class="evidence fixture">fixture tests</span> are the repository's test suite against a controlled fake backend (run locally for every number on this site; the same suite runs in CI on push, and a CI run is reported only once one exists for the revision); <span class="evidence docs">documented</span> means the configuration was written from the client's own documentation and has not been exercised. Product names identify compatible software; no partnership or endorsement is implied. Details per client and backend: <a href="/integrations/">Integrations</a>.</p>
+</section>
+
+<section aria-labelledby="evidence-title">
+  <h2 id="evidence-title">Measured, not promised</h2>
+  <p>In the recorded run of 2026-10-11 (three models on one machine, 32 held-out tasks, 400-token budget), automatic routing and the strongest single model each scored 30 of 32; automatic routing completed 32 requests versus 31 (the image task the fixed model cannot take), recorded zero capability violations versus one, and had a p95 end-to-end latency of 7.958 s versus 4.760 s because two requests went to a slower thinking model. Routing overhead — the decision itself, separate from the response — was 0.98 ms at p95.</p>
+  <p>That is one run on one machine with a small task set; the confidence intervals overlap. Read the <a href="/benchmarks/">methodology, numbers and limitations</a>, or regenerate every aggregate from the <a href="https://github.com/gopalasubramanium/modelsaar/tree/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/live-runs/2026-10-11-gx10-hardening">raw per-request records</a>.</p>
+</section>
+
+<section class="faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">Practical questions</h2>
+  <details><summary>What hardware do I need?</summary><p>Whatever your inference backend needs to run the models you want; ModelSaar adds a small Python process and no GPU requirement of its own. It has been run on a MacBook Air talking to an ASUS GX10 over a private network, and on a plain Linux container against a test backend.</p></details>
+  <details><summary>Do I need models already?</summary><p>Yes. ModelSaar never downloads models and never accepts model licences on your behalf. Pull them with your backend (for example <code>ollama pull gemma4:e4b</code>) first. <code>modelsaar demo</code> starts a clearly labelled simulated backend if you want to try the commands without any model.</p></details>
+  <details><summary>Does it use the internet?</summary><p>Not for routing. The gateway binds to loopback, talks only to the backend addresses you configure, sends no telemetry and never fetches remote media. The installer downloads the ModelSaar source from GitHub at a pinned commit, and your package tool downloads its Python dependencies.</p></details>
+  <details><summary>What about cloud models my backend forwards to?</summary><p>By default (<code>locality_mode: local_only</code>) deployments that Ollama marks as cloud-forwarded are excluded, even when a client asks for them by name. Set <code>allow_remote</code> deliberately if you want them; the decision record shows the locality evidence either way.</p></details>
+  <details><summary>I only have one model.</summary><p>Then <code>auto</code> uses that model whenever it qualifies for the request, and you still get one address, generated keys, a health check and a decision record. Adding a second model later changes nothing in your apps.</p></details>
+  <details><summary>Which models are supported?</summary><p>Any model your backend serves. Capabilities (tools, image input, strict JSON, streaming) are discovered from the backend and verified with short probes; a capability that is unknown never qualifies a model for a request that needs it. A small catalogue supplies optional quality hints that are labelled as priors until you measure.</p></details>
+  <details><summary>What happens when nothing qualifies?</summary><p>You get an HTTP 422 with the blocker for every deployment and a remedy — never a silently truncated history, a dropped image or a weakened schema.</p></details>
+  <details><summary>What does it cost? What is the licence?</summary><p>ModelSaar is free, Apache-2.0 licensed open source. Model weights keep their own licences, which you accept through your backend.</p></details>
+  <details><summary>How do I update or uninstall?</summary><p>Re-run the installer: it pins the newer candidate commit and keeps your config, keys and state. <code>modelsaar uninstall</code> removes only the files ModelSaar created and lists anything it left in place; then remove the package with your package tool. Details in <a href="/docs/installation/">Installation</a>.</p></details>
+  <details><summary>How do I see why a model was chosen?</summary><p>Every response carries <code>X-ModelSaar-Request-Id</code> and <code>X-ModelSaar-Deployment</code>. <code>modelsaar decisions</code> lists recent decisions, <code>modelsaar explain -m "…"</code> dry-runs a request, and <code>/admin/ui</code> shows the status page. Records hold metadata only, never your prompts.</p></details>
+</section>
+
+<section aria-labelledby="close-title">
+  <h2 id="close-title">Try it on the models you already have</h2>
+  <p>Python and a running backend are all you need for a first routed request. If something does not work, the <a href="https://github.com/gopalasubramanium/modelsaar/issues/new/choose">issue templates</a> ask for exactly the decision record and doctor output that make it fixable.</p>
+  <div class="actions">
+    <a class="btn primary" href="/get-started/">Get started locally</a>
+    <a class="btn" href="https://github.com/gopalasubramanium/modelsaar">Read the source</a>
+    <a class="btn" href="/docs/contributing/">Contribute</a>
+  </div>
+</section>
+
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

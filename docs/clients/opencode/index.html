@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenCode · ModelSaar</title>
+<meta name="description" content="Connecting OpenCode (V1 and V2 config schemas) to ModelSaar.">
+<link rel="canonical" href="https://modelsaar.com/docs/clients/opencode/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="OpenCode · ModelSaar">
+<meta property="og:description" content="Connecting OpenCode (V1 and V2 config schemas) to ModelSaar.">
+<meta property="og:url" content="https://modelsaar.com/docs/clients/opencode/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OpenCode · ModelSaar">
+<meta name="twitter:description" content="Connecting OpenCode (V1 and V2 config schemas) to ModelSaar.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "OpenCode", "description": "Connecting OpenCode (V1 and V2 config schemas) to ModelSaar.", "url": "https://modelsaar.com/docs/clients/opencode/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "clients", "item": "https://modelsaar.com/docs/clients/"}, {"@type": "ListItem", "position": 4, "name": "OpenCode", "item": "https://modelsaar.com/docs/clients/opencode/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">OpenCode</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>OpenCode</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/clients/opencode.md"><code>docs/clients/opencode.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>Verified against opencode.ai/docs (updated Oct 8 2026), opencode.ai/v2/docs, the live config schema
+and the <code>dev</code> source on 2026-10-11 (sources in <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/research/clients-2026-10-11.md">research/clients-2026-10-11.md</a>, §3).
+Test status: configuration keys <strong>documented</strong>; live OpenCode tool round trip <strong>NOT RUN</strong> in this build.</p>
+<p><strong>Never mix the two schemas.</strong> <code>modelsaar client-config opencode</code> emits V1; <code>opencode-v2</code> emits V2;
+<code>--apply</code> refuses to write a V1 block into a V2 file and vice versa.</p>
+<h2 id="v1-opencodeaidocs">V1 (<code>opencode.ai/docs</code>)</h2>
+<p>File: <code>~/.config/opencode/opencode.json</code> (global) or <code>./opencode.json</code> (project); JSON or JSONC.
+Top-level <strong><code>provider</code></strong> (singular). Use <code>npm: "@ai-sdk/openai-compatible"</code> → Chat Completions
+(<code>@ai-sdk/openai</code> defaults to the Responses API, which ModelSaar does not implement). Include <code>/v1</code>.
+Models are declared manually.</p>
+<pre tabindex="0"><code class="language-jsonc">{
+  &quot;$schema&quot;: &quot;https://opencode.ai/config.json&quot;,
+  &quot;model&quot;: &quot;modelsaar/auto&quot;,
+  &quot;provider&quot;: {
+    &quot;modelsaar&quot;: {
+      &quot;npm&quot;: &quot;@ai-sdk/openai-compatible&quot;,
+      &quot;name&quot;: &quot;ModelSaar&quot;,
+      &quot;options&quot;: { &quot;baseURL&quot;: &quot;http://127.0.0.1:8484/v1&quot;, &quot;apiKey&quot;: &quot;{env:MODELSAAR_API_KEY}&quot;, &quot;setCacheKey&quot;: true },
+      &quot;models&quot;: {
+        &quot;auto&quot;:      { &quot;name&quot;: &quot;ModelSaar auto&quot;, &quot;tool_call&quot;: true, &quot;reasoning&quot;: false, &quot;attachment&quot;: false,
+                       &quot;modalities&quot;: { &quot;input&quot;: [&quot;text&quot;], &quot;output&quot;: [&quot;text&quot;] },
+                       &quot;limit&quot;: { &quot;context&quot;: 32768, &quot;output&quot;: 8192 }, &quot;cost&quot;: { &quot;input&quot;: 0, &quot;output&quot;: 0 } },
+        &quot;auto-code&quot;: { &quot;name&quot;: &quot;ModelSaar auto-code&quot;, &quot;tool_call&quot;: true,
+                       &quot;limit&quot;: { &quot;context&quot;: 32768, &quot;output&quot;: 8192 }, &quot;cost&quot;: { &quot;input&quot;: 0, &quot;output&quot;: 0 } }
+      }
+    }
+  }
+}
+</code></pre>
+<h2 id="v2-opencodeaiv2docs">V2 (<code>opencode.ai/v2/docs</code>)</h2>
+<p>Top-level <strong><code>providers</code></strong> (plural); <code>package</code>, <code>settings</code>, <code>env</code>, model <code>capabilities</code>. V1 fields
+<code>attachment</code>, <code>reasoning</code>, <code>temperature</code>, <code>interleaved</code>, <code>release_date</code> are ignored in V2.</p>
+<pre tabindex="0"><code class="language-jsonc">{
+  &quot;$schema&quot;: &quot;https://opencode.ai/config.json&quot;,
+  &quot;providers&quot;: {
+    &quot;modelsaar&quot;: {
+      &quot;name&quot;: &quot;ModelSaar&quot;,
+      &quot;env&quot;: [&quot;MODELSAAR_API_KEY&quot;],
+      &quot;package&quot;: &quot;@opencode/ai/providers/openai-compatible&quot;,
+      &quot;settings&quot;: { &quot;baseURL&quot;: &quot;http://127.0.0.1:8484/v1&quot; },
+      &quot;models&quot;: {
+        &quot;auto&quot;: { &quot;name&quot;: &quot;ModelSaar auto&quot;, &quot;capabilities&quot;: { &quot;tools&quot;: true, &quot;input&quot;: [&quot;text&quot;], &quot;output&quot;: [&quot;text&quot;] } }
+      }
+    }
+  }
+}
+</code></pre>
+<p>(<code>limit</code> sub-keys for V2 were not shown in the fetched docs; omit them unless your schema validator
+accepts them.)</p>
+<h2 id="session-continuity">Session continuity</h2>
+<p>OpenCode sets <code>toolChoice</code> only when a caller asks (none by default) and streams tool deltas.
+<code>options.setCacheKey: true</code> (V1) attaches the session id as a prompt cache key <em>inside the AI SDK</em>;
+whether <code>@ai-sdk/openai-compatible</code> emits <code>prompt_cache_key</code> on the wire is <strong>not documented</strong>, so do
+not rely on it. ModelSaar still keeps every tool round trip on the deployment that issued the tool
+calls (tool-call-id continuity), which is what matters for agent loops. For whole-session pinning,
+request a concrete deployment id (e.g. <code>modelsaar/ollama/qwen3.8:27b</code> declared as a model) instead of
+<code>auto</code>.</p>
+<h2 id="pitfalls">Pitfalls</h2>
+<ul>
+<li>Missing <code>/v1</code> → 404s from the gateway.</li>
+<li><code>tool_call: true</code> is required for agent use; use the alias contract's <code>tools</code> value from
+  <code>modelsaar client-config</code> (only <code>supported</code> aliases should be marked).</li>
+<li>Ollama users: tool calls fail on small contexts — set <code>num_ctx</code> ≥ 16–32k in the Modelfile; the
+  gateway's 422 "effective context" blocker tells you when the served context is too small.</li>
+</ul></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Independent review findings F01–F18 · ModelSaar</title>
+<meta name="description" content="Findings of the 2026-10-11 review of commit 1122e1f, their fixes, regression tests and execution evidence.">
+<link rel="canonical" href="https://modelsaar.com/docs/review-2026-10-11/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Independent review findings F01–F18 · ModelSaar">
+<meta property="og:description" content="Findings of the 2026-10-11 review of commit 1122e1f, their fixes, regression tests and execution evidence.">
+<meta property="og:url" content="https://modelsaar.com/docs/review-2026-10-11/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Independent review findings F01–F18 · ModelSaar">
+<meta name="twitter:description" content="Findings of the 2026-10-11 review of commit 1122e1f, their fixes, regression tests and execution evidence.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Independent review findings F01–F18", "description": "Findings of the 2026-10-11 review of commit 1122e1f, their fixes, regression tests and execution evidence.", "url": "https://modelsaar.com/docs/review-2026-10-11/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Independent review findings F01–F18", "item": "https://modelsaar.com/docs/review-2026-10-11/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Independent review findings F01–F18</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Independent review findings F01–F18</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/review-2026-10-11-findings.md"><code>docs/review-2026-10-11-findings.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>The review grouped its confirmed findings under eight headings (privacy, dispatch contract,
+resources, embeddings, evidence, evaluator, first run/files, verification). This table keeps the
+reviewer's <strong>18 grouped findings</strong> with stable ids, in the order the review stated them, and maps each
+to the implementation (branch <code>hardening/review-2026-10-11</code>), the regression test that asserts the
+corrected behaviour, and the evidence that it was executed.</p>
+<p>Regression tests live in <code>tests/test_hardening_2026_10_11.py</code> (28 tests) unless noted. They assert
+the <em>corrected</em> behaviour. <code>scripts/reproduce_review_baseline.sh</code> is the diagnostic that runs the same
+tests against <code>1122e1f</code>: 26 of 28 fail there — 22 on the behavioural assertion (the reviewed defect) and
+4 because they use a config field or symbol the fix introduced (<code>memory_margin_gb</code>/<code>unknown_memory_policy</code>,
+<code>identity</code>, <code>EVIDENCE_SCHEME</code>; each has a sibling test that fails on the behavioural assertion). The two
+that pass are positive controls — replicas sharing an alias, evidence surviving load/unload — i.e.
+behaviour the fix had to preserve. The only adaptation needed to run them at the baseline is copying in
+the branch's <code>fakebackend.py</code>/<code>conftest.py</code> (new recorder and failure-mode hooks); the baseline's gateway
+code is untouched. Per-test outcomes with the failing assertion: <code>docs/live-runs/2026-10-11-baseline/</code>
+(website branch).</p>
+<p>Evidence keys: <strong>U</strong> = <code>python -m pytest</code> on the branch (see docs/verification-report.md for the exact
+revision and totals of each run); <strong>B</strong> = baseline reproduction above; <strong>L</strong> = live run on the GX10
+(<code>docs/live-runs/2026-10-11-gx10-hardening/</code>); <strong>M</strong> = Mac test run (<code>sandbox-exec</code>;
+<code>mac-tests-&lt;commit&gt;.txt</code>, see verification report); <strong>CI</strong> = GitHub Actions on the PR revision — a CI
+<em>definition</em> exists for every item; a CI <em>run</em> is recorded here only once the branch has been pushed and
+the run has completed, which has not happened yet.</p>
+<p><strong>Reopened by the second independent review (2026-10-11, of <code>80276bb</code>) and re-closed on 2026-10-12.</strong>
+The second review kept its own identifiers (R1–R8, <code>REVIEW.txt</code>; H01–H05, <code>HANDOFF.txt</code>); its tests are
+in <code>tests/independent_review_2026_10_11/</code> verbatim. The table marks the F entries whose coverage it
+found incomplete as <strong>fixed; reopened by R<em>n</em>, re-closed 2026-10-12</strong> — "all fixed" at <code>80276bb</code> was
+not true for those entries. A third-party verification of the corrected revision is pending.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>id</th>
+<th>finding (as confirmed by the review)</th>
+<th>disposition</th>
+<th>implementation</th>
+<th>regression test(s)</th>
+<th>evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F01</td>
+<td><code>_exact_counts</code> ran before hard eligibility and sent the whole message to every deployment with <code>/tokenize</code>, including a remote one under <code>local_only</code></td>
+<td><strong>fixed</strong></td>
+<td>two-pass eligibility; tokenizer counts only for policy-allowed deployments, one deadline, label <code>tokenize:&lt;backend&gt;+template-estimate</code> (<code>routing/router.py</code>, <code>routing/eligibility.py</code>, <code>config.py: exact_count_deadline_s</code>)</td>
+<td><code>test_local_only_sends_no_message_text_to_remote_tokenizer</code>, <code>test_exact_counts_only_for_policy_allowed_and_labelled_as_estimate</code></td>
+<td>U, B</td>
+</tr>
+<tr>
+<td>F02</td>
+<td><code>audio_url</code>/<code>video_url</code> parts bypassed <code>fetch_remote_media=false</code> and reached incapable backends; nested content loosely typed</td>
+<td><strong>fixed</strong></td>
+<td>typed content parts; unknown types/keys → <code>400 unsupported_content_type</code> before dispatch (<code>protocol/openai.py</code>)</td>
+<td><code>test_unsupported_content_part_types_rejected_before_any_dispatch</code></td>
+<td>U, B, L (<code>client-checks.json: unsupported_part_400</code>)</td>
+</tr>
+<tr>
+<td>F03</td>
+<td>tool-result turn replayed on another candidate after HTTP 500 (also applies to reasoning continuation and pinned sessions)</td>
+<td><strong>fixed</strong></td>
+<td><code>Decision.failover_allowed/failover_note</code>; no pre-commit failover when bound (<code>routing/router.py</code>, <code>server.py</code>)</td>
+<td><code>test_no_failover_for_tool_result_turn</code>, <code>test_no_failover_for_pinned_session</code></td>
+<td>U, B, L (<code>tool_result_continuation</code>: <code>failover_allowed=false</code>)</td>
+</tr>
+<tr>
+<td>F04</td>
+<td>a timeout released the reservation while the backend kept computing; classifier timeout did the same</td>
+<td><strong>fixed; reopened by R1/R4 (streaming read timeout, probe timeout and embedding call still released the slot; embeddings had no deadline), re-closed 2026-10-12</strong></td>
+<td><code>AdapterError(kind="timeout")</code> → <code>mark_uncertain()</code>; streaming read timeout typed; classifier timeout holds its slot (<code>server.py</code>, <code>adapters/base.py</code>, <code>routing/classifier.py</code>, <code>routing/router.py</code>)</td>
+<td><code>test_timeout_holds_slot_uncertain_then_recovers</code> (one-slot pool, 300 ms timeout, hold expiry, recovery)</td>
+<td>U, B</td>
+</tr>
+<tr>
+<td>F05</td>
+<td>HTTP 200 headers reset the circuit, so four truncated streams left <code>failures=1</code></td>
+<td><strong>fixed; reopened by R4 (a stream of malformed data frames + <code>[DONE]</code> still counted as a validated completion and pinned the session), re-closed 2026-10-12</strong></td>
+<td>circuit success only after validated completion (non-stream envelope / completed stream) (<code>server.py</code>)</td>
+<td><code>test_circuit_opens_on_truncated_streams</code></td>
+<td>U, B</td>
+</tr>
+<tr>
+<td>F06</td>
+<td><code>response_model_field=deployment</code> named the failed model after failover</td>
+<td><strong>fixed</strong></td>
+<td>attribution computed per attempt (<code>server.py</code>)</td>
+<td><code>test_response_model_follows_failover_target</code></td>
+<td>U, B, L (<code>client-checks.json</code>: <code>model</code> = requested alias in body and in every SSE frame)</td>
+</tr>
+<tr>
+<td>F07</td>
+<td>upstream 200 HTML became downstream 200 with an error-shaped body and <code>outcome=ok</code></td>
+<td><strong>fixed</strong></td>
+<td>envelope validation + <code>text/event-stream</code> check pre-commit → <code>502 upstream_bad_response</code>, no pin, no circuit success (<code>server.py</code>)</td>
+<td><code>test_html_200_is_a_typed_502_and_never_pins</code></td>
+<td>U, B</td>
+</tr>
+<tr>
+<td>F08</td>
+<td><code>memory_gb=1</code> dispatched a 20.7 GB deployment; memory setting unused</td>
+<td><strong>fixed; reopened by R2 (completed dispatch dropped the model's weights from the count until the next poll; <code>reject</code> ignored unknown residents), re-closed 2026-10-12</strong> (budget, not OOM guarantee)</td>
+<td>pool memory budget enforced atomically with the slot: resident + distinct reserved + candidate (+classifier) + <code>memory_margin_gb</code> ≤ <code>memory_gb</code>; weights-only estimates with provenance; <code>unknown_memory_policy</code>; <code>/admin/status</code> shows holders (<code>routing/admission.py</code>, <code>config.py</code>, <code>routing/router.py</code>)</td>
+<td><code>test_pool_memory_budget_is_enforced_before_dispatch</code>, <code>test_pool_memory_budget_counts_distinct_reservations_and_unknown_policy</code>, <code>test_unknown_memory_estimate_policy</code></td>
+<td>U, B (the live config sets no <code>memory_gb</code>, so L does not exercise it)</td>
+</tr>
+<tr>
+<td>F09</td>
+<td><code>modelsaar probe</code> ran inference through a separate Router while the gateway held a one-slot pool</td>
+<td><strong>fixed</strong></td>
+<td><code>POST /admin/probe</code> under gateway admission; CLI uses it when a gateway listens, refuses direct probing next to a listener without <code>--allow-concurrent</code>; offline probes reserve through their own admission; live eval refuses to start next to a listener (<code>server.py</code>, <code>cli.py</code>, <code>evaluation/harness.py</code>)</td>
+<td><code>test_admin_probe_runs_under_gateway_admission</code>, <code>test_cli_probe_coordinates_through_running_gateway</code></td>
+<td>U, B, L (<code>23-admin-probe-via-gateway.txt</code>)</td>
+</tr>
+<tr>
+<td>F10</td>
+<td>one alias interchanged two distinct models with equal dimensions as residency changed; "same revision" comment unimplemented</td>
+<td><strong>fixed; reopened by R3 (an alias whose first member had an unknown identity was anchored only after a response, so concurrent first use could return two spaces), re-closed 2026-10-12</strong></td>
+<td>deployment identity (Ollama digest / declared <code>identity</code>); alias members must share the effective identity; unknown identity is never a replica; changed identity requires <code>embeddings[].identity</code> after re-indexing; prefixes rejected (<code>registry.py</code>, adapters, <code>routing/router.py</code>, <code>config.py</code>)</td>
+<td><code>test_alias_never_interchanges_distinct_models_with_equal_dimensions</code>, <code>test_known_identical_replicas_share_an_alias</code> (positive control), <code>test_unknown_identity_is_not_a_verified_replica</code></td>
+<td>U, B (fixture backend; <strong>no real embedding model was pulled</strong> — NOT RUN live)</td>
+</tr>
+<tr>
+<td>F11</td>
+<td>8-d contract returned 200 for 4-d vectors; prefix/normalization declared but unenforced</td>
+<td><strong>fixed</strong></td>
+<td>request <code>dimensions</code>/<code>encoding_format</code> guarded (<code>400 unsupported_contract_option</code>); output count/indices/dims/finite/unit-norm validated (<code>502 embedding_contract_violation</code>) (<code>server.py</code>, <code>routing/router.py</code>)</td>
+<td><code>test_wrong_output_shape_is_a_contract_error</code>, <code>test_request_level_contract_changes_rejected</code></td>
+<td>U, B (fixture; NOT RUN live)</td>
+</tr>
+<tr>
+<td>F12</td>
+<td>changing a generic backend URL under the same id/model preserved the fingerprint; a replacement inherited a stored tools probe</td>
+<td><strong>fixed</strong></td>
+<td>fingerprint = backend + <strong>endpoint</strong> + model + digest + <strong>identity</strong> + runtime(+version) + template + quant + pool; unknown inputs visible; evidence scheme 2 with migration (old rows kept, unused, <code>doctor</code> reports); measurements carry conditions; load/unload still not an identity change (<code>registry.py</code>, adapters, <code>store.py</code>, <code>probes.py</code>, <code>doctor.py</code>)</td>
+<td><code>test_endpoint_change_invalidates_stored_probe</code>, <code>test_evidence_scheme_versioning_invalidates_old_rows</code>, <code>test_load_unload_keeps_evidence</code> (preserved behaviour)</td>
+<td>U, B; <code>scripts/install-check.sh</code> (scheme-1 DB migration PASS)</td>
+</tr>
+<tr>
+<td>F13</td>
+<td>scorer defects: <code>code-05</code> trailing space; print-then-raise passed <code>code-04</code>; tool call without id/required arg scored; <code>16</code> satisfied <code>6</code> by substring</td>
+<td><strong>fixed; reopened by R7 (flushed expected output + public marker then <code>os._exit(0)</code> scored as success; tool arguments were not checked against the declared schema), re-closed 2026-10-12</strong></td>
+<td>symmetric whitespace rule, completion sentinel + exit 0, strict <code>tool_call</code> (id, name, JSON-object args, required keys, <code>args_contains</code>), typed <code>number</code> with tolerance; positive/negative controls per scorer (<code>evaluation/scoring.py</code>, <code>fixtures/README.md</code>)</td>
+<td><code>tests/test_evaluation.py</code>: <code>test_code05_gold_rle_passes_with_trailing_space_output</code>, <code>test_code_exec_print_then_raise_fails</code>, <code>test_code_exec_print_then_exit_zero_fails</code>, <code>test_tool_call_without_id_fails</code>, <code>test_tool_call_missing_required_argument_fails</code>, <code>test_number_rejects_superstring_match</code>, … (<code>tests/test_evaluation.py</code>, 42 tests incl. sandbox, selector and checkpoint tests)</td>
+<td>U, M (code-exec controls executed under <code>sandbox-exec</code>), L (scorer <code>2026.10.11-2</code> used for the live numbers)</td>
+</tr>
+<tr>
+<td>F14</td>
+<td>live evaluator executed generated Python with ordinary host authority (wrote outside its temp dir)</td>
+<td><strong>fixed; reopened by R7 (bwrap bound the whole host root read-only and the macOS profile allowed host reads, contrary to the no-host-authority wording), re-closed 2026-10-12</strong> (sandbox-or-skip)</td>
+<td>bubblewrap / <code>sandbox-exec</code> / Docker (<code>--network none --read-only</code>) with CPU/memory/output/time limits; no backend → task skipped and denominators reported; no unsafe opt-in (<code>evaluation/sandbox.py</code>)</td>
+<td><code>test_sandbox_run_refuses_without_backend</code>, <code>test_sandbox_has_no_unsafe_opt_in</code>, <code>test_sandbox_blocks_writes_outside_work</code>, <code>test_sandbox_blocks_network</code>, <code>test_sandbox_reference_solution_passes</code>, <code>test_sandbox_timeout_fails_cleanly</code>, <code>test_code_exec_skipped_without_backend</code></td>
+<td>U (4 isolation tests <strong>skipped</strong> in the cloud container: no backend), M (executed with <code>sandbox-exec</code>), L (<code>sandbox: sandbox-exec</code>, 0 skipped)</td>
+</tr>
+<tr>
+<td>F15</td>
+<td><code>--deployments</code> bare names entered the fixed sweep but excluded all <code>auto</code> candidates</td>
+<td><strong>fixed</strong></td>
+<td>selectors resolved once to canonical ids; unknown/ambiguous rejected early; same candidate set for calibration and every policy (<code>evaluation/harness.py: resolve_selectors</code>)</td>
+<td><code>test_resolve_selectors_bare_and_full</code>, <code>test_resolve_selectors_unknown_and_ambiguous</code>, <code>test_run_live_resolves_bare_selector_everywhere</code>, <code>test_run_live_rejects_unknown_selector_early</code></td>
+<td>U, L (bare names <code>qwen3.6:latest gemma4:31b qwen3-coder:latest</code> resolved; <code>auto</code> restricted to the same three)</td>
+</tr>
+<tr>
+<td>F16</td>
+<td>classifier output not validated against its closed schema (extra fields, non-numeric confidence, trailing content)</td>
+<td><strong>fixed</strong></td>
+<td><code>parse_classifier_output</code> strict schema, deterministic fallback, confidence kept distinct from quality (<code>routing/classifier.py</code>)</td>
+<td><code>tests/test_classifier_schema.py</code> (27 parametrised cases), <code>test_classifier_requires_local_deployment_under_local_only</code></td>
+<td>U, B; classifier <strong>disabled</strong> in L (not exercised live)</td>
+</tr>
+<tr>
+<td>F17</td>
+<td><code>client-config --apply</code> changed a 0600 secret-bearing file to 0644; uninstall recursively deleted arbitrary contents under <code>keys/</code>/<code>state/</code></td>
+<td><strong>fixed</strong></td>
+<td>mode-preserving apply, private temp files (O_EXCL), unique backups; uninstall removes only owned files, refuses symlinked boundaries, leaves the rest (<code>clientconfig/__init__.py</code>, <code>cli.py</code>)</td>
+<td><code>test_apply_patch_preserves_mode_private_tmp_unique_backups</code>, <code>test_uninstall_removes_only_owned_files_and_refuses_symlinks</code>, <code>tests/test_review_regressions.py::test_uninstall_preserves_foreign_files</code> (refined from the earlier "refuse" behaviour)</td>
+<td>U, B</td>
+</tr>
+<tr>
+<td>F18</td>
+<td>fresh Compose-equivalent entrypoint exited for missing keys; <code>init --profile fast</code> left <code>auto</code> on <code>quality</code></td>
+<td><strong>fixed; reopened by R5 (the first-use sequence shown after the installer failed — <code>init</code> refuses an existing config; <code>modelsaar test</code> sent the key to any 200 listener), re-closed 2026-10-12</strong></td>
+<td><code>modelsaar keys ensure</code> (idempotent, never rotates, touches only key files) + container <code>CMD</code>; <code>scripts/compose-smoke.sh</code> (empty volume, read-only config, non-root, keys unchanged across restart) in CI; <code>init --profile</code> sets <code>aliases.auto.profile</code> (<code>cli.py</code>, <code>Dockerfile</code>, <code>.github/workflows/ci.yml</code>)</td>
+<td><code>test_keys_ensure_is_idempotent_and_serve_points_to_it</code>, <code>test_init_profile_applies_to_auto_alias</code></td>
+<td>U, B; compose smoke: <strong>CI only</strong> (no Docker daemon in the build container) — see verification report for the CI run</td>
+</tr>
+</tbody>
+</table>
+<h3 id="review-8-reproducible-live-evidence-not-a-numbered-finding">Review §8 — reproducible live evidence (not a numbered finding)</h3>
+<table tabindex="0">
+<thead>
+<tr>
+<th>requirement</th>
+<th>disposition</th>
+<th>where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>missing <code>eval-live.json</code>; interrupted console log tracked as if a result</td>
+<td>fixed: <code>.gitignore</code> <code>/eval-*.json</code>; both 0.1.0 artefacts tracked and labelled</td>
+<td><code>docs/live-runs/2026-10-11-gx10/README.md</code></td>
+</tr>
+<tr>
+<td>resumable one-command verification with sanitised records</td>
+<td><code>scripts/live_verify.sh</code> (+ <code>scripts/live_client_checks.py</code>, <code>scripts/eval_aggregate.py</code>); <code>--checkpoint/--resume</code></td>
+<td>run folder <code>MANIFEST.md</code> lists commands, revision, config, identities, settings, failures</td>
+</tr>
+<tr>
+<td>real clients, real-model embeddings, vLLM/llama.cpp, matched reasoning budget</td>
+<td><strong>NOT RUN</strong>, labelled with exact commands</td>
+<td><code>docs/verification-report.md</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="deferred-not-done-in-this-pass">Deferred / not done in this pass</h3>
+<ul>
+<li>Memory budget on real hardware (F08): the live config sets no <code>memory_gb</code>; the enforcement is
+  fixture-tested only.</li>
+<li>Embedding identity/validation against a real embedding model (F10/F11): fixture-tested only.</li>
+<li>Classifier on real models (F16): disabled in the live run.</li>
+</ul></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

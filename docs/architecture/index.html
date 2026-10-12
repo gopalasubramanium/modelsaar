@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture · ModelSaar</title>
+<meta name="description" content="Components of the ModelSaar gateway and how a request flows through them.">
+<link rel="canonical" href="https://modelsaar.com/docs/architecture/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Architecture · ModelSaar">
+<meta property="og:description" content="Components of the ModelSaar gateway and how a request flows through them.">
+<meta property="og:url" content="https://modelsaar.com/docs/architecture/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Architecture · ModelSaar">
+<meta name="twitter:description" content="Components of the ModelSaar gateway and how a request flows through them.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Architecture", "description": "Components of the ModelSaar gateway and how a request flows through them.", "url": "https://modelsaar.com/docs/architecture/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Architecture", "item": "https://modelsaar.com/docs/architecture/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Architecture</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Architecture</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/architecture.md"><code>docs/architecture.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>One process, one versioned YAML config, a CLI, optional SQLite state. No external services.</p>
+<pre tabindex="0"><code>                 ┌────────────────────────────────────────────────────────────────────┐
+  clients        │ modelsaar.server (Starlette)                                       │
+  Open WebUI     │  /v1/models  /v1/chat/completions  /v1/embeddings  /healthz /readyz│
+  OpenClaw  ───▶ │  /admin/{status,decisions,explain,refresh,ui}   (admin key)        │
+  OpenCode       │        │ auth (security.py)   commitment rules   SSE relay (sse.py)│
+  Hermes         └────────┼───────────────────────────────────────────────────────────┘
+                          ▼
+                 ┌──────────────────── routing/router.py ───────────────────┐
+                 │ requirements.py ─▶ eligibility.py ─▶ classifier.py ─▶    │
+                 │   (tokens.py)        (hard filters)   (optional, local)   │
+                 │                 ─▶ scoring.py ─▶ decision.py             │
+                 │ affinity.py (sessions, tool round trips)                  │
+                 │ admission.py (pools, queues, reservations, circuits)      │
+                 └───────┬──────────────────────────────┬───────────────────┘
+                         │ registry.py (deployments,     │ store.py (SQLite:
+                         │ tri-state caps, fingerprints) │ probes, measurements, decisions)
+                         ▼                               ▼
+                 ┌─ adapters/ ───────────────────────────────────────────────┐
+                 │ ollama.py: /api/tags /api/show /api/ps /api/version       │
+                 │            + /v1/chat/completions, /v1/embeddings         │
+                 │ openai_compat.py: /models /chat/completions /embeddings   │
+                 │                   /tokenize (vLLM)                        │
+                 │ register_adapter() plugin hook                            │
+                 └──────────────┬────────────────────────────────────────────┘
+                                ▼
+                  user-managed runtimes: Ollama, vLLM, llama.cpp server, LM Studio, …
+   catalogue/starter.yaml ─ priors/tags/roles (model-card evidence, dated)
+   probes.py ─ live capability checks keyed by fingerprint
+   evaluation/ ─ harness, synthetic fixtures, scorers; clientconfig/ ─ generators; doctor.py
+</code></pre>
+<h2 id="modules">Modules</h2>
+<table tabindex="0">
+<thead>
+<tr>
+<th>module</th>
+<th>responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config.py</code></td>
+<td>Versioned, typed configuration (<code>version: 1</code>); atomic write; loopback/LAN guard; aliases, pools, backends, overrides, embedding contracts</td>
+</tr>
+<tr>
+<td><code>registry.py</code></td>
+<td><code>Deployment</code> records: identity (backend, model, digest, runtime version, template hash, quantization, context, pool), states (configured/discovered/available/loaded/healthy), three-state capabilities with provenance, measurements, fingerprint</td>
+</tr>
+<tr>
+<td><code>store.py</code></td>
+<td>SQLite (stdlib) for probe evidence and measurements per fingerprint, bounded decision log (metadata only)</td>
+</tr>
+<tr>
+<td><code>adapters/</code></td>
+<td>Backend protocol handling; typed, allow-listed translation; URL confinement to the configured host</td>
+</tr>
+<tr>
+<td><code>protocol/openai.py</code></td>
+<td>Request validation; unknown fields are rejected, never dropped</td>
+</tr>
+<tr>
+<td><code>protocol/sse.py</code></td>
+<td>Incremental SSE parser tolerant of partial frames/CRLF/UTF-8 boundaries; relay observer</td>
+</tr>
+<tr>
+<td><code>routing/requirements.py</code></td>
+<td>Structural requirements and deterministic multi-label task signals; language detection</td>
+</tr>
+<tr>
+<td><code>routing/tokens.py</code></td>
+<td>Documented conservative token estimates (script-aware); <code>router._exact_counts</code> refines borderline cases via a runtime's <code>/tokenize</code> when available</td>
+</tr>
+<tr>
+<td><code>routing/eligibility.py</code></td>
+<td>Hard filters with per-deployment reasons and remedies</td>
+</tr>
+<tr>
+<td><code>routing/classifier.py</code></td>
+<td>Optional local classifier with strict contract, timeout, deterministic fallback</td>
+</tr>
+<tr>
+<td><code>routing/scoring.py</code></td>
+<td>Transparent ranking; evidence levels; tie-break to lower overhead</td>
+</tr>
+<tr>
+<td><code>routing/affinity.py</code></td>
+<td>Caller-scoped session affinity from explicit identifiers; tool round-trip continuity</td>
+</tr>
+<tr>
+<td><code>routing/admission.py</code></td>
+<td>Bounded queues, backend/pool concurrency, atomic reservation, uncertain occupancy, circuit breakers</td>
+</tr>
+<tr>
+<td><code>routing/decision.py</code></td>
+<td>Decision record</td>
+</tr>
+<tr>
+<td><code>routing/router.py</code></td>
+<td>Orchestration, discovery refresh (atomic registry swap), alias contracts, <code>/v1/models</code> truth</td>
+</tr>
+<tr>
+<td><code>server.py</code></td>
+<td>HTTP surface, auth, commitment rules, failover, streaming relay, admin API, status page</td>
+</tr>
+<tr>
+<td><code>probes.py</code></td>
+<td>Capability probes and latency/load measurement</td>
+</tr>
+<tr>
+<td><code>catalogue/</code></td>
+<td>Verified starter catalogue + matcher (priors only)</td>
+</tr>
+<tr>
+<td><code>clientconfig/</code></td>
+<td>Verified client configuration generators with safe apply</td>
+</tr>
+<tr>
+<td><code>doctor.py</code></td>
+<td>Diagnostics</td>
+</tr>
+<tr>
+<td><code>evaluation/</code></td>
+<td>Harness, fixtures, scorers, baselines</td>
+</tr>
+<tr>
+<td><code>cli.py</code></td>
+<td><code>modelsaar</code> commands</td>
+</tr>
+<tr>
+<td><code>testing/fakebackend.py</code></td>
+<td>Controlled Ollama/OpenAI-compatible fixture with fault injection (tests + <code>demo</code>)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment-identity-and-state">Deployment identity and state</h2>
+<p>A deployment id is <code>&lt;backend_id&gt;/&lt;model_name&gt;</code>. Its fingerprint hashes backend, model, digest,
+runtime + version, template hash, quantization, served context and pool. Probe results and
+measurements are stored against the fingerprint; when any of those change, stored evidence no longer
+applies and is listed under <code>invalidated_probe_fingerprints</code> for transparency.</p>
+<p>States are distinct: <em>configured</em> (declared in config), <em>discovered</em> (listed by the runtime),
+<em>available on disk</em>, <em>loaded</em> (resident per <code>/api/ps</code>), <em>healthy</em> (backend reachable), and
+<em>eligible for a particular request</em> (only decided per request by the filters).</p>
+<h2 id="configuration-snapshots">Configuration snapshots</h2>
+<p><code>load_config</code> returns an immutable object with a content hash. A request captures the router/config
+snapshot at entry and uses it throughout; registry refreshes replace the deployment map atomically
+and never change a request midway. Configuration changes take effect by restarting <code>modelsaar serve</code>
+(no hot reload in 0.1).</p>
+<h2 id="response-commitment-rules">Response commitment rules</h2>
+<ul>
+<li>Before any header/byte is sent: on connection failure or upstream 5xx, at most
+  <code>routing.max_failover_attempts</code> (default 1) retries to the next candidate that passed the same
+  hard filters. Only chat completions (stateless, repeatable) are retried.</li>
+<li>After the first byte: no retries, no switching. Upstream failure ends the stream with an SSE
+  <code>error</code> frame and <code>[DONE]</code>; the decision records <code>stream_failed_after_commit</code>.</li>
+<li>Client disconnect or read timeout mid-stream: the reservation becomes <em>uncertain</em> for
+  <code>admission.uncertain_hold_s</code> because the backend may still be generating (same for embedding
+  timeouts and probe timeouts; a probe run stops after one).</li>
+</ul></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

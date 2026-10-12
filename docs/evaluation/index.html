@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation harness · ModelSaar</title>
+<meta name="description" content="How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies.">
+<link rel="canonical" href="https://modelsaar.com/docs/evaluation/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Evaluation harness · ModelSaar">
+<meta property="og:description" content="How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies.">
+<meta property="og:url" content="https://modelsaar.com/docs/evaluation/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Evaluation harness · ModelSaar">
+<meta name="twitter:description" content="How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Evaluation harness", "description": "How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies.", "url": "https://modelsaar.com/docs/evaluation/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Evaluation harness", "item": "https://modelsaar.com/docs/evaluation/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Evaluation harness</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Evaluation harness</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/evaluation.md"><code>docs/evaluation.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p><code>modelsaar eval</code> is an executable harness that compares <code>auto</code> against strong fixed policies on a
+compact, inspectable task set with executable or exact scoring. It reports per-category results with
+95 % Wilson intervals, completion rate, capability violations, latency and routing overhead.</p>
+<h2 id="task-set">Task set</h2>
+<p><code>src/modelsaar/evaluation/fixtures/tasks.jsonl</code>: 47 original synthetic tasks (Apache-2.0, no
+third-party data) across conversation, coding, agent/tools, math, extraction (strict schema),
+summarization, translation, RAG-style, decision, vision, a tool round trip, mixed-language and
+deliberately ambiguous prompts, plus a long-but-easy transformation. Splits: <code>calib</code> (15) and <code>test</code>
+(32) use different templates. Scorers: <code>nonempty</code>, <code>contains</code>, <code>contains_any</code>, <code>json_schema</code> (+field
+checks), <code>tool_call</code> (strict: non-empty id, expected name, JSON-object arguments that conform to the
+tool's declared parameter schema, contain every required parameter and the expected substrings),
+<code>code_exec</code> (a trusted runner executes the model code with its stdout captured, then the task
+harness with <em>its</em> stdout captured, and writes a result record keyed with a per-run nonce; the task
+passes only when that record says the harness completed and the harness output equals the
+expectation — text the model prints, including any "completion marker", is never evidence). <code>code_exec</code>
+runs <strong>only</strong> under bubblewrap (Linux; only the Python runtime and system libraries are visible),
+<code>sandbox-exec</code> (macOS; deny-by-default profile with runtime read roots — <strong>unsupported in this alpha
+pending verification</strong>: disabled unless <code>MODELSAAR_MACOS_SANDBOX=verify</code>, so on macOS <code>code_exec</code>
+tasks are skipped and the report says why) or Docker (<code>--network none --read-only</code>) with
+CPU/memory/output/time limits; without one of those the task is skipped and the report says so —
+there is no host-execution fallback. The sandbox is tested for writes, network,
+timeouts and reading a synthetic host file outside the work directory; it does not defend the
+evaluator against model code that targets the evaluator process itself. Scorer rules are versioned
+(<code>SCORER_VERSION</code>) and recorded in the report's <code>conditions</code>; checkpoint records (<code>--checkpoint</code>,
+<code>--resume</code>) are bound to the task content, the scorer version and request budgets, the routing
+configuration and the eligible deployment set (for routed policies: a new, removed or re-identified
+alternative re-runs the task) and the deployment fingerprint, and anything that no longer matches is
+re-run and counted under <code>resume_rejected</code> instead of being attributed to the new run. <code>--probe</code>
+runs the capability probes through the gateway's admission, one reservation per deployment; after an
+uncertain timeout the reservation is held and the remaining deployments are reported <code>deferred</code>
+rather than probed on top of work that may still be running.
+No LLM judge is used. See <code>src/modelsaar/evaluation/fixtures/README.md</code> for the exact rules.</p>
+<h2 id="procedure">Procedure</h2>
+<ol>
+<li>Probe every local generative deployment (<code>streaming</code>, <code>tools</code>, <code>json_object</code>, <code>json_schema</code>,
+   <code>vision</code>) so capability evidence is real, not declared.</li>
+<li>Sweep the calib split over every deployment → per-deployment quality/latency. This calibrates
+   the <strong>fixed-strong</strong> (best calib success) and <strong>fixed-fast</strong> (lowest calib p50) baselines and, with
+   <code>--save-measurements</code>, becomes routing evidence keyed by fingerprint.</li>
+<li>Sweep the test split over every deployment → per-deployment results and the <strong>oracle</strong> (a task
+   counts as solvable if any deployment solved it; an offline upper bound, unavailable at runtime).</li>
+<li>Run <strong>auto</strong> live through the gateway on the test split (routing overhead measured per request
+   from the decision record).</li>
+<li>Derive <strong>rules</strong> (deterministic specialist mapping that is <em>given the gold category label</em>, an
+   advantage auto lacks) and <strong>random</strong> (seeded) from the test sweep.</li>
+</ol>
+<p>All policies send identical requests through the same HTTP gateway with the same eligibility checks
+and budgets (<code>temperature 0</code>, <code>max_tokens 400</code>).</p>
+<h2 id="running">Running</h2>
+<pre tabindex="0"><code class="language-bash">modelsaar eval --mode simulated                 # no models needed; validates mechanics only
+modelsaar eval --mode live --probe --save-measurements --out eval-$(date +%F).json
+</code></pre>
+<p>Live mode starts an in-process gateway from your config on a free port. Because that gateway's
+admission cannot coordinate with another instance using the same backends, the run refuses to start
+while a gateway listens on the configured port unless you pass <code>--allow-concurrent</code>. Long runs are
+resumable: <code>--checkpoint PATH</code> (default <code>&lt;out&gt;.records.jsonl</code> with <code>--out</code>) appends one sanitised
+record per request (ids, status, latency, scorer detail — never prompts), and <code>--resume</code> skips
+recorded tasks whose deployment fingerprint is unchanged. The report records exact deployments
+(model, parameter size, quantization, runtime, context, fingerprint, endpoint), the conditions
+(<code>max_tokens</code>, temperature, seed, scorer version, git commit, sandbox backend, dataset revision),
+date, sample counts and every request's outcome. <code>scripts/live_verify.sh</code> wraps probes, wire-level
+client checks and this evaluation into one resumable command.</p>
+<h2 id="acceptance-targets-for-a-reference-configuration">Acceptance targets for a reference configuration</h2>
+<p>Define before measuring; the harness reports against them.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>metric</th>
+<th>target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>capability violations (422 for requests a deployment could serve) under <code>auto</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td>completion rate under <code>auto</code></td>
+<td>≥ fixed-strong</td>
+</tr>
+<tr>
+<td>overall success under <code>auto</code></td>
+<td>≥ fixed-strong − 0.05 (never materially worse than the best single model)</td>
+</tr>
+<tr>
+<td>routing overhead (deterministic path)</td>
+<td>p95 &lt; 5 ms; with classifier &lt; <code>classifier.timeout_s</code></td>
+</tr>
+<tr>
+<td>classifier timeouts</td>
+<td>&lt; 5 % of consulted requests</td>
+</tr>
+</tbody>
+</table>
+<h2 id="results-read-the-label-before-the-table">Results — read the label before the table</h2>
+<p>Every table below is tied to a scorer version and a source revision. The current scorer is
+<code>2026.10.12-3</code> (record-based <code>code_exec</code> completion evidence, tool-argument schema validation; see
+"Scorers" above). <strong>No live evaluation has been run under the current scorer yet</strong> (only the simulated smoke, which validates mechanics, not model quality). The numbers below were
+produced by the scorer named next to them and are kept as recorded; they are not relabelled, and a
+rerun — when it happens — will be reported as a separate run with its own scorer version.</p>
+<p><strong>Current reference result:</strong> the GX10 run of 2026-10-11 at source <code>0f8af84</code> (scorer <code>2026.10.11-2</code>,
+3 deployments, 32 test tasks): <code>auto</code> and the strongest fixed model each 30/32; <code>auto</code> completed
+32/32 vs 31/32 and recorded 0 vs 1 capability violations; reported end-to-end p95 7.958 s vs 4.760 s;
+routing overhead p95 0.98 ms (a separate quantity). The <code>long-01</code> difference occurred on the same
+model and its cause has not been isolated; the live classifier was disabled. Full manifest, exact
+comparison and the 173 sanitised records: <code>live-runs/2026-10-11-gx10-hardening/MANIFEST.md</code> (the
+aggregates reproduce from the records with <code>scripts/eval_aggregate.py</code>; the run has
+<code>resumed_records = 0</code>). This is the result the website quotes.</p>
+<h3 id="historical-simulated-configuration-2026-10-11-source-c26ee44-before-scorer-versioning">Historical: simulated configuration (2026-10-11, source <code>c26ee44</code> — before scorer versioning)</h3>
+<p>Three scripted fake deployments (<code>sim-small:1b</code>, <code>sim-code:7b</code> tagged <code>code</code>, <code>sim-large:27b</code> with
+vision/thinking), 15 calib / 32 test tasks, seed 7:</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>policy</th>
+<th>success</th>
+<th>95 % CI</th>
+<th>completion</th>
+<th>violations</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auto (live routing)</td>
+<td>0.938</td>
+<td>[0.80, 0.98]</td>
+<td>1.00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>fixed-strong (calibrated: sim-large)</td>
+<td>0.719</td>
+<td>[0.55, 0.84]</td>
+<td>1.00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>fixed-fast (calibrated: sim-small)</td>
+<td>0.438</td>
+<td>[0.28, 0.61]</td>
+<td>0.97</td>
+<td>1</td>
+</tr>
+<tr>
+<td>rules (gold label + specialist tags)</td>
+<td>0.969</td>
+<td>[0.84, 0.99]</td>
+<td>1.00</td>
+<td>0</td>
+</tr>
+<tr>
+<td>random</td>
+<td>0.469</td>
+<td>[0.31, 0.64]</td>
+<td>0.97</td>
+<td>1</td>
+</tr>
+<tr>
+<td>oracle (upper bound)</td>
+<td>0.969</td>
+<td>[0.84, 0.99]</td>
+<td>1.00</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Routing overhead mean 0.43 ms, p95 0.52 ms; deterministic task-label accuracy 0.84; one routing
+mistake (<code>math-06</code>, "Is 97 a prime number? Answer yes or no." — classified as ambiguous between
+math and decision; with only two calibration samples per category the blended quality difference did
+not outweigh the resident small model's latency/residency advantage). The rules baseline
+matches the oracle here only because it is handed the gold category label, which <code>auto</code> must infer.
+<strong>This validates the harness and the policy mechanics only.</strong> The fake backends answer correctly by
+script when the task is in their <code>good_at</code> list, so the numbers say nothing about real model quality.
+(CI re-runs a simulated smoke on every push; its numbers change with the scorer and are not quoted.)</p>
+<h3 id="historical-first-real-hardware-run-gx10-ollama-03213-2026-10-11-source-1122e1f-scorer-before-versioning">Historical: first real-hardware run (GX10 / Ollama 0.32.13, 2026-10-11, source <code>1122e1f</code>, scorer before versioning)</h3>
+<p>Superseded by the current reference result above; kept because the bugs it exposed are the subject
+of the 2026-10-11 review (F01–F18). 3-deployment subset:</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>policy</th>
+<th>success</th>
+<th>95 % CI</th>
+<th>completion</th>
+<th>violations</th>
+<th>p50 ms</th>
+<th>p95 ms</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>auto (live routing)</td>
+<td>0.875</td>
+<td>[0.72, 0.95]</td>
+<td>1.000</td>
+<td>0</td>
+<td>693</td>
+<td>27 136</td>
+</tr>
+<tr>
+<td>fixed-strong (qwen3-coder)</td>
+<td>0.906</td>
+<td>[0.76, 0.97]</td>
+<td>0.969</td>
+<td>1</td>
+<td>646</td>
+<td>4 849</td>
+</tr>
+<tr>
+<td>fixed-fast (qwen3-coder)</td>
+<td>0.906</td>
+<td>[0.76, 0.97]</td>
+<td>0.969</td>
+<td>1</td>
+<td>646</td>
+<td>4 849</td>
+</tr>
+<tr>
+<td>rules (gold label)</td>
+<td>0.812</td>
+<td>[0.65, 0.91]</td>
+<td>1.000</td>
+<td>0</td>
+<td>959</td>
+<td>4 868</td>
+</tr>
+<tr>
+<td>random</td>
+<td>0.688</td>
+<td>[0.51, 0.82]</td>
+<td>0.938</td>
+<td>2</td>
+<td>4 189</td>
+<td>9 826</td>
+</tr>
+<tr>
+<td>oracle</td>
+<td>0.969</td>
+<td>[0.84, 0.99]</td>
+<td>1.000</td>
+<td>0</td>
+<td>552</td>
+<td>4 585</td>
+</tr>
+</tbody>
+</table>
+<p>In that run <code>auto</code> did not match the best fixed model (it mostly chose that model); its measurable
+gains were coverage (no capability violations, 100 % completion) at the price of p95 latency when a
+thinking model was selected. Context and the defects it exposed: <a href="/docs/verification-report/">verification-report.md</a>.</p>
+<h2 id="reporting-rules">Reporting rules</h2>
+<ul>
+<li>Report per-category results with uncertainty; never a single universal "% better".</li>
+<li>If <code>auto</code> cannot beat a good fixed policy on your hardware, say so; the benefits may then be
+  capability coverage (tools/vision/context across models), flexibility, or installation — and the
+  simple mode (request a concrete deployment id) remains.</li>
+<li>Adaptive learning, bandits and online exploration are not part of 0.1 (roadmap).</li>
+</ul></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

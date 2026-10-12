@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy and security of the gateway · ModelSaar</title>
+<meta name="description" content="Defaults and guarantees of the gateway: binding, keys, locality, payload handling, logging, code execution.">
+<link rel="canonical" href="https://modelsaar.com/docs/privacy/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Privacy and security of the gateway · ModelSaar">
+<meta property="og:description" content="Defaults and guarantees of the gateway: binding, keys, locality, payload handling, logging, code execution.">
+<meta property="og:url" content="https://modelsaar.com/docs/privacy/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy and security of the gateway · ModelSaar">
+<meta name="twitter:description" content="Defaults and guarantees of the gateway: binding, keys, locality, payload handling, logging, code execution.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Privacy and security of the gateway", "description": "Defaults and guarantees of the gateway: binding, keys, locality, payload handling, logging, code execution.", "url": "https://modelsaar.com/docs/privacy/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Privacy and security of the gateway", "item": "https://modelsaar.com/docs/privacy/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Privacy and security of the gateway</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Privacy and security of the gateway</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/privacy.md"><code>docs/privacy.md</code></a> at commit <code>b9d69f7299ed</code>. The repository file is authoritative.</p></header><p>ModelSaar implements security as product behaviour. Defaults, what they guarantee, and what they
+cannot.</p>
+<h2 id="defaults">Defaults</h2>
+<table tabindex="0">
+<thead>
+<tr>
+<th>control</th>
+<th>default</th>
+<th>where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bind address</td>
+<td><code>127.0.0.1</code> (loopback). Non-loopback requires <code>security.allow_lan: true</code> explicitly; config load fails otherwise</td>
+<td><code>server.host</code>, <code>security.allow_lan</code></td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>Generated inference key(s) and a separate admin key (mode 600). No default/universal key exists</td>
+<td><code>keys/api_keys</code>, <code>keys/admin_key</code></td>
+</tr>
+<tr>
+<td>Admin vs inference authority</td>
+<td><code>/admin/*</code> requires the admin key; an inference key is rejected (403). The admin key is also accepted on inference routes (one-way separation): keep it on the host only</td>
+<td><code>security.py</code></td>
+</tr>
+<tr>
+<td>Execution locality</td>
+<td><code>local_only</code>: only deployments with locality <code>local</code> are eligible or advertised. Ollama cloud-forwarded models (<code>remote_model</code>/<code>remote_host</code>, <code>:cloud</code> names) are classified <code>remote</code> with the evidence recorded; generic endpoints carry the operator's declaration as a stated trust assumption</td>
+<td><code>security.locality_mode</code></td>
+</tr>
+<tr>
+<td>Backend destinations</td>
+<td>Adapters only build paths relative to the configured <code>base_url</code>; absolute or protocol-relative paths raise; redirects are not followed; hosts are allow-listed</td>
+<td><code>adapters/base.py</code></td>
+</tr>
+<tr>
+<td>Remote media</td>
+<td>Never fetched. Requests with <code>http(s)</code> image URLs are rejected with a remedy (send <code>data:</code> URLs)</td>
+<td><code>security.fetch_remote_media: false</code></td>
+</tr>
+<tr>
+<td>Prompt logging</td>
+<td>Off. Decision records hold metadata only (task labels, token counts, capability flags) plus at most a short redacted upstream error excerpt (≤200 chars) when a backend fails. Error messages are redacted for key-like strings</td>
+<td><code>security.log_prompts</code>, <code>security.redact</code></td>
+</tr>
+<tr>
+<td>Caches</td>
+<td>No response cache, no prompt-derived cache. Affinity is scoped per caller and holds only a deployment id</td>
+<td><code>routing/affinity.py</code></td>
+</tr>
+<tr>
+<td>Telemetry / learning</td>
+<td>None. <code>security.telemetry_opt_in</code> exists for future opt-in features; nothing is sent anywhere</td>
+<td></td>
+</tr>
+<tr>
+<td>Request size</td>
+<td>32 MiB limit; unknown fields rejected rather than forwarded</td>
+<td><code>server.max_request_bytes</code></td>
+</tr>
+<tr>
+<td>Untrusted content</td>
+<td>Prompts, tool outputs, model cards and classifier output are data. Classifier output is schema-validated against a closed label set and can only refine a task label</td>
+<td><code>routing/classifier.py</code></td>
+</tr>
+<tr>
+<td>Payload-bearing operations</td>
+<td>Nothing derived from a request leaves the gateway before policy filtering. Tokenizer counts (<code>/tokenize</code>) are requested only from deployments that already passed locality, enablement, health and capability filters; the optional classifier must be a local deployment unless <code>routing.classifier.allow_remote</code> <strong>and</strong> <code>security.locality_mode: allow_remote</code> are both set. Unknown content part types (<code>audio_url</code>, <code>video_url</code>, <code>file</code>, …) are rejected with <code>400 unsupported_content_type</code> before any dispatch</td>
+<td><code>routing/router.py</code>, <code>protocol/openai.py</code></td>
+</tr>
+<tr>
+<td>Code execution</td>
+<td>The gateway never executes model-generated commands. The evaluation harness runs <em>model-written Python</em> only inside bubblewrap (Linux; input allowlist: the Python runtime and system libraries, nothing else from the host), <code>sandbox-exec</code> (macOS; deny-by-default profile with runtime read roots) or a <code>--network none --read-only</code> Docker container with CPU/memory/output/time limits; a synthetic host file outside the work directory is tested to be unreadable. When none is available the task is <strong>skipped</strong>. There is no unsandboxed fallback and no flag to enable one. Limit: the sandbox does not protect the evaluator process from model code that targets it directly</td>
+<td><code>evaluation/sandbox.py</code></td>
+</tr>
+<tr>
+<td>Dependencies</td>
+<td>Five pinned-range runtime deps; CI runs <code>pip-audit</code> and secret scanning; workflow permissions are read-only</td>
+<td><code>.github/workflows/ci.yml</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="lan-exposure">LAN exposure</h2>
+<p>Set <code>server.host: 0.0.0.0</code> <strong>and</strong> <code>security.allow_lan: true</code>. Keys then travel over plain HTTP:
+terminate TLS in front (Caddy/nginx) or use a trusted private tunnel (Tailscale/WireGuard). Rotate
+keys with <code>modelsaar keys rotate</code>. The admin key should never leave the host. <code>modelsaar keys ensure</code>
+creates missing key files (idempotent, never rotates) and is what the container runs before <code>serve</code>.</p>
+<h2 id="file-handling">File handling</h2>
+<p><code>client-config --apply</code> keeps the target file's permission bits (a <code>0600</code> file stays <code>0600</code>; new files
+are created <code>0600</code> because the snippet carries the gateway key), writes temp files and backups private
+from creation and never reuses a backup name. <code>modelsaar uninstall</code> removes only the files ModelSaar
+created (config and its backups, its key files, its state database), refuses symlinked <code>keys/</code>/<code>state/</code>
+boundaries and leaves anything else in place.</p>
+<h2 id="offline-operation-scope-of-the-claim">Offline operation — scope of the claim</h2>
+<p>What was tested: with the fake backend on loopback and <code>locality_mode: local_only</code>, no request,
+classification or telemetry leaves the host; cloud aliases are excluded even when requested
+explicitly (<code>tests/test_acceptance.py::test_local_only_blocks_cloud_even_when_explicit</code>,
+<code>test_prompt_injection_cannot_change_routing</code>); a remote-labelled backend with a <code>/tokenize</code> endpoint
+receives zero bytes of message text (<code>tests/test_hardening_2026_10_11.py::test_local_only_sends_no_message_text_to_remote_tokenizer</code>).</p>
+<p>What the gateway cannot prove: that an opaque backend is truly local. A localhost address can be a
+proxy; Ollama can forward <code>:cloud</code> models. ModelSaar records the evidence it has (<code>locality_evidence</code>
+in <code>/admin/status</code>) and treats operator declarations as trust assumptions.</p>
+<p>What is outside the gateway: client tools (web search, browsers, code execution), auxiliary models
+(Open WebUI task model, OpenClaw utility model, Hermes compression model) and unrelated applications
+have their own network behaviour. Changing the main model endpoint does not make a whole application
+offline. To check: run <code>modelsaar serve</code> and the client with outbound network blocked (macOS: a
+firewall rule or Little Snitch; Linux: <code>unshare -n</code> / nftables) and confirm the client still
+completes a chat through the gateway.</p>
+<h2 id="reporting">Reporting</h2>
+<p>See <a href="/docs/security-policy/">SECURITY.md</a>.</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>

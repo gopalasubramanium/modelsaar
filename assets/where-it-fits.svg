@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 420" width="1100" height="420" role="img" aria-labelledby="t d" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="18">
+  <title id="t">Where ModelSaar fits</title>
+  <desc id="d">Apps on the left send OpenAI-compatible requests for the model "auto" to ModelSaar in the middle, which checks requirements and capabilities, ranks eligible deployments, records a decision and forwards the request unchanged to one of the inference backends on the right that serve the model weights.</desc>
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="#55635f"/></marker></defs>
+  <!-- apps -->
+  <text x="40" y="52" font-size="15" fill="#55635f">Apps you already use</text>
+  <g fill="#f1f3ef" stroke="#d6dcd6">
+    <rect x="40" y="70" width="220" height="56" rx="6"/><rect x="40" y="142" width="220" height="56" rx="6"/><rect x="40" y="214" width="220" height="56" rx="6"/><rect x="40" y="286" width="220" height="56" rx="6"/>
+  </g>
+  <g fill="#16211f">
+    <text x="60" y="104">Open WebUI</text><text x="60" y="176">OpenCode · OpenClaw</text><text x="60" y="248">Hermes Agent</text><text x="60" y="320">Your scripts and SDKs</text>
+  </g>
+  <!-- arrows apps -> gateway -->
+  <g stroke="#55635f" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M262 98 C 330 98, 330 206, 400 206"/><path d="M262 170 C 330 170, 330 206, 400 206"/><path d="M262 242 C 330 242, 330 206, 400 206"/><path d="M262 314 C 330 314, 330 206, 400 206"/>
+  </g>
+  <text x="268" y="52" font-size="14" fill="#55635f">one address · model: auto</text>
+  <!-- gateway -->
+  <rect x="404" y="70" width="300" height="272" rx="8" fill="#0f5c50"/>
+  <text x="430" y="108" font-size="22" font-weight="600" fill="#fff">ModelSaar</text>
+  <text x="430" y="132" font-size="14" fill="#cfe6df">OpenAI-compatible gateway on your machine</text>
+  <g fill="#fff" font-size="16">
+    <text x="430" y="172">1 · read the request's requirements</text>
+    <text x="430" y="202">2 · cross out what cannot do the job</text>
+    <text x="430" y="232">3 · rank the rest on evidence</text>
+    <text x="430" y="262">4 · forward unchanged, keep continuity</text>
+    <text x="430" y="292">5 · record the decision (no prompt)</text>
+  </g>
+  <rect x="430" y="306" width="248" height="24" rx="4" fill="#f0b84a"/>
+  <text x="440" y="323" font-size="14" fill="#1a1400">X-ModelSaar-Deployment: ollama/…</text>
+  <!-- arrows gateway -> backends -->
+  <g stroke="#55635f" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M706 206 C 760 206, 760 112, 820 112"/><path d="M706 206 C 760 206, 760 224, 820 224"/>
+  </g>
+  <!-- backends -->
+  <text x="820" y="52" font-size="15" fill="#55635f">Inference backends you run</text>
+  <g fill="#f1f3ef" stroke="#d6dcd6"><rect x="822" y="80" width="240" height="64" rx="6"/><rect x="822" y="192" width="240" height="64" rx="6"/></g>
+  <g fill="#16211f"><text x="842" y="106">Ollama</text><text x="842" y="128" font-size="14" fill="#55635f">your pulled models</text>
+  <text x="842" y="218">vLLM · llama.cpp server</text><text x="842" y="240" font-size="14" fill="#55635f">declared models</text></g>
+  <text x="822" y="300" font-size="14" fill="#55635f">Weights, licences and hardware stay here.</text>
+  <text x="822" y="320" font-size="14" fill="#55635f">ModelSaar never downloads a model.</text>
+  <text x="40" y="392" font-size="14" fill="#55635f">Decision records: modelsaar decisions · modelsaar explain · /admin/ui</text>
+</svg>

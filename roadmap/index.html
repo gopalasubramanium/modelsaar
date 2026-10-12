@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap and status · ModelSaar</title>
+<meta name="description" content="Current status of ModelSaar and clearly identified future work.">
+<link rel="canonical" href="https://modelsaar.com/roadmap/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Roadmap and status · ModelSaar">
+<meta property="og:description" content="Current status of ModelSaar and clearly identified future work.">
+<meta property="og:url" content="https://modelsaar.com/roadmap/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Roadmap and status · ModelSaar">
+<meta name="twitter:description" content="Current status of ModelSaar and clearly identified future work.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Roadmap and status", "description": "Current status of ModelSaar and clearly identified future work.", "url": "https://modelsaar.com/roadmap/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Roadmap and status", "item": "https://modelsaar.com/roadmap/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/" aria-current="page">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Roadmap and status</li></ol></nav>
+<section aria-labelledby="rm-title">
+  <h1 id="rm-title">Roadmap and status</h1>
+  <p class="lede">Where ModelSaar is today, what the next step is, and what is planned but not implemented. Nothing in the "planned" list is available now.</p>
+</section>
+
+<section aria-labelledby="now-title">
+  <h2 id="now-title">Now: public alpha</h2>
+  <ul>
+    <li><strong>Implemented and tested:</strong> OpenAI-compatible gateway (chat completions with streaming, models, embeddings, health), Ollama and generic OpenAI-compatible adapters, three-state capability evidence with probes and fingerprints, deterministic routing with profiles and aliases, session and tool-call continuity, admission control with memory budgets, decision records and a status page, the CLI, client configuration generators, an evaluation harness with sandboxed scoring, and a fault-injection test suite (208 tests at the pinned revision, including the independent reviewer's 29 contract checks kept verbatim; the 6 sandbox tests need an isolation backend and are skipped where none exists).</li>
+    <li><strong>Exercised live:</strong> discovery, probes, routing, streaming, tool calls, tool-result continuity, session pinning and a three-model evaluation against Ollama 0.32.13 on an ASUS GX10 (<a href="/benchmarks/">Benchmarks</a>).</li>
+    <li><strong>Review status (precise):</strong> an independent review of the first public revision (<code>1122e1f</code>) produced 18 grouped findings, addressed on the hardening branch with regression tests (<a href="/docs/review-2026-10-11/">F01–F18</a>). A second independent review of that branch (<code>80276bb</code>) reproduced 11 further contract failures and 6 launcher/installer observations (R1–R8; occupancy after stream/probe timeouts, resident-memory accounting, embedding identity anchoring, stream validation, the beginner path, evaluator isolation/scoring/resume, publication guards). Those were corrected on 2026-10-12 and the reviewer's own tests pass and are part of the suite; F04, F08, F10, F13, F14 and F17 were reopened and re-closed by that pass. A third independent review of the corrected revision (2026-10-12) reproduced five further edge conditions (failed residency query, refused-connection residency, stream terminal ordering, evaluator probe admission, checkpoint alternatives); they were closed in the alpha pass and the reviewer's tests are in the suite. <strong>Independent verification of this exact candidate is pending.</strong> The installer pins the candidate.</li>
+    <li><strong>Not yet:</strong> a tagged release, a PyPI package or a container image; real-client workflow tests (Open WebUI, OpenClaw, OpenCode, Hermes); a real vLLM/llama.cpp run; real-model embeddings; a thinking-matched evaluation budget.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="next-title">
+  <h2 id="next-title">Next</h2>
+  <ol>
+    <li>Independent verification of the corrected hardening revision (the 2026-10-12 pass), then merge and a first tagged release (0.1.x) with a PyPI package and container image.</li>
+    <li>One real client workflow recorded end to end (Open WebUI is the quickest), then the others.</li>
+    <li>An evaluation with a reasoning-matched budget and all eight GX10 models, and a run against a generic OpenAI-compatible server.</li>
+  </ol>
+</section>
+
+<section aria-labelledby="later-title">
+  <h2 id="later-title">Planned, not implemented</h2>
+  <ul>
+    <li>Native decision-model adapters as routing classifiers and a decisions-style endpoint.</li>
+    <li>Audio and video inputs; multimodal embeddings; OCR and guardrail pipelines as separate results.</li>
+    <li>Responses API and Anthropic Messages with fail-closed translation.</li>
+    <li>Exact tokenisation for more runtimes; better served-context detection for Ollama.</li>
+    <li>Managed model lifecycle (keep-alive/unload) under leases and locks; composition with llama-swap.</li>
+    <li>Cascades and ensembles; scheduling across hosts.</li>
+    <li>Opt-in adaptive learning from outcomes with versioning, holdout evaluation, privacy controls and rollback.</li>
+    <li>Optional LLM-judge scorers in the evaluation harness, with identity, bias and cost disclosed.</li>
+  </ul>
+  <p>The repository's <a href="/docs/roadmap-detail/">roadmap file</a> is the source for this list; the <a href="/docs/changelog/">changelog</a> records what actually landed, and <a href="/docs/backlog-post-alpha/">the post-alpha backlog</a> lists what the alpha deliberately leaves unverified or disabled (macOS code-execution sandbox, real-client walkthroughs, a live run under the current scorer).</p>
+</section>
+
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=b9d69f72" defer></script>
+</body>
+</html>
