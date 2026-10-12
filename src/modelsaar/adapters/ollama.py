@@ -31,6 +31,7 @@ OLLAMA_ASSUMED_DEFAULT_NUM_CTX = 4096
 
 class OllamaAdapter(BaseAdapter):
     type_name = "ollama"
+    reports_residency = True  # /api/ps is a real observation of resident models
     adapter_capabilities = {
         "tool_choice_required": "unsupported",  # OpenAI layer ignores tool_choice
         "json_object": "supported",
@@ -222,7 +223,7 @@ class OllamaAdapter(BaseAdapter):
             return await self._post_stream("/v1/chat/completions", fwd, timeout=timeout)
         return await self._post_json("/v1/chat/completions", fwd, timeout=timeout)
 
-    async def embeddings(self, dep: Deployment, body: dict[str, Any]) -> UpstreamResponse:
+    async def embeddings(self, dep: Deployment, body: dict[str, Any], timeout: float | None = None) -> UpstreamResponse:
         fwd = {k: v for k, v in body.items() if k in ("input", "encoding_format", "dimensions")}
         fwd["model"] = dep.model
-        return await self._post_json("/v1/embeddings", fwd)
+        return await self._post_json("/v1/embeddings", fwd, timeout=timeout)

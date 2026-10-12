@@ -35,6 +35,9 @@ class ProbeResult:
     note: str = ""
     latency_ms: float = 0.0
     details: dict[str, Any] = field(default_factory=dict)
+    # True when the probe's inference timed out: the backend may still be computing, so the
+    # runner stops and the caller keeps the slot/memory occupied (uncertain hold).
+    uncertain: bool = False
 
 
 @dataclass
@@ -44,6 +47,8 @@ class ProbeReport:
     results: list[ProbeResult] = field(default_factory=list)
     measurements: list[Measurement] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
+    uncertain: bool = False  # a probe timed out; later probes were not run
+    skipped: list[str] = field(default_factory=list)  # probes not run because of an uncertain timeout
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -52,7 +57,17 @@ class ProbeReport:
             "results": [r.__dict__ for r in self.results],
             "measurements": [m.__dict__ for m in self.measurements],
             "errors": self.errors,
+            "uncertain": self.uncertain,
+            "skipped": self.skipped,
         }
+
+
+def _error_result(capability: str, e: AdapterError) -> ProbeResult:
+    """A probe that could not get an answer. A timeout is *uncertain*: the backend may still be
+    generating, so it must not be followed by more probe inference on the same reservation."""
+    if e.kind == "timeout":
+        return ProbeResult(capability, "unknown", f"probe timed out ({e.message[:80]}); backend may still be computing", uncertain=True)
+    return ProbeResult(capability, "unknown", f"probe error: {e.message[:100]}")
 
 
 _TOOL = {
@@ -128,7 +143,7 @@ async def probe_tools(adapter: BaseAdapter, dep: Deployment, timeout: float) -> 
     try:
         r = await _chat(adapter, dep, body, timeout)
     except AdapterError as e:
-        return ProbeResult("tools", "unknown", f"probe error: {e.message[:100]}")
+        return _error_result("tools", e)
     ms = (time.monotonic() - t0) * 1000
     if r.status >= 500:
         return ProbeResult("tools", "unknown", f"backend returned {r.status} (transient?) for a tools request", ms)
@@ -158,7 +173,7 @@ async def probe_parallel_tools(adapter: BaseAdapter, dep: Deployment, timeout: f
     try:
         r = await _chat(adapter, dep, body, timeout)
     except AdapterError as e:
-        return ProbeResult("parallel_tools", "unknown", f"probe error: {e.message[:100]}")
+        return _error_result("parallel_tools", e)
     ms = (time.monotonic() - t0) * 1000
     names = {(c.get("function") or {}).get("name") for c in _tool_calls(r)}
     if {"get_current_time", "get_weather"} <= names:
@@ -175,7 +190,7 @@ async def probe_json_schema(adapter: BaseAdapter, dep: Deployment, timeout: floa
     try:
         r = await _chat(adapter, dep, body, timeout)
     except AdapterError as e:
-        return ProbeResult("json_schema", "unknown", f"probe error: {e.message[:100]}")
+        return _error_result("json_schema", e)
     ms = (time.monotonic() - t0) * 1000
     if r.status >= 500:
         return ProbeResult("json_schema", "unknown", f"backend returned {r.status} (transient?)", ms)
@@ -206,7 +221,7 @@ async def probe_json_object(adapter: BaseAdapter, dep: Deployment, timeout: floa
     try:
         r = await _chat(adapter, dep, body, timeout)
     except AdapterError as e:
-        return ProbeResult("json_object", "unknown", f"probe error: {e.message[:100]}")
+        return _error_result("json_object", e)
     ms = (time.monotonic() - t0) * 1000
     if _budget_exhausted(r):
         return ProbeResult("json_object", "unknown", _EXHAUSTED_NOTE, ms)
@@ -233,7 +248,7 @@ async def probe_vision(adapter: BaseAdapter, dep: Deployment, timeout: float) ->
     try:
         r = await _chat(adapter, dep, body, timeout)
     except AdapterError as e:
-        return ProbeResult("vision", "unknown", f"probe error: {e.message[:100]}")
+        return _error_result("vision", e)
     ms = (time.monotonic() - t0) * 1000
     if r.status >= 500:
         return ProbeResult("vision", "unknown", f"backend returned {r.status} (transient?)", ms)
@@ -253,7 +268,7 @@ async def probe_streaming(adapter: BaseAdapter, dep: Deployment, timeout: float)
     try:
         s: UpstreamStream = await adapter.chat(dep, body, stream=True, timeout=timeout)
     except AdapterError as e:
-        return ProbeResult("streaming", "unknown", f"probe error: {e.message[:100]}"), None
+        return _error_result("streaming", e), None
     if s.status != 200:
         await s.close()
         return ProbeResult("streaming", "unknown" if s.status >= 500 else "unsupported", f"backend returned {s.status}"), None
@@ -266,6 +281,9 @@ async def probe_streaming(adapter: BaseAdapter, dep: Deployment, timeout: float)
                 ttft = (time.monotonic() - t0) * 1000
             for ev in parser.feed(chunk):
                 obs.observe(ev)
+    except AdapterError as e:
+        await s.close()
+        return _error_result("streaming", e), ttft
     finally:
         await s.close()
     ms = (time.monotonic() - t0) * 1000
@@ -281,15 +299,19 @@ async def probe_streaming(adapter: BaseAdapter, dep: Deployment, timeout: float)
     return ProbeResult("streaming", value, note, ms), ttft
 
 
-async def measure_latency(adapter: BaseAdapter, dep: Deployment, timeout: float) -> Measurement:
-    """Two short requests: the first may include model loading, the second is warm."""
+async def measure_latency(adapter: BaseAdapter, dep: Deployment, timeout: float) -> tuple[Measurement, bool]:
+    """Two short requests: the first may include model loading, the second is warm. The second
+    value is True when a request timed out (the backend may still be computing)."""
     body = {"messages": [{"role": "user", "content": "Reply with the single word: ready"}], "max_tokens": 256, "temperature": 0}
     times: list[float] = []
+    uncertain = False
     for _ in range(2):
         t0 = time.monotonic()
         try:
             r = await _chat(adapter, dep, body, timeout)
-        except AdapterError:
+        except AdapterError as e:
+            if e.kind == "timeout":
+                uncertain = True
             break
         if r.status != 200:
             break
@@ -313,7 +335,7 @@ async def measure_latency(adapter: BaseAdapter, dep: Deployment, timeout: float)
         m.load_ms = max(0.0, times[0] - times[1]) if not dep.loaded else 0.0
     elif times:
         m.p50_ms = times[0]
-    return m
+    return m, uncertain
 
 
 async def run_probes(
@@ -335,33 +357,55 @@ async def run_probes(
             dep.set_cap(r.capability, r.value, "probe", r.note)  # type: ignore[arg-type]
             if store:
                 store.save_probe(dep.id, dep.fingerprint, r.capability, r.value, r.note)
+        if r.uncertain:
+            rep.uncertain = True
 
+    def _stop(after: str) -> None:
+        # One reservation covers this run. After a timeout the backend may still be computing, so
+        # no further inference is started on it; the caller holds the reservation as uncertain.
+        rep.errors.append(
+            f"probe {after!r} timed out; the backend may still be computing, so the remaining probes were "
+            "not run and the slot is held as uncertain (re-run `modelsaar probe` later)"
+        )
+
+    order = ["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"]
     ttft: float | None = None
-    if "streaming" in which:
-        r, ttft = await probe_streaming(adapter, dep, timeout)
-        await _save(r)
-    if "tools" in which:
-        if dep.cap("tools") == "unsupported" and dep.capabilities["tools"].provenance == "source_claim":
-            rep.results.append(ProbeResult("tools", "unsupported", "skipped: backend metadata says tools unsupported"))
-        else:
-            await _save(await probe_tools(adapter, dep, timeout))
-    if "parallel_tools" in which and dep.cap("tools") == "supported":
-        await _save(await probe_parallel_tools(adapter, dep, timeout))
-    if "json_object" in which:
-        await _save(await probe_json_object(adapter, dep, timeout))
-    if "json_schema" in which:
-        await _save(await probe_json_schema(adapter, dep, timeout))
-    if "vision" in which:
-        if dep.cap("vision") == "unsupported" and dep.capabilities["vision"].provenance == "source_claim":
-            rep.results.append(ProbeResult("vision", "unsupported", "skipped: backend metadata says vision unsupported"))
-        else:
-            await _save(await probe_vision(adapter, dep, timeout))
-    if "latency" in which:
-        m = await measure_latency(adapter, dep, timeout)
-        if ttft is not None:
-            m.ttft_ms = ttft
-        rep.measurements.append(m)
-        dep.measurements[m.task] = m
-        if store and m.samples:
-            store.save_measurement(dep.id, dep.fingerprint, m.__dict__)
+    for name in order:
+        if name not in which:
+            continue
+        if rep.uncertain:
+            rep.skipped.append(name)
+            continue
+        if name == "streaming":
+            r, ttft = await probe_streaming(adapter, dep, timeout)
+            await _save(r)
+        elif name == "tools":
+            if dep.cap("tools") == "unsupported" and dep.capabilities["tools"].provenance == "source_claim":
+                rep.results.append(ProbeResult("tools", "unsupported", "skipped: backend metadata says tools unsupported"))
+            else:
+                await _save(await probe_tools(adapter, dep, timeout))
+        elif name == "parallel_tools":
+            if dep.cap("tools") == "supported":
+                await _save(await probe_parallel_tools(adapter, dep, timeout))
+        elif name == "json_object":
+            await _save(await probe_json_object(adapter, dep, timeout))
+        elif name == "json_schema":
+            await _save(await probe_json_schema(adapter, dep, timeout))
+        elif name == "vision":
+            if dep.cap("vision") == "unsupported" and dep.capabilities["vision"].provenance == "source_claim":
+                rep.results.append(ProbeResult("vision", "unsupported", "skipped: backend metadata says vision unsupported"))
+            else:
+                await _save(await probe_vision(adapter, dep, timeout))
+        elif name == "latency":
+            m, timed_out = await measure_latency(adapter, dep, timeout)
+            if timed_out:
+                rep.uncertain = True
+            if ttft is not None:
+                m.ttft_ms = ttft
+            rep.measurements.append(m)
+            dep.measurements[m.task] = m
+            if store and m.samples:
+                store.save_measurement(dep.id, dep.fingerprint, m.__dict__)
+        if rep.uncertain and name not in rep.skipped:
+            _stop(name)
     return rep

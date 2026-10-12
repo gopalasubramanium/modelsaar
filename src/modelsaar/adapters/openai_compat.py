@@ -133,7 +133,7 @@ class OpenAICompatAdapter(BaseAdapter):
             return await self._post_stream("/chat/completions", fwd, timeout=timeout)
         return await self._post_json("/chat/completions", fwd, timeout=timeout)
 
-    async def embeddings(self, dep: Deployment, body: dict[str, Any]) -> UpstreamResponse:
+    async def embeddings(self, dep: Deployment, body: dict[str, Any], timeout: float | None = None) -> UpstreamResponse:
         fwd = {k: v for k, v in body.items() if k in ("input", "encoding_format", "dimensions", "user")}
         fwd["model"] = dep.model
-        return await self._post_json("/embeddings", fwd)
+        return await self._post_json("/embeddings", fwd, timeout=timeout)

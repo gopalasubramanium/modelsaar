@@ -32,6 +32,29 @@ class SSEEvent:
     def is_done(self) -> bool:
         return self.data is not None and self.data.strip() == "[DONE]"
 
+    @property
+    def kind(self) -> str:
+        """Classify the frame for completion validation:
+        ``comment`` — no data field (SSE comments, keepalives, event-only frames); ignorable.
+        ``done`` — the ``[DONE]`` sentinel.
+        ``chunk`` — a JSON object shaped like a chat completion chunk (``choices`` list), a usage-only
+        frame (``usage`` object, possibly with empty ``choices``) or an upstream error object.
+        ``malformed`` — data that is not JSON, not an object, or an object with none of those keys.
+        Only ``chunk`` frames are evidence of a completion; ``malformed`` frames invalidate the stream."""
+        if self.data is None:
+            return "comment"
+        if self.is_done:
+            return "done"
+        try:
+            v = json.loads(self.data)
+        except json.JSONDecodeError:
+            return "malformed"
+        if not isinstance(v, dict):
+            return "malformed"
+        if isinstance(v.get("choices"), list) or isinstance(v.get("usage"), dict) or "error" in v:
+            return "chunk"
+        return "malformed"
+
 
 @dataclass
 class SSEParser:
@@ -103,12 +126,40 @@ class StreamObserver:
     saw_done: bool = False
     error: str | None = None
     tool_call_indexes: set[int] = field(default_factory=set)
+    valid_chunks: int = 0  # frames that are completion chunks / usage frames / error objects
+    comments: int = 0  # keepalives and comments (ignored for validation)
+    malformed: int = 0  # data frames that are not a completion structure
+    malformed_sample: str = ""
+
+    def completion_problem(self) -> str | None:
+        """Why the observed stream is not a validated completion, or None when it is one.
+        A completion needs at least one completion chunk, no malformed data frame, and either a
+        finish_reason or the [DONE] sentinel. Comments/keepalives and usage-only frames are fine."""
+        if self.error is not None:
+            return f"upstream emitted an error event: {self.error[:160]}"
+        if self.malformed:
+            return f"upstream emitted {self.malformed} malformed SSE data frame(s) (first: {self.malformed_sample!r})"
+        if not self.valid_chunks:
+            return "upstream stream contained no completion chunk"
+        if not self.saw_done and self.finish_reason is None:
+            return "upstream stream ended without a finish_reason or [DONE] (truncated)"
+        return None
 
     def observe(self, ev: SSEEvent) -> None:
         self.events += 1
-        if ev.is_done:
+        kind = ev.kind
+        if kind == "done":
             self.saw_done = True
             return
+        if kind == "comment":
+            self.comments += 1
+            return
+        if kind == "malformed":
+            self.malformed += 1
+            if not self.malformed_sample:
+                self.malformed_sample = (ev.data or "")[:80]
+            return
+        self.valid_chunks += 1
         obj = ev.json()
         if not obj:
             return

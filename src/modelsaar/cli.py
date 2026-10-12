@@ -184,6 +184,8 @@ def _print_probe_report(rep: dict[str, Any]) -> None:
         print(f"  latency           p50={p50 and round(p50)}ms ttft={ttft and round(ttft)}ms load~{load and round(load)}ms (samples={m.get('samples')})")
     for e in rep.get("errors", []):
         print(f"  error: {e}")
+    if rep.get("skipped"):
+        print(f"  not run (uncertain timeout): {', '.join(rep['skipped'])}")
 
 
 def cmd_probe(args: argparse.Namespace) -> None:
@@ -259,7 +261,15 @@ def _probe_offline(cfg: Config, args: argparse.Namespace) -> None:
             reservation = await r.admission.acquire(d, timeout=None)
             try:
                 rep = await run_probes(r.adapters[d.backend_id], d, store, args.which or None, timeout=args.timeout)
-            finally:
+            except BaseException:
+                await reservation.release()
+                raise
+            if rep.uncertain:
+                # The backend may still be computing: in this offline process the hold only delays the
+                # next deployment's probes; the gateway-coordinated path holds the real slot.
+                await reservation.mark_uncertain()
+                await asyncio.sleep(min(r.admission.cfg.uncertain_hold_s, 5.0))
+            else:
                 await reservation.release()
             _print_probe_report(rep.as_dict())
             reports.append(rep.as_dict())

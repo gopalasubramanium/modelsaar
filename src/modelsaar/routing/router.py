@@ -60,6 +60,8 @@ class Router:
         self.catalogue = load_catalogue()
         self._refresh_lock = asyncio.Lock()
         self.last_refresh_error: str = ""
+        # Alias -> established embedding identity (process memory; mirrored in the state DB).
+        self._alias_identity_memory: dict[str, str] = {}
 
     async def aclose(self) -> None:
         for a in self.adapters.values():
@@ -92,6 +94,18 @@ class Router:
                 self._apply_stored_evidence(d)
             self.registry.replace(deps)
             self.last_refresh_error = "; ".join(errors)
+            self._reconcile_residency(errors)
+
+    def _reconcile_residency(self, errors: list[str] | None = None) -> None:
+        """Hand the admission layer the backends whose residency was just observed (healthy adapters
+        that report it), so assumed-resident weights are replaced by the observation."""
+        failed = {e.split(":", 1)[0] for e in (errors or [])}
+        observed = {
+            bid for bid, a in self.adapters.items()
+            if getattr(a, "reports_residency", False) and bid not in failed
+            and all(d.healthy for d in self.registry.by_backend(bid))
+        }
+        self.admission.reconcile_residency(self.registry.all(), observed)
 
     async def _discover_backend(self, bid: str, adapter: BaseAdapter) -> list[Deployment]:
         return await adapter.discover()
@@ -153,6 +167,7 @@ class Router:
                 d.loaded = d.model in loaded
                 if d.loaded:
                     d.loaded_observed_at = time.time()
+        self._reconcile_residency()
 
     # ------------------------------------------------------------------ #
     # Alias availability (truthful /v1/models)
@@ -428,16 +443,10 @@ class Router:
     # ------------------------------------------------------------------ #
     # Embedding contracts
     # ------------------------------------------------------------------ #
-    def _embedding_identity_blocker(self, contract, d: Deployment) -> str | None:  # type: ignore[no-untyped-def]
-        """The effective identity of an alias is: embeddings[].identity when declared, else the
-        identity recorded in the state DB on first successful use, else the identity of the first
-        member in contract order. A member is interchangeable only when its identity is known and
-        equal to that. Single-member aliases with an unknown identity are allowed (nothing to
-        interchange) but the decision says so."""
-        expected = contract.identity or self._recorded_embedding_identity(contract.alias)
-        if not expected:
-            first = self.registry.get(contract.deployments[0])
-            expected = first.identity if first else ""
+    def _embedding_identity_blocker(self, contract, d: Deployment, expected: str) -> str | None:  # type: ignore[no-untyped-def]
+        """A member is interchangeable only when its identity is known and equal to the alias's
+        established identity (see ``_alias_identity``). Single-member aliases with an unknown
+        identity are allowed (nothing to interchange) but the decision says so."""
         if len(contract.deployments) == 1 and not expected:
             return None
         if not d.identity:
@@ -446,28 +455,72 @@ class Router:
                 f"backends[].models[].identity to treat it as a replica of alias {contract.alias!r}"
             )
         if expected and d.identity != expected:
-            src = "embeddings[].identity" if contract.identity else "the identity recorded for this alias"
+            src = "embeddings[].identity" if contract.identity else "the identity established for this alias"
             return (
                 f"identity {d.identity[:24]} ({d.identity_source}) differs from {src} {expected[:24]}; "
                 "changed identity requires an explicit re-indexing decision"
             )
         return None
 
+    def _alias_identity(self, contract, members: list[Deployment]) -> tuple[str, str | None]:  # type: ignore[no-untyped-def]
+        """Establish the alias's identity BEFORE any dispatch, atomically for this process (this
+        runs synchronously inside the event loop and the anchor is persisted before returning, so
+        two concurrent first requests see the same anchor).
+
+        Precedence: ``embeddings[].identity`` (declared) > the identity recorded for the alias >
+        the verified identity of the first member *in contract order* whose identity is known.
+        Members with a different known identity are excluded from then on; members with an unknown
+        identity are never interchangeable (single-member aliases excepted). The anchor is a
+        configured member's verified identity, never something learned from a response, so the
+        first-use race cannot bind two embedding spaces. The second value is a note when the
+        configuration was ambiguous (several known identities) and the deterministic choice was made."""
+        expected = contract.identity or self._recorded_embedding_identity(contract.alias)
+        if expected:
+            return expected, None
+        by_id = {d.id: d for d in members}
+        ordered = [by_id[did] for did in contract.deployments if did in by_id]
+        known = [d.identity for d in ordered if d.identity]
+        if not known:
+            return "", None
+        anchor = known[0]
+        self._anchor_embedding_identity(contract.alias, anchor)
+        note = None
+        if len(set(known)) > 1:
+            note = (
+                f"alias {contract.alias!r} members declare {len(set(known))} different identities; anchored to "
+                f"{anchor[:16]} (first member in contract order with a verified identity) before dispatch — "
+                "declare embeddings[].identity to make this explicit"
+            )
+        return anchor, note
+
+    def _anchor_embedding_identity(self, alias: str, identity: str) -> None:
+        self._alias_identity_memory[alias] = identity
+        if self.store:
+            try:
+                self.store.set_meta(f"embedding_identity:{alias}", identity)
+            except Exception:  # pragma: no cover
+                pass
+
     def _recorded_embedding_identity(self, alias: str) -> str:
+        mem = self._alias_identity_memory.get(alias)
+        if mem:
+            return mem
         if not self.store:
             return ""
         try:
-            return self.store.get_meta(f"embedding_identity:{alias}") or ""
+            v = self.store.get_meta(f"embedding_identity:{alias}") or ""
         except Exception:  # pragma: no cover
             return ""
+        if v:
+            self._alias_identity_memory[alias] = v
+        return v
 
     def record_embedding_identity(self, alias: str, dep: Deployment) -> None:
-        """Called after a validated embedding response: pins the alias to the identity that served it."""
-        if self.store and dep.identity and not self._recorded_embedding_identity(alias):
-            try:
-                self.store.set_meta(f"embedding_identity:{alias}", dep.identity)
-            except Exception:  # pragma: no cover
-                pass
+        """Kept for callers: the alias identity is established before dispatch (``_alias_identity``),
+        so a response can only confirm it. A response from a different identity is impossible because
+        such a member is excluded before dispatch."""
+        if dep.identity and not self._recorded_embedding_identity(alias):
+            self._anchor_embedding_identity(alias, dep.identity)
 
     def embedding_request_problem(self, body: dict[str, Any], contract, dep: Deployment) -> str | None:  # type: ignore[no-untyped-def]
         """Request options that would change the alias's space are refused, not forwarded."""
@@ -653,9 +706,13 @@ class Router:
                     keep.append(d)
             res.eligible = keep
         if contract:
+            expected, note = self._alias_identity(contract, candidates)
+            if note:
+                dec.reasons.append(note)
+                dec.remedies.append("set embeddings[].identity to the verified identity the index was built with")
             keep = []
             for d in res.eligible:
-                why = self._embedding_identity_blocker(contract, d)
+                why = self._embedding_identity_blocker(contract, d, expected)
                 if why:
                     dec.exclusions[d.id] = [why]
                     if "re-index" not in " ".join(dec.remedies):

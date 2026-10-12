@@ -322,17 +322,26 @@ async def _relay(
     response_model: str,
     caller: str,
 ) -> AsyncIterator[bytes]:
-    """Relay upstream SSE to the client. After the first byte the response is committed."""
+    """Relay upstream SSE to the client. After the first byte the response is committed.
+
+    Occupancy: the reservation is released only on confirmed completion or a confirmed upstream
+    failure (the backend ended the stream). A read timeout or client disconnect leaves the backend
+    possibly still generating, so the slot and the pool memory are held as *uncertain* until the
+    configured hold expires (admission.uncertain_hold_s) — the same rule as non-streaming timeouts."""
     parser = SSEParser()
     obs = StreamObserver()
     tool_ids: list[str] = []
     completed = False
+    uncertain = False
     try:
         async for chunk in upstream.aiter_bytes():
             if obs.first_byte_at is None:
                 obs.first_byte_at = time.monotonic()
             for ev in parser.feed(chunk):
                 obs.observe(ev)
+                if ev.kind == "malformed":
+                    # Not forwarded: it is not a completion structure. The stream is invalidated below.
+                    continue
                 obj = ev.json()
                 if obj:
                     for ch in obj.get("choices") or []:
@@ -342,11 +351,11 @@ async def _relay(
                 yield rewrite_model_field(ev, response_model)
         for ev in parser.flush():
             obs.observe(ev)
-            yield rewrite_model_field(ev, response_model)
-        if obs.error is not None:
-            raise _UpstreamStreamError(f"upstream emitted an error event: {obs.error[:160]}")
-        if not obs.saw_done and obs.finish_reason is None:
-            raise _UpstreamStreamError("upstream stream ended without a finish_reason or [DONE] (truncated)")
+            if ev.kind != "malformed":
+                yield rewrite_model_field(ev, response_model)
+        problem = obs.completion_problem()
+        if problem:
+            raise _UpstreamStreamError(problem)
         completed = True
         if not obs.saw_done:
             # Finish reason seen but no terminal sentinel: terminate the protocol so clients do not hang.
@@ -360,7 +369,14 @@ async def _relay(
         router.record(dec)
         raise
     except Exception as e:  # upstream failure mid-stream: terminate, never switch.
-        dec.outcome = "stream_truncated_after_commit" if isinstance(e, _UpstreamStreamError) else "stream_failed_after_commit"
+        if isinstance(e, AdapterError) and e.kind == "timeout":
+            # The gateway stopped waiting; the backend did not end the stream and may still compute.
+            uncertain = True
+            dec.outcome = "stream_timeout_after_commit"
+        elif isinstance(e, _UpstreamStreamError):
+            dec.outcome = "stream_invalid_after_commit" if obs.malformed or not obs.valid_chunks else "stream_truncated_after_commit"
+        else:
+            dec.outcome = "stream_failed_after_commit"
         dec.outcome_detail = redact(str(e))[:200]
         c = router.admission.circuit(router.registry.get(dep_id).backend_id) if router.registry.get(dep_id) else None
         if c:
@@ -369,14 +385,14 @@ async def _relay(
             "upstream stream failed after the response was committed; the gateway does not switch models "
             f"mid-response ({redact(str(e))[:160]})",
             code="upstream_stream_error",
-            modelsaar={"request_id": dec.request_id, "deployment": dep_id, "events_delivered": obs.events},
+            modelsaar={"request_id": dec.request_id, "deployment": dep_id, "events_delivered": obs.events, "outcome": dec.outcome},
         )
         yield b"data: [DONE]\n\n"
     finally:
         if completed:
             dec.outcome = "ok"
             dec.outcome_detail = (
-                f"events={obs.events} finish={obs.finish_reason} tool_deltas={obs.tool_call_deltas} "
+                f"events={obs.events} chunks={obs.valid_chunks} finish={obs.finish_reason} tool_deltas={obs.tool_call_deltas} "
                 f"usage={'yes' if obs.usage else 'no'}"
             )
             await reservation.release()
@@ -392,7 +408,11 @@ async def _relay(
                 for i in tool_ids:
                     router.affinity.remember_tool_calls(caller, [i], dep_id)
             router.record(dec)
-        elif dec.outcome in ("stream_failed_after_commit", "stream_truncated_after_commit"):
+        elif uncertain:
+            await reservation.mark_uncertain()
+            await upstream.close()
+            router.record(dec)
+        elif dec.outcome in ("stream_failed_after_commit", "stream_truncated_after_commit", "stream_invalid_after_commit"):
             await reservation.release()
             await upstream.close()
             router.record(dec)
@@ -435,14 +455,28 @@ async def embeddings(request: Request) -> Response:
         router.record(dec)
         return _json(e.status, error_body(e.message, code="admission_rejected"), headers)
     try:
-        resp = await adapter.embeddings(dep, body)
+        # Same deadline rule as chat: the server request timeout or the backend timeout, whichever is tighter.
+        resp = await adapter.embeddings(dep, body, timeout=state.cfg.server.request_timeout_s)
     except AdapterError as e:
-        dec.outcome = "upstream_error"
+        if e.kind == "timeout":
+            # The backend may still be computing: hold the slot/memory as uncertain, do not release.
+            await reservation.mark_uncertain()
+        else:
+            await reservation.release()
+        state.requests_failed += 1
+        dec.outcome = "upstream_timeout" if e.kind == "timeout" else "upstream_error"
         dec.outcome_detail = redact(e.message)[:200]
         router.record(dec)
-        return _json(e.status, error_body(redact(e.message), code="upstream_error"), headers)
-    finally:
+        return _json(e.status, error_body(redact(e.message), code="upstream_timeout" if e.kind == "timeout" else "upstream_error", modelsaar={"request_id": dec.request_id, "deployment": dep.id}), headers)
+    except Exception as e:  # noqa: BLE001 - every failure path must account for the slot
         await reservation.release()
+        state.requests_failed += 1
+        dec.outcome = "internal_error"
+        dec.outcome_detail = redact(f"{e.__class__.__name__}: {e}")[:200]
+        router.record(dec)
+        log.exception("unexpected error in embeddings dispatch to %s", dep.id)
+        return _json(500, error_body("internal gateway error", code="internal_error", modelsaar={"request_id": dec.request_id}), headers)
+    await reservation.release()
     if resp.status != 200:
         dec.outcome = "upstream_error"
         router.record(dec)
@@ -673,7 +707,14 @@ async def admin_probe(request: Request) -> Response:
         return _json(e.status, error_body(e.message, code="admission_rejected"), {"Retry-After": "2"})
     try:
         rep = await run_probes(router.adapters[dep.backend_id], dep, state.store, which, timeout=timeout)
-    finally:
+    except BaseException:
+        await reservation.release()
+        raise
+    if rep.uncertain:
+        # A probe inference timed out: the runner stopped and the backend may still be computing.
+        # Hold the slot and the pool memory as uncertain (same rule as serving timeouts).
+        await reservation.mark_uncertain()
+    else:
         await reservation.release()
     await router.refresh()
     return _json(200, rep.as_dict())

@@ -34,6 +34,12 @@ class _Slot:
     memory_margin_gb: float = 0.0
     unknown_memory_policy: str = "allow"
     holders: dict[str, int] = field(default_factory=dict)
+    # Weights assumed resident after a dispatch completed: a request slot is released when the
+    # response ends, but the model's weights stay loaded in the runtime. The assumption is kept
+    # (conservatively counted against the budget) until a residency observation reconciles it or
+    # the pool's assumed_residency_ttl_s expires. dep_id -> monotonic time of the last completion.
+    assumed_resident: dict[str, float] = field(default_factory=dict)
+    assumed_residency_ttl_s: float | None = None
 
     @property
     def used(self) -> int:
@@ -46,8 +52,19 @@ class _Slot:
         n = self.holders.get(dep_id, 0) - 1
         if n <= 0:
             self.holders.pop(dep_id, None)
+            if self.memory_gb is not None:
+                # The slot is free; the weights are not. Keep them counted until reconciled.
+                self.assumed_resident[dep_id] = time.monotonic()
         else:
             self.holders[dep_id] = n
+
+    def assumed(self) -> set[str]:
+        """Deployments whose weights are assumed resident (TTL applied)."""
+        if self.assumed_residency_ttl_s is not None:
+            cutoff = time.monotonic() - self.assumed_residency_ttl_s
+            for k in [k for k, t in self.assumed_resident.items() if t < cutoff]:
+                self.assumed_resident.pop(k, None)
+        return set(self.assumed_resident)
 
 
 @dataclass
@@ -128,6 +145,7 @@ class Admission:
                 memory_gb=p.memory_gb,
                 memory_margin_gb=p.memory_margin_gb,
                 unknown_memory_policy=p.unknown_memory_policy,
+                assumed_residency_ttl_s=p.assumed_residency_ttl_s,
             )
             for p in pools
         }
@@ -180,7 +198,9 @@ class Admission:
             return None
         members = {d.id: d for d in self.pool_members(pool_id)}
         members.setdefault(dep.id, dep)
-        counted: set[str] = set(s.holders) | {dep.id} | {d.id for d in members.values() if d.loaded}
+        # Counted once each: active/uncertain holders, the candidate, members observed loaded, and
+        # members assumed resident since their last completion (not yet reconciled by an observation).
+        counted: set[str] = set(s.holders) | {dep.id} | {d.id for d in members.values() if d.loaded} | (s.assumed() & set(members))
         total = 0.0
         unknown: list[str] = []
         for did in sorted(counted):
@@ -195,10 +215,13 @@ class Admission:
             "memory_gb": s.memory_gb,
             "margin_gb": s.memory_margin_gb,
             "counted": sorted(counted),
+            "assumed_resident": sorted(s.assumed() & set(members)),
             "estimated_gb": round(total, 2),
             "unknown": unknown,
             "policy_unknown": s.unknown_memory_policy,
-            "fits": total + s.memory_margin_gb <= s.memory_gb,
+            # With unknown_memory_policy=reject an unknown member anywhere in the count blocks admission:
+            # a resident or reserved model of unknown size makes the whole budget unverifiable.
+            "fits": total + s.memory_margin_gb <= s.memory_gb and not (unknown and s.unknown_memory_policy == "reject"),
         }
 
     def memory_blocker(self, dep: Deployment) -> str | None:
@@ -210,6 +233,12 @@ class Admission:
                 f"memory estimate unknown for {dep.id} and pool {v['pool']} has unknown_memory_policy=reject "
                 f"(declare memory_gb_estimate under backends[].models or deployments[] overrides)"
             )
+        if v["unknown"] and v["policy_unknown"] == "reject":
+            return (
+                f"memory estimate unknown for {', '.join(v['unknown'])} already counted in pool {v['pool']} "
+                f"(resident or reserved) and the pool has unknown_memory_policy=reject; the budget cannot be verified "
+                "(declare memory_gb_estimate for every member or unload the unknown model)"
+            )
         if not v["fits"]:
             return (
                 f"memory budget: pool {v['pool']} memory_gb={v['memory_gb']} < resident+reserved estimate "
@@ -218,6 +247,18 @@ class Admission:
                 f"{'; unknown: ' + ', '.join(v['unknown']) if v['unknown'] else ''})"
             )
         return None
+
+    def reconcile_residency(self, deployments: list[Deployment], observed_backends: set[str]) -> None:
+        """Apply a residency observation. For every backend in ``observed_backends`` the registry's
+        ``loaded`` flags are the truth, so assumptions about its deployments are dropped (a model the
+        runtime reports loaded is counted through ``loaded``; one it reports unloaded is no longer
+        counted). Deployments of backends that cannot report residency keep their assumption."""
+        by_id = {d.id: d for d in deployments}
+        for s in self._pools.values():
+            for did in list(s.assumed_resident):
+                d = by_id.get(did)
+                if d is None or d.backend_id in observed_backends:
+                    s.assumed_resident.pop(did, None)
 
     async def acquire(self, dep: Deployment, timeout: float | None = None) -> Reservation:
         slots = self._slots_for(dep)
@@ -278,6 +319,7 @@ class Admission:
                         "memory_margin_gb": s.memory_margin_gb,
                         "memory_reserved_gb": round(reserved, 2),
                         "memory_holders": sorted(s.holders),
+                        "memory_assumed_resident": sorted(s.assumed() & set(members)),
                         "unknown_memory_policy": s.unknown_memory_policy,
                     }
                 )

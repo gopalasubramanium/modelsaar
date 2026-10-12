@@ -84,8 +84,15 @@ class ResourcePool(StrictModel):
     memory_margin_gb: float = 0.0
     # What to do with a deployment whose memory estimate is unknown when memory_gb is set:
     # "allow" admits it (counted as 0, labelled unknown in the decision); "reject" treats
-    # it as not fitting.
+    # it as not fitting — and applies to every counted member (resident, reserved or assumed
+    # resident), not only the candidate: one unknown model makes the budget unverifiable.
     unknown_memory_policy: Literal["allow", "reject"] = "allow"
+    # After a dispatch completes its request slot is released but the weights stay loaded. The
+    # pool keeps counting them ("assumed resident") until the runtime's residency observation
+    # (Ollama /api/ps on refresh) reconciles the registry. Runtimes that cannot report residency
+    # keep the assumption indefinitely unless this TTL (seconds) is set; this is the conservative
+    # choice because the gateway cannot see when such a runtime evicts a model.
+    assumed_residency_ttl_s: float | None = None
 
 
 class BackendConfig(StrictModel):
