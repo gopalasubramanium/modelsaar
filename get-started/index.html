@@ -1,10 +1,15 @@
 <!doctype html>
+<!--
+ModelSaar. Created by Gopala Subramanium: https://me.sgopala.com
+Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
+-->
 <html lang="en" data-theme="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Get started · ModelSaar</title>
 <meta name="description" content="Prerequisites, installation, first request and client connection for ModelSaar on macOS, Linux and WSL.">
+<meta name="author" content="Gopala Subramanium">
 <link rel="canonical" href="https://modelsaar.com/get-started/">
 
 <meta property="og:type" content="website">
@@ -27,7 +32,7 @@
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
+<link rel="stylesheet" href="/assets/site.css?v=dfbf140a">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Get started", "description": "Prerequisites, installation, first request and client connection for ModelSaar on macOS, Linux and WSL.", "url": "https://modelsaar.com/get-started/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Get started", "item": "https://modelsaar.com/get-started/"}]}</script>
 </head>
 <body>
@@ -113,7 +118,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
 <section aria-labelledby="ops-title">
   <h2 id="ops-title">Running it day to day</h2>
   <dl>
-    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/b9d69f7299ed47f014e808f93b42e5888d4b5d22/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
+    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/dfbf140a549d203916bb8904c0776140efded5af/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
     <dt>Stop / restart</dt><dd>Ctrl-C in the terminal, or your service manager's stop/restart. Configuration changes need a restart; in-flight requests finish on the old config.</dd>
     <dt>Update</dt><dd>Re-run the installer (it pins the newer candidate commit), or with uv/pipx/pip re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
     <dt>Troubleshoot</dt><dd><code>modelsaar doctor</code> first; then <code>modelsaar decisions --limit 10</code> for the last routing records and <code>modelsaar explain -m "…" [--tools --image --json-schema]</code> to dry-run a request. More in <a href="/docs/troubleshooting/">Troubleshooting</a>.</dd>
@@ -131,7 +136,8 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
   <div class="foot-grid">
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+      <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/dfbf140a549d203916bb8904c0776140efded5af">dfbf140a549d</a> on 2026-10-12. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -143,6 +149,6 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=b9d69f72" defer></script>
+<script src="/assets/site.js?v=dfbf140a" defer></script>
 </body>
 </html>

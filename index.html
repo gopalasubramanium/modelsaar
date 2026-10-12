@@ -1,10 +1,15 @@
 <!doctype html>
+<!--
+ModelSaar. Created by Gopala Subramanium: https://me.sgopala.com
+Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
+-->
 <html lang="en" data-theme="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ModelSaar — one address for your local AI</title>
 <meta name="description" content="ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.">
+<meta name="author" content="Gopala Subramanium">
 <link rel="canonical" href="https://modelsaar.com/">
 
 <meta property="og:type" content="website">
@@ -27,8 +32,8 @@
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=b9d69f72">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect."}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "ModelSaar", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.", "codeRepository": "https://github.com/gopalasubramanium/modelsaar", "programmingLanguage": "Python", "runtimePlatform": "Python 3.10+", "license": "https://www.apache.org/licenses/LICENSE-2.0", "url": "https://modelsaar.com", "version": "0.1.0 (unreleased public alpha)"}</script>
+<link rel="stylesheet" href="/assets/site.css?v=dfbf140a">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect."}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "ModelSaar", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.", "codeRepository": "https://github.com/gopalasubramanium/modelsaar", "author": {"@type": "Person", "name": "Gopala Subramanium", "url": "https://me.sgopala.com"}, "programmingLanguage": "Python", "runtimePlatform": "Python 3.10+", "license": "https://www.apache.org/licenses/LICENSE-2.0", "url": "https://modelsaar.com", "version": "0.1.0 (unreleased public alpha)"}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -173,7 +178,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
 <section aria-labelledby="evidence-title">
   <h2 id="evidence-title">Measured, not promised</h2>
   <p>In the recorded run of 2026-10-11 (three models on one machine, 32 held-out tasks, 400-token budget), automatic routing and the strongest single model each scored 30 of 32; automatic routing completed 32 requests versus 31 (the image task the fixed model cannot take), recorded zero capability violations versus one, and had a p95 end-to-end latency of 7.958 s versus 4.760 s because two requests went to a slower thinking model. Routing overhead — the decision itself, separate from the response — was 0.98 ms at p95.</p>
-  <p>That is one run on one machine with a small task set; the confidence intervals overlap. Read the <a href="/benchmarks/">methodology, numbers and limitations</a>, or regenerate every aggregate from the <a href="https://github.com/gopalasubramanium/modelsaar/tree/b9d69f7299ed47f014e808f93b42e5888d4b5d22/docs/live-runs/2026-10-11-gx10-hardening">raw per-request records</a>.</p>
+  <p>That is one run on one machine with a small task set; the confidence intervals overlap. Read the <a href="/benchmarks/">methodology, numbers and limitations</a>, or regenerate every aggregate from the <a href="https://github.com/gopalasubramanium/modelsaar/tree/dfbf140a549d203916bb8904c0776140efded5af/docs/live-runs/2026-10-11-gx10-hardening">raw per-request records</a>.</p>
 </section>
 
 <section class="faq" aria-labelledby="faq-title">
@@ -205,7 +210,8 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
   <div class="foot-grid">
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/b9d69f7299ed47f014e808f93b42e5888d4b5d22">b9d69f7299ed</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+      <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/dfbf140a549d203916bb8904c0776140efded5af">dfbf140a549d</a> on 2026-10-12. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -217,6 +223,6 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=b9d69f72" defer></script>
+<script src="/assets/site.js?v=dfbf140a" defer></script>
 </body>
 </html>

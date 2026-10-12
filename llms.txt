@@ -14,6 +14,7 @@ ModelSaar is Apache-2.0-licensed open source (https://github.com/gopalasubramani
 - [Privacy](https://modelsaar.com/privacy/): What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host's access logs).
 - [Roadmap and status](https://modelsaar.com/roadmap/): Current status of ModelSaar and clearly identified future work.
 - [Documentation](https://modelsaar.com/docs/): ModelSaar documentation: installation, configuration, routing, API, operations, evaluation, clients.
+- [Say thanks](https://modelsaar.com/thanks/): Meet ModelSaar's creator, share useful feedback, or offer optional appreciation via PayPal.
 - [Installation, upgrade, rollback, uninstall](https://modelsaar.com/docs/installation/): Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.
 - [Routing: requirements, eligibility, ranking](https://modelsaar.com/docs/routing/): How ModelSaar analyses a request, which hard filters apply, how candidates are ranked and how embeddings, memory budgets and failover behave.
 - [Architecture](https://modelsaar.com/docs/architecture/): Components of the ModelSaar gateway and how a request flows through them.
