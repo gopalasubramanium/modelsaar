@@ -1,7 +1,7 @@
 <section aria-labelledby="gs-title">
   <h1 id="gs-title">Get started</h1>
   <p class="lede">From nothing to a first request routed through <code>auto</code>. Two paths: the beginner path installs, configures and verifies in a few commands; the expert path is the same thing without the wrapper.</p>
-  <div class="callout"><p><strong>Status:</strong> ModelSaar is a development preview. No release has been tagged and no package is published, so every install path below pins the reviewed commit <code>{{ facts.INSTALL_SHA[:12] }}</code> of the <code>{{ facts.INSTALL_BRANCH }}</code> branch. Re-running the installer later moves you to the next reviewed commit.</p></div>
+  <div class="callout"><p><strong>Status:</strong> ModelSaar is a <strong>public alpha</strong>. No release has been tagged and no package is published, so every install path below pins commit <code>{{ facts.INSTALL_SHA[:12] }}</code> of the <code>{{ facts.INSTALL_BRANCH }}</code> branch — the candidate described on the <a href="{{ href('/roadmap/') }}">roadmap</a> (two independent reviews reproduced and re-checked its defects; independent verification of this exact candidate is pending). Re-running the installer later moves you to the next pinned commit.</p></div>
 </section>
 
 <section aria-labelledby="prereq-title">
@@ -67,7 +67,7 @@
   <dl>
     <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="{{ facts.REPO_URL }}/tree/{{ site.commit }}/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="{{ href('/docs/installation/') }}">Installation</a> (gateway only; models stay with your runtime).</dd>
     <dt>Stop / restart</dt><dd>Ctrl-C in the terminal, or your service manager's stop/restart. Configuration changes need a restart; in-flight requests finish on the old config.</dd>
-    <dt>Update</dt><dd>Re-run the installer (it pins the newer reviewed commit), or with uv/pipx/pip re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
+    <dt>Update</dt><dd>Re-run the installer (it pins the newer candidate commit), or with uv/pipx/pip re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
     <dt>Troubleshoot</dt><dd><code>modelsaar doctor</code> first; then <code>modelsaar decisions --limit 10</code> for the last routing records and <code>modelsaar explain -m "…" [--tools --image --json-schema]</code> to dry-run a request. More in <a href="{{ href('/docs/troubleshooting/') }}">Troubleshooting</a>.</dd>
     <dt>Uninstall</dt><dd><code>modelsaar uninstall</code> removes only the files ModelSaar created under <code>~/.modelsaar</code> (config, its backups, keys, state DB) and lists anything it left in place. Then <code>uv tool uninstall modelsaar</code>, <code>pipx uninstall modelsaar</code> or <code>pip uninstall modelsaar</code>. Models and client configurations are never touched; applied client configs have <code>.bak-&lt;timestamp&gt;</code> copies next to them.</dd>
   </dl>
@@ -75,5 +75,5 @@
 
 <section aria-labelledby="tested-title">
   <h2 id="tested-title">What has actually been tested</h2>
-  <p>The one-line installer and the uv/pip paths were executed in a clean environment on Linux (x86_64) and on macOS (arm64) against the pinned commit; the exact transcripts are linked from the <a href="{{ href('/docs/verification-report/') }}">verification report</a>. WSL2 follows the Linux path and has not been executed by the project. Native Windows is not supported yet.</p>
+  <p>Two kinds of evidence, stated separately. <strong>At the current pinned commit</strong> the installer and the CLI were exercised end to end on Linux with the package-manager step stubbed (fresh install, repeat install, an unrelated service on the port, a running gateway, <code>serve</code>, <code>test</code>, one client configuration — <code>docs/live-runs/2026-10-12-installer-scenarios/</code>). <strong>At an earlier pin</strong> (<code>80276bb</code>) the real installer paths — uv, pipx and <code>pip --user</code> on Linux x86_64, uv on macOS arm64 against the owner's Ollama host — were executed with real package installation (<code>docs/live-runs/2026-10-11-installer/</code>). A real package-manager installation at the current pin, and a real-client walkthrough, have not been run yet; both are listed in the <a href="{{ href('/docs/verification-report/') }}">verification report</a>. WSL2 follows the Linux path and has not been executed by the project. Native Windows is not supported.</p>
 </section>
