@@ -237,14 +237,14 @@ Transcripts: `docs/live-runs/2026-10-12-correction/before/` (website branch).
 | R5 | `/healthz` carries `service: modelsaar`; `modelsaar test` identifies the listener before sending a key and requires routing attribution; installer (website branch) does the same and prints `serve`, the key value vs the key command, one `client-config` command per app | `server.py`, `cli.py`, `site/static/install.sh`, site content |
 | R7 | `code_exec` scored from a nonce-keyed runner record (harness output captured separately from model output); tool arguments validated against the declared schema; checkpoint records bound to task content, scorer version, budgets, routing config hash and deployment fingerprint (format 2; legacy records re-run); bwrap input allowlist and deny-by-default macOS profile; `SCORER_VERSION 2026.10.12-3` | `evaluation/scoring.py`, `evaluation/sandbox.py`, `evaluation/harness.py` |
 
-### Executed after correction (this tree; the final hardening head differs from the executed tree only by this documentation commit — the exact-head rerun is recorded in `docs/live-runs/2026-10-12-correction/`)
+### Executed after correction (at the final hardening head: the first line of every transcript in `docs/live-runs/2026-10-12-correction/final-head/` on the website branch names the exact revision; worktree clean, fresh venv)
 
 | check | command | outcome |
 |---|---|---|
 | reviewer's 17 contract checks | `pytest tests/independent_review_2026_10_11/` | **17 passed** (11 formerly failing + 6 controls) |
 | author regression tests for R1–R5, R7 | `pytest tests/test_correction_2026_10_12.py` | 14 passed (recovery after hold, reconciliation by observation, same-identity replicas, keepalive/usage frames, malformed-amid-valid, legacy/changed/removed checkpoint cases, listener identification) |
 | full suite, no isolation backend | `python -m pytest -m "not live"` — CPython 3.13.16, Linux x86_64 | **190 passed, 6 skipped** (the 6 sandbox tests; skip reason printed) |
-| full suite, bubblewrap on PATH | same, with `bwrap` 0.9 available | **196 passed, 0 skipped** — the sandbox tests executed: writes, network, timeout, reference solutions, **synthetic host file outside the work directory unreadable**, forged completion marker rejected |
+| full suite, bubblewrap on PATH | same, with `bwrap` 0.9 available | **196 passed, 0 skipped** — the sandbox tests executed: writes, network, timeout, reference solutions, **synthetic host file outside the work directory unreadable**, forged completion marker rejected. (The first exact-head rerun in a venv under `/tmp` found that the private `/tmp` mount hid such a venv inside bubblewrap; fixed by mount order and rerun.) |
 | lint | `ruff check src tests` | pass (the verbatim reviewer files are excluded from ruff, not from pytest) |
 | simulated evaluation smoke | `modelsaar eval --mode simulated --limit 12` | runs end to end under the new scorer |
 | installer scenarios (real installer + real CLI, loopback fixtures) | `scripts/installer_scenarios.py` (website branch) | 10/10: fresh, repeat, unrelated listener (no key sent), running gateway reused, `serve`, `test` with attribution, `client-config open-webui`, key value — `docs/live-runs/2026-10-12-installer-scenarios/` |
