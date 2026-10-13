@@ -244,7 +244,9 @@ class Harness:
             self.record("1_old_installer_externally_managed_failure", None, why="--old-install not given")
             return
         home = self.mkhome("c1")
-        path = self.mkpath("c1", python3=self.a.managed_python)
+        # The previous installer's package spec was a git+https URL, so pip needed git; the GX10 has git. Keep it
+        # here so the failure reproduced is the externally-managed one, not a missing-git one.
+        path = self.mkpath("c1", python3=self.a.managed_python, keep={"git"})
         fake = self.backend()
         try:
             e = self.install_env(home, path, fake, free_port())
