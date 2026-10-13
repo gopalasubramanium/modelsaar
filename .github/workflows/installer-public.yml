@@ -1,0 +1,44 @@
+name: installer-public
+
+# Manual check of the installer the public actually downloads: the literal `curl -fsSL <url> | sh` in a fresh
+# runner (externally managed Ubuntu 24.04 Python, no uv/pipx/git on the installer's PATH), on ARM64 and x86_64.
+# The routed request goes to the repository's controlled fake backend, not a real model. Run after a site
+# publication: the served script's bytes must equal the one in the published gh-pages commit.
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: installer URL
+        default: https://modelsaar.com/install.sh
+        required: true
+      expected_sha256:
+        description: sha256 of install.sh in the published gh-pages commit (optional)
+        default: ""
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  public:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04-arm, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Harness dependencies (separate venv; the OS Python under test is untouched)
+        run: python3 -m venv ~/harness && ~/harness/bin/pip install -q -e . && ~/harness/bin/pip install -q starlette uvicorn
+      - name: curl -fsSL <url> | sh in a fresh HOME
+        run: |
+          export PIP_CONFIG_FILE=/dev/null   # the runner image's pip.conf (break-system-packages=true) is not what a stock OS has
+          REF=$(sed -n 's/^INSTALL_SHA = "\([0-9a-f]*\)".*/\1/p' site/facts.py)
+          EXP="${{ github.event.inputs.expected_sha256 }}"
+          ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
+            --public-url "${{ github.event.inputs.url }}" ${EXP:+--expect-sha256 "$EXP"} --out installer-public-${{ matrix.os }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: installer-public-${{ matrix.os }}
+          path: installer-public-${{ matrix.os }}

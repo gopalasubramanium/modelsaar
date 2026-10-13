@@ -47,7 +47,7 @@
   <ol class="steps">
     <li>
       <h3>Install ModelSaar</h3>
-      <p>Python 3.10 or newer on macOS, Linux or WSL2. The one-line installer uses <code>uv</code>, <code>pipx</code> or <code>pip --user</code> — whichever you have — and pins one candidate commit.</p>
+      <p>macOS, Linux or WSL2. The one-line installer uses your <code>uv</code> or <code>pipx</code> if you have one, otherwise an isolated environment of its own (it can fetch a pinned <code>uv</code> for that; never <code>sudo</code>, never the system Python), and pins one candidate commit.</p>
       {{ cmd(facts.INSTALL_ONE_LINER) }}
     </li>
     <li>

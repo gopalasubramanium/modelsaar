@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased — one-line installer: isolated installation on externally managed Python, 2026-10-13
+
+* **Installer (`site/static/install.sh`):** the `python3 -m pip install --user` fallback is gone — on
+  Debian/Ubuntu (PEP 668) it failed with `error: externally-managed-environment`. The installer now uses
+  your `uv` or `pipx` if present, otherwise a user-owned virtual environment under
+  `~/.local/share/modelsaar/envs/<commit>` created by your Python 3.10+, and when that Python cannot
+  create one (no `python3-venv`, older Python) it downloads one pinned, checksum-verified official `uv`
+  release binary (0.12.24; Linux x86_64/aarch64 gnu+musl, macOS) into `~/.local/share/modelsaar/uv` and
+  lets it build the environment (uv fetches a Python of its own, 3.10–3.13, only when none exists). The package is installed from the pinned commit's GitHub source archive
+  (no `git` needed). The exact installed executable is used for `init` and the routed check; a
+  `~/.local/bin/modelsaar` link is created only when that name is free; repeat runs reuse a complete
+  environment and a working installation is replaced only after the new one installed; exit codes 0/1/2
+  distinguish installed+configured+routed, not installed, and routing check failed. Gateway package pin
+  unchanged (`d6e09e7`).
+* **Tests:** `scripts/installer_fallback_tests.py` runs the real installer with real package
+  installations on externally managed Ubuntu 24.04 (reproduction of the old failure with the kept
+  fixture, venv path, no-ensurepip bootstrap with checksum tamper check, uv/pipx paths, repeat and
+  failed-attempt preservation, exit codes) against the controlled fake backend; CI job `installer` runs
+  it on `ubuntu-24.04` and `ubuntu-24.04-arm`; `installer-public` (manual) runs the literal
+  `curl -fsSL https://modelsaar.com/install.sh | sh` on both.
+
 ## Unreleased — alpha closure pass, 2026-10-12 (correction review R1-C, R2-A/B, R4-C, R7-C)
 
 * **Residency (R2-A/B):** a failed `/api/ps` query is no longer an empty observation — known and

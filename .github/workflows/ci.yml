@@ -69,3 +69,52 @@ jobs:
         run: docker run --rm modelsaar:ci modelsaar --version
       - name: Fresh-volume start (Compose-equivalent; keys bootstrapped once, read-only config, non-root)
         run: scripts/compose-smoke.sh modelsaar:ci
+
+  # The one-line installer on an OS whose Python is externally managed (PEP 668), x86_64 and ARM64. Real
+  # package installations from the pinned commit's GitHub archive; the routed request goes to the repository's
+  # controlled fake backend (not a real model). Cases: original failure reproduced with the previous installer,
+  # user-owned venv on the OS interpreter, venv/ensurepip unavailable -> pinned checksum-verified uv, existing
+  # uv and pipx paths, repeat/failed-attempt preservation, exit codes. Nothing is installed into the OS Python.
+  installer:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0   # case 7 installs the pinned commit from this clone (git+file) and from the archive
+      - name: Harness dependencies (a separate venv; the OS Python under test is untouched)
+        run: |
+          python3 -m venv ~/harness && ~/harness/bin/pip install -q -e . && ~/harness/bin/pip install -q starlette uvicorn
+          ls -l /usr/lib/python3.12/EXTERNALLY-MANAGED
+      - name: The pinned uv for the existing-uv case (same URL and checksum the installer uses)
+        run: |
+          UVV=$(sed -n 's/^UV_VERSION="\(.*\)"/\1/p' site/static/install.sh)
+          T="$(uname -m)-unknown-linux-gnu"
+          curl -fsSL -o /tmp/uv.tgz "https://github.com/astral-sh/uv/releases/download/$UVV/uv-$T.tar.gz"
+          WANT=$(sed -n "s/^ *$T) *echo \([0-9a-f]*\).*/\1/p" site/static/install.sh); echo "$WANT  /tmp/uv.tgz" | sha256sum -c -
+          tar -xzf /tmp/uv.tgz -C /tmp && cp /tmp/uv-$T/uv /tmp/uv-pinned && /tmp/uv-pinned --version
+      - name: Cases 1, 2, 4, 5, 6, 7 (externally managed /usr/bin/python3.12; no uv/pipx/git on the installer's PATH unless the case provides them)
+        run: |
+          # GitHub's runner image ships a pip configuration that sets break-system-packages=true, which a stock
+          # Debian/Ubuntu does not have; the OS default (PEP 668 enforced) is restored for the installer under test.
+          echo "--- runner pip config:"; python3 -m pip config list -v 2>/dev/null | head -20; cat /etc/pip.conf 2>/dev/null || true
+          export PIP_CONFIG_FILE=/dev/null
+          REF=$(sed -n 's/^INSTALL_SHA = "\([0-9a-f]*\)".*/\1/p' site/facts.py)
+          ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
+            --old-install scripts/fixtures/install-2026-10-12-pip-user.sh --uv-binary /tmp/uv-pinned --repo "$PWD" --cases 1,2,4,5,7 --out installer-cases-${{ matrix.os }}
+      - name: Case 3 — the OS venv package removed (python3 -m venv then fails for lack of ensurepip, as on a minimal Debian/Ubuntu); no git
+        run: |
+          sudo apt-get remove -y -qq python3.12-venv python3-venv >/dev/null
+          (python3.12 -m venv /tmp/should-fail && echo "unexpected: venv still works" && exit 1) || true
+          export PIP_CONFIG_FILE=/dev/null
+          REF=$(sed -n 's/^INSTALL_SHA = "\([0-9a-f]*\)".*/\1/p' site/facts.py)
+          ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
+            --no-ensurepip-python /usr/bin/python3.12 --cases 3 --out installer-case3-${{ matrix.os }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: installer-cases-${{ matrix.os }}
+          path: installer-case*-${{ matrix.os }}
