@@ -1,0 +1,53 @@
+ModelSaar installer — Linux, commit 80276bbeb9e6cbe3297c6b32bd73df48d389b238
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+installed: modelsaar 0.1.0 via uv (<scratch>/before/repro/installer-fixture-cy06wsat/bin/modelsaar)
+existing configuration kept: <scratch>/before/repro/installer-fixture-cy06wsat/modelsaar/config.yaml (keys and state untouched)
+a gateway is already listening on http://127.0.0.1:34107; using it for the check
+
+GET /v1/models -> 200: []
+POST /v1/chat/completions -> 200 in 1ms; deployment=None request=None
+content: response from an unrelated service
+
+verification: OK — a request went through 'auto' and came back from the deployment shown above
+
+Gateway address:  http://127.0.0.1:34107/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)
+API key:          head -1 <scratch>/before/repro/installer-fixture-cy06wsat/modelsaar/keys/api_keys
+Config:           <scratch>/before/repro/installer-fixture-cy06wsat/modelsaar/config.yaml
+
+Next:
+  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)
+  2. check it:               modelsaar test         (in another terminal)
+  3. connect an app:         modelsaar client-config open-webui|opencode|opencode-v2|openclaw|hermes
+     or set Base URL http://127.0.0.1:34107/v1, model 'auto', and the API key above in any OpenAI-compatible app
+  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)
+  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m "…"
+  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar
+
+LOOPBACK REQUESTS (invented key only)
+[
+  {
+    "method": "GET",
+    "path": "/healthz",
+    "authorization": null
+  },
+  {
+    "method": "GET",
+    "path": "/v1/models",
+    "authorization": "Bearer msk_review_invented_fixture_key_not_a_secret"
+  },
+  {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "authorization": "Bearer msk_review_invented_fixture_key_not_a_secret",
+    "body": {
+      "model": "auto",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Reply with one word: ready"
+        }
+      ],
+      "max_tokens": 64
+    }
+  }
+]

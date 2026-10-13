@@ -1,0 +1,14 @@
+Files orig/modelsaar-review-2026-10-11/MANIFEST.md and v2/modelsaar-review-2026-10-11/MANIFEST.md differ
+Files orig/modelsaar-review-2026-10-11/README.md and v2/modelsaar-review-2026-10-11/README.md differ
+Files orig/modelsaar-review-2026-10-11/SHA256SUMS.txt and v2/modelsaar-review-2026-10-11/SHA256SUMS.txt differ
+Files orig/modelsaar-review-2026-10-11/launcher/README.md and v2/modelsaar-review-2026-10-11/launcher/README.md differ
+Files orig/modelsaar-review-2026-10-11/launcher/SHA256SUMS.txt and v2/modelsaar-review-2026-10-11/launcher/SHA256SUMS.txt differ
+Files orig/modelsaar-review-2026-10-11/launcher/gh_lib.sh and v2/modelsaar-review-2026-10-11/launcher/gh_lib.sh differ
+9,11c9,11
+< Exact location on the Mac: `~/Library/Mobile Documents/com~apple~CloudDocs/Model_Router/gh/`
+< (the iCloud "Model_Router" folder). Publication clones the repository to `~/.modelsaar-live/publish`
+< (outside iCloud, so git locks are not interfered with); override with `MODELSAAR_PUBLISH_CLONE=…`.
+---
+> Exact location on the Mac: `/Users/sgopala/Documents/Documents - Gopala’s MacBook Air M5/Projects/Model_Router/gh/`
+> (the Model_Router project folder; the review archive is beside it in `../review/`). Publication clones the repository to `~/.modelsaar-live/publish`
+> (outside the synced project folder, so file syncing cannot interfere with git locks); override with `MODELSAAR_PUBLISH_CLONE=…`.

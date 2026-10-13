@@ -23,7 +23,20 @@ cp "$ROOT/tests/conftest.py" "$W/tests/"
 cp "$ROOT/src/modelsaar/testing/fakebackend.py" "$W/src/modelsaar/testing/"
 echo "baseline: $(git -C "$W" rev-parse HEAD)"
 echo "tests:    tests/test_hardening_2026_10_11.py from $(git -C "$ROOT" rev-parse --short HEAD)"
-cd "$W" && PYTHONPATH="$W/src" "$PY" -m pytest -p no:cacheprovider -q -rA tests/test_hardening_2026_10_11.py 2>/dev/null \
-  | grep -E "^(PASSED|FAILED|ERROR) " | sed -E 's/ - .*//' | sort -k2 | awk '{printf "%-7s %s\n", $1, $2}'
+cd "$W" && PYTHONPATH="$W/src" "$PY" -m pytest -p no:cacheprovider -o addopts="" -v --tb=line tests/test_hardening_2026_10_11.py 2>/dev/null > "$W/run.txt"
+# One line per test: outcome, test id, and the failing assertion message (from --tb=line, in run order),
+# so a behavioural FAILED can be told apart from a collection/import/environment ERROR.
+"$PY" - "$W/run.txt" <<'PY'
+import re, sys
+lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
+outcomes = [(m.group(1), m.group(2)) for m in (re.match(r"^(tests/\S+::\w+) (PASSED|FAILED|ERROR)", l) for l in lines) if m]
+reasons = [re.sub(r"^.*?test_hardening_2026_10_11\.py:(\d+): ", r"line \1: ", l) for l in lines if re.match(r"^/.*test_hardening_2026_10_11\.py:\d+: ", l)]
+it = iter(reasons)
+for test, out in outcomes:
+    why = next(it, "?") if out != "PASSED" else "expected behaviour already present at the baseline (positive control)"
+    print(f"{out:6s} {test.split('::')[1]:70s} | {why[:120]}")
+print()
+print([l for l in lines if re.search(r"\d+ (passed|failed)", l)][-1])
+PY
 echo "(FAILED/ERROR at the baseline = the defect the test guards against was present; PASSED = the test's"
 echo " scenario already behaved correctly at the baseline or depends on a new test hook only)"

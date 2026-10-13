@@ -1,0 +1,19 @@
+[
+  {
+    "id": "untracked_file_published",
+    "result": "DEFECT REPRODUCED",
+    "source_commit_claim": "840b06852f73770d0c16773cf75c2465aa42bcea",
+    "source_commit_contains_fixture": false,
+    "generated_output_contains_fixture": true,
+    "build_exit": 0,
+    "scope": "isolated clone, generated local branch only, benign invented file"
+  },
+  {
+    "id": "rollback_tree_identity",
+    "result": "PASS",
+    "new_commit": "e12bf199fd118a8eaaa4f2181c4e66402b2402ee",
+    "parent": "dbd32c488b71b2787d7c9bdb1bfe5d7fba3cffbf",
+    "restored_tree_equals_target": true,
+    "target": "beeda76b738589a8ee6f4c0fb8041b7f94accf2a"
+  }
+]

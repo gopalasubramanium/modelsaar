@@ -1,0 +1,38 @@
+=== gh_run publish started Mon Oct 12 01:42:38 Asia 2026
+--- GitHub login: review-owner-stub
+--- origin: https://github.com/gopalasubramanium/modelsaar.git
+--- bundle verified: hardening=80276bbeb9e6cbe3297c6b32bd73df48d389b238 website=840b06852f73770d0c16773cf75c2465aa42bcea gh-pages=beeda76b738589a8ee6f4c0fb8041b7f94accf2a
+--- origin/main = 1122e1f2b5006003f8832598c81f658b8945c112 (must not change: no merge, no default-branch change)
+--- step 1: hardening branch
+To <scratch>/before/repro/skip-domain-14hdku4c/origin.git
+ * [new branch]      80276bbeb9e6cbe3297c6b32bd73df48d389b238 -> hardening/review-2026-10-11
+   pushed hardening/review-2026-10-11 -> 80276bbeb9e6cbe3297c6b32bd73df48d389b238
+   [done] 1-hardening-pushed
+--- step 2: hardening draft PR
+   draft PR: https://github.com/gopalasubramanium/modelsaar/pull/1
+   [done] 2-hardening-pr
+--- step 3: website branch
+To <scratch>/before/repro/skip-domain-14hdku4c/origin.git
+ * [new branch]      840b06852f73770d0c16773cf75c2465aa42bcea -> website/modelsaar-com
+   pushed website/modelsaar-com -> 840b06852f73770d0c16773cf75c2465aa42bcea
+   [done] 3-website-pushed
+--- step 4: website draft PR (base = hardening branch while it is unmerged)
+   draft PR: https://github.com/gopalasubramanium/modelsaar/pull/2
+   [done] 4-website-pr
+--- CI runs started by the pushes (on: push / pull_request; nothing is dispatched):
+review stub: ci queued
+review stub: ci queued
+--- step 5: gh-pages (generated output)
+To <scratch>/before/repro/skip-domain-14hdku4c/origin.git
+ * [new branch]      beeda76b738589a8ee6f4c0fb8041b7f94accf2a -> gh-pages
+   pushed gh-pages -> beeda76b738589a8ee6f4c0fb8041b7f94accf2a
+   [done] 5-pages-pushed
+--- step 6: Pages configuration
+{"source[branch]": "gh-pages", "source[path]": "/", "cname": "modelsaar.com"}
+   [done] 6-pages-configured
+--- step 7: Pages build
+built commit=review-stub
+--- published. Next (owner, DNS): gh/README.md steps 3-5; then: bash gh_run.command status
+=== gh_run publish exit=0 Mon Oct 12 01:42:38 Asia 2026
+
+PAGES CONFIG {"source[branch]": "gh-pages", "source[path]": "/", "cname": "modelsaar.com"}

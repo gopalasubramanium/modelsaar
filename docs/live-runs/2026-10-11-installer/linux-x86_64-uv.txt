@@ -1,0 +1,65 @@
+ModelSaar installer — Linux, commit 91f9e6c30b7431a5a09cc34f478f02c82ba62dc6
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+Resolved 16 packages in 838ms
+   Building modelsaar @ git+file:///home/claude/modelsaar@91f9e6c30b7431a5a09cc34f478f02c82ba62dc6
+Downloading pydantic-core (2.1MiB)
+ Downloaded pydantic-core
+      Built modelsaar @ git+file:///home/claude/modelsaar@91f9e6c30b7431a5a09cc34f478f02c82ba62dc6
+Prepared 16 packages in 1.30s
+Installed 16 packages in 7ms
+ + annotated-types==0.8.0
+ + anyio==4.15.1
+ + certifi==2026.7.22
+ + click==8.5.0
+ + h11==0.16.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + idna==3.20
+ + modelsaar==0.1.0 (from git+file:///home/claude/modelsaar@91f9e6c30b7431a5a09cc34f478f02c82ba62dc6)
+ + pydantic==2.14.0
+ + pydantic-core==2.50.0
+ + pyyaml==6.0.3
+ + starlette==1.7.0
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + uvicorn==0.54.0
+Installed 1 executable: modelsaar
+warning: `/tmp/tmp.ukVxZO0Vaf/home/.local/bin` is not on your PATH. To use installed tools, add the directory to your PATH.
+installed: modelsaar 0.1.0 via uv (/tmp/tmp.ukVxZO0Vaf/home/.local/bin/modelsaar)
+discovered ollama at http://127.0.0.1:11434
+wrote /tmp/tmp.ukVxZO0Vaf/home/.modelsaar/config.yaml
+API key:   /tmp/tmp.ukVxZO0Vaf/home/.modelsaar/keys/api_keys
+admin key: /tmp/tmp.ukVxZO0Vaf/home/.modelsaar/keys/admin_key
+discovered 2 deployment(s):
+  ollama/small:1b                          role=generative ctx=8192 tools=supported vision=unsupported locality=local
+  ollama/big:27b                           role=generative ctx=32768 tools=supported vision=supported locality=local
+
+next steps:
+  modelsaar doctor            # check reachability, context assumptions, unknown capabilities
+  modelsaar probe --all       # verify tools/json/vision/streaming on each model (uses local compute)
+  modelsaar serve             # start the gateway
+  modelsaar client-config open-webui|openclaw|opencode|opencode-v2|hermes
+starting a temporary gateway on http://127.0.0.1:8484 for the check …
+
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'auto-vision', 'ollama/small:1b', 'ollama/big:27b']
+POST /v1/chat/completions -> 200 in 6ms; deployment=ollama/small:1b request=req_620bfa58947e419c
+content: Hello from small:1b: you said 'Reply with one word: ready' — ünïcødé ✓
+temporary gateway stopped
+
+verification: OK — a request went through 'auto' and came back from the deployment shown above
+
+Gateway address:  http://127.0.0.1:8484/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)
+API key:          head -1 /tmp/tmp.ukVxZO0Vaf/home/.modelsaar/keys/api_keys
+Config:           /tmp/tmp.ukVxZO0Vaf/home/.modelsaar/config.yaml
+
+Next:
+  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)
+  2. check it:               modelsaar test         (in another terminal)
+  3. connect an app:         modelsaar client-config open-webui|opencode|opencode-v2|openclaw|hermes
+     or set Base URL http://127.0.0.1:8484/v1, model 'auto', and the API key above in any OpenAI-compatible app
+  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)
+  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m "…"
+  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar
+
+note: add /tmp/tmp.ukVxZO0Vaf/home/.local/bin to your PATH to run 'modelsaar' from a new shell

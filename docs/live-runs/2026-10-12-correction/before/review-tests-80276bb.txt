@@ -1,0 +1,295 @@
+OBSERVATION {"admission": {"backend:ollama": {"active": 0, "limit": 4, "uncertain": 0, "waiting": 0}, "pool:pool": {"active": 0, "limit": 1, "uncertain": 0, "waiting": 0}}, "backend_active_after_timeout": 1, "backend_max_active": 2, "backend_requests": 2, "case": "stream_timeout", "first_contains_gateway_error": true, "first_status": 200, "second_status": 200, "stream": true}
+FOBSERVATION {"admission": {"backend:ollama": {"active": 0, "limit": 4, "uncertain": 1, "waiting": 0}, "pool:pool": {"active": 0, "limit": 1, "uncertain": 1, "waiting": 0}}, "backend_active_after_timeout": 1, "backend_max_active": 1, "backend_requests": 1, "case": "stream_timeout", "first_contains_gateway_error": false, "first_status": 504, "second_status": 503, "stream": false}
+.OBSERVATION {"admission": {"backend:ollama": {"active": 0, "limit": 4, "uncertain": 0, "waiting": 0}, "pool:pool": {"active": 0, "limit": 1, "uncertain": 0, "waiting": 0}}, "backend_active": 2, "backend_max_active": 2, "backend_requests": 2, "case": "probe_timeout", "http_status": 200, "response": {"deployment_id": "ollama/small:1b", "errors": [], "fingerprint": "a0353ebc8f6c2c7e", "measurements": [], "results": [{"capability": "tools", "details": {}, "latency_ms": 0.0, "note": "probe error: ollama: read timeout", "value": "unknown"}, {"capability": "json_object", "details": {}, "latency_ms": 0.0, "note": "probe error: ollama: read timeout", "value": "unknown"}]}}
+FOBSERVATION {"case": "embedding_timeout", "configured_backend_timeout_s": 0.08, "configured_server_timeout_s": 0.08, "elapsed_s": 0.558, "http_status": 200}
+FOBSERVATION {"anchored": false, "case": "embedding_identity_race", "first_deployment": "a/embed:0.6b", "first_status": 200, "identities": {"a/embed:0.6b": "weights-A", "b/embed-other:1b": "weights-B"}, "recorded_identity": "weights-B", "second_deployment": "b/embed-other:1b", "second_status": 200}
+FOBSERVATION {"anchored": true, "case": "embedding_identity_race", "first_deployment": "a/embed:0.6b", "first_status": 200, "identities": {"a/embed:0.6b": "weights-A", "b/embed-other:1b": "weights-B"}, "recorded_identity": "weights-A", "second_deployment": null, "second_status": 422}
+.OBSERVATION {"backend_requests": 2, "backend_resident_models": ["small:1b", "plain:3b"], "budget_gb": 5.0, "case": "post_completion_memory", "first_model_router_loaded": false, "first_status": 200, "per_model_estimate_gb": 3.0, "refresh_before_second": false, "second_status": 200}
+FOBSERVATION {"backend_requests": 1, "backend_resident_models": ["small:1b"], "budget_gb": 5.0, "case": "post_completion_memory", "first_model_router_loaded": true, "first_status": 200, "per_model_estimate_gb": 3.0, "refresh_before_second": true, "second_status": 422}
+.OBSERVATION {"blocker": null, "case": "unknown_resident_memory", "view": {"counted": ["b/known", "b/unknown"], "estimated_gb": 4.0, "fits": true, "margin_gb": 0.0, "memory_gb": 5.0, "policy_unknown": "reject", "pool": "pool", "unknown": ["b/unknown"]}}
+FOBSERVATION {"affinity_stats": {"sessions": 1, "tool_rounds": 0}, "body": "data: not-json\n\ndata: [DONE]\n\n", "case": "invalid_sse", "circuit_failures": 0, "outcome": "ok", "status": 200}
+F{"case": "forged_completion", "scored_ok": true, "detail": "[reviewer-authored-test-string] stdout matches, harness completed, exit 0"}
+F.{"case": "tool_argument_wrong_type", "scored_ok": true, "detail": "called bash with id, valid JSON object args ['command'], {'command': 'pytest'}"}
+F.{"case": "changed_task_resume", "requests_sent": 0, "result": {"task": "review-task", "category": "conversation", "split": "test", "policy": "auto", "model": "auto", "deployment": "local/a", "fingerprint": "same-weights", "status": 200, "ok": true, "latency_ms": 1.0, "detail": "contains 'old answer'", "resumed": true}}
+F{"case": "removed_deployment_resume", "resumed": true}
+F.
+=================================== FAILURES ===================================
+_ test_stream_read_timeout_holds_capacity_until_recovery[streaming-regression] _
+
+stream = True
+
+    @pytest.mark.parametrize("stream", [True, False], ids=["streaming-regression", "nonstream-positive-control"])
+    def test_stream_read_timeout_holds_capacity_until_recovery(stream):
+        fake = ContinuingBackend(make_models())
+        fake.start()
+        g = one_slot_gateway(fake)
+        try:
+            first = chat(g, "ollama/small:1b", "hello", stream=stream)
+            status = g.admin.get("/admin/status").json()["admission"]
+            active_after_timeout = fake.active
+            second = chat(g, "ollama/small:1b", "hello", stream=stream)
+            observe("stream_timeout", stream=stream, first_status=first.status_code,
+                    first_contains_gateway_error="upstream_stream_error" in first.text,
+                    backend_active_after_timeout=active_after_timeout, admission=status,
+                    second_status=second.status_code, backend_max_active=fake.max_active,
+                    backend_requests=len(fake.requests))
+            assert active_after_timeout == 1, "fixture must establish computation survived HTTP timeout"
+>           assert status["pool:pool"]["uncertain"] == 1, "streaming read timeout released a still-computing backend"
+E           AssertionError: streaming read timeout released a still-computing backend
+E           assert 0 == 1
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py:113: AssertionError
+________________ test_probe_timeout_stops_later_probe_inference ________________
+
+    def test_probe_timeout_stops_later_probe_inference():
+        fake = ContinuingBackend(make_models())
+        fake.start()
+        g = one_slot_gateway(fake)
+        try:
+            result = g.admin.post("/admin/probe", json={"deployment": "ollama/small:1b",
+                                                       "which": ["tools", "json_object"], "timeout": 0.08})
+            status = g.admin.get("/admin/status").json()["admission"]
+            observe("probe_timeout", http_status=result.status_code, response=result.json(),
+                    admission=status, backend_active=fake.active, backend_max_active=fake.max_active,
+                    backend_requests=len(fake.requests))
+>           assert fake.max_active <= 1, "probe runner started a second inference while timed-out first inference still ran"
+E           AssertionError: probe runner started a second inference while timed-out first inference still ran
+E           assert 2 <= 1
+E            +  where 2 = <test_remaining_contracts.ContinuingBackend object at 0x7fc300af2d50>.max_active
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py:132: AssertionError
+__________________ test_embedding_backend_timeout_is_enforced __________________
+
+    def test_embedding_backend_timeout_is_enforced():
+        fake = ContinuingBackend(make_models(), duration=0.55)
+        fake.start()
+        g = build_gateway(
+            f"http://127.0.0.1:{fake.port}", server=ServerConfig(request_timeout_s=0.08),
+            backends=(BackendConfig(id="ollama", type="ollama", base_url=f"http://127.0.0.1:{fake.port}",
+                                    resource_pool="pool", timeout_s=0.08),),
+        )
+        try:
+            start = time.monotonic()
+            result = g.client.post("/v1/embeddings", json={"model": "ollama/embed:0.6b", "input": "hello"})
+            elapsed = time.monotonic() - start
+            observe("embedding_timeout", configured_server_timeout_s=0.08, configured_backend_timeout_s=0.08,
+                    elapsed_s=round(elapsed, 3), http_status=result.status_code)
+>           assert result.status_code == 504, "embedding call ignored both configured timeouts and waited for slow backend"
+E           AssertionError: embedding call ignored both configured timeouts and waited for slow backend
+E           assert 200 == 504
+E            +  where 200 = <Response [200 OK]>.status_code
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py:154: AssertionError
+_ test_unknown_first_embedding_member_cannot_allow_distinct_spaces[unanchored-regression] _
+
+anchored = False
+
+    @pytest.mark.parametrize("anchored", [False, True], ids=["unanchored-regression", "declared-anchor-positive-control"])
+    def test_unknown_first_embedding_member_cannot_allow_distinct_spaces(anchored):
+        models = make_models()
+        for m in models:
+            if "embedding" in m.capabilities:
+                m.embedding_dimensions = 8
+        fake = ContinuingBackend(models, duration=0.4)
+        fake.start()
+        g = build_gateway(
+            f"http://127.0.0.1:{fake.port}",
+            admission=AdmissionConfig(max_queue=0),
+            backends=(
+                BackendConfig(id="unknown", type="openai_compatible", base_url=f"http://127.0.0.1:{fake.port}",
+                              discover=False, resource_pool="pool", max_concurrent=1,
+                              models=(DeclaredModel(name="unknown-first", role="embedding", embedding_dimensions=8),)),
+                BackendConfig(id="a", type="openai_compatible", base_url=f"http://127.0.0.1:{fake.port}",
+                              discover=False, resource_pool="pool", max_concurrent=1,
+                              models=(DeclaredModel(name="embed:0.6b", role="embedding", embedding_dimensions=8, identity="weights-A"),)),
+                BackendConfig(id="b", type="openai_compatible", base_url=f"http://127.0.0.1:{fake.port}",
+                              discover=False, resource_pool="pool", max_concurrent=1,
+                              models=(DeclaredModel(name="embed-other:1b", role="embedding", embedding_dimensions=8, identity="weights-B"),)),
+            ),
+            embeddings=(EmbeddingContract(alias="embed-safe", dimensions=8, identity="weights-A" if anchored else None,
+                                          deployments=("unknown/unknown-first", "a/embed:0.6b", "b/embed-other:1b")),),
+            deployments=(),
+        )
+        try:
+            body = {"model": "embed-safe", "input": "same input"}
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(g.client.post, "/v1/embeddings", json=body)
+                deadline = time.monotonic() + 2
+                while not fake.requests and time.monotonic() < deadline:
+                    time.sleep(0.005)
+                assert fake.requests and fake.requests[0]["model"] == "embed:0.6b"
+                # A's backend is now at its real configured admission limit. B remains available.
+                second = g.client.post("/v1/embeddings", json=body)
+                first = future.result()
+            observe("embedding_identity_race", anchored=anchored, first_status=first.status_code, second_status=second.status_code,
+                    first_deployment=first.headers.get("x-modelsaar-deployment"),
+                    second_deployment=second.headers.get("x-modelsaar-deployment"),
+                    identities={"a/embed:0.6b": "weights-A", "b/embed-other:1b": "weights-B"},
+                    recorded_identity=g.router._recorded_embedding_identity("embed-safe"))
+            accepted = [r.headers.get("x-modelsaar-deployment") for r in (first, second) if r.status_code == 200]
+>           assert len(set(accepted)) <= 1, "one embedding alias returned vectors from two distinct declared identities"
+E           AssertionError: one embedding alias returned vectors from two distinct declared identities
+E           assert 2 <= 1
+E            +  where 2 = len({'a/embed:0.6b', 'b/embed-other:1b'})
+E            +    where {'a/embed:0.6b', 'b/embed-other:1b'} = set(['a/embed:0.6b', 'b/embed-other:1b'])
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py:203: AssertionError
+_ test_completed_dispatch_keeps_loaded_weights_in_memory_budget[between-polls-regression] _
+
+refresh_before_second = False
+
+    @pytest.mark.parametrize("refresh_before_second", [False, True], ids=["between-polls-regression", "refresh-positive-control"])
+    def test_completed_dispatch_keeps_loaded_weights_in_memory_budget(refresh_before_second):
+        models = make_models()
+        for m in models:
+            m.loaded = False
+        fake = ResidencyBackend(models)
+        fake.start()
+        g = build_gateway(
+            f"http://127.0.0.1:{fake.port}",
+            resource_pools=(ResourcePool(id="pool", max_concurrent=1, memory_gb=5.0),),
+            deployments=(DeploymentOverride(backend="ollama", model="small:1b", memory_gb_estimate=3.0),
+                         DeploymentOverride(backend="ollama", model="plain:3b", memory_gb_estimate=3.0)),
+        )
+        try:
+            first = chat(g, "ollama/small:1b", "hello")
+            if refresh_before_second:
+                g.refresh()
+            observed_by_router = g.router.registry.get("ollama/small:1b").loaded
+            second = chat(g, "ollama/plain:3b", "hello")
+            observe("post_completion_memory", refresh_before_second=refresh_before_second, first_status=first.status_code, second_status=second.status_code,
+                    first_model_router_loaded=observed_by_router,
+                    backend_resident_models=[m.name for m in fake.models.values() if m.loaded],
+                    backend_requests=len(fake.requests), budget_gb=5.0, per_model_estimate_gb=3.0)
+            assert first.status_code == 200
+>           assert second.status_code != 200, "completed model's weights vanished from admission before the next residency refresh"
+E           AssertionError: completed model's weights vanished from admission before the next residency refresh
+E           assert 200 != 200
+E            +  where 200 = <Response [200 OK]>.status_code
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py:240: AssertionError
+___________ test_reject_unknown_memory_applies_to_existing_residents ___________
+
+    def test_reject_unknown_memory_applies_to_existing_residents():
+        from modelsaar.routing.admission import Admission
+        from modelsaar.registry import Deployment
+        pool = ResourcePool(id="pool", memory_gb=5.0, unknown_memory_policy="reject")
+        adm = Admission(AdmissionConfig(), [pool], [BackendConfig(id="b", type="openai_compatible", base_url="http://127.0.0.1:1", resource_pool="pool")])
+        resident = Deployment(id="b/unknown", backend_id="b", backend_type="openai_compatible", model="unknown", resource_pool="pool", loaded=True)
+        candidate = Deployment(id="b/known", backend_id="b", backend_type="openai_compatible", model="known", resource_pool="pool", memory_gb_estimate=4.0)
+        adm.pool_members = lambda _: [resident, candidate]
+        view = adm.memory_view(candidate)
+        blocker = adm.memory_blocker(candidate)
+        observe("unknown_resident_memory", view=view, blocker=blocker)
+>       assert blocker is not None, "strict unknown-memory pool treats an already resident unknown model as zero memory"
+E       AssertionError: strict unknown-memory pool treats an already resident unknown model as zero memory
+E       assert None is not None
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py:257: AssertionError
+___________ test_invalid_sse_is_not_validated_success_or_session_pin ___________
+
+    def test_invalid_sse_is_not_validated_success_or_session_pin():
+        fake = InvalidSSEBackend(make_models())
+        fake.start()
+        g = build_gateway(f"http://127.0.0.1:{fake.port}")
+        try:
+            response = g.client.post("/v1/chat/completions", headers={"X-ModelSaar-Session": "invalid-session"},
+                                     json={"model": "ollama/small:1b", "messages": [{"role": "user", "content": "hello"}], "stream": True})
+            dec = g.decision(response.headers["x-modelsaar-request-id"])
+            observe("invalid_sse", status=response.status_code, body=response.text, outcome=dec["outcome"],
+                    affinity_stats=g.router.affinity.stats(), circuit_failures=g.router.admission.circuit("ollama").failures)
+>           assert dec["outcome"] != "ok", "malformed SSE plus DONE was marked a validated completion"
+E           AssertionError: malformed SSE plus DONE was marked a validated completion
+E           assert 'ok' != 'ok'
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py:278: AssertionError
+_______ test_flushed_marker_then_exit_does_not_count_as_executed_harness _______
+
+    def test_flushed_marker_then_exit_does_not_count_as_executed_harness():
+        # No function is defined and the task harness is never reached. Only harmless stdout/exit.
+        code = ("import os, sys\n"
+                "sys.stdout.write('True False\\n__MODELSAAR_HARNESS_OK__\\n')\n"
+                "sys.stdout.flush()\n"
+                "os._exit(0)\n")
+        ok, detail = score(TASKS["code-01"], response(code), runner=trusted_string_runner)
+        print(json.dumps({"case": "forged_completion", "scored_ok": ok, "detail": detail}))
+>       assert ok is False, "code never defines/calls is_palindrome, but a flushed marker earns success"
+E       AssertionError: code never defines/calls is_palindrome, but a flushed marker earns success
+E       assert True is False
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py:46: AssertionError
+______________ test_tool_argument_wrong_schema_type_does_not_pass ______________
+
+    def test_tool_argument_wrong_schema_type_does_not_pass():
+        # The fixture requires a string command, but the scorer stringifies a list for substring checks.
+        task = TASKS["agent-03"]
+        definition = task["tools"][0]["function"]["parameters"]
+        assert definition["properties"]["command"]["type"] == "string"
+        ok, detail = score(task, response(calls=[tool_call({"command": ["pytest"]})]))
+        print(json.dumps({"case": "tool_argument_wrong_type", "scored_ok": ok, "detail": detail}))
+>       assert ok is False, "command array violates declared tool schema but is scored successful"
+E       AssertionError: command array violates declared tool schema but is scored successful
+E       assert True is False
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py:68: AssertionError
+___________________ test_changed_task_cannot_reuse_old_score ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-56/test_changed_task_cannot_reuse0')
+
+    def test_changed_task_cannot_reuse_old_score(tmp_path):
+        checkpoint = tmp_path / "changed-task.jsonl"
+        checkpoint.write_text(json.dumps(saved_record()) + "\n")
+        run = EvalRun("http://127.0.0.1:9", "review-only-fake-key", "review-only-fake-admin", False,
+                      checkpoint=checkpoint, resume=True)
+        run.fingerprints = {"local/a": "same-weights"}
+        requests = []
+    
+        def mock(request):
+            requests.append(json.loads(request.content))
+            return httpx.Response(200, json=response("new answer"), headers={"x-modelsaar-deployment": "local/a"})
+    
+        run.c.close()
+        run.c = httpx.Client(base_url="http://127.0.0.1:9", transport=httpx.MockTransport(mock))
+        try:
+            changed = {"id": "review-task", "category": "conversation", "split": "test",
+                       "messages": [{"role": "user", "content": "A different task requiring a new answer"}],
+                       "expected": {"type": "contains", "value": "new answer"}}
+            result = run.run_one(changed, "auto", "auto")
+            print(json.dumps({"case": "changed_task_resume", "requests_sent": len(requests), "result": result}))
+>           assert len(requests) == 1 and not result.get("resumed"), "changed prompt/scorer reused an unbound old record"
+E           AssertionError: changed prompt/scorer reused an unbound old record
+E           assert (0 == 1)
+E            +  where 0 = len([])
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py:102: AssertionError
+____________________ test_removed_deployment_cannot_resume _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-56/test_removed_deployment_cannot0')
+
+    def test_removed_deployment_cannot_resume(tmp_path):
+        checkpoint = tmp_path / "removed-deployment.jsonl"
+        checkpoint.write_text(json.dumps(saved_record()) + "\n")
+        run = EvalRun("http://127.0.0.1:9", "review-only-fake-key", "review-only-fake-admin", False,
+                      checkpoint=checkpoint, resume=True)
+        try:
+            run.fingerprints = {"local/b": "different-weights"}
+            result = run._resumable("review-task", "auto")
+            print(json.dumps({"case": "removed_deployment_resume", "resumed": result is not None}))
+>           assert result is None, "auto checkpoint reuses a deployment that is no longer in the eligible run"
+E           AssertionError: auto checkpoint reuses a deployment that is no longer in the eligible run
+E           assert {'task': 'review-task', 'category': 'conversation', 'split': 'test', 'policy': 'auto', ...} is None
+
+../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py:117: AssertionError
+=========================== short test summary info ============================
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py::test_stream_read_timeout_holds_capacity_until_recovery[streaming-regression]
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py::test_probe_timeout_stops_later_probe_inference
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py::test_embedding_backend_timeout_is_enforced
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py::test_unknown_first_embedding_member_cannot_allow_distinct_spaces[unanchored-regression]
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py::test_completed_dispatch_keeps_loaded_weights_in_memory_budget[between-polls-regression]
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py::test_reject_unknown_memory_applies_to_existing_residents
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/hardening/test_remaining_contracts.py::test_invalid_sse_is_not_validated_success_or_session_pin
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py::test_flushed_marker_then_exit_does_not_count_as_executed_harness
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py::test_tool_argument_wrong_schema_type_does_not_pass
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py::test_changed_task_cannot_reuse_old_score
+FAILED ../../review-pack/ModelSaar_Independent_Review_2026-10-11/evidence/test_evaluator_remaining_contracts.py::test_removed_deployment_cannot_resume
+11 failed, 6 passed in 9.05s

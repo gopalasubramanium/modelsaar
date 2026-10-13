@@ -1,0 +1,34 @@
+[
+  {
+    "id": "positive_resume",
+    "result": "PASS",
+    "exit_codes": [
+      3,
+      3
+    ],
+    "new_pr_count": 2,
+    "pages_not_pushed": true
+  },
+  {
+    "id": "skip_domain_still_custom",
+    "result": "DEFECT REPRODUCED",
+    "exit_code": 0,
+    "CNAME": "modelsaar.com",
+    "api_cname": "modelsaar.com",
+    "verified_marker": false
+  },
+  {
+    "id": "build_query_failure_success",
+    "result": "DEFECT REPRODUCED",
+    "exit_code": 0,
+    "published_marker": true,
+    "actual_observation": "Pages latest-build API failed 404"
+  },
+  {
+    "id": "origin_prefix_accepted",
+    "result": "DEFECT REPRODUCED",
+    "exit_code": 3,
+    "configured_origin": "https://github.com/gopalasubramanium/modelsaar-unrelated.git",
+    "hardening_pushed": "80276bbeb9e6cbe3297c6b32bd73df48d389b238"
+  }
+]

@@ -1,0 +1,187 @@
+
+$ sh /home/claude/modelsaar/site/static/install.sh
+ModelSaar installer — Linux, commit __PINNED_SHA__
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+installed: modelsaar 0.1.0 via uv (/tmp/modelsaar-inst-0cx926oa/bin/modelsaar)
+wrote /tmp/modelsaar-inst-0cx926oa/home/config.yaml
+API key:   /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys
+admin key: /tmp/modelsaar-inst-0cx926oa/home/keys/admin_key
+discovered 2 deployment(s):
+  ollama/small:1b                          role=generative ctx=8192 tools=supported vision=unsupported locality=local
+  ollama/plain:3b                          role=generative ctx=4096 tools=unsupported vision=unsupported locality=local
+
+next steps:
+  modelsaar doctor            # check reachability, context assumptions, unknown capabilities
+  modelsaar probe --all       # verify tools/json/vision/streaming on each model (uses local compute)
+  modelsaar serve             # start the gateway
+  modelsaar client-config open-webui|openclaw|opencode|opencode-v2|hermes
+starting a temporary gateway on http://127.0.0.1:49831 for the check …
+
+GET /healthz -> modelsaar 0.1.0
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'ollama/small:1b', 'ollama/plain:3b']
+POST /v1/chat/completions -> 200 in 6ms; deployment=ollama/small:1b request=req_c612c20dbfeb45fd
+routed: 'auto' -> ollama/small:1b (request req_c612c20dbfeb45fd)
+content: Hello from small:1b: you said 'Reply with one word: ready' — ünïcødé ✓
+temporary gateway stopped
+
+verification: OK — 'auto' was routed by ModelSaar to the deployment shown above (request id printed)
+
+Gateway address:  http://127.0.0.1:49831/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)
+API key:          head -1 /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys
+Config:           /tmp/modelsaar-inst-0cx926oa/home/config.yaml
+
+Next:
+  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)
+                             (init has already run; do not run 'modelsaar init' again — it keeps your existing config)
+  2. check it:               modelsaar test         (in another terminal)
+  3. connect an app, one command per app:
+       modelsaar client-config open-webui     modelsaar client-config opencode   (or opencode-v2)
+       modelsaar client-config openclaw       modelsaar client-config hermes
+     or set Base URL http://127.0.0.1:49831/v1, model 'auto', and the API key in any OpenAI-compatible app:
+     run 'head -1 /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys' and paste the printed msk_… line into the key field
+  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)
+  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m "…"
+  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar
+[exit 0]
+== fresh_install: PASS
+
+$ sh /home/claude/modelsaar/site/static/install.sh
+ModelSaar installer — Linux, commit __PINNED_SHA__
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+installed: modelsaar 0.1.0 via uv (/tmp/modelsaar-inst-0cx926oa/bin/modelsaar)
+existing configuration kept: /tmp/modelsaar-inst-0cx926oa/home/config.yaml (keys and state untouched)
+starting a temporary gateway on http://127.0.0.1:49831 for the check …
+
+GET /healthz -> modelsaar 0.1.0
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'ollama/small:1b', 'ollama/plain:3b']
+POST /v1/chat/completions -> 200 in 6ms; deployment=ollama/small:1b request=req_fe47d3c6ec374ff1
+routed: 'auto' -> ollama/small:1b (request req_fe47d3c6ec374ff1)
+content: Hello from small:1b: you said 'Reply with one word: ready' — ünïcødé ✓
+temporary gateway stopped
+
+verification: OK — 'auto' was routed by ModelSaar to the deployment shown above (request id printed)
+
+Gateway address:  http://127.0.0.1:49831/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)
+API key:          head -1 /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys
+Config:           /tmp/modelsaar-inst-0cx926oa/home/config.yaml
+
+Next:
+  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)
+                             (init has already run; do not run 'modelsaar init' again — it keeps your existing config)
+  2. check it:               modelsaar test         (in another terminal)
+  3. connect an app, one command per app:
+       modelsaar client-config open-webui     modelsaar client-config opencode   (or opencode-v2)
+       modelsaar client-config openclaw       modelsaar client-config hermes
+     or set Base URL http://127.0.0.1:49831/v1, model 'auto', and the API key in any OpenAI-compatible app:
+     run 'head -1 /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys' and paste the printed msk_… line into the key field
+  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)
+  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m "…"
+  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar
+[exit 0]
+== repeat_install_keeps_config: PASS
+
+$ sh /home/claude/modelsaar/site/static/install.sh
+ModelSaar installer — Linux, commit __PINNED_SHA__
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+installed: modelsaar 0.1.0 via uv (/tmp/modelsaar-inst-0cx926oa/bin/modelsaar)
+existing configuration kept: /tmp/modelsaar-inst-0cx926oa/home/config.yaml (keys and state untouched)
+[stderr] modelsaar install: port 49831 is in use by something that is not a ModelSaar gateway (GET http://127.0.0.1:49831/healthz answered HTTP 200 without the ModelSaar health contract). Nothing was sent to it. Choose another port: MODELSAAR_PORT=8585 sh install.sh (new config), or edit server.port in /tmp/modelsaar-inst-0cx926oa/home/config.yaml
+[exit 1]
+== unrelated_listener_is_a_collision: PASS
+
+$ modelsaar test
+
+[stderr] something that is not a ModelSaar gateway is listening at http://127.0.0.1:49831 (GET /healthz did not return the ModelSaar health contract). No key was sent. Port collision: stop that service or set server.port to a free port in the config and restart `modelsaar serve`.
+[exit 1]
+== test_refuses_unrelated_listener: PASS
+
+$ modelsaar serve &   (first use after the installer: NOT `modelsaar init && modelsaar serve`)
+== serve_starts_and_identifies_itself: PASS
+
+$ modelsaar init
+
+[stderr] /tmp/modelsaar-inst-0cx926oa/home/config.yaml already exists; use --force to overwrite (keys and state are preserved)
+[exit 1]
+== init_refuses_existing_config_so_the_site_must_not_chain_it: PASS
+
+$ modelsaar test
+GET /healthz -> modelsaar 0.1.0
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'ollama/small:1b', 'ollama/plain:3b']
+POST /v1/chat/completions -> 200 in 6ms; deployment=ollama/small:1b request=req_1b2cc69653f14938
+routed: 'auto' -> ollama/small:1b (request req_1b2cc69653f14938)
+content: Hello from small:1b: you said 'Reply with one word: ready' — ünïcødé ✓
+[exit 0]
+== test_passes_with_attribution: PASS
+
+$ sh /home/claude/modelsaar/site/static/install.sh
+ModelSaar installer — Linux, commit __PINNED_SHA__
+installing with uv (isolated tool environment; Python 3.12 is fetched by uv if needed)
+installed: modelsaar 0.1.0 via uv (/tmp/modelsaar-inst-0cx926oa/bin/modelsaar)
+existing configuration kept: /tmp/modelsaar-inst-0cx926oa/home/config.yaml (keys and state untouched)
+a ModelSaar gateway is already listening on http://127.0.0.1:49831 (identified by its health contract); using it for the check
+
+GET /healthz -> modelsaar 0.1.0
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'ollama/small:1b', 'ollama/plain:3b']
+POST /v1/chat/completions -> 200 in 5ms; deployment=ollama/small:1b request=req_1ddfab3d33c3443f
+routed: 'auto' -> ollama/small:1b (request req_1ddfab3d33c3443f)
+content: Hello from small:1b: you said 'Reply with one word: ready' — ünïcødé ✓
+
+verification: OK — 'auto' was routed by ModelSaar to the deployment shown above (request id printed)
+
+Gateway address:  http://127.0.0.1:49831/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)
+API key:          head -1 /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys
+Config:           /tmp/modelsaar-inst-0cx926oa/home/config.yaml
+
+Next:
+  1. run the gateway:        modelsaar serve        (keep it running; examples/ has launchd and systemd units)
+                             (init has already run; do not run 'modelsaar init' again — it keeps your existing config)
+  2. check it:               modelsaar test         (in another terminal)
+  3. connect an app, one command per app:
+       modelsaar client-config open-webui     modelsaar client-config opencode   (or opencode-v2)
+       modelsaar client-config openclaw       modelsaar client-config hermes
+     or set Base URL http://127.0.0.1:49831/v1, model 'auto', and the API key in any OpenAI-compatible app:
+     run 'head -1 /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys' and paste the printed msk_… line into the key field
+  verify capabilities once:  modelsaar probe --all  (while the gateway runs; uses your backend's compute)
+  diagnose:                  modelsaar doctor · modelsaar decisions · modelsaar explain -m "…"
+  uninstall:                 modelsaar uninstall; then: uv tool uninstall modelsaar | pipx uninstall modelsaar | pip uninstall modelsaar
+[exit 0]
+== installer_reuses_running_gateway: PASS
+
+$ modelsaar client-config open-webui
+# Open WebUI -> ModelSaar  (checked against docs 2026-10-11)
+
+Open WebUI concatenates paths onto the connection URL (`{url}/chat/completions`, `{url}/models`),
+so the URL MUST include `/v1` and must not end with a slash.
+
+## UI steps
+1. Admin Panel -> Settings -> Connections -> "Manage OpenAI API Connections" -> Add Connection
+2. URL:      http://127.0.0.1:49831/v1
+3. API Key:  <your ModelSaar API key>   (file: ~/.modelsaar/keys/api_keys)
+4. Save, then "Verify Connection" (this calls GET http://127.0.0.1:49831/v1/models with a Bearer token).
+   Models are auto-listed from /models: auto, auto-quality, auto-balanced, auto-fast plus concrete deployments.
+
+## Environment-variable equivalent (Docker / compose)
+ENABLE_OPENAI_API=true
+OPENAI_API_BASE_URLS=http://127.0.0.1:49831/v1
+OPENAI_API_KEYS=<your ModelSaar API key>
+# Route Open WebUI's background tasks (titles, tags, follow-ups) to the fast alias instead of the chat model:
+TASK_MODEL_EXTERNAL=auto-fast
+# Optional: forward the chat id so ModelSaar keeps a conversation on one deployment (session affinity):
+ENABLE_FORWARD_USER_INFO_HEADERS=true     # sends X-OpenWebUI-Chat-Id (and user headers) to the gateway
+
+## Docker networking
+Open WebUI in a container cannot reach 127.0.0.1 of the host. Use host.docker.internal (macOS/Windows);
+on Linux add `--add-host=host.docker.internal:host-gateway` and bind ModelSaar to a non-loopback address
+(server.host: 0.0.0.0, security.allow_lan: true) - only on a trusted network. Podman: host.containers.internal.
+
+## Notes
+- Tool calling: Native (default) mode sends `tools`; Open WebUI does not send tool_choice.
+- Per-model capability toggles (vision, etc.) live in Admin -> Models; ModelSaar also enforces them server-side.
+[exit 0]
+== client_config_open_webui_renders_from_running_gateway: PASS
+
+$ head -1 /tmp/modelsaar-inst-0cx926oa/home/keys/api_keys   (output redacted in this transcript)
+msk_… (47 characters, one line)
+== key_command_prints_a_pasteable_value: PASS
+
+results: /tmp/claude-0/-home-claude/6554ef63-3e14-54a9-b19e-6d56cdb00710/scratchpad/after/installer-scenarios/results.json

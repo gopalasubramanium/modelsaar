@@ -11,7 +11,7 @@ real; simulated runs are labelled as such.
 | Build/test container (cloud) | Linux x86_64, CPython 3.13.16, starlette 1.7.0, uvicorn 0.54.0, httpx 0.28.1, pydantic 2.14.0, PyYAML 6.0.3, pytest 9.1.1. No GPU. Network: PyPI reachable; Hugging Face, Ollama registry and Docker daemon **not** available. |
 | Independent review venv | CPython 3.10.20 (uv), same dependency versions — full test suite passed (reviewer's run). |
 | Owner's Linux VM bridge | aarch64, CPython 3.10.12: `pytest` → **61 passed** at that commit (64 at HEAD); `modelsaar eval --mode simulated --limit 10` ran (Python 3.10/aarch64 compatibility). |
-| **Owner's MacBook Air M5 (macOS, Darwin 27.0.0 arm64) → ASUS GX10 (NVIDIA GB10) over Tailscale** | Real run on 2026-10-11 14:17–16:25 IST: uv-managed CPython 3.12.15, ModelSaar 0.1.0, **Ollama 0.32.13** at `http://100.83.54.124:11434` serving 8 models. Outputs: `live-check-20261011-141721/` (committed next to the report). Driven from this session by double-clicking `run_live_check.command`, `run_live_eval.command`, `run_reprobe.command` in Finder. |
+| **Owner's MacBook Air M5 (macOS, Darwin 27.0.0 arm64) → ASUS GX10 (NVIDIA GB10) over Tailscale** | Real run on 2026-10-11 14:17–16:25 IST: uv-managed CPython 3.12.15, ModelSaar 0.1.0, **Ollama 0.32.13** at `http://<gx10-tailscale-address>:11434` serving 8 models. Outputs: `live-check-20261011-141721/` (committed next to the report). Driven from this session by double-clicking `run_live_check.command`, `run_live_eval.command`, `run_reprobe.command` in Finder. |
 
 ## Executed
 
@@ -64,7 +64,7 @@ Deployments discovered (all Q4_K_M GGUF, declared locality `local` = owner's pri
 
 | check | result |
 |---|---|
-| `init --endpoint http://100.83.54.124:11434` | wrote config + keys; discovered 8 deployments |
+| `init --endpoint http://<gx10-tailscale-address>:11434` | wrote config + keys; discovered 8 deployments |
 | `discover` | capabilities from `/api/show` (tools/vision/thinking), residency + served context from `/api/ps` (131072 while loaded), locality evidence recorded; cloud-alias detection exercised negatively (none present) |
 | `doctor` | 0 failures; warnings only for assumed served context (4096) on unloaded models without Modelfile `num_ctx` |
 | `probe --all` (first pass, probe budgets 40/200 tokens) | **exposed bug**: thinking models (muse-glimmer, qwen3.6*, gemma4) exhausted the budget on reasoning → streaming/JSON/vision recorded `unsupported` (false negatives). Fixed in commit `dadd377` (larger budgets, reasoning deltas counted, exhausted budget → `unknown`). |
@@ -123,9 +123,9 @@ section was produced by the repaired code.
 | check | command | outcome |
 |---|---|---|
 | Lint | `ruff check src tests` | pass |
-| Full test suite (cloud container) — superseded by the 2026-10-12 pass below | `python -m pytest` — CPython 3.13.16, Linux x86_64, no isolation backend; revision `0172760`…`91f9e6c` (same test files) | **156 passed, 4 skipped** in 70 s. The 4 skips are `tests/test_evaluation.py::test_sandbox_blocks_writes_outside_work`, `::test_sandbox_blocks_network`, `::test_sandbox_reference_solution_passes`, `::test_sandbox_timeout_fails_cleanly` — skip reason "no isolation backend (bwrap not installed; docker present but daemon not reachable)". |
-| Full test suite (owner's Mac) — superseded by the run at `80276bb` (161 passed) and by the 2026-10-12 pass below | `python -m pytest -rs -v --durations=5` — macOS Darwin 27.0.0 arm64, CPython 3.12.15, isolation backend **`sandbox-exec`** (`/usr/bin/sandbox-exec`; bwrap and docker absent); revision `01727604726077fe70e7acef398427149e45c4c1`; run 2026-10-11 19:55 IST via `run_mac_tests.command` | **160 passed, 0 skipped** in 48 s, exit 0 — the four isolation tests executed under `sandbox-exec` (`test_sandbox_timeout_fails_cleanly` 2.01 s). Log: `docs/live-runs/mac-tests-0172760.txt`. |
-| Regression tests for the review findings | `python -m pytest tests/test_hardening_2026_10_11.py` | 27 passed; each one reproduced its defect against `1122e1f` before the fix (finding → fix → test table in docs/progress.md) |
+| Full test suite (cloud container) — superseded by the 2026-10-12 pass below | `python -m pytest` — CPython 3.13.16, Linux x86_64, no isolation backend; revision `80276bb` | **157 passed, 4 skipped** in 70 s. The 4 skips are `tests/test_evaluation.py::test_sandbox_blocks_writes_outside_work`, `::test_sandbox_blocks_network`, `::test_sandbox_reference_solution_passes`, `::test_sandbox_timeout_fails_cleanly` — skip reason "no isolation backend (bwrap not installed; docker present but daemon not reachable)". |
+| Full test suite (owner's Mac) — superseded by the 2026-10-12 pass below | `python -m pytest -rs -v --durations=5` — macOS Darwin 27.0.0 arm64, CPython 3.12.15, isolation backend **`sandbox-exec`** (`/usr/bin/sandbox-exec`; bwrap and docker absent); revision **`80276bbeb9e6cbe3297c6b32bd73df48d389b238`** (the hardening head; an earlier run on `0172760` gave 160 passed and was superseded after `91f9e6c` changed `modelsaar test`); run 2026-10-11 21:04 IST via `run_mac_tests.command` | **161 passed, 0 skipped** in 48 s, exit 0 — the four isolation tests executed under `sandbox-exec` (`test_sandbox_timeout_fails_cleanly` 2.0 s). Logs and commit classification: `docs/live-runs/2026-10-11-mac-tests/`. |
+| Regression tests for the review findings | `python -m pytest tests/test_hardening_2026_10_11.py` | 28 passed; run against `1122e1f` 26 fail (22 behavioural, 4 on a field/symbol the fix introduced) and 2 positive controls pass — `docs/live-runs/2026-10-11-baseline/` (finding → fix → test table in docs/progress.md) |
 | Evaluator tests — superseded by the 2026-10-12 pass below | `python -m pytest tests/test_evaluation.py tests/test_classifier_schema.py` | 65 passed, 4 skipped (sandbox) of 69 at that revision |
 | Clean wheel install, loopback default, private keys, one routed request, scheme-1 state DB migration | `scripts/install-check.sh` | **PASS** (`modelsaar 0.1.0` wheel into a fresh venv; `server.host: 127.0.0.1`; `keys/api_keys` mode 600; chat via `auto` ok; `doctor` reports the 1 probe + 1 measurement written under evidence scheme 1; `meta.evidence_scheme = 2`; old rows kept) |
 | Fresh-volume container start (Compose-equivalent: empty volume, read-only config mount, non-root, keys created once, unchanged after restart) | `scripts/compose-smoke.sh` | **NOT RUN here** (no Docker daemon in the build container); the script is a CI step (`container` job) and runs on the next push |
@@ -136,7 +136,7 @@ section was produced by the repaired code.
 Driven by double-clicking `run_live_verify.command` in Finder from this session; the script ran
 detached (`nohup caffeinate`) and copied its folder back. Environment (`00-env.txt`): macOS Darwin
 27.0.0 arm64, CPython 3.12.15, ModelSaar 0.1.0 at commit `0f8af84b66df`, **Ollama 0.32.13** at
-`http://100.83.54.124:11434`; `sandbox-exec` available, so `code_exec` tasks were scored in isolation.
+`http://<gx10-tailscale-address>:11434`; `sandbox-exec` available, so `code_exec` tasks were scored in isolation.
 Config is in `10b-config-redacted.txt`; model digests in `02-backend-tags.txt` (qwen3.6 `096fdbd02fe6…`,
 gemma4:31b `6316f0629137…`, qwen3-coder `06c1097efce0…`, all Q4_K_M); these digests are the deployments'
 identities and part of their fingerprints.
@@ -196,6 +196,13 @@ unloaded models was assumed 4096; 3 of 8 deployments swept; one hardware/runtime
 Complete sanitised per-request records: `eval-live.json.records.jsonl` (173 records: ids, status,
 latency, scorer detail; no prompts); machine-readable aggregates: `eval-live.json`.
 
+### Installer and website (branch `website/modelsaar-com`)
+
+| check | outcome |
+|---|---|
+| `https://modelsaar.com/install.sh` (source `site/static/install.sh`, pinned to the hardening branch head) | executed on **Linux x86_64** through all three paths (pipx, uv, `pip --user`), a repeat run, an unreachable backend and an occupied port, against the fixture backend on port 11434; and on the **owner's Mac (arm64, uv, system Python 3.9 too old → uv fetched 3.12)** against the GX10: `modelsaar test` 200 from `ollama/qwen3.8:latest`. Transcripts: `docs/live-runs/2026-10-11-installer/`. The first Mac attempt failed on a corrupt uv cache entry (documented, troubleshooting entry added). The served URL itself could not be exercised before the domain is connected. |
+| Website | built from the repository; static checks, Playwright/axe checks and Lighthouse lab runs recorded in `site/VALIDATION.md` |
+
 ### Still NOT RUN after this pass
 
 | item | how to run |
@@ -222,7 +229,7 @@ reviewer's test files byte-for-byte in `tests/independent_review_2026_10_11/`.
 | launcher reproducer (`reproduce_launcher.py`, path constants adapted; stub `gh`, local bare origin) | positive resume PASS; skip-domain, build-query-failure, origin-prefix: **DEFECT REPRODUCED** | matches `launcher_results.json` |
 | installer reproducer (`reproduce_installer.py`) | foreign `/healthz` accepted, saved fixture key sent, `verification: OK`; `init && serve` exit 1 | **DEFECT REPRODUCED** ×2 |
 | publication-tree reproducer | untracked file entered gh-pages with BUILD-INFO claiming the clean commit | **DEFECT REPRODUCED**; rollback control PASS |
-| address guard at website `840b068` | 192.168.50.9 and 172.16.50.9 accepted; CGNAT and 10/8 rejected | reproduced |
+| address guard at website `840b068` | synthetic 192.168/16 and 172.16/12 examples accepted (misses); CGNAT and 10/8 rejected | reproduced |
 
 Transcripts: `docs/live-runs/2026-10-12-correction/before/` (website branch).
 

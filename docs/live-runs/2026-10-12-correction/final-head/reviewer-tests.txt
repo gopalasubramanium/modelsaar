@@ -1,0 +1,23 @@
+revision 5cb7443e73e2b43e2cd2c1540096c2fe772e438a
+plugins: platformdirs-4.13.0, anyio-4.15.1
+collecting ... collected 17 items
+
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_flushed_marker_then_exit_does_not_count_as_executed_harness PASSED [  5%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_correct_function_still_passes PASSED [ 11%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_tool_argument_wrong_schema_type_does_not_pass PASSED [ 17%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_tool_argument_correct_type_still_passes PASSED [ 23%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_changed_task_cannot_reuse_old_score PASSED [ 29%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_removed_deployment_cannot_resume PASSED [ 35%]
+tests/independent_review_2026_10_11/test_evaluator_remaining_contracts.py::test_changed_fingerprint_is_rejected_positive_control PASSED [ 41%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_stream_read_timeout_holds_capacity_until_recovery[streaming-regression] PASSED [ 47%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_stream_read_timeout_holds_capacity_until_recovery[nonstream-positive-control] PASSED [ 52%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_probe_timeout_stops_later_probe_inference PASSED [ 58%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_embedding_backend_timeout_is_enforced PASSED [ 64%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_unknown_first_embedding_member_cannot_allow_distinct_spaces[unanchored-regression] PASSED [ 70%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_unknown_first_embedding_member_cannot_allow_distinct_spaces[declared-anchor-positive-control] PASSED [ 76%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_completed_dispatch_keeps_loaded_weights_in_memory_budget[between-polls-regression] PASSED [ 82%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_completed_dispatch_keeps_loaded_weights_in_memory_budget[refresh-positive-control] PASSED [ 88%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_reject_unknown_memory_applies_to_existing_residents PASSED [ 94%]
+tests/independent_review_2026_10_11/test_remaining_contracts.py::test_invalid_sse_is_not_validated_success_or_session_pin PASSED [100%]
+
+============================== 17 passed in 7.80s ==============================

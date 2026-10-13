@@ -41,7 +41,9 @@ dev = [
 modelsaar = "modelsaar.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/gopalasubramanium/modelsaar"
+Homepage = "https://modelsaar.com"
+Repository = "https://github.com/gopalasubramanium/modelsaar"
+Creator = "https://me.sgopala.com"
 
 [tool.setuptools.packages.find]
 where = ["src"]

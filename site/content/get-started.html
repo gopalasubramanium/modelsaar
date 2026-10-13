@@ -1,0 +1,79 @@
+<section aria-labelledby="gs-title">
+  <h1 id="gs-title">Get started</h1>
+  <p class="lede">From nothing to a first request routed through <code>auto</code>. Two paths: the beginner path installs, configures and verifies in a few commands; the expert path is the same thing without the wrapper.</p>
+  <div class="callout"><p><strong>Status:</strong> ModelSaar is a <strong>public alpha</strong>. No release has been tagged and no package is published, so every install path below pins commit <code>{{ facts.INSTALL_SHA[:12] }}</code> of the <code>{{ facts.INSTALL_BRANCH }}</code> branch — the candidate described on the <a href="{{ href('/roadmap/') }}">roadmap</a> (two independent reviews reproduced and re-checked its defects; independent verification of this exact candidate is pending). Re-running the installer later moves you to the next pinned commit.</p></div>
+</section>
+
+<section aria-labelledby="prereq-title">
+  <h2 id="prereq-title">Before you start</h2>
+  <ul>
+    <li><strong>An inference backend with at least one model.</strong> Ollama is the first-class path: <code>ollama serve</code> running and a model pulled (for example <code>ollama pull gemma4:e4b</code>). Any OpenAI-compatible server (vLLM, llama.cpp server, LM Studio) also works; you will declare its models in the config. ModelSaar never downloads models and never accepts a model's licence for you.</li>
+    <li><strong>Python 3.10 or newer</strong>, or the <code>uv</code> tool (which fetches a suitable Python itself). Check with <code>python3 --version</code> or <code>uv --version</code>.</li>
+    <li><strong>macOS (Apple silicon or Intel), Linux, or Windows through WSL2.</strong> macOS arm64 and Linux x86_64 are the platforms the project has actually run on; native Windows is untested.</li>
+    <li><strong>Hardware:</strong> whatever your backend needs for the models you chose. ModelSaar itself is a small Python process.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="install-title">
+  <h2 id="install-title">1. Install</h2>
+  <h3>Beginner path: one command</h3>
+  {{ cmd(facts.INSTALL_ONE_LINER) }}
+  <p>The script is short and does only this: checks your platform and Python; installs the ModelSaar package at the pinned commit with <code>uv tool install</code>, <code>pipx</code> or <code>python3 -m pip install --user</code> (first one found; it does not install those tools for you); runs <code>modelsaar init</code> if you have no config yet (it looks for Ollama on <code>127.0.0.1:11434</code> and other documented loopback ports, writes <code>~/.modelsaar/config.yaml</code> and private keys with mode 600); then starts a temporary gateway, sends one request through <code>auto</code>, stops it and prints the result with your next step. Existing config, keys and state are never overwritten; an occupied gateway port is reported, not fought over.</p>
+  <p id="inspect">To read it before running it:</p>
+  {{ cmd(facts.INSTALL_INSPECT) }}
+  <p>Options are environment variables: <code>MODELSAAR_ENDPOINT=http://host:port</code> (backend other than local Ollama), <code>MODELSAAR_PORT=8484</code>, <code>MODELSAAR_NO_CHECK=1</code> (skip the verification request), <code>MODELSAAR_REF=&lt;sha&gt;</code> (install a different commit — you take responsibility for it).</p>
+
+  <h3 id="manual">Expert path: install by hand</h3>
+  <p>With <code>uv</code> (recommended; isolated, fetches Python 3.12 if needed):</p>
+  {{ cmd(facts.install_cmds()['uv']) }}
+  <p>With <code>pipx</code>:</p>
+  {{ cmd(facts.install_cmds()['pipx']) }}
+  <p>With plain pip (user install; needs Python ≥ 3.10 and <code>~/.local/bin</code> on your PATH):</p>
+  {{ cmd(facts.install_cmds()['pip']) }}
+  <p>From a source checkout (what the test suite and the verification scripts use):</p>
+  {{ cmd(facts.install_cmds()['source']) }}
+  <p>All four give you the <code>modelsaar</code> command and nothing else; nothing starts automatically.</p>
+</section>
+
+<section aria-labelledby="first-title">
+  <h2 id="first-title">2. Configure and run</h2>
+  <p><strong>Before this step</strong> an inference server with at least one model must be running (for example <code>ollama serve</code> after <code>ollama pull …</code>); ModelSaar never downloads models.</p>
+  <p>If you used the one-line installer, <code>modelsaar init</code> has already run (the installer printed the models it discovered) — skip to <code>modelsaar doctor</code>. With uv, pipx, pip or a source checkout, run it once:</p>
+  {{ cmd('modelsaar init', 'Finds Ollama on 127.0.0.1:11434 (or pass --endpoint URL --type ollama|openai_compatible), writes ~/.modelsaar/config.yaml and keys, discovers your models. Refuses to overwrite an existing config without --force; after the installer, do not run it again.') }}
+  {{ cmd('modelsaar doctor', 'Reachability, assumed context lengths, unknown capabilities, cloud-forwarded aliases — with a remedy per warning.') }}
+  {{ cmd('modelsaar serve', 'Starts the gateway at http://127.0.0.1:8484/v1 (loopback only). Leave it running; stop with Ctrl-C.') }}
+  <p>Optional but recommended once: <code>modelsaar probe --all</code> verifies streaming, tool calling, JSON schema and image input on each model with short real requests (it uses your backend's compute). Run it while the gateway is up; the probes go through the gateway so they never collide with your own traffic.</p>
+  <h3>Verify</h3>
+  {{ cmd(facts.FIRST_USE_CHECK, 'In a second terminal. Identifies the listener on the configured port (GET /healthz must answer the ModelSaar health contract before any key is sent), lists the models the gateway advertises and sends one chat completion through auto; prints the deployment that answered and the request id.') }}
+  <p>If it prints an HTTP 422, no model qualified — the body says which blocker applies to each deployment and what to change. If it cannot connect, the gateway is not running on the configured port; the message says so. If something else is listening on that port, it says "not a ModelSaar gateway" and sends nothing: change <code>server.port</code> or stop the other service.</p>
+</section>
+
+<section aria-labelledby="client-title">
+  <h2 id="client-title">3. Connect an app</h2>
+  <p>Any app that speaks the OpenAI Chat Completions API needs three values. First print the key in a terminal:</p>
+  {{ cmd(facts.KEY_COMMAND, 'Prints one line starting with msk_. That printed line is the API key to paste into a GUI field; the command itself is shell syntax, not a key.') }}
+  {{ cmd('Base URL:  ' + facts.GATEWAY_URL + '\nModel:     auto        # or auto-fast, auto-code, auto-vision, or a concrete deployment id\nAPI key:   ' + facts.KEY_PLACEHOLDER, lang='text') }}
+  <p>Or let ModelSaar print the exact settings for your app — one command per app:</p>
+  {{ facts.client_config_list_html() }}
+  <p><code>--apply</code> merges file-based configs with a backup and keeps the file's permissions. The key never leaves your machine unless you send it somewhere.</p>
+  <div class="callout">
+    <p><strong>Addresses when the app is not on the same machine.</strong> <code>127.0.0.1</code> always means "the machine (or container) where the app runs". An Open WebUI container on the same host reaches the gateway at <code>http://host.docker.internal:8484/v1</code>; an app on another computer needs the gateway bound beyond loopback (<code>server.host: 0.0.0.0</code> <em>and</em> <code>security.allow_lan: true</code>, with TLS or a private network in front — see <a href="{{ href('/privacy/') }}">Privacy</a>). <code>modelsaar client-config … --docker</code> prints the container form.</p>
+  </div>
+  <p>One model only? <code>auto</code> uses it whenever it qualifies; nothing else changes. More models later expand its choices without touching the app.</p>
+</section>
+
+<section aria-labelledby="ops-title">
+  <h2 id="ops-title">Running it day to day</h2>
+  <dl>
+    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="{{ facts.REPO_URL }}/tree/{{ site.commit }}/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="{{ href('/docs/installation/') }}">Installation</a> (gateway only; models stay with your runtime).</dd>
+    <dt>Stop / restart</dt><dd>Ctrl-C in the terminal, or your service manager's stop/restart. Configuration changes need a restart; in-flight requests finish on the old config.</dd>
+    <dt>Update</dt><dd>Re-run the installer (it pins the newer candidate commit), or with uv/pipx/pip re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
+    <dt>Troubleshoot</dt><dd><code>modelsaar doctor</code> first; then <code>modelsaar decisions --limit 10</code> for the last routing records and <code>modelsaar explain -m "…" [--tools --image --json-schema]</code> to dry-run a request. More in <a href="{{ href('/docs/troubleshooting/') }}">Troubleshooting</a>.</dd>
+    <dt>Uninstall</dt><dd><code>modelsaar uninstall</code> removes only the files ModelSaar created under <code>~/.modelsaar</code> (config, its backups, keys, state DB) and lists anything it left in place. Then <code>uv tool uninstall modelsaar</code>, <code>pipx uninstall modelsaar</code> or <code>pip uninstall modelsaar</code>. Models and client configurations are never touched; applied client configs have <code>.bak-&lt;timestamp&gt;</code> copies next to them.</dd>
+  </dl>
+</section>
+
+<section aria-labelledby="tested-title">
+  <h2 id="tested-title">What has actually been tested</h2>
+  <p>Two kinds of evidence, stated separately. <strong>At the current pinned commit</strong> the installer and the CLI were exercised end to end on Linux with the package-manager step stubbed (fresh install, repeat install, an unrelated service on the port, a running gateway, <code>serve</code>, <code>test</code>, one client configuration — <code>docs/live-runs/2026-10-12-installer-scenarios/</code>). <strong>At an earlier pin</strong> (<code>80276bb</code>) the real installer paths — uv, pipx and <code>pip --user</code> on Linux x86_64, uv on macOS arm64 against the owner's Ollama host — were executed with real package installation (<code>docs/live-runs/2026-10-11-installer/</code>). A real package-manager installation at the current pin, and a real-client walkthrough, have not been run yet; both are listed in the <a href="{{ href('/docs/verification-report/') }}">verification report</a>. WSL2 follows the Linux path and has not been executed by the project. Native Windows is not supported.</p>
+</section>

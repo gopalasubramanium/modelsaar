@@ -5,7 +5,7 @@ Compact state so another session can continue without repeating finished work.
 ## State (2026-10-11, hardening pass)
 
 * Branch `hardening/review-2026-10-11` (base `main` = `1122e1f`, the reviewed commit). Eleven commits;
-  **156 passed, 4 skipped** (`python -m pytest`, CPython 3.13.16, Linux; the 4 skips are `code_exec`
+  **157 passed, 4 skipped** at `80276bb` (`python -m pytest`, CPython 3.13.16, Linux; the 4 skips are `code_exec`
   sandbox tests: no bubblewrap/`sandbox-exec`/Docker daemon in that container — they run on macOS and on
   CI's Ubuntu once bubblewrap is present); `ruff check src tests` clean.
 * Not done in this pass (per the task's authorization): no push, no tag, no PyPI/GHCR publication, no change
@@ -48,7 +48,7 @@ Deliberate non-changes: no catalogue expansion, no new API families beyond `POST
 ```
 python -m venv .venv && .venv/bin/pip install -e .[dev]
 .venv/bin/ruff check src tests
-.venv/bin/python -m pytest                       # 156 passed, 4 skipped (sandbox), 70 s
+.venv/bin/python -m pytest                       # 157 passed, 4 skipped (sandbox) at 80276bb, 70 s; Mac: 161 passed, 0 skipped
 scripts/install-check.sh                        # wheel install, loopback default, 0600 keys, scheme-1 DB migration: PASS
 scripts/compose-smoke.sh                        # NOT RUN here (no Docker daemon); runs in CI job `container`
 scripts/live_verify.sh http://127.0.0.1:23111 small:1b big:27b   # dry run against the fake backend: all steps exit 0, resume works

@@ -23,6 +23,8 @@ Start with `modelsaar doctor` — it checks most of the items below and prints a
 | Port already in use | another gateway or service on 8484 | change `server.port`; `doctor` reports it |
 | Missing tool/reasoning parser (vLLM) | server started without `--enable-auto-tool-choice --tool-call-parser` | restart vLLM with the flags; probe reports `tools unsupported` until then |
 | `config version N is not supported` | config written by a newer/older build | `modelsaar config migrate` or upgrade the package |
+| `modelsaar test`: `no gateway is listening at …` | the gateway is not running on the configured port | `modelsaar serve` in another terminal (or under launchd/systemd), then `modelsaar test` |
+| `ModuleNotFoundError: No module named 'httpcore…'` (or another dependency) right after a `uv tool install` | a corrupt entry in uv's wheel cache (seen on macOS) | `uv cache clean httpcore` (or `UV_NO_CACHE=1 uv tool install --force …`), then re-run the installer |
 
 Logs: `modelsaar serve` prints warnings only; set `observability.log_level: DEBUG` for more (still no
 prompt content unless `security.log_prompts: true`, which is for debugging only).

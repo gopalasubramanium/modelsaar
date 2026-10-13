@@ -1,0 +1,30 @@
+<section aria-labelledby="pv-title">
+  <h1 id="pv-title">Privacy</h1>
+  <p class="lede">Two separate things: what the ModelSaar gateway does with your requests on your machine, and what this website does when you visit it.</p>
+</section>
+
+<section aria-labelledby="gw-title">
+  <h2 id="gw-title">The gateway</h2>
+  <p>ModelSaar runs where you install it. By default it binds to <code>127.0.0.1</code>, authenticates every request with keys it generated into files with mode 600, and talks only to the backend addresses in your configuration. It sends no telemetry, keeps no response cache and logs no prompts; decision records hold metadata (task labels, token counts, capability flags, outcome) and at most a short, redacted upstream error excerpt.</p>
+  <ul>
+    <li><strong>Local-only by default.</strong> <code>security.locality_mode: local_only</code> makes only deployments with locality <code>local</code> eligible or advertised. Ollama's cloud-forwarded models are detected and excluded; a generic endpoint's locality is whatever you declared, recorded as a trust assumption. Nothing derived from a request leaves the gateway before policy filtering: tokenizer counts are requested only from deployments that already passed locality, enablement, health and capability filters, and the optional classifier must be a local deployment unless you opt in twice.</li>
+    <li><strong>Remote media is never fetched.</strong> Image URLs must be inline <code>data:</code> URLs; unknown content types are rejected before dispatch.</li>
+    <li><strong>No model-generated code is executed by the gateway.</strong> The evaluation harness runs model-written Python only inside an isolation sandbox, or skips the task.</li>
+    <li><strong>Exposure beyond your machine is explicit.</strong> Binding to a LAN address requires <code>security.allow_lan: true</code>; keys then travel over plain HTTP, so put TLS or a private network (Tailscale, WireGuard) in front and never send the admin key off the host.</li>
+    <li><strong>What it cannot prove.</strong> That an opaque backend is truly local, or what your backend does with the request after it arrives. ModelSaar records the evidence it has (<code>locality_evidence</code> in the status output) and nothing more.</li>
+  </ul>
+  <p>The full defaults table, with the code path for each guarantee, is in <a href="{{ href('/docs/privacy/') }}">Privacy and security of the gateway</a>.</p>
+</section>
+
+<section aria-labelledby="site-title">
+  <h2 id="site-title">This website</h2>
+  <p>modelsaar.com is a static site. It uses no analytics scripts, no cookies, no forms, no accounts, no newsletter and no third-party embeds; its fonts are served from this site. The hosting provider keeps standard access logs (IP address, user agent, requested URL, time) for operating the service — see the hosting section below for who that is. We do not combine those logs with anything else. The <code>install.sh</code> script served here downloads the ModelSaar source from GitHub at a pinned commit; GitHub's own privacy terms apply to that request.</p>
+  <p>If this changes (for example, if we add privacy-respecting aggregate analytics), this page will say so and describe exactly what is collected and for how long.</p>
+  <h3>Hosting</h3>
+  <p id="hosting">{{ facts.HOSTING_NOTE }}</p>
+</section>
+
+<section aria-labelledby="contact-title">
+  <h2 id="contact-title">Security reports</h2>
+  <p>Report a vulnerability in the gateway as described in the <a href="{{ href('/docs/security-policy/') }}">security policy</a>. Please do not file security reports as public issues.</p>
+</section>

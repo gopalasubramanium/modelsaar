@@ -1,0 +1,31 @@
+name: Integration problem (a client or backend does not work through ModelSaar)
+description: Something in Open WebUI, OpenCode, OpenClaw, Hermes, Ollama, vLLM, llama.cpp… fails through the gateway.
+labels: [integration]
+body:
+  - type: input
+    id: version
+    attributes: { label: ModelSaar version and commit, description: "`modelsaar --version`; for a source install also `git rev-parse HEAD`", placeholder: "modelsaar 0.1.0, 91f9e6c" }
+    validations: { required: true }
+  - type: input
+    id: client
+    attributes: { label: Client and version, placeholder: "Open WebUI v0.6.x in Docker / OpenCode 1.2 / curl" }
+    validations: { required: true }
+  - type: input
+    id: backend
+    attributes: { label: Backend and version, placeholder: "Ollama 0.32.13 on another host over Tailscale" }
+    validations: { required: true }
+  - type: textarea
+    id: doctor
+    attributes: { label: "`modelsaar doctor` output", render: text }
+    validations: { required: true }
+  - type: textarea
+    id: decision
+    attributes: { label: "Decision record for a failing request", description: "`modelsaar decisions --limit 5`, or `GET /admin/decisions/<X-ModelSaar-Request-Id>`. Records contain no prompts; redact anything else you consider private.", render: json }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: What you expected and what happened instead }
+    validations: { required: true }
+  - type: textarea
+    id: config
+    attributes: { label: "Relevant config (`modelsaar config show`, keys redacted)", render: yaml }

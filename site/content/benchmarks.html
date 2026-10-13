@@ -1,0 +1,34 @@
+<section aria-labelledby="bm-title">
+  <h1 id="bm-title">Benchmarks and evidence</h1>
+  <p class="lede">Does automatic routing help? What one recorded run shows: the same task score as the strongest single model, better coverage, higher tail latency. Nothing more is claimed. Everything on this page can be regenerated from files in the repository.</p>
+</section>
+
+<section aria-labelledby="method-title">
+  <h2 id="method-title">Method</h2>
+  <p><code>modelsaar eval</code> compares <strong>auto</strong> (live routing through the gateway) against policies that use the same requests, the same gateway and the same budgets:</p>
+  <ul>
+    <li><strong>fixed-strong</strong> and <strong>fixed-fast</strong>: the single deployment with the best success / lowest latency on a calibration split that is disjoint from the test split;</li>
+    <li><strong>rules</strong>: a deterministic mapping that is <em>given the gold task label</em> and the catalogue's specialist tags — an advantage auto does not have;</li>
+    <li><strong>random</strong> (seeded) as a floor and <strong>oracle</strong> (a task counts as solved if any deployment solved it) as an offline ceiling that is not available at runtime.</li>
+  </ul>
+  <p>The task set is 47 original synthetic tasks (conversation, coding, agent/tools, math, extraction with strict schemas, summarisation, translation, RAG-style, decisions, image questions, a tool round trip, mixed-language and deliberately ambiguous prompts), split 15 calibration / 32 test with different templates. Scoring is executable or exact: numbers with tolerance, strict tool-call validation, JSON-schema checks, and Python tasks run inside an isolation sandbox (bubblewrap, macOS <code>sandbox-exec</code> or Docker) or skipped with the changed denominator reported. No LLM judge. Full definition: <a href="{{ href('/docs/evaluation/') }}">Evaluation</a> and the <a href="{{ facts.REPO_URL }}/blob/{{ site.commit }}/src/modelsaar/evaluation/fixtures/README.md">fixture README</a>.</p>
+</section>
+
+<section aria-labelledby="result-title">
+  <h2 id="result-title">Recorded run — {{ facts.live_eval()['generated_at'][:10] }}, three models on an ASUS GX10</h2>
+  <p>Deployments: {{ ', '.join(d['id'].split('/',1)[1] + ' (' + d['parameter_size'] + ' ' + d['quantization'] + ')' for d in facts.live_eval()['deployments']) }} served by Ollama 0.32.13; {{ facts.live_eval()['n_calib'] }} calibration / {{ facts.live_eval()['n_test'] }} test tasks; <code>temperature 0</code>, <code>max_tokens {{ facts.live_eval()['conditions']['max_tokens'] }}</code>, seed {{ facts.live_eval()['conditions']['seed'] }}, scorer <code>{{ facts.live_eval()['conditions']['scorer_version'] }}</code>, code isolation <code>{{ facts.live_eval()['sandbox']['backend'] }}</code>, gateway at commit <code>{{ facts.live_eval()['conditions']['git_commit'][:12] }}</code>. Success is the share of the 32 held-out tasks scored correct; completion is the share that returned HTTP 200; a violation is a 422 for a request some deployment could have served; latencies are end-to-end per request.</p>
+  {{ c.benchmark_table(site) }}
+  <p><strong>Reading it.</strong> Automatic routing and fixed-strong each scored 30 of 32. Automatic routing completed 32 versus 31 requests (the image task the fixed model cannot take), recorded zero versus one capability violation, and had a p95 end-to-end latency of 7.958 s versus 4.760 s because two requests went to a slower thinking model. The two policies differ on exactly two tasks: the image task, solved by automatic routing, and <code>long-01</code>, whose result differed despite selection of the same model; the cause has not been isolated.</p>
+  <p><strong>What it does not show.</strong> n = 32 and every 95 % confidence interval overlaps every other; equal point estimates do not establish equivalence, and nothing here shows general superiority. The 400-token budget systematically penalises the two thinking models (their reasoning counts against it), so the fixed model was also the one that happened to suit the budget; a matched larger budget has not been run. One machine, one runtime, three of eight available models, synthetic tasks.</p>
+  <p><strong>Routing overhead</strong> — the time the gateway spends deciding, which is separate from end-to-end response latency — was mean {{ facts.live_eval()['routing']['overhead_ms_mean'] }} ms, p95 {{ facts.live_eval()['routing']['overhead_ms_p95'] }} ms over the 32 auto requests, with the deterministic task label matching the gold label {{ '%.0f' % (facts.live_eval()['routing']['task_label_accuracy']*100) }} % of the time and the classifier disabled.</p>
+</section>
+
+<section aria-labelledby="raw-title">
+  <h2 id="raw-title">Raw evidence and reproduction</h2>
+  <ul>
+    <li><a href="{{ facts.REPO_URL }}/tree/{{ site.commit }}/docs/live-runs/2026-10-11-gx10-hardening"><code>docs/live-runs/2026-10-11-gx10-hardening/</code></a>: the report (<code>eval-live.json</code>), 173 sanitised per-request records (<code>eval-live.json.records.jsonl</code>: ids, status, latency, scorer detail — no prompts), probe outputs, decision records, the redacted configuration, model digests and a <code>MANIFEST.md</code> with every setting.</li>
+    <li><code>python scripts/eval_aggregate.py &lt;records&gt; &lt;report&gt;</code> recomputes every aggregate from the records and exits non-zero on any difference (it matched).</li>
+    <li>Run your own: <code>modelsaar eval --mode live --save-measurements --out eval.json</code> (resumable with <code>--checkpoint</code>/<code>--resume</code>); the saved measurements then become routing evidence for your deployments.</li>
+    <li>An earlier run with the pre-review evaluator (lenient scorers) reported auto 0.875 vs fixed 0.906; it is kept as a historical record in <a href="{{ href('/docs/verification-report/') }}">the verification report</a> and is not comparable.</li>
+  </ul>
+</section>
