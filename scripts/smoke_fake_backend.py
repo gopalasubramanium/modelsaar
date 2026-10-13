@@ -49,4 +49,5 @@ r = c.post("/v1/chat/completions", json={"model": "auto", "messages": [{"role": 
 print(r.status_code, json.dumps(r.json())[:400])
 ad = httpx.Client(base_url=url, headers={"Authorization": f"Bearer {admin_key}"}, timeout=30)
 print(json.dumps(ad.get("/admin/decisions?limit=1").json()["decisions"][0], indent=1)[:1500])
-gw.stop(); fake.stop()
+gw.stop()
+fake.stop()

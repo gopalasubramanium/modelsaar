@@ -6,7 +6,6 @@ import argparse
 import asyncio
 import json
 import os
-import shutil
 import sys
 import time
 from pathlib import Path
@@ -96,7 +95,10 @@ def cmd_init(args: argparse.Namespace) -> None:
     )
     cfg = cfg.model_copy(update={"server": cfg.server.model_copy(update={"port": args.port})})
     cfg = cfg.model_copy(update={"routing": cfg.routing.model_copy(update={"default_profile": args.profile})})
-    cfg = cfg.model_copy(update={"config_path": str(path)})
+    # The `auto` alias carries its own profile; the advertised default must be what `auto` does.
+    aliases = dict(cfg.aliases)
+    aliases["auto"] = aliases["auto"].model_copy(update={"profile": args.profile})
+    cfg = cfg.model_copy(update={"aliases": aliases, "config_path": str(path)})
     write_config_atomic(cfg, path)
     api_p, adm_p = cfg.resolve(cfg.server.api_keys_file), cfg.resolve(cfg.server.admin_key_file)
     if not read_keys(api_p):
@@ -158,8 +160,87 @@ def cmd_discover(args: argparse.Namespace) -> None:
         print(f"  {a:14s} " + (f"-> {c['deployments']} ctx>={c['context_length_min']} tools={c['tools']} vision={c['vision']}" if c else "(not advertised: no usable deployment)"))
 
 
+def _gateway_listening(cfg: Config) -> str | None:
+    """'gateway' when a ModelSaar gateway answers /healthz on the configured address, 'other' when
+    something else holds the port, None when the port is free."""
+    url = f"http://{cfg.server.host}:{cfg.server.port}"
+    try:
+        r = httpx.get(f"{url}/healthz", timeout=2.0)
+    except httpx.ConnectError:
+        return None
+    except httpx.HTTPError:
+        return "other"
+    try:
+        return "gateway" if r.status_code == 200 and r.json().get("status") == "ok" and "version" in r.json() else "other"
+    except ValueError:
+        return "other"
+
+
+def _print_probe_report(rep: dict[str, Any]) -> None:
+    for res in rep.get("results", []):
+        print(f"  {res['capability']:16s} {res['value']:12s} {res['latency_ms']:7.0f}ms  {res.get('note', '')}")
+    for m in rep.get("measurements", []):
+        p50, ttft, load = m.get("p50_ms"), m.get("ttft_ms"), m.get("load_ms")
+        print(f"  latency           p50={p50 and round(p50)}ms ttft={ttft and round(ttft)}ms load~{load and round(load)}ms (samples={m.get('samples')})")
+    for e in rep.get("errors", []):
+        print(f"  error: {e}")
+    if rep.get("skipped"):
+        print(f"  not run (uncertain timeout): {', '.join(rep['skipped'])}")
+
+
 def cmd_probe(args: argparse.Namespace) -> None:
+    """Probes use inference. While a gateway is running they go through POST /admin/probe so the
+    gateway's admission (slots, queue, memory budget) coordinates them with live traffic. Direct
+    (offline) probing is only allowed when no gateway listens on the configured port, or with
+    --allow-concurrent (the operator accepts uncoordinated concurrent inference)."""
     cfg = _load(args)
+    listening = _gateway_listening(cfg)
+    if listening == "gateway" and not args.offline:
+        _probe_via_gateway(cfg, args)
+        return
+    if listening is not None and not args.allow_concurrent:
+        what = "a ModelSaar gateway" if listening == "gateway" else "another process"
+        sys.exit(
+            f"{what} is listening on {cfg.server.host}:{cfg.server.port}; direct probing would run inference "
+            "outside the gateway's admission control. Drop --offline to probe through the gateway, stop it, "
+            "or pass --allow-concurrent to accept uncoordinated concurrent inference."
+        )
+    if listening is None:
+        print(f"no gateway at {cfg.server.host}:{cfg.server.port}; probing directly (offline, uncoordinated with any other inference)")
+    _probe_offline(cfg, args)
+
+
+def _probe_via_gateway(cfg: Config, args: argparse.Namespace) -> None:
+    reports: list[dict[str, Any]] = []
+    with _admin_client(cfg) as c:
+        c.timeout = httpx.Timeout(args.timeout * 8 + 60)
+        status = c.get("/admin/status")
+        if status.status_code != 200:
+            sys.exit(f"gateway at {c.base_url} refused the admin key ({status.status_code}); check {cfg.server.admin_key_file}")
+        deps = status.json().get("deployments", [])
+        targets = [
+            d["id"]
+            for d in deps
+            if d.get("role") == "generative" and (d.get("state") or {}).get("healthy") and (args.all or d["id"] in args.deployment)
+        ]
+        if cfg.security.locality_mode == "local_only":
+            targets = [d["id"] for d in deps if d["id"] in targets and d.get("locality") == "local"]
+        if not targets:
+            print("no matching generative deployments (check `modelsaar discover`)")
+        for dep_id in targets:
+            print(f"probing {dep_id} via gateway {c.base_url} (admission-coordinated) ...")
+            r = c.post("/admin/probe", json={"deployment": dep_id, "which": args.which or None, "timeout": args.timeout})
+            if r.status_code != 200:
+                print(f"  refused ({r.status_code}): {r.json().get('error', {}).get('message', r.text[:200])}")
+                continue
+            rep = r.json()
+            _print_probe_report(rep)
+            reports.append(rep)
+    if args.json:
+        _out(reports, True)
+
+
+def _probe_offline(cfg: Config, args: argparse.Namespace) -> None:
     from .probes import run_probes
     from .routing.router import Router
     from .store import Store
@@ -176,11 +257,21 @@ def cmd_probe(args: argparse.Namespace) -> None:
         reports = []
         for d in targets:
             print(f"probing {d.id} (fingerprint {d.fingerprint}) ...")
-            rep = await run_probes(r.adapters[d.backend_id], d, store, args.which or None, timeout=args.timeout)
-            for res in rep.results:
-                print(f"  {res.capability:16s} {res.value:12s} {res.latency_ms:7.0f}ms  {res.note}")
-            for m in rep.measurements:
-                print(f"  latency           p50={m.p50_ms and round(m.p50_ms)}ms ttft={m.ttft_ms and round(m.ttft_ms)}ms load~{m.load_ms and round(m.load_ms)}ms (samples={m.samples})")
+            # The offline path still respects this process's own admission (pool memory budget, slots).
+            reservation = await r.admission.acquire(d, timeout=None)
+            try:
+                rep = await run_probes(r.adapters[d.backend_id], d, store, args.which or None, timeout=args.timeout)
+            except BaseException:
+                await reservation.release()
+                raise
+            if rep.uncertain:
+                # The backend may still be computing: in this offline process the hold only delays the
+                # next deployment's probes; the gateway-coordinated path holds the real slot.
+                await reservation.mark_uncertain()
+                await asyncio.sleep(min(r.admission.cfg.uncertain_hold_s, 5.0))
+            else:
+                await reservation.release()
+            _print_probe_report(rep.as_dict())
             reports.append(rep.as_dict())
         await r.aclose()
         store.close()
@@ -200,7 +291,7 @@ def cmd_serve(args: argparse.Namespace) -> None:
     configure_logging(cfg.observability.log_level)
     app, router, auth, store = build(cfg)
     if not auth.configured:
-        sys.exit("API/admin key files are missing; run `modelsaar keys rotate` (or `modelsaar init`)")
+        sys.exit("API/admin key files are missing; run `modelsaar keys ensure` (or `modelsaar init`)")
     url = f"http://{cfg.server.host}:{cfg.server.port}"
     print(f"ModelSaar {__version__} on {url}/v1  (config {cfg.config_path}, hash {cfg.config_hash})")
     print(f"API key file:   {cfg.resolve(cfg.server.api_keys_file)}")
@@ -323,21 +414,68 @@ def cmd_decisions(args: argparse.Namespace) -> None:
                 print(f"{d['request_id']} {d['requested_model']:14s} -> {d.get('chosen')!s:40s} {d.get('outcome'):14s} {d['overhead_ms']:6.1f}ms {(d.get('requirements') or {}).get('primary_task')}")
 
 
+HEALTH_SERVICE = "modelsaar"
+
+
+def gateway_identity(base_url: str, timeout: float = 5.0) -> tuple[str, dict[str, Any] | None]:
+    """Identify what listens at ``base_url`` WITHOUT sending a key: ``("modelsaar", health)`` when
+    GET /healthz returns the ModelSaar health contract (JSON with service=modelsaar); ``("none",
+    None)`` when nothing accepts connections; ``("other", None)`` for any other listener (a plain
+    200 is not enough — an unrelated service must be treated as a port collision)."""
+    try:
+        r = httpx.get(base_url.rstrip("/") + "/healthz", timeout=timeout, headers={"Accept": "application/json"})
+    except httpx.ConnectError:
+        return "none", None
+    except httpx.HTTPError:
+        return "other", None
+    try:
+        body = r.json()
+    except ValueError:
+        return "other", None
+    if r.status_code == 200 and isinstance(body, dict) and body.get("service") == HEALTH_SERVICE:
+        return "modelsaar", body
+    return "other", None
+
+
 def cmd_test(args: argparse.Namespace) -> None:
     cfg = _load(args)
+    base = f"http://{cfg.server.host}:{cfg.server.port}"
+    kind, health = gateway_identity(base)
+    if kind == "none":
+        sys.exit(
+            f"no gateway is listening at {base} — start it with `modelsaar serve` "
+            "(in another terminal, or under launchd/systemd; see examples/) and run `modelsaar test` again"
+        )
+    if kind == "other":
+        sys.exit(
+            f"something that is not a ModelSaar gateway is listening at {base} (GET /healthz did not return the "
+            "ModelSaar health contract). No key was sent. Port collision: stop that service or set server.port to "
+            "a free port in the config and restart `modelsaar serve`."
+        )
+    print(f"GET /healthz -> modelsaar {health.get('version', '?')}")
     with _api_client(cfg) as c:
         r = c.get("/v1/models")
+        if r.status_code == 401:
+            sys.exit(f"the gateway at {base} rejected the API key from {cfg.resolve(cfg.server.api_keys_file)}; restart the gateway after `modelsaar keys rotate`")
         print(f"GET /v1/models -> {r.status_code}: {[m['id'] for m in r.json().get('data', [])]}")
         body = {"model": args.model, "messages": [{"role": "user", "content": args.message}], "max_tokens": 64}
         t0 = time.monotonic()
         r = c.post("/v1/chat/completions", json=body)
         ms = (time.monotonic() - t0) * 1000
-        print(f"POST /v1/chat/completions -> {r.status_code} in {ms:.0f}ms; deployment={r.headers.get('x-modelsaar-deployment')} request={r.headers.get('x-modelsaar-request-id')}")
-        if r.status_code == 200:
-            print("content:", (r.json()["choices"][0]["message"].get("content") or "")[:300])
-        else:
+        dep, rid = r.headers.get("x-modelsaar-deployment"), r.headers.get("x-modelsaar-request-id")
+        print(f"POST /v1/chat/completions -> {r.status_code} in {ms:.0f}ms; deployment={dep} request={rid}")
+        if r.status_code != 200:
             _out(r.json(), True)
             sys.exit(1)
+        if not rid or not dep:
+            # A 200 without ModelSaar attribution did not come from this gateway's router.
+            sys.exit("the response carries no ModelSaar routing attribution (X-ModelSaar-Request-Id / X-ModelSaar-Deployment); this is not a ModelSaar-routed completion")
+        try:
+            content = r.json()["choices"][0]["message"].get("content") or ""
+        except (KeyError, IndexError, TypeError, ValueError):
+            sys.exit("the response is not a chat completion envelope")
+        print(f"routed: {args.model!r} -> {dep} (request {rid})")
+        print("content:", content[:300])
 
 
 def cmd_client_config(args: argparse.Namespace) -> None:
@@ -393,6 +531,15 @@ def cmd_keys(args: argparse.Namespace) -> None:
         if args.reveal:
             print("api:", *read_keys(api_p))
             print("admin:", *read_keys(adm_p))
+    elif args.keys_cmd == "ensure":
+        # Idempotent first-run bootstrap: create missing key files, never rotate existing ones,
+        # touch nothing but the key files (the config may be a read-only mount).
+        for label, p, prefix in (("API key", api_p, "msk"), ("admin key", adm_p, "msa")):
+            if read_keys(p):
+                print(f"{label}: unchanged ({p})")
+            else:
+                write_key_file(p, [generate_key(prefix)])
+                print(f"{label}: created ({p})")
     elif args.keys_cmd == "rotate":
         if args.admin:
             write_key_file(adm_p, [generate_key("msa")])
@@ -476,42 +623,65 @@ def cmd_demo(args: argparse.Namespace) -> None:
         fake.stop()
 
 
+def _owned_files(home: Path, cfg: Config | None) -> tuple[list[Path], list[Path]]:
+    """Files ModelSaar creates under its home, and the directories it creates for them."""
+    api = cfg.resolve(cfg.server.api_keys_file) if cfg else home / "keys/api_keys"
+    adm = cfg.resolve(cfg.server.admin_key_file) if cfg else home / "keys/admin_key"
+    db = cfg.resolve(cfg.server.state_db) if cfg else home / "state/modelsaar.db"
+    files = [home / "config.yaml", home / "config.yaml.tmp", api, api.with_name(api.name + ".tmp"), adm, adm.with_name(adm.name + ".tmp")]
+    files += [db, db.with_name(db.name + "-wal"), db.with_name(db.name + "-shm"), db.with_name(db.name + ".tmp")]
+    files += sorted(home.glob("config.yaml.bak*")) if home.exists() else []
+    dirs = sorted({api.parent, adm.parent, db.parent} - {home}, key=lambda d: len(d.parts), reverse=True)
+    return files, dirs
+
+
 def cmd_uninstall(args: argparse.Namespace) -> None:
     path = Path(args.config) if args.config else default_config_path()
     home = path.parent
     print("ModelSaar uninstall removes ONLY the gateway's own files:")
-    print(f"  {home}  (config.yaml, keys/, state/)")
-    print("It does NOT remove models from your inference runtime, nor any client configuration.")
+    print(f"  {home}  (config.yaml and its backups, its key files, its state database)")
+    print("It does NOT remove models from your inference runtime, nor any client configuration,")
+    print("nor any other file you placed under that directory.")
     print("Client configs changed with `client-config --apply` have .bak-<timestamp> backups next to them.")
     print("Afterwards remove the package with: pip uninstall modelsaar   (or `uv tool uninstall modelsaar`)")
     if not args.yes:
-        ans = input(f"delete {home}? [y/N] ").strip().lower()
+        ans = input(f"delete ModelSaar's files under {home}? [y/N] ").strip().lower()
         if ans != "y":
             print("aborted")
             return
     if not home.exists():
         print(f"{home} does not exist; nothing to remove")
         return
-    known = {"config.yaml", "config.yaml.tmp", "keys", "state"}
-    known |= {n for n in os.listdir(home) if n.startswith("config.yaml.bak")}
-    others = sorted(set(os.listdir(home)) - known)
-    if others:
-        sys.exit(
-            f"{home} contains files ModelSaar did not create: {others}. Refusing to delete the directory; "
-            "remove config.yaml, keys/ and state/ manually if you want them gone."
-        )
-    for name in sorted(set(os.listdir(home))):
-        target = home / name
-        if target.is_dir():
-            shutil.rmtree(target)
-        else:
-            target.unlink()
-        print(f"removed {target}")
+    cfg: Config | None
     try:
-        home.rmdir()
-        print(f"removed {home}")
-    except OSError:
-        pass
+        cfg = load_config(path) if path.exists() else None
+    except Exception:
+        cfg = None  # unparseable config: fall back to the default layout
+    files, dirs = _owned_files(home, cfg)
+    # Safety boundaries: never operate through symlinks, never outside home.
+    for p in [home, *dirs]:
+        if p.is_symlink():
+            sys.exit(f"{p} is a symlink; refusing to delete through it. Remove ModelSaar's files manually.")
+    for f in files:
+        try:
+            f.resolve().relative_to(home.resolve())
+        except ValueError:
+            sys.exit(f"{f} resolves outside {home}; refusing. Remove ModelSaar's files manually.")
+    for f in files:
+        if f.is_symlink():
+            print(f"skipped {f} (symlink)")
+            continue
+        if f.exists():
+            f.unlink()
+            print(f"removed {f}")
+    for d in [*dirs, home]:
+        try:
+            d.rmdir()
+            print(f"removed {d}")
+        except OSError:
+            if d.exists():
+                left = sorted(os.listdir(d))
+                print(f"left in place: {d} (not created by ModelSaar or not empty: {left[:5]}{'...' if len(left) > 5 else ''})")
 
 
 # --------------------------------------------------------------------------- #
@@ -541,6 +711,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--which", nargs="*", choices=["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"])
     s.add_argument("--timeout", type=float, default=120.0)
     s.add_argument("--json", action="store_true")
+    s.add_argument("--offline", action="store_true", help="probe directly instead of through a running gateway (refused while a gateway listens unless --allow-concurrent)")
+    s.add_argument("--allow-concurrent", action="store_true", help="accept uncoordinated inference next to a running gateway/other process")
     s.set_defaults(fn=cmd_probe)
 
     s = sub.add_parser("serve", help="start the gateway")
@@ -587,6 +759,7 @@ def build_parser() -> argparse.ArgumentParser:
     ks = s.add_subparsers(dest="keys_cmd", required=True)
     k = ks.add_parser("show")
     k.add_argument("--reveal", action="store_true")
+    k = ks.add_parser("ensure", help="create missing key files (idempotent; never rotates). Used by the container entrypoint.")
     k = ks.add_parser("rotate")
     k.add_argument("--admin", action="store_true")
     s.set_defaults(fn=cmd_keys)
@@ -605,7 +778,14 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--seed", type=int, default=7)
     s.add_argument("--save-measurements", action="store_true", help="live mode: store per-deployment quality/latency evidence for routing")
     s.add_argument("--probe", action="store_true", help="live mode: run capability probes on every deployment first")
-    s.add_argument("--deployments", nargs="*", help="live mode: restrict the sweep, baselines and the `auto` alias to these deployment ids")
+    s.add_argument(
+        "--deployments",
+        nargs="*",
+        help="live mode: restrict the sweep, baselines and the `auto` alias to these deployment ids (or bare model names when unambiguous)",
+    )
+    s.add_argument("--checkpoint", help="per-task record file (JSONL) for resumable runs; default <out>.records.jsonl when --out is given")
+    s.add_argument("--resume", action="store_true", help="skip tasks already recorded in the checkpoint file")
+    s.add_argument("--allow-concurrent", action="store_true", help="live mode: run even if a gateway/other process listens on the configured port")
     s.set_defaults(fn=cmd_eval)
 
     s = sub.add_parser("demo", help="start a SIMULATED backend + gateway to try the UX without models")

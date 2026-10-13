@@ -133,6 +133,25 @@ async def run_doctor(cfg: Config | None, cfg_error: str | None, path: Path) -> D
         rep.add("fail", "discovery", f"discovery failed: {e}")
         return rep
     deps = router.registry.all()
+    if router.store:
+        inv = router.store.invalidated_counts()
+        if inv["probes"] or inv["measurements"]:
+            rep.add(
+                "warn",
+                "evidence",
+                f"{inv['probes']} probe row(s) and {inv['measurements']} measurement row(s) were written under an older "
+                f"evidence scheme (current: {inv['scheme']}) and are no longer used for routing",
+                "re-run `modelsaar probe --all` and `modelsaar eval --mode live --save-measurements`",
+            )
+        for d in deps:
+            if d.raw_metadata.get("invalidated_probe_fingerprints"):
+                rep.add(
+                    "warn",
+                    f"deployment:{d.id}",
+                    f"stored probes exist for earlier fingerprint(s) {d.raw_metadata['invalidated_probe_fingerprints']}; the current "
+                    f"fingerprint {d.fingerprint} (endpoint/identity/runtime/template/quant) has none",
+                    f"run `modelsaar probe {d.id}`",
+                )
     if not deps:
         rep.add("fail", "discovery", "no deployments discovered", "pull a model into your runtime (e.g. `ollama pull <model>`) or declare models in config")
     gen = [d for d in deps if d.role == "generative" and d.healthy and d.enabled]

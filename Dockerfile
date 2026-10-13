@@ -12,5 +12,6 @@ USER modelsaar
 VOLUME ["/data"]
 EXPOSE 8484
 HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8484/healthz').status==200 else 1)"
-# Provide /data/config.yaml (see examples/config.docker.yaml) or run `modelsaar init` once.
-CMD ["modelsaar", "serve"]
+# Provide /data/config.yaml (see examples/config.docker.yaml; it may be a read-only mount).
+# First start creates the key files under /data/keys (idempotent; existing keys are never rotated).
+CMD ["sh", "-c", "modelsaar keys ensure && exec modelsaar serve"]

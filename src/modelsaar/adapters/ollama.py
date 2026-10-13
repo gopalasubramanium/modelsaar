@@ -31,6 +31,7 @@ OLLAMA_ASSUMED_DEFAULT_NUM_CTX = 4096
 
 class OllamaAdapter(BaseAdapter):
     type_name = "ollama"
+    reports_residency = True  # /api/ps is a real observation of resident models
     adapter_capabilities = {
         "tool_choice_required": "unsupported",  # OpenAI layer ignores tool_choice
         "json_object": "supported",
@@ -45,11 +46,13 @@ class OllamaAdapter(BaseAdapter):
         except AdapterError as e:
             return False, e.message
 
-    async def loaded_models(self) -> dict[str, dict[str, Any]]:
+    async def loaded_models(self) -> dict[str, dict[str, Any]] | None:
         try:
             ps = await self._get_json("/api/ps")
         except AdapterError:
-            return {}
+            self.last_residency_observation_ok = False
+            return None  # failed query: not an observation, never "nothing is resident"
+        self.last_residency_observation_ok = True
         out: dict[str, dict[str, Any]] = {}
         for m in ps.get("models", []) or []:
             name = m.get("name") or m.get("model")
@@ -65,7 +68,7 @@ class OllamaAdapter(BaseAdapter):
     async def discover(self) -> list[Deployment]:
         tags = await self._get_json("/api/tags")
         ok, _ = await self.health()
-        loaded = await self.loaded_models() if ok else {}
+        loaded = (await self.loaded_models() if ok else None) or {}
         deps: list[Deployment] = []
         for m in tags.get("models", []) or []:
             name = m.get("name") or m.get("model")
@@ -81,8 +84,11 @@ class OllamaAdapter(BaseAdapter):
                 parameter_size=str(details.get("parameter_size", "")),
                 quantization=str(details.get("quantization_level", "")),
                 digest=str(m.get("digest", "")),
+                identity=str(m.get("digest", "")),
+                identity_source="ollama digest" if m.get("digest") else "",
                 runtime="ollama",
                 runtime_version=self.runtime_version,
+                endpoint=self.endpoint,
                 resource_pool=self.cfg.resource_pool,
                 discovered=True,
                 available_on_disk=True,
@@ -219,7 +225,7 @@ class OllamaAdapter(BaseAdapter):
             return await self._post_stream("/v1/chat/completions", fwd, timeout=timeout)
         return await self._post_json("/v1/chat/completions", fwd, timeout=timeout)
 
-    async def embeddings(self, dep: Deployment, body: dict[str, Any]) -> UpstreamResponse:
+    async def embeddings(self, dep: Deployment, body: dict[str, Any], timeout: float | None = None) -> UpstreamResponse:
         fwd = {k: v for k, v in body.items() if k in ("input", "encoding_format", "dimensions")}
         fwd["model"] = dep.model
-        return await self._post_json("/v1/embeddings", fwd)
+        return await self._post_json("/v1/embeddings", fwd, timeout=timeout)

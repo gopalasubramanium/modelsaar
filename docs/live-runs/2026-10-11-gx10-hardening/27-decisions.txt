@@ -1,0 +1,7 @@
+req_7412d69907564da8 auto           -> ollama/qwen3.8:latest                    ok                0.7ms conversation
+req_b5ec262fbd2d408b auto           -> ollama/qwen3.8:latest                    ok                0.5ms conversation
+req_83052c93ea464512 auto           -> ollama/qwen3-coder:latest                ok                0.8ms agent
+req_b3c12f066b824adc auto           -> ollama/qwen3-coder:latest                ok                0.4ms agent
+req_13868feebce8487a auto-fast      -> ollama/qwen3-coder:latest                ok                0.6ms conversation
+req_7523a14affae40bd auto           -> ollama/qwen3.8:latest                    ok                0.2ms conversation
+req_9d03167a2c4b4b12 auto           -> ollama/qwen3.8:latest                    ok                0.2ms conversation

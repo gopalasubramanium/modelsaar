@@ -58,7 +58,7 @@ def filter_deployments(
         method = req.tokens.method if req.tokens else ""
         if exact_input_tokens and dep.id in exact_input_tokens:
             input_tokens = exact_input_tokens[dep.id]
-            method = f"exact:{dep.backend_id}/tokenize"
+            method = f"tokenize:{dep.backend_id}+template-estimate"
         if req.tokens:
             total_tokens = input_tokens + req.tokens.output_allowance
             if dep.cap("thinking") == "supported":

@@ -1,0 +1,5 @@
+# Real client checks (installed clients only)
+opencode: NOT RUN (not installed). Command: modelsaar client-config opencode --apply; then chat in the client; verify with: modelsaar decisions --limit 10
+openclaw: NOT RUN (not installed). Command: modelsaar client-config openclaw --apply; then chat in the client; verify with: modelsaar decisions --limit 10
+hermes: NOT RUN (not installed). Command: modelsaar client-config hermes --apply; then chat in the client; verify with: modelsaar decisions --limit 10
+open-webui: NOT RUN (no running container). Command: docker run -d -p 3000:8080 ghcr.io/open-webui/open-webui:main; set OPENAI_API_BASE_URL=http://host.docker.internal:27782/v1 (see modelsaar client-config open-webui)

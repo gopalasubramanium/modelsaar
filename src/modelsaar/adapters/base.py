@@ -48,8 +48,16 @@ class UpstreamStream:
     started_at: float = field(default_factory=time.monotonic)
 
     async def aiter_bytes(self) -> AsyncIterator[bytes]:
-        async for chunk in self._response.aiter_bytes():
-            yield chunk
+        """Yield raw bytes. A read timeout while the stream is open is typed as an
+        ``AdapterError(kind="timeout")`` so callers can hold occupancy as uncertain: the backend may
+        still be generating after the gateway stops waiting."""
+        try:
+            async for chunk in self._response.aiter_bytes():
+                yield chunk
+        except httpx.ReadTimeout as e:
+            raise AdapterError("read timeout while streaming", status=504, retryable=False, kind="timeout") from e
+        except httpx.HTTPError as e:
+            raise AdapterError(f"{e.__class__.__name__}: {e}", status=502, retryable=False, kind="transport") from e
 
     async def aread(self) -> bytes:
         return await self._response.aread()
@@ -85,6 +93,8 @@ class BaseAdapter:
             limits=httpx.Limits(max_connections=cfg.max_concurrent + 4),
         )
         self.runtime_version: str = ""
+        # Execution endpoint identity used in deployment fingerprints (no credentials).
+        self.endpoint = f"{parts.scheme}://{parts.netloc}{parts.path.rstrip('/')}"
 
     async def aclose(self) -> None:
         await self._client.aclose()
@@ -108,10 +118,17 @@ class BaseAdapter:
         except ValueError as e:
             raise AdapterError(f"{self.cfg.id}: non-JSON response from {path}", status=502) from e
 
+    def _deadline(self, timeout: float | None) -> httpx.Timeout:
+        """The effective deadline for one upstream call: the backend's configured ``timeout_s`` or the
+        caller's (server) deadline, whichever is tighter. A caller passing ``None`` gets the backend
+        deadline, never "no timeout" (an explicit ``None`` would disable the client timeout in httpx)."""
+        read = self.cfg.timeout_s if timeout is None else min(float(timeout), self.cfg.timeout_s)
+        return httpx.Timeout(read, connect=min(self.cfg.connect_timeout_s, read))
+
     async def _post_json(self, path: str, body: dict[str, Any], timeout: float | None = None) -> UpstreamResponse:
         t0 = time.monotonic()
         try:
-            r = await self._client.post(self._url(path), json=body, timeout=timeout)
+            r = await self._client.post(self._url(path), json=body, timeout=self._deadline(timeout))
         except (httpx.ConnectError, httpx.ConnectTimeout) as e:
             raise AdapterError(f"{self.cfg.id}: connection failed: {e}", retryable=True, kind="connect") from e
         except httpx.ReadTimeout as e:
@@ -126,11 +143,13 @@ class BaseAdapter:
         return UpstreamResponse(status=r.status_code, body=data, headers=dict(r.headers), elapsed_ms=elapsed)
 
     async def _post_stream(self, path: str, body: dict[str, Any], timeout: float | None = None) -> UpstreamStream:
-        req = self._client.build_request("POST", self._url(path), json=body, timeout=timeout)
+        req = self._client.build_request("POST", self._url(path), json=body, timeout=self._deadline(timeout))
         try:
             resp = await self._client.send(req, stream=True)
         except (httpx.ConnectError, httpx.ConnectTimeout) as e:
             raise AdapterError(f"{self.cfg.id}: connection failed: {e}", retryable=True, kind="connect") from e
+        except httpx.ReadTimeout as e:
+            raise AdapterError(f"{self.cfg.id}: read timeout", status=504, retryable=False, kind="timeout") from e
         except httpx.HTTPError as e:
             raise AdapterError(f"{self.cfg.id}: {e.__class__.__name__}: {e}", retryable=False, kind="transport") from e
 
@@ -148,14 +167,23 @@ class BaseAdapter:
     async def discover(self) -> list[Deployment]:
         raise NotImplementedError
 
-    async def loaded_models(self) -> dict[str, dict[str, Any]]:
-        """Return {model_name: info} for models currently resident in memory, if the runtime exposes it."""
+    # True when ``loaded_models`` is a real observation of the runtime (e.g. Ollama /api/ps). Pools
+    # keep assumed residency for deployments of a backend that cannot report it.
+    reports_residency: bool = False
+    # Outcome of the most recent residency query: True = observed, False = the query failed (the
+    # runtime is up but did not answer /api/ps), None = never asked / not a reporting runtime.
+    # A failed query is NOT an empty resident set; callers keep known/assumed occupancy.
+    last_residency_observation_ok: bool | None = None
+
+    async def loaded_models(self) -> dict[str, dict[str, Any]] | None:
+        """Return {model_name: info} for models currently resident in memory when the runtime exposes
+        it, ``{}`` when it does not report residency, and ``None`` when the query failed."""
         return {}
 
     async def chat(self, dep: Deployment, body: dict[str, Any], stream: bool, timeout: float | None = None):
         raise NotImplementedError
 
-    async def embeddings(self, dep: Deployment, body: dict[str, Any]) -> UpstreamResponse:
+    async def embeddings(self, dep: Deployment, body: dict[str, Any], timeout: float | None = None) -> UpstreamResponse:
         raise NotImplementedError
 
     async def tokenize(self, dep: Deployment, text: str) -> int | None:

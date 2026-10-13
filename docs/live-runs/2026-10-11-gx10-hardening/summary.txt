@@ -1,0 +1,52 @@
+[18:32:52] ModelSaar live verify; commit 0f8af84; backend http://100.83.54.124:11434; eval deployments: qwen3.6:latest gemma4:31b qwen3-coder:latest; output live-verify-0f8af84
+[18:32:52] == 00-env: bash -c uname -a; python3 --version; modelsaar --version; git rev-parse HEAD; git status --short | head -20
+[18:32:52]    exit=0
+[18:32:52] == 01-backend-version: curl -sS -m 5 http://100.83.54.124:11434/api/version
+[18:32:52]    exit=0
+[18:32:52] == 02-backend-tags: curl -sS -m 10 http://100.83.54.124:11434/api/tags
+[18:32:52]    exit=0
+[18:32:52] == 03-backend-ps: curl -sS -m 5 http://100.83.54.124:11434/api/ps
+[18:32:53]    exit=0
+[18:32:53] == 10-init: modelsaar init --endpoint http://100.83.54.124:11434 --type ollama --port 27782 --force
+[18:32:55]    exit=0
+[18:32:55] == 10b-config-redacted: bash -c modelsaar config show | sed -E 's/(api_key:).*/\1 REDACTED/'
+[18:32:55]    exit=0
+[18:32:55] == 11-discover: modelsaar discover
+[18:32:57]    exit=0
+[18:32:57] == 12-doctor: modelsaar doctor
+[18:32:59]    exit=0
+[18:32:59] == 13-probe-all: modelsaar probe --all --timeout 300
+[18:39:10]    exit=0
+[18:39:10] == 14-discover-after-probe: modelsaar discover --json
+[18:39:12]    exit=0
+[18:39:12] == 15-explain-chat: modelsaar explain -m Give me one sentence of encouragement before an exam.
+[18:39:14]    exit=0
+[18:39:14] == 16-explain-code-tools: modelsaar explain -m Fix the failing pytest in src/app.py --tools
+[18:39:15]    exit=0
+[18:39:15] == 17-explain-vision: modelsaar explain -m What is in this picture? --image
+[18:39:17]    exit=0
+[18:39:17] == 18-explain-schema: modelsaar explain -m Extract name and age from: Priya, 34 --json-schema
+[18:39:19]    exit=0
+[18:39:19] == starting gateway on port 27782
+[18:39:21] == 21-models: bash -c curl -sS -m 10 "$GW_URL/v1/models" -H "Authorization: Bearer $KEY"
+[18:39:21]    exit=0
+[18:39:21] == 22-test: modelsaar test
+[18:39:23]    exit=0
+[18:39:23] == 23-admin-probe-via-gateway: bash -c curl -sS -m 600 -X POST "$GW_URL/admin/probe" -H "Authorization: Bearer $ADM" -H "Content-Type: application/json" -d "{\"deployment\":\"ollama/$1\",\"which\":[\"streaming\"]}" _ qwen3.6:latest
+[18:39:35]    exit=0
+[18:39:35] == 29-client-checks: bash -c python3 "$1" "$GW_URL" "$KEY" "$2" "$ADM" _ scripts/live_client_checks.py live-verify-0f8af84/client-checks.json
+[18:39:46]    exit=0
+[18:39:46] == 27-decisions: modelsaar decisions --limit 30
+[18:39:46]    exit=0
+[18:39:46] == 28-status: modelsaar status
+[18:39:46]    exit=0
+[18:39:46] == gateway stopped
+[18:39:46] == 30-eval-live (resumable; checkpoint live-verify-0f8af84/eval-live.json.records.jsonl)
+[19:01:54]    exit=0
+[19:01:54] == 31-explain-after-eval: modelsaar explain -m Fix the failing pytest in src/app.py --tools
+[19:01:56]    exit=0
+[19:01:56] == 32-discover-after-eval: modelsaar discover --json
+[19:01:58]    exit=0
+[19:01:58] == 33-doctor-after-eval: modelsaar doctor
+[19:02:00]    exit=0
+[19:02:00] done. Files: live-verify-0f8af84/ (eval-live.json, client-checks.json, numbered steps). Re-run the same command to resume/refresh.

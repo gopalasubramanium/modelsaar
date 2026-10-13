@@ -1,0 +1,13 @@
+request req_ce7fe7303c3548fe: auto -> ollama/qwen3.8:latest  (profile quality, 0.87 ms)
+task: extraction {'extraction': 0.8} ambiguous=False  tokens~3123
+  - task=extraction (clear); required: strict JSON schema; context need ~3123 tokens
+  - ollama/qwen3.8:latest ranked first on profile quality: quality 0.70 (prior:catalogue), latency cost 0.17, resident
+candidates:
+  ollama/qwen3.8:latest                    score=+0.658 quality=0.70±0.25 [prior:catalogue] latency=0.17 residency=0.00 ['latency:measured-other-task', 'load:memory-heuristic']
+  ollama/qwen3-coder:latest                score=+0.577 quality=0.60±0.30 [prior-general:catalogue] latency=0.03 residency=0.00 ['latency:measured-other-task', 'load:measured']
+  ollama/qwen3.6:latest                    score=+0.567 quality=0.72±0.30 [prior-general:catalogue] latency=0.20 residency=1.00 ['latency:measured-other-task', 'load:memory-heuristic']
+  ollama/qwen3-coder-next:latest           score=+0.539 quality=0.59±0.35 [uncalibrated:size-heuristic] latency=0.04 residency=0.01 ['latency:measured-other-task', 'load:measured']
+  ollama/muse-glimmer:latest               score=+0.530 quality=0.70±0.30 [prior-general:catalogue] latency=1.00 residency=0.02 ['latency:measured-other-task', 'load:measured']
+  ollama/qwen3.6-fast:latest               score=+0.520 quality=0.58±0.35 [uncalibrated:size-heuristic] latency=0.24 residency=0.00 ['latency:measured-other-task', 'load:measured']
+  ollama/qwen3.6-accurate:latest           score=+0.514 quality=0.58±0.35 [uncalibrated:size-heuristic] latency=0.27 residency=0.00 ['latency:measured-other-task', 'load:measured']
+  ollama/gemma4:31b                        score=+0.476 quality=0.57±0.35 [uncalibrated:size-heuristic] latency=0.53 residency=0.00 ['latency:measured-other-task', 'load:measured']

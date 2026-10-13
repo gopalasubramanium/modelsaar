@@ -56,6 +56,9 @@ class Measurement:
     load_ms: float | None = None
     source: str = "eval"  # eval | probe | live
     measured_at: float | None = None
+    # Measurement conditions (hardware/context/generation settings/workload) so a number is never
+    # read outside the conditions it was taken under.
+    conditions: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -70,6 +73,13 @@ class Deployment:
     parameter_size: str = ""
     quantization: str = ""
     digest: str = ""
+    # Checkpoint identity: a weights digest from the runtime or an operator declaration. Empty
+    # means unknown; a bare model-name match is never an identity.
+    identity: str = ""
+    identity_source: str = ""
+    # Execution endpoint (scheme://host:port/path of the backend base URL). Part of the
+    # fingerprint: the same backend id and model name on another server is other evidence.
+    endpoint: str = ""
     runtime: str = ""
     runtime_version: str = ""
     template_hash: str = ""
@@ -108,16 +118,7 @@ class Deployment:
         # Intrinsic identity only. The *served* context length and residency change whenever a
         # runtime loads/unloads a model (Ollama reports it only while loaded); they affect eligibility
         # per request but do not change what the checkpoint can do, so they must not invalidate evidence.
-        parts = {
-            "backend": self.backend_id,
-            "model": self.model,
-            "digest": self.digest,
-            "runtime": self.runtime,
-            "runtime_version": self.runtime_version,
-            "template": self.template_hash,
-            "quant": self.quantization,
-            "pool": self.resource_pool,
-        }
+        parts = self.fingerprint_inputs()
         s = json.dumps(parts, sort_keys=True)
         self.fingerprint = hashlib.sha256(s.encode()).hexdigest()[:16]
         return self.fingerprint
@@ -132,6 +133,22 @@ class Deployment:
     def is_eligible_base(self) -> bool:
         return self.enabled and self.healthy
 
+    def fingerprint_inputs(self) -> dict[str, Any]:
+        """Checkpoint identity + serving configuration that affects capabilities. Empty values are
+        unknown and are shown as such in `modelsaar discover` / the admin status."""
+        return {
+            "backend": self.backend_id,
+            "endpoint": self.endpoint,
+            "model": self.model,
+            "digest": self.digest,
+            "identity": self.identity,
+            "runtime": self.runtime,
+            "runtime_version": self.runtime_version,
+            "template": self.template_hash,
+            "quant": self.quantization,
+            "pool": self.resource_pool,
+        }
+
     def summary(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -142,6 +159,10 @@ class Deployment:
             "family": self.family,
             "parameter_size": self.parameter_size,
             "quantization": self.quantization,
+            "identity": self.identity,
+            "identity_source": self.identity_source,
+            "endpoint": self.endpoint,
+            "fingerprint_inputs": {k: (v if v not in ("", None) else "unknown") for k, v in self.fingerprint_inputs().items()},
             "context_length": self.context_length,
             "max_output_tokens": self.max_output_tokens,
             "locality": self.locality,

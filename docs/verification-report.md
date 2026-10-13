@@ -82,6 +82,9 @@ Deployments discovered (all Q4_K_M GGUF, declared locality `local` = owner's pri
 
 ### Live evaluation (3-deployment subset; 15 calib / 32 test tasks; temperature 0; max_tokens 400)
 
+**Historical** — source `1122e1f`, evaluator before scorer versioning; superseded by the hardening-pass
+run below (scorer `2026.10.11-2`), which the website quotes. Kept as recorded.
+
 | policy | success | 95 % CI | completion | violations | p50 ms | p95 ms |
 |---|---|---|---|---|---|---|
 | auto (live routing) | 0.875 | [0.72, 0.95] | **1.000** | **0** | 693 | 27 136 |
@@ -109,7 +112,185 @@ overhead p95 < 5 ms ✔. The simple mode (request a concrete deployment id) rema
 Caveats: small n (CIs overlap everywhere); `max_tokens 400` penalises thinking models; served context
 for unloaded models was assumed 4096 during the run; only 3 of 8 deployments were swept.
 
-## NOT RUN (needs hardware, a daemon, or a real client)
+## Hardening pass (branch `hardening/review-2026-10-11`, commit `0f8af84` + docs)
+
+The numbers above are the **historical 2026-10-11 results of the 0.1.0 evaluator** and are left as they
+were reported (that evaluator had lenient scorers; see docs/progress.md finding 6). Everything in this
+section was produced by the repaired code.
+
+### Executed (deterministic)
+
+| check | command | outcome |
+|---|---|---|
+| Lint | `ruff check src tests` | pass |
+| Full test suite (cloud container) — superseded by the 2026-10-12 pass below | `python -m pytest` — CPython 3.13.16, Linux x86_64, no isolation backend; revision `0172760`…`91f9e6c` (same test files) | **156 passed, 4 skipped** in 70 s. The 4 skips are `tests/test_evaluation.py::test_sandbox_blocks_writes_outside_work`, `::test_sandbox_blocks_network`, `::test_sandbox_reference_solution_passes`, `::test_sandbox_timeout_fails_cleanly` — skip reason "no isolation backend (bwrap not installed; docker present but daemon not reachable)". |
+| Full test suite (owner's Mac) — superseded by the run at `80276bb` (161 passed) and by the 2026-10-12 pass below | `python -m pytest -rs -v --durations=5` — macOS Darwin 27.0.0 arm64, CPython 3.12.15, isolation backend **`sandbox-exec`** (`/usr/bin/sandbox-exec`; bwrap and docker absent); revision `01727604726077fe70e7acef398427149e45c4c1`; run 2026-10-11 19:55 IST via `run_mac_tests.command` | **160 passed, 0 skipped** in 48 s, exit 0 — the four isolation tests executed under `sandbox-exec` (`test_sandbox_timeout_fails_cleanly` 2.01 s). Log: `docs/live-runs/mac-tests-0172760.txt`. |
+| Regression tests for the review findings | `python -m pytest tests/test_hardening_2026_10_11.py` | 27 passed; each one reproduced its defect against `1122e1f` before the fix (finding → fix → test table in docs/progress.md) |
+| Evaluator tests — superseded by the 2026-10-12 pass below | `python -m pytest tests/test_evaluation.py tests/test_classifier_schema.py` | 65 passed, 4 skipped (sandbox) of 69 at that revision |
+| Clean wheel install, loopback default, private keys, one routed request, scheme-1 state DB migration | `scripts/install-check.sh` | **PASS** (`modelsaar 0.1.0` wheel into a fresh venv; `server.host: 127.0.0.1`; `keys/api_keys` mode 600; chat via `auto` ok; `doctor` reports the 1 probe + 1 measurement written under evidence scheme 1; `meta.evidence_scheme = 2`; old rows kept) |
+| Fresh-volume container start (Compose-equivalent: empty volume, read-only config mount, non-root, keys created once, unchanged after restart) | `scripts/compose-smoke.sh` | **NOT RUN here** (no Docker daemon in the build container); the script is a CI step (`container` job) and runs on the next push |
+| Live verification script, dry run against the fake backend (SIMULATED models) | `scripts/live_verify.sh http://127.0.0.1:23111 small:1b big:27b`, then the same command again | all steps exit 0; second run skipped every finished step and resumed the evaluation from its checkpoint (`resumed_records: 126`); no key material in any output file |
+
+### Executed live — owner's Mac → GX10, 2026-10-11 18:32–19:02 IST (`docs/live-runs/2026-10-11-gx10-hardening/`)
+
+Driven by double-clicking `run_live_verify.command` in Finder from this session; the script ran
+detached (`nohup caffeinate`) and copied its folder back. Environment (`00-env.txt`): macOS Darwin
+27.0.0 arm64, CPython 3.12.15, ModelSaar 0.1.0 at commit `0f8af84b66df`, **Ollama 0.32.13** at
+`http://100.83.54.124:11434`; `sandbox-exec` available, so `code_exec` tasks were scored in isolation.
+Config is in `10b-config-redacted.txt`; model digests in `02-backend-tags.txt` (qwen3.6 `096fdbd02fe6…`,
+gemma4:31b `6316f0629137…`, qwen3-coder `06c1097efce0…`, all Q4_K_M); these digests are the deployments'
+identities and part of their fingerprints.
+
+| step | outcome |
+|---|---|
+| `init` (fresh home), `discover`, `doctor` | 8 deployments; `doctor` 0 failures, warnings: assumed served context 4096 for unloaded models, `json_schema` unknown until probed |
+| `probe --all` (offline path: no gateway listening yet) | all 8 probed with evidence (`13-probe-all.txt`): streaming/tools/parallel_tools/json_object/json_schema **supported on all 8**; vision supported on 6, `unsupported` on muse-glimmer (answered but did not identify the colour) and on the two coder models (backend metadata) |
+| `explain` dry runs (chat / code+tools / vision / strict schema) | code+tools → qwen3-coder (catalogue prior 0.77, blend shown), vision → a vision-capable model, schema → json_schema-verified model (`15-18-*.txt`) |
+| gateway started; `/v1/models`, `modelsaar test` | ok |
+| **`POST /admin/probe`** (streaming probe of qwen3.6 through the running gateway's admission) | 200 in 11.0 s; evidence visible without restart (`23-admin-probe-via-gateway.txt`) |
+| **Wire-level client checks** (`scripts/live_client_checks.py`, `client-checks.json`) | chat 200 → qwen3.8, `model` field = `auto` (attribution ok); stream 200 → qwen3-coder, 12 frames, `finish=stop`, `[DONE]`, every frame's `model` = `auto-fast`, `content-type: text/event-stream`; **tool emission** 200 → qwen3-coder, 1 tool call, `finish=tool_calls`; **tool-result continuation** 200 on the same deployment, decision `affinity.tool_round_trip = ollama/qwen3-coder:latest`, `failover_allowed = false`; **session header** (`X-ModelSaar-Session`) pinned the second request to the first's deployment, decision `affinity.status = found`, `session_source = header:X-ModelSaar-Session`; `video_url` part → **400 `unsupported_content_type`** with no backend dispatch |
+| `decisions`, `status` | `27-decisions.txt`: the same `auto` alias sent conversation to qwen3.8 and agent/tool traffic to qwen3-coder; overhead 0.2–0.8 ms |
+| Real clients | **NOT RUN** — none installed on the Mac (`50-real-clients.txt` lists the exact commands per client) |
+
+### Live evaluation with the repaired evaluator (3 deployments; 15 calib / 32 test; `max_tokens 400`, temperature 0, seed 7, scorer `2026.10.11-2`, tasks sha256 `84c34596cb64…`, sandbox `sandbox-exec`)
+
+Deployments: qwen3.6:latest (35.5B, ctx assumed 4096), gemma4:31b (31.3B, ctx assumed 4096),
+qwen3-coder:latest (30.5B, ctx 131072). Calibration picked qwen3-coder as both fixed-strong and
+fixed-fast (calib success 0.933 / p50 0.68 s; gemma4 0.80 / 17.8 s; qwen3.6 0.467 / 4.3 s).
+
+| policy | success | 95 % CI | completion | violations | p50 ms | p95 ms |
+|---|---|---|---|---|---|---|
+| **auto (live routing)** | **0.938** | [0.80, 0.98] | **1.000** | **0** | 598 | 7 958 |
+| fixed-strong (calibrated: qwen3-coder) | 0.938 | [0.80, 0.98] | 0.969 | 1 | 639 | 4 760 |
+| fixed-fast (calibrated: qwen3-coder) | 0.938 | [0.80, 0.98] | 0.969 | 1 | 639 | 4 760 |
+| rules (gold label + specialist tags) | 0.812 | [0.65, 0.91] | 1.000 | 0 | 963 | 4 859 |
+| random (diagnostic) | 0.719 | [0.55, 0.84] | 1.000 | 0 | 4 320 | 24 356 |
+| oracle (offline upper bound, not available at runtime) | 1.000 | [0.89, 1.00] | 1.000 | 0 | 639 | 4 671 |
+
+Per deployment on the test split: qwen3-coder 0.938 (p50 0.64 s, 1 violation = the vision task it
+cannot take), gemma4:31b 0.938 (p50 20.3 s, thinking), qwen3.6 0.500 (p50 4.3 s; 0/5 coding, 0/3
+summarization, 0/2 translation under the 400-token budget — its reasoning consumes the budget).
+Routing overhead mean 0.67 ms, p95 0.98 ms; task-label accuracy 0.844; evidence levels used by `auto`:
+measured for all 32 requests (`measured:2` 25, `measured:1` 7); classifier not enabled. `auto` sent 30/32
+tasks to qwen3-coder and the vision task plus the tool round trip (`cont-01`) to gemma4. Routing
+mistakes (auto failed, oracle succeeded): `math-05` (qwen3-coder answered 100 for 50), `long-01`
+(qwen3-coder dropped a required line). The rules baseline scored 0/5 on coding because it follows the
+catalogue's `code` tag to qwen3.6 in deployment order, which fails coding under this budget — a
+reminder that tags are hypotheses and measured evidence is what `auto` uses.
+
+**Reading.** On this task set and hardware, `auto` and fixed-strong each scored 30/32; `auto`
+completed 32 versus 31 requests, recorded zero versus one capability violation (the fixed model cannot
+take the image task), and had a p95 end-to-end latency of 7.958 s versus 4.760 s because the two tasks it
+sent to gemma4 took 16.6 s and 21.6 s. Routing overhead (0.98 ms p95) is separate from end-to-end
+latency. The two policies differ on exactly two tasks: `vis-02` (solved by `auto`) and `long-01`, whose
+result differed despite selection of the same model; the cause has not been isolated. Equal point
+estimates with overlapping intervals establish neither equivalence nor general superiority, and nothing
+here shows faster answers. Acceptance targets (docs/evaluation.md): violations 0 ✔;
+completion ≥ fixed-strong ✔; success ≥ fixed-strong − 0.05 ✔; overhead p95 < 5 ms ✔. The explicit
+option (request a concrete deployment id, or `auto-fast`) remains the right choice when one model is
+known to be best for a workload.
+
+Caveats: n = 32 (CIs overlap everywhere); `max_tokens 400` systematically penalises thinking
+models (qwen3.6, gemma4) — a matched larger budget was not run in this pass; served context for
+unloaded models was assumed 4096; 3 of 8 deployments swept; one hardware/runtime; synthetic tasks.
+Complete sanitised per-request records: `eval-live.json.records.jsonl` (173 records: ids, status,
+latency, scorer detail; no prompts); machine-readable aggregates: `eval-live.json`.
+
+### Still NOT RUN after this pass
+
+| item | how to run |
+|---|---|
+| Real clients (Open WebUI, OpenClaw, OpenCode, Hermes) | see `50-real-clients.txt` in the run folder: install/start the client, `modelsaar client-config <client> --apply`, chat, `modelsaar decisions --limit 10` |
+| Fresh-volume container start | `scripts/compose-smoke.sh` on a host with Docker (also runs in CI) |
+| Evaluation with a thinking-matched budget / all 8 deployments | `run_live_verify.command` with `DEPS` widened; raise `MAX_TOKENS` in `evaluation/harness.py` for a separately labelled run |
+| Embeddings contract against a real embedding model (identity binding, output validation) | `ollama pull qwen3-embedding:0.6b`, declare `embeddings:`, `curl /v1/embeddings` |
+| Generic OpenAI-compatible backend (vLLM / llama.cpp) incl. `/tokenize` and `identity` declarations | `modelsaar init --endpoint http://127.0.0.1:8000/v1 --type openai_compatible`, declare models, `scripts/live_verify.sh` |
+
+## Correction pass 2026-10-12 (second independent review, R1–R8, of hardening `80276bb`)
+
+The review pack (`ModelSaar_Independent_Review_2026-10-11`) reproduced the existing suite (157 passed,
+4 skipped, ruff clean) and then obtained **11 failing desired-contract checks** (7 gateway/resource/
+embedding + 4 evaluator) with 6 passing positive controls, plus 6 launcher/installer observations.
+This pass reproduced every one of them before changing anything, corrected them, and kept the
+reviewer's test files byte-for-byte in `tests/independent_review_2026_10_11/`.
+
+### Reproduced before correction (isolated worktree at exactly `80276bb`, fresh venv, CPython 3.13.16)
+
+| what | command | result |
+|---|---|---|
+| reviewer's contract tests | `pytest evidence/hardening/test_remaining_contracts.py evidence/test_evaluator_remaining_contracts.py` with `PYTHONPATH=<80276bb>/src:<80276bb>/tests` | **11 failed, 6 passed** — the same 11 ids as the review |
+| launcher reproducer (`reproduce_launcher.py`, path constants adapted; stub `gh`, local bare origin) | positive resume PASS; skip-domain, build-query-failure, origin-prefix: **DEFECT REPRODUCED** | matches `launcher_results.json` |
+| installer reproducer (`reproduce_installer.py`) | foreign `/healthz` accepted, saved fixture key sent, `verification: OK`; `init && serve` exit 1 | **DEFECT REPRODUCED** ×2 |
+| publication-tree reproducer | untracked file entered gh-pages with BUILD-INFO claiming the clean commit | **DEFECT REPRODUCED**; rollback control PASS |
+| address guard at website `840b068` | 192.168.50.9 and 172.16.50.9 accepted; CGNAT and 10/8 rejected | reproduced |
+
+Transcripts: `docs/live-runs/2026-10-12-correction/before/` (website branch).
+
+### Corrections (source)
+
+| id | change | files |
+|---|---|---|
+| R1 | typed stream read timeout → uncertain hold (same rule as non-stream); probe runner stops after an uncertain timeout, reports `skipped`, and the admin/CLI paths hold the reservation | `adapters/base.py`, `server.py` (`_relay`, `admin_probe`), `probes.py`, `cli.py` |
+| R2 | pools count a completed deployment's weights as *assumed resident* until a residency observation reconciles them (Ollama `/api/ps`; `assumed_residency_ttl_s` for runtimes without one); `unknown_memory_policy=reject` applies to every counted member; status shows `memory_assumed_resident` | `routing/admission.py`, `routing/router.py`, `config.py` |
+| R3 | alias identity established before dispatch (declared > recorded > first member in contract order with a verified identity), recorded synchronously; differing known identity excluded regardless of dimensions | `routing/router.py` |
+| R4 | embeddings carry the server deadline; an explicit `None` never disables the httpx timeout (tighter of server/backend deadlines everywhere); SSE frames classified comment/done/chunk/malformed; completion requires ≥1 chunk, no malformed frame, finish or `[DONE]`; malformed frames not relayed, invalidate the stream | `adapters/base.py`, `adapters/*.py`, `protocol/sse.py`, `server.py` |
+| R5 | `/healthz` carries `service: modelsaar`; `modelsaar test` identifies the listener before sending a key and requires routing attribution; installer (website branch) does the same and prints `serve`, the key value vs the key command, one `client-config` command per app | `server.py`, `cli.py`, `site/static/install.sh`, site content |
+| R7 | `code_exec` scored from a nonce-keyed runner record (harness output captured separately from model output); tool arguments validated against the declared schema; checkpoint records bound to task content, scorer version, budgets, routing config hash and deployment fingerprint (format 2; legacy records re-run); bwrap input allowlist and deny-by-default macOS profile; `SCORER_VERSION 2026.10.12-3` | `evaluation/scoring.py`, `evaluation/sandbox.py`, `evaluation/harness.py` |
+
+### Executed after correction (at the final hardening head: the first line of every transcript in `docs/live-runs/2026-10-12-correction/final-head/` on the website branch names the exact revision; worktree clean, fresh venv)
+
+| check | command | outcome |
+|---|---|---|
+| reviewer's 17 contract checks | `pytest tests/independent_review_2026_10_11/` | **17 passed** (11 formerly failing + 6 controls) |
+| author regression tests for R1–R5, R7 | `pytest tests/test_correction_2026_10_12.py` | 14 passed (recovery after hold, reconciliation by observation, same-identity replicas, keepalive/usage frames, malformed-amid-valid, legacy/changed/removed checkpoint cases, listener identification) |
+| full suite, no isolation backend | `python -m pytest -m "not live"` — CPython 3.13.16, Linux x86_64 | **190 passed, 6 skipped** (the 6 sandbox tests; skip reason printed) |
+| full suite, bubblewrap on PATH | same, with `bwrap` 0.9 available | **196 passed, 0 skipped** — the sandbox tests executed: writes, network, timeout, reference solutions, **synthetic host file outside the work directory unreadable**, forged completion marker rejected. (The first exact-head rerun in a venv under `/tmp` found that the private `/tmp` mount hid such a venv inside bubblewrap; fixed by mount order and rerun.) |
+| lint | `ruff check src tests` | pass (the verbatim reviewer files are excluded from ruff, not from pytest) |
+| simulated evaluation smoke | `modelsaar eval --mode simulated --limit 12` | runs end to end under the new scorer |
+| installer scenarios (real installer + real CLI, loopback fixtures) | `scripts/installer_scenarios.py` (website branch) | 10/10: fresh, repeat, unrelated listener (no key sent), running gateway reused, `serve`, `test` with attribution, `client-config open-webui`, key value — `docs/live-runs/2026-10-12-installer-scenarios/` |
+
+### Not run in this pass
+
+Real GX10 inference under the corrected code (the benchmark result above is unchanged and still
+labelled scorer `2026.10.11-2`; a rerun under `2026.10.12-3` would be a new, separately labelled run);
+real-model embeddings; vLLM/llama.cpp; a real client UI (exact owner-run steps in `site/VALIDATION.md`);
+Docker; live GitHub publication, DNS, TLS.
+
+**macOS `sandbox-exec` — NOT RUN at this revision, and material.** The owner's Mac was not reachable from
+this session, so the rewritten deny-by-default profile (`_macos_profile`) has only been inspected, not
+executed. If it is too strict for the Mac's Python installation, the 6 sandbox tests will *fail* there
+(not skip) and `code_exec` tasks will fail until the profile is widened; if it is too loose, the
+read-isolation test (`test_sandbox_cannot_read_a_synthetic_host_file_outside_the_work_directory`)
+will fail. Owner step: in the Model_Router checkout at this revision run
+`python -m pytest tests/test_evaluation.py -k sandbox -rs -v` and attach the transcript as
+`docs/live-runs/<date>-mac-tests/mac-tests-<commit>.txt`; the bubblewrap profile with the same
+allowlist idea was executed here (196 passed).
+
+## Alpha closure pass 2026-10-12 (third independent review of `5cb7443`: R1-C, R2-A, R2-B, R4-C, R6-A, R6-B, R7-C, R8-D)
+
+The review reproduced the existing suite (190 passed, 6 skipped, ruff clean, the 17 earlier reviewer tests
+passing) and obtained 6 further behavioural failures with 6 controls, plus two launcher residuals and one
+editorial list. This pass reproduced the 12 cases at `5cb7443` (6 failed / 6 passed), corrected them, and
+kept the reviewer's three files verbatim under `tests/independent_review_2026_10_12/`.
+
+| id | correction | status |
+|---|---|---|
+| R2-A | `loaded_models()` returns `None` when `/api/ps` fails; the router keeps previous `loaded` flags and the admission layer keeps assumed residency until a successful observation (`last_residency_observation_ok`) | **fixed** |
+| R2-B | `Reservation.release(submitted=False)` for a `connect` failure (nothing reached the runtime): no assumed residency, failover proceeds | **fixed** |
+| R4-C | the upstream `[DONE]` is held; the gateway emits exactly one terminal marker after validation, so an error frame precedes it | **fixed** |
+| R1-C | `probe_all` acquires the gateway reservation per deployment, holds it after an uncertain timeout and reports the remaining deployments `deferred` | **fixed** (evaluator `--probe`) |
+| R7-C | routed-policy checkpoints include `eligible_set_key` (sorted ids + fingerprints; ids only in simulated mode); fixed sweeps unchanged | **fixed** |
+| macOS code execution | `sandbox-exec` backend **disabled in the alpha** unless `MODELSAAR_MACOS_SANDBOX=verify` (owner verification run); `code_exec` tasks are skipped on macOS with that reason | **disabled pending verification** |
+| R6-A / R6-B | launcher: all push URLs enumerated (`--get-all`, `--push --all`), multiple destinations refused; `verify-serving` requires HTTPS 200 + matching BUILD-INFO + served `install.sh` byte-identical to the gh-pages commit; Mac runner refuses dirty checkouts, requires `sandbox-exec`, fails on skips, writes PASSED/FAILED | **fixed** (launcher is outside the repository; mocked outcomes in the archive) |
+| R8-D | website copy: installer evidence by pin, candidate status, launch measures, OpenCode commands, roadmap summary | **fixed** (website branch) |
+
+Executed after the pass: the exact-head transcripts are in `docs/live-runs/2026-10-12-alpha/` on the website
+branch (suite without/with bubblewrap, lint, both reviewer test sets, simulated eval, real `pip install` from
+the pinned commit plus one routed request against the fixture backend). Not run: macOS `sandbox-exec`
+(disabled for the alpha; owner `run_mac_tests.command`), real GX10 inference under the corrected code, real
+client UI, live publication/DNS/TLS.
+
+## NOT RUN (needs hardware, a daemon, or a real client) — status at 0.1.0 / 1122e1f
 
 | item | why not here | how to run |
 |---|---|---|
@@ -128,7 +309,8 @@ for unloaded models was assumed 4096 during the run; only 3 of 8 deployments wer
 * Token estimate is conservative by design; borderline cases use `/tokenize` only on runtimes that have it.
 * With no measurements, `auto` prefers the cheaper of effectively tied candidates; after `eval --save-measurements`
   quality evidence dominates (shown in the simulated run: evidence levels `measured:*` for all test requests).
-* The evaluation code sandbox is basic (subprocess + rlimits), not a security boundary.
+* (0.1.0) The evaluation code sandbox was basic (subprocess + rlimits); since the hardening pass code
+  tasks run only under bubblewrap / `sandbox-exec` / Docker or are skipped.
 * Admin key is also valid for inference (one-way separation).
 
 ## Publication actions requiring separate authorization

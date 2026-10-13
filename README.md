@@ -1,5 +1,7 @@
 # ModelSaar
 
+**Status: public alpha** — pinned candidate commits, no tagged release, no PyPI package or container image; see `docs/verification-report.md` for what has and has not been executed and `docs/roadmap.md` for scope.
+
 [![ci](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml/badge.svg)](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml)
 
 **Intelligent routing for local AI models.** One endpoint. Intelligent model selection.
@@ -60,7 +62,7 @@ modelsaar probe --all       # live checks: streaming, tools, JSON schema, vision
 modelsaar serve             # http://127.0.0.1:8484/v1 ; keys in ~/.modelsaar/keys/
 
 # 5. first request (in another shell)
-modelsaar test              # GET /v1/models + one chat completion through `auto`
+modelsaar test              # identifies the gateway (GET /healthz), GET /v1/models, one routed completion through `auto`
 ```
 
 Example request:
@@ -73,8 +75,12 @@ curl -s http://127.0.0.1:8484/v1/chat/completions \
   -D - | grep -i x-modelsaar      # X-ModelSaar-Deployment tells you what was selected
 ```
 
-Then connect a client: `modelsaar client-config open-webui | openclaw | opencode | opencode-v2 | hermes`
-prints verified configuration; `--apply` merges file-based configs with a backup. See
+Then connect a client. One command per client (pick yours; these are separate commands, not a
+pipeline): `modelsaar client-config open-webui`, `modelsaar client-config openclaw`,
+`modelsaar client-config opencode` (or `opencode-v2`), `modelsaar client-config hermes`. Each prints
+verified configuration; `--apply` merges file-based configs with a backup. For a GUI field that asks
+for an API key, print the key in a terminal with `head -1 ~/.modelsaar/keys/api_keys` and paste the
+value it prints (a line starting with `msk_`) — the `$(...)` form above is shell syntax, not a key. See
 [docs/clients/](docs/clients/).
 
 No models yet? `modelsaar demo` starts a clearly labelled **simulated** backend so you can try the
@@ -128,23 +134,25 @@ against real models (owner's GX10 via Tailscale, 2026-10-11); **D** documented f
 | Tool round trips, streaming tool deltas, strict schema routing, image routing | F |
 | Failover before commitment / termination after commitment | F |
 | Admission limits, queue rejection, uncertain occupancy on disconnect | F |
-| Probes, fingerprint invalidation, embedding contracts, local-only policy | F |
+| Probes, fingerprint invalidation (endpoint + identity), embedding contracts (verified identity, output validation), local-only policy | F |
+| Privacy before payload operations (no `/tokenize`/classifier traffic to policy-excluded deployments), continuity (no failover inside tool round trips / pinned sessions), timeout holds, pool memory budgets, probes under gateway admission | F (`tests/test_hardening_2026_10_11.py`) |
 | Open WebUI / OpenClaw / OpenCode V1+V2 / Hermes configuration | D; live tool round trip **NOT RUN** |
 | Several real deployments routed by `auto` (chat → qwen3.6, code/tools → qwen3-coder, vision → qwen3.6, agent → gemma4) | **L** — see [docs/verification-report.md](docs/verification-report.md) |
-| Live evaluation vs fixed/rules/random/oracle baselines (3-deployment subset) | **L** — auto 0.875 vs fixed-strong 0.906 (overlapping CIs), 0 capability violations |
+| Live evaluation vs fixed/rules/random/oracle baselines (3-deployment subset) | **L** (2026-10-11, pre-hardening evaluator: auto 0.875 vs fixed-strong 0.906, overlapping CIs, 0 capability violations — historical; a rerun with the repaired evaluator is recorded in docs/verification-report.md when complete) |
 | Responses API, Anthropic Messages | not implemented (explicit 501) |
 
 ## Limitations (0.1)
 
 * Served context length for Ollama models is **assumed 4096** unless the Modelfile sets `num_ctx`,
   the model is currently loaded (`/api/ps`), or you add an override; `doctor` warns about it.
-* Token counts are conservative estimates (chars/3 for Latin text, one token per CJK/other wide character, plus overheads); when a backend exposes `/tokenize` (vLLM) the gateway asks for exact counts only in borderline cases (estimate within ±50 % of a deployment's context).
+* Token counts are conservative estimates (chars/3 for Latin text, one token per CJK/other wide character, plus overheads); when a backend exposes `/tokenize` (vLLM) the gateway asks it for text counts only in borderline cases (estimate within ±50 % of a deployment's context), only for deployments that already passed every policy filter, and still adds estimated template/image overhead.
+* Pool `memory_gb` budgets use weights-only estimates plus a margin; they prevent clearly oversized dispatches, not every OOM.
 * Ollama's OpenAI layer does not support `tool_choice=required/named`, remote image URLs,
   `logit_bias`, `n`, `logprobs`; such requests are rejected with blockers rather than altered.
 * Audio/video inputs, multimodal embeddings, OCR and decision-model pipelines, Responses API,
   Anthropic Messages, managed model loading/unloading, cascades and learned policies are out of
   scope for 0.1 (see [docs/roadmap.md](docs/roadmap.md)).
-* The evaluation harness's code execution is a basic subprocess sandbox, not a security boundary.
+* The evaluation harness executes model-written code only under bubblewrap / `sandbox-exec` / Docker; without one of those, code tasks are skipped (reported), never run on the host.
 * Quality priors from the catalogue are hypotheses; run `modelsaar eval --mode live --save-measurements`
   to replace them with measurements on your hardware.
 

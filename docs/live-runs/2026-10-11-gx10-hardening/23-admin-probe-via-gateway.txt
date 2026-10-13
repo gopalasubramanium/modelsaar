@@ -1,0 +1,1 @@
+{"deployment_id":"ollama/qwen3.6:latest","fingerprint":"f88be6aabf739d04","results":[{"capability":"streaming","value":"supported","note":"events=194 content_chunks=5 reasoning_chunks=186 done=True finish=stop usage=yes","latency_ms":11026.859040997806,"details":{}}],"measurements":[],"errors":[]}

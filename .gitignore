@@ -6,7 +6,9 @@ build/
 dist/
 .pytest_cache/
 .ruff_cache/
-eval-*.json
+/eval-*.json
 live-check-*/
 live-*-console.log
 *.bak
+tests/independent_review_2026_10_12/probe-*.json
+gh-launcher/

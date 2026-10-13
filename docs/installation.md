@@ -17,6 +17,13 @@ modelsaar serve
 With `uv`: `uv venv && . .venv/bin/activate && uv pip install -e .` (or `uv tool install .` to get a
 global `modelsaar` command).
 
+`modelsaar init` is for a first installation: it refuses to overwrite an existing `config.yaml`
+(`--force` replaces it; keys and state are kept). If you installed with the website's one-line
+installer, `init` has already run — continue with `modelsaar serve` and, in another terminal,
+`modelsaar test`. `modelsaar test` first identifies the listener on the configured port
+(unauthenticated `GET /healthz` must return the ModelSaar health contract) and sends the API key only
+to a ModelSaar gateway; an unrelated service on that port is reported as a collision.
+
 Files created by `init` (default `~/.modelsaar`, override with `MODELSAAR_HOME` or `--config`):
 
 ```
@@ -101,10 +108,29 @@ unit (Linux) are in `examples/`. Remove the unit/plist to stop auto-starting.
 ## Uninstall
 
 ```bash
-modelsaar uninstall        # removes ~/.modelsaar (config, keys, state) after confirmation
+modelsaar uninstall        # removes ModelSaar's own files under ~/.modelsaar after confirmation
 pip uninstall modelsaar    # or: uv tool uninstall modelsaar
 ```
 
-Uninstall never touches models in your runtime or client configuration files. Client configs
-changed with `client-config --apply` have `.bak-<timestamp>` copies next to them; restore those to
-undo the change.
+Uninstall removes only the files ModelSaar created (`config.yaml` and its backups, its key files, its
+state database) and then the directories if they are empty; anything else under `~/.modelsaar` is
+left in place and listed. It refuses to operate through symlinked `keys/` or `state/` directories. It
+never touches models in your runtime or client configuration files. Client configs changed with
+`client-config --apply` have `.bak-<timestamp>` copies next to them (same permission bits as the
+original); restore those to undo the change.
+
+## Evidence scheme and upgrades
+
+The state database records an evidence scheme (currently 2). Probes and measurements written under
+an older scheme (0.1.0: fingerprints without endpoint/identity, lenient evaluator) are kept for audit
+but never used for routing; `modelsaar doctor` reports how many such rows exist and the remedy
+(`modelsaar probe --all`, `modelsaar eval --mode live --save-measurements`). `scripts/install-check.sh`
+reproduces a clean wheel install, the loopback default, private key files and this migration.
+
+## Container first start
+
+`docker compose up` with an empty volume works without a pre-created key: the image's command is
+`modelsaar keys ensure && exec modelsaar serve`, which creates `/data/keys/*` once (never rotating
+existing keys) and leaves the read-only `config.yaml` mount untouched. `scripts/compose-smoke.sh`
+checks exactly this (empty volume, non-root user, read-only config, keys unchanged across a restart)
+and runs in CI.

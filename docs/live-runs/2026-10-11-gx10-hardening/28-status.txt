@@ -1,0 +1,18 @@
+ModelSaar 0.1.0 up 27.0s  requests=8 failed=1 ready=True
+aliases:
+  auto           ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-quality   ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-balanced  ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-fast      ['ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-code      ['ollama/qwen3.6:latest', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder:latest'] ctx>=4096 tools=supported vision=partial
+  auto-vision    ['ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=supported
+deployments:
+  ollama/muse-glimmer:latest               generative healthy=True loaded=False ctx=4096 tools=supported
+  ollama/qwen3.6:latest                    generative healthy=True loaded=True ctx=131072 tools=supported
+  ollama/gemma4:31b                        generative healthy=True loaded=False ctx=4096 tools=supported
+  ollama/qwen3.8:latest                    generative healthy=True loaded=True ctx=131072 tools=supported
+  ollama/qwen3-coder-next:latest           generative healthy=True loaded=False ctx=4096 tools=supported
+  ollama/qwen3-coder:latest                generative healthy=True loaded=False ctx=4096 tools=supported
+  ollama/qwen3.6-accurate:latest           generative healthy=True loaded=False ctx=131072 tools=supported
+  ollama/qwen3.6-fast:latest               generative healthy=True loaded=False ctx=65536 tools=supported
+admission: {'backend:ollama': {'limit': 4, 'active': 0, 'waiting': 0, 'uncertain': 0}, 'pool:local-machine': {'limit': 1, 'active': 0, 'waiting': 0, 'uncertain': 0}}

@@ -78,6 +78,21 @@ class ResourcePool(StrictModel):
     max_concurrent: int = 1
     max_queue: int = 16
     queue_timeout_s: float = 30.0
+    # Memory headroom kept free on the pool. A dispatch is admitted only when the resident
+    # set (distinct loaded deployments, including the classifier) plus the candidate's
+    # memory estimate plus this margin fits in memory_gb.
+    memory_margin_gb: float = 0.0
+    # What to do with a deployment whose memory estimate is unknown when memory_gb is set:
+    # "allow" admits it (counted as 0, labelled unknown in the decision); "reject" treats
+    # it as not fitting — and applies to every counted member (resident, reserved or assumed
+    # resident), not only the candidate: one unknown model makes the budget unverifiable.
+    unknown_memory_policy: Literal["allow", "reject"] = "allow"
+    # After a dispatch completes its request slot is released but the weights stay loaded. The
+    # pool keeps counting them ("assumed resident") until the runtime's residency observation
+    # (Ollama /api/ps on refresh) reconciles the registry. Runtimes that cannot report residency
+    # keep the assumption indefinitely unless this TTL (seconds) is set; this is the conservative
+    # choice because the gateway cannot see when such a runtime evicts a model.
+    assumed_residency_ttl_s: float | None = None
 
 
 class BackendConfig(StrictModel):
@@ -135,6 +150,10 @@ class DeclaredModel(StrictModel):
     catalogue_id: str | None = None
     memory_gb_estimate: float | None = None
     embedding_dimensions: int | None = None
+    # Operator-declared model identity (e.g. a weights digest or an exact revision id) for
+    # backends that expose none. Used to prove that two embedding deployments are the same
+    # model; a bare name match never is.
+    identity: str | None = None
 
 
 class DeploymentOverride(StrictModel):
@@ -179,6 +198,9 @@ class ClassifierConfig(StrictModel):
     # Only consult the classifier when deterministic classification is unsure.
     only_when_ambiguous: bool = True
     max_output_tokens: int = 64
+    # The classifier receives an excerpt of the user's message. It must be a local deployment
+    # unless the operator explicitly allows a remote one here AND security.locality_mode permits it.
+    allow_remote: bool = False
 
 
 class TokenEstimateConfig(StrictModel):
@@ -189,6 +211,8 @@ class TokenEstimateConfig(StrictModel):
     default_max_output: int = 1024
     reasoning_budget: int = 2048
     safety_margin: float = 0.05
+    # Total wall-clock budget for exact token counting across all candidate deployments.
+    exact_count_deadline_s: float = 1.5
 
 
 class RoutingConfig(StrictModel):
@@ -227,12 +251,27 @@ class AffinityConfig(StrictModel):
 
 class EmbeddingContract(StrictModel):
     alias: str
-    deployments: tuple[str, ...]  # all must be the same model revision; validated at load
+    deployments: tuple[str, ...]  # all must be the same model identity; validated at refresh
     dimensions: int | None = None
     normalized: bool = True
+    # Reserved: the gateway never rewrites embedding inputs, so any non-empty prefix would be
+    # a silent contract change. Rejected at load.
     query_prefix: str = ""
     document_prefix: str = ""
+    # Optional expected identity (digest / revision) every member must match.
+    identity: str | None = None
     note: str = ""
+
+    @model_validator(mode="after")
+    def _check(self) -> EmbeddingContract:
+        if not self.deployments:
+            raise ValueError(f"embedding contract {self.alias!r} lists no deployments")
+        if self.query_prefix or self.document_prefix:
+            raise ValueError(
+                f"embedding contract {self.alias!r}: query_prefix/document_prefix are not applied by"
+                " the gateway (inputs are forwarded verbatim); remove them"
+            )
+        return self
 
 
 class ObservabilityConfig(StrictModel):

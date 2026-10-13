@@ -1,0 +1,71 @@
+{
+  "gateway": "http://127.0.0.1:27782",
+  "checks": {
+    "chat": {
+      "status": 200,
+      "request_id": "req_7523a14affae40bd",
+      "deployment": "ollama/qwen3.8:latest",
+      "profile": "quality",
+      "response_model": "auto",
+      "attribution_ok": true,
+      "finish": "length"
+    },
+    "stream": {
+      "status": 200,
+      "request_id": "req_13868feebce8487a",
+      "deployment": "ollama/qwen3-coder:latest",
+      "profile": "fast",
+      "frames": 12,
+      "done": true,
+      "finish": "stop",
+      "model_fields": [
+        "auto-fast"
+      ],
+      "content_type": "text/event-stream; charset=utf-8"
+    },
+    "tools_emission": {
+      "status": 200,
+      "request_id": "req_b3c12f066b824adc",
+      "deployment": "ollama/qwen3-coder:latest",
+      "profile": "quality",
+      "tool_calls": 1,
+      "finish": "tool_calls"
+    },
+    "tool_result_continuation": {
+      "status": 200,
+      "request_id": "req_83052c93ea464512",
+      "deployment": "ollama/qwen3-coder:latest",
+      "profile": "quality",
+      "same_deployment": true,
+      "issuer": "ollama/qwen3-coder:latest",
+      "affinity": {
+        "session_source": "none",
+        "status": "stateless",
+        "tool_round_trip": "ollama/qwen3-coder:latest"
+      },
+      "failover_allowed": false
+    },
+    "session_header_pin": {
+      "status": 200,
+      "request_id": "req_7412d69907564da8",
+      "deployment": "ollama/qwen3.8:latest",
+      "profile": "quality",
+      "first": "ollama/qwen3.8:latest",
+      "pinned": true,
+      "affinity": {
+        "session_source": "header:X-ModelSaar-Session",
+        "pinned": "ollama/qwen3.8:latest",
+        "status": "found"
+      }
+    },
+    "unsupported_part_400": {
+      "status": 400,
+      "request_id": null,
+      "deployment": null,
+      "profile": null,
+      "code": "unsupported_content_type"
+    }
+  },
+  "started_at": "2026-10-11T18:39:35+0530",
+  "finished_at": "2026-10-11T18:39:46+0530"
+}

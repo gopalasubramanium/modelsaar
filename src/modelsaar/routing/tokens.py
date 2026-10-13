@@ -24,7 +24,7 @@ class TokenBudget:
     output_allowance: int
     reasoning_allowance: int
     images: int
-    method: str  # "exact:<backend>" | "estimate:chars/3"
+    method: str  # "tokenize:<backend>+template-estimate" | "estimate:chars/3"
 
     @property
     def total(self) -> int:

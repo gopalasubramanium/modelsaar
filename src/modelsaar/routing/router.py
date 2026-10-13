@@ -54,11 +54,14 @@ class Router:
                 raise ValueError(f"unknown backend type {b.type}")
             self.adapters[b.id] = cls(b, allowed)
         self.admission = Admission(cfg.admission, list(cfg.resource_pools), list(cfg.backends))
+        self.admission.pool_members = lambda pool_id: [d for d in self.registry.all() if d.resource_pool == pool_id]
         self.affinity = AffinityStore(cfg.affinity)
         self.classifier = LocalClassifier(cfg.routing.classifier)
         self.catalogue = load_catalogue()
         self._refresh_lock = asyncio.Lock()
         self.last_refresh_error: str = ""
+        # Alias -> established embedding identity (process memory; mirrored in the state DB).
+        self._alias_identity_memory: dict[str, str] = {}
 
     async def aclose(self) -> None:
         for a in self.adapters.values():
@@ -89,8 +92,29 @@ class Router:
                 apply_catalogue(d, self.catalogue)
                 d.compute_fingerprint()
                 self._apply_stored_evidence(d)
+                # A failed residency query must not turn a known-loaded model into "unloaded":
+                # carry the previous observation forward until the runtime answers again.
+                a = self.adapters.get(d.backend_id)
+                if a is not None and getattr(a, "reports_residency", False) and a.last_residency_observation_ok is False:
+                    prev = self.registry.get(d.id)
+                    if prev is not None:
+                        d.loaded = prev.loaded
+                        d.loaded_observed_at = prev.loaded_observed_at
             self.registry.replace(deps)
             self.last_refresh_error = "; ".join(errors)
+            self._reconcile_residency(errors)
+
+    def _reconcile_residency(self, errors: list[str] | None = None) -> None:
+        """Hand the admission layer the backends whose residency was just observed (healthy adapters
+        that report it), so assumed-resident weights are replaced by the observation."""
+        failed = {e.split(":", 1)[0] for e in (errors or [])}
+        observed = {
+            bid for bid, a in self.adapters.items()
+            if getattr(a, "reports_residency", False) and bid not in failed
+            and a.last_residency_observation_ok is True  # the residency query itself succeeded
+            and all(d.healthy for d in self.registry.by_backend(bid))
+        }
+        self.admission.reconcile_residency(self.registry.all(), observed)
 
     async def _discover_backend(self, bid: str, adapter: BaseAdapter) -> list[Deployment]:
         return await adapter.discover()
@@ -144,14 +168,17 @@ class Router:
         """Cheap update of loaded/healthy flags without full discovery."""
         for bid, a in self.adapters.items():
             ok, msg = await a.health()
-            loaded = await a.loaded_models() if ok else {}
+            loaded = await a.loaded_models() if ok else None
             for d in self.registry.by_backend(bid):
                 d.healthy = ok
                 d.health_checked_at = time.time()
                 d.last_error = "" if ok else msg
+                if loaded is None:
+                    continue  # no observation (runtime down or /api/ps failed): keep the previous flags
                 d.loaded = d.model in loaded
                 if d.loaded:
                     d.loaded_observed_at = time.time()
+        self._reconcile_residency()
 
     # ------------------------------------------------------------------ #
     # Alias availability (truthful /v1/models)
@@ -268,32 +295,47 @@ class Router:
         req = analyze_chat(body, self.cfg.routing.token_estimate, thinking_possible)
         request_fields = set(body.keys())
 
-        # --- exact token counts where the runtime offers them (bounded: borderline cases only) ---
-        exact = await self._exact_counts(body, req)
-        if exact:
-            dec.requirements_note = f"exact token counts used for {sorted(exact)}"
-
-        # --- hard filters --------------------------------------------------
+        # --- hard filters, pass 1: estimates only. No request content leaves the gateway here. ---
         deps = self.registry.all()
-        res = filter_deployments(
-            deps,
-            req,
-            self.cfg.security,
-            alias=alias,
-            explicit_model=explicit.id if explicit else None,
-            feasibility=self.admission.feasibility,
-            backend_unsupported_fields=lambda d: self.adapters[d.backend_id].unsupported_fields(),
-            request_fields=request_fields,
-            exact_input_tokens=exact or None,
-        )
+
+        def _filter(exact: dict[str, int] | None):
+            return filter_deployments(
+                deps,
+                req,
+                self.cfg.security,
+                alias=alias,
+                explicit_model=explicit.id if explicit else None,
+                feasibility=self.admission.feasibility,
+                backend_unsupported_fields=lambda d: self.adapters[d.backend_id].unsupported_fields(),
+                request_fields=request_fields,
+                exact_input_tokens=exact,
+            )
+
+        res = _filter(None)
+        # Pass 2: tokenizer-based counts, only for deployments that passed every policy and
+        # capability filter (eligible, or excluded by the context estimate alone). A deployment
+        # that is remote under local_only, disabled, unhealthy or lacks a capability never
+        # receives the prompt.
+        allowed = [d for d in res.eligible] + [
+            d
+            for d in deps
+            for e in res.exclusions
+            if e.deployment_id == d.id and e.reasons and all(r.startswith("effective context ") and "<" in r for r in e.reasons)
+        ]
+        exact = await self._exact_counts(body, req, allowed)
+        if exact:
+            dec.requirements_note = "tokenizer counts used: " + ", ".join(
+                f"{did}={exact[did]} (tokenize:{did.split('/', 1)[0]}+template-estimate)" for did in sorted(exact)
+            )
+            res = _filter(exact)
         dec.exclusions = res.blockers_summary()
         dec.remedies = sorted({r for e in res.exclusions for r in e.remedies})
 
         # --- optional classifier (only refines the task label) ------------
         if res.eligible and self.classifier.should_run(req):
-            cdep = self._classifier_deployment()
+            cdep, why = self._classifier_deployment()
             if cdep is None:
-                dec.classifier = {"used": False, "status": "unavailable", "note": "configured classifier deployment not found"}
+                dec.classifier = {"used": False, "status": "unavailable", "note": why}
             else:
                 try:
                     reservation = await self.admission.acquire(cdep, timeout=self.cfg.routing.classifier.timeout_s)
@@ -301,10 +343,15 @@ class Router:
                     reservation = None
                     dec.classifier = {"used": False, "status": "skipped", "note": "classifier deployment at capacity"}
                 if reservation is not None:
+                    out = None
                     try:
                         out = await self.classifier.classify(self.adapters[cdep.backend_id], cdep, body, req)
                     finally:
-                        await reservation.release()
+                        if out is not None and out.status == "timeout":
+                            # The classifier may still be generating: hold its slot as uncertain.
+                            await reservation.mark_uncertain()
+                        else:
+                            await reservation.release()
                     dec.classifier = out.as_dict()
                     if out.used and out.task and out.confidence is not None and out.confidence >= 0.5:
                         req.tasks[out.task] = max(req.tasks.get(out.task, 0.0), round(out.confidence, 2))
@@ -374,8 +421,25 @@ class Router:
                         cands.insert(0, cands.pop(i))
                     c.notes.append("affinity: pinned deployment kept")
                     break
+        for c in cands:
+            mv = self.admission.memory_view(c.deployment)
+            if mv is not None:
+                c.notes.append(f"memory: pool {mv['pool']} ~{mv['estimated_gb']}/{mv['memory_gb']} GB with this deployment (weights-only estimates)")
+                if c.deployment.id in mv["unknown"]:
+                    c.notes.append("memory estimate unknown for this deployment (admitted under unknown_memory_policy=allow)")
         dec.candidates = [c.as_dict() for c in cands]
         chosen = cands[0]
+        # Continuity: a request that is tied to the deployment that started the exchange is never
+        # handed to another model by failover; it fails and the client decides.
+        if req.is_tool_result_turn and dec.affinity.get("tool_round_trip"):
+            dec.failover_allowed = False
+            dec.failover_note = "tool round trip in progress; cross-model handover refused"
+        elif req.needs_continuation:
+            dec.failover_allowed = False
+            dec.failover_note = "reasoning continuation state present; cross-model handover refused"
+        elif affinity_dep and chosen.deployment.id == affinity_dep:
+            dec.failover_allowed = False
+            dec.failover_note = f"session pinned to {affinity_dep}; failover would break continuity"
         dec.chosen = chosen.deployment.id
         dec.evidence = chosen.evidence.split(' (blend')[0]
         dec.reasons.extend(self._reasons(dec, chosen, len(res.eligible), len(res.exclusions)))
@@ -387,22 +451,118 @@ class Router:
             dec._session = (session_key, source)  # type: ignore[attr-defined]  # not serialized
         return dec
 
+    # ------------------------------------------------------------------ #
+    # Embedding contracts
+    # ------------------------------------------------------------------ #
+    def _embedding_identity_blocker(self, contract, d: Deployment, expected: str) -> str | None:  # type: ignore[no-untyped-def]
+        """A member is interchangeable only when its identity is known and equal to the alias's
+        established identity (see ``_alias_identity``). Single-member aliases with an unknown
+        identity are allowed (nothing to interchange) but the decision says so."""
+        if len(contract.deployments) == 1 and not expected:
+            return None
+        if not d.identity:
+            return (
+                f"identity unknown for {d.id} (a model-name match is not an identity); declare "
+                f"backends[].models[].identity to treat it as a replica of alias {contract.alias!r}"
+            )
+        if expected and d.identity != expected:
+            src = "embeddings[].identity" if contract.identity else "the identity established for this alias"
+            return (
+                f"identity {d.identity[:24]} ({d.identity_source}) differs from {src} {expected[:24]}; "
+                "changed identity requires an explicit re-indexing decision"
+            )
+        return None
+
+    def _alias_identity(self, contract, members: list[Deployment]) -> tuple[str, str | None]:  # type: ignore[no-untyped-def]
+        """Establish the alias's identity BEFORE any dispatch, atomically for this process (this
+        runs synchronously inside the event loop and the anchor is persisted before returning, so
+        two concurrent first requests see the same anchor).
+
+        Precedence: ``embeddings[].identity`` (declared) > the identity recorded for the alias >
+        the verified identity of the first member *in contract order* whose identity is known.
+        Members with a different known identity are excluded from then on; members with an unknown
+        identity are never interchangeable (single-member aliases excepted). The anchor is a
+        configured member's verified identity, never something learned from a response, so the
+        first-use race cannot bind two embedding spaces. The second value is a note when the
+        configuration was ambiguous (several known identities) and the deterministic choice was made."""
+        expected = contract.identity or self._recorded_embedding_identity(contract.alias)
+        if expected:
+            return expected, None
+        by_id = {d.id: d for d in members}
+        ordered = [by_id[did] for did in contract.deployments if did in by_id]
+        known = [d.identity for d in ordered if d.identity]
+        if not known:
+            return "", None
+        anchor = known[0]
+        self._anchor_embedding_identity(contract.alias, anchor)
+        note = None
+        if len(set(known)) > 1:
+            note = (
+                f"alias {contract.alias!r} members declare {len(set(known))} different identities; anchored to "
+                f"{anchor[:16]} (first member in contract order with a verified identity) before dispatch — "
+                "declare embeddings[].identity to make this explicit"
+            )
+        return anchor, note
+
+    def _anchor_embedding_identity(self, alias: str, identity: str) -> None:
+        self._alias_identity_memory[alias] = identity
+        if self.store:
+            try:
+                self.store.set_meta(f"embedding_identity:{alias}", identity)
+            except Exception:  # pragma: no cover
+                pass
+
+    def _recorded_embedding_identity(self, alias: str) -> str:
+        mem = self._alias_identity_memory.get(alias)
+        if mem:
+            return mem
+        if not self.store:
+            return ""
+        try:
+            v = self.store.get_meta(f"embedding_identity:{alias}") or ""
+        except Exception:  # pragma: no cover
+            return ""
+        if v:
+            self._alias_identity_memory[alias] = v
+        return v
+
+    def record_embedding_identity(self, alias: str, dep: Deployment) -> None:
+        """Kept for callers: the alias identity is established before dispatch (``_alias_identity``),
+        so a response can only confirm it. A response from a different identity is impossible because
+        such a member is excluded before dispatch."""
+        if dep.identity and not self._recorded_embedding_identity(alias):
+            self._anchor_embedding_identity(alias, dep.identity)
+
+    def embedding_request_problem(self, body: dict[str, Any], contract, dep: Deployment) -> str | None:  # type: ignore[no-untyped-def]
+        """Request options that would change the alias's space are refused, not forwarded."""
+        fmt = body.get("encoding_format")
+        if fmt not in (None, "float"):
+            return f"encoding_format={fmt!r} is not supported by this gateway's embedding contract (only float)"
+        dims = body.get("dimensions")
+        expected = (contract.dimensions if contract else None) or dep.embedding_dimensions
+        if dims is not None and expected and int(dims) != expected:
+            return f"dimensions={dims} would change the embedding space of {contract.alias if contract else dep.id} ({expected}-d)"
+        return None
+
     def pin_session(self, dec: Decision, caller_id: str, dep_id: str) -> None:
         sess = getattr(dec, "_session", None)
         if sess:
             self.affinity.set(caller_id, sess[0], dep_id, sess[1])
 
-    async def _exact_counts(self, body: dict[str, Any], req: Requirements) -> dict[str, int]:
-        """Ask runtimes with a tokenizer endpoint (vLLM /tokenize) for exact input counts, only for
-        deployments where the estimate is within +-50% of the context limit (the cases where an
-        estimate could wrongly include or exclude them)."""
-        if not req.tokens:
+    async def _exact_counts(self, body: dict[str, Any], req: Requirements, candidates: list[Deployment]) -> dict[str, int]:
+        """Ask runtimes with a tokenizer endpoint (vLLM /tokenize) for text token counts, only for
+        ``candidates`` (already policy-filtered by the caller) whose estimate is within +-50% of the
+        context limit. All calls share one wall-clock deadline (routing.token_estimate.exact_count_deadline_s);
+        a deployment that is not counted in time keeps its estimate. The result is the tokenizer count
+        of the text plus the gateway's template/message/image overhead estimate, so it is labelled
+        ``tokenize:<backend>+template-estimate`` rather than exact."""
+        if not req.tokens or not candidates:
             return {}
-        from .tokens import _text_of
 
         text: str | None = None
         out: dict[str, int] = {}
-        for d in self.registry.all():
+        deadline = time.monotonic() + self.cfg.routing.token_estimate.exact_count_deadline_s
+        for d in candidates:
             if not (d.enabled and d.healthy and d.role == "generative" and d.context_length):
                 continue
             est_total = req.tokens.input_estimate + req.tokens.output_allowance + (
@@ -414,32 +574,57 @@ class Router:
             if adapter is None or adapter.tokenize.__func__ is BaseAdapter.tokenize:  # type: ignore[attr-defined]
                 continue
             if text is None:
-                parts = []
-                for m in body.get("messages") or []:
-                    if isinstance(m, dict):
-                        t, _ = _text_of(m.get("content"))
-                        parts.append(t)
-                        if m.get("tool_calls"):
-                            parts.append(json.dumps(m["tool_calls"]))
-                for t in body.get("tools") or []:
-                    parts.append(json.dumps(t))
-                text = "\n".join(parts)
+                text = self._countable_text(body)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
             try:
-                n = await adapter.tokenize(d, text)
-            except Exception:  # noqa: BLE001 - exact counting is best effort; the estimate stands
+                n = await asyncio.wait_for(adapter.tokenize(d, text), timeout=remaining)
+            except Exception:  # noqa: BLE001 - counting is best effort; the estimate stands
                 n = None
             if isinstance(n, int) and n > 0:
-                # Keep the per-message/template/image overheads on top of the exact text count.
+                # Keep the per-message/template/image overheads on top of the tokenizer's text count.
                 overhead = req.tokens.input_estimate - math.ceil(len(text) / self.cfg.routing.token_estimate.chars_per_token)
                 out[d.id] = n + max(0, overhead)
         return out
 
-    def _classifier_deployment(self) -> Deployment | None:
+    @staticmethod
+    def _countable_text(body: dict[str, Any]) -> str:
+        """Everything in the request that reaches the model as text: message content, reasoning
+        content, tool calls, tool definitions and the response_format schema."""
+        from .tokens import _text_of
+
+        parts: list[str] = []
+        for m in body.get("messages") or []:
+            if isinstance(m, dict):
+                t, _ = _text_of(m.get("content"))
+                parts.append(t)
+                if isinstance(m.get("reasoning_content"), str):
+                    parts.append(m["reasoning_content"])
+                if m.get("tool_calls"):
+                    parts.append(json.dumps(m["tool_calls"]))
+        for t in body.get("tools") or []:
+            parts.append(json.dumps(t))
+        if isinstance(body.get("response_format"), dict):
+            parts.append(json.dumps(body["response_format"]))
+        return "\n".join(parts)
+
+    def _classifier_deployment(self) -> tuple[Deployment | None, str]:
+        """The classifier receives an excerpt of the user's message, so it must be a local
+        deployment unless the operator opted in twice: routing.classifier.allow_remote AND
+        security.locality_mode=allow_remote."""
         c = self.cfg.routing.classifier
         d = self.registry.get(f"{c.backend}/{c.model}")
-        if d and d.healthy and d.enabled and (self.cfg.security.locality_mode == "allow_remote" or d.locality == "local"):
-            return d
-        return None
+        if d is None:
+            return None, "configured classifier deployment not found"
+        if not (d.healthy and d.enabled):
+            return None, "configured classifier deployment is disabled or unhealthy"
+        if d.locality != "local" and not (c.allow_remote and self.cfg.security.locality_mode == "allow_remote"):
+            return None, (
+                f"classifier deployment {d.id} is not local ({d.locality_evidence[:60]}); message excerpts stay on the host"
+                " unless routing.classifier.allow_remote and security.locality_mode=allow_remote are both set"
+            )
+        return d, ""
 
     def _reasons(self, dec: Decision, chosen, n_eligible: int, n_excluded: int) -> list[str]:
         r = []
@@ -528,6 +713,24 @@ class Router:
                     dec.exclusions[d.id] = [
                         f"embedding dimensions {d.embedding_dimensions} differ from contract {contract.dimensions}"
                     ]
+                else:
+                    keep.append(d)
+            res.eligible = keep
+        if contract:
+            expected, note = self._alias_identity(contract, candidates)
+            if note:
+                dec.reasons.append(note)
+                dec.remedies.append("set embeddings[].identity to the verified identity the index was built with")
+            keep = []
+            for d in res.eligible:
+                why = self._embedding_identity_blocker(contract, d, expected)
+                if why:
+                    dec.exclusions[d.id] = [why]
+                    if "re-index" not in " ".join(dec.remedies):
+                        dec.remedies.append(
+                            "members of an embeddings alias must be one verified identity (shared digest or a declared "
+                            "backends[].models[].identity); after changing the model, re-index and set embeddings[].identity"
+                        )
                 else:
                     keep.append(d)
             res.eligible = keep

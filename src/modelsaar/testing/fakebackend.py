@@ -5,7 +5,7 @@ It is used by the contract/fault-injection test suite and by ``modelsaar demo``
 (clearly labelled SIMULATED). Behaviours are deterministic and can be changed
 per model at runtime:
 
-  ok | error_500 | fail_mid_stream | truncate_stream | slow | hang | bad_json | unsupported_tools
+  ok | error_500 | fail_mid_stream | truncate_stream | slow | stall | hang | bad_json | unsupported_tools
 
 Responses are synthetic: a model "answers" by echoing structural facts, calls
 a tool when one is offered, emits schema-conformant JSON when asked, and
@@ -48,6 +48,7 @@ class FakeModel:
     good_at: list[str] = field(default_factory=list)
     json_schema_ok: bool = True
     embedding_dimensions: int = 8
+    normalize_embeddings: bool = True
     template: str = "{{ .Prompt }}"
     # Simulated thinking model: spends this many output tokens on reasoning before answering.
     thinking_tokens: int = 0
@@ -85,6 +86,23 @@ def _gold_code(t: str) -> str:
     return "It matches three digits, a hyphen, then four digits (undefined is not a function is a JavaScript error)."
 
 
+def _gold_tool_args(fn: dict[str, Any], text: str) -> dict[str, Any]:
+    """Arguments a competent agent would pass for the eval fixtures: every required parameter
+    of the offered tool is filled with a task-appropriate value (the strict ``tool_call`` scorer
+    rejects calls that lack required arguments or the expected substrings)."""
+    low = text.lower()
+    required = list(((fn.get("parameters") or {}).get("required")) or [])
+    args: dict[str, Any] = {}
+    for key in required:
+        if key == "command":
+            args[key] = "pytest -q" if "pytest" in low else "git status" if "git" in low else "ls"
+        elif key == "path":
+            args[key] = "README.md" if "readme" in low else "pyproject.toml" if "pyproject" in low else "."
+        else:
+            args[key] = "x"
+    return args
+
+
 def _expected_text(task: str, text: str, ok: bool, name: str) -> str:
     if not ok:
         return f"I am not sure about that. ({name})"
@@ -99,6 +117,7 @@ class FakeBackend:
         self.active = 0
         self.max_active = 0
         self.requests: list[dict[str, Any]] = []  # metadata only (model, stream, has_tools)
+        self.tokenize_requests: list[dict[str, Any]] = []  # metadata only (model, chars)
         self._lock = threading.Lock()
         self.app = self._build()
         self._server: uvicorn.Server | None = None
@@ -207,7 +226,7 @@ class FakeBackend:
             if tools and "tools" in m.capabilities:
                 if ok:
                     fn = tools[0].get("function", {})
-                    return {"tool_calls": [{"id": f"call_{m.name.replace(':', '_')}_0", "type": "function", "function": {"name": fn.get("name", "fn"), "arguments": json.dumps({"command": "ls"})}}]}
+                    return {"tool_calls": [{"id": f"call_{m.name.replace(':', '_')}_0", "type": "function", "function": {"name": fn.get("name", "fn"), "arguments": json.dumps(_gold_tool_args(fn, text))}}]}
                 return {"content": f"I would list the files but I cannot. ({m.name})"}
             rf = body.get("response_format") or {}
             if rf.get("type") == "json_schema":
@@ -264,6 +283,8 @@ class FakeBackend:
         try:
             if m.behaviour == "slow":
                 await asyncio.sleep(1.0)
+            if m.behaviour == "stall":
+                await asyncio.sleep(1.5)  # longer than a test gateway's request timeout, short enough to finish
             ans = self._answer(m, body)
             rid = f"chatcmpl-fake-{int(time.time()*1000)}"
             budget = body.get("max_tokens") or 4096
@@ -275,9 +296,10 @@ class FakeBackend:
                         "usage": {"prompt_tokens": 10, "completion_tokens": budget, "total_tokens": 10 + budget},
                     }
                 )
+            if m.behaviour == "bad_json":
+                # A reverse proxy's HTML page served with 200, for both streaming and non-streaming.
+                return Response(b"<html>not json</html>", status_code=200, media_type="text/html")
             if not body.get("stream"):
-                if m.behaviour == "bad_json":
-                    return Response(b"<html>not json</html>", status_code=200, media_type="text/html")
                 msg: dict[str, Any] = {"role": "assistant", "content": ans.get("content")}
                 finish = "stop"
                 if ans.get("tool_calls"):
@@ -373,6 +395,8 @@ class FakeBackend:
         """vLLM-style /tokenize: here 1 token per 4 characters (deterministic fake tokenizer)."""
         body = await request.json()
         n = len(str(body.get("prompt", ""))) // 4
+        # Metadata only: which model and how much text reached this backend's tokenizer.
+        self.tokenize_requests.append({"model": body.get("model"), "chars": len(str(body.get("prompt", "")))})
         return JSONResponse({"count": n, "max_model_len": 32768, "tokens": list(range(n))})
 
     async def v1_embeddings(self, request: Request) -> Response:
@@ -385,7 +409,10 @@ class FakeBackend:
             inputs = [inputs]
         data = []
         for i, text in enumerate(inputs or []):
-            vec = [((hash((m.name, str(text), j)) % 1000) / 1000.0) for j in range(m.embedding_dimensions)]
+            vec = [((hash((m.name, str(text), j)) % 1000) / 1000.0 + 0.001) for j in range(m.embedding_dimensions)]
+            if m.normalize_embeddings:
+                norm = sum(v * v for v in vec) ** 0.5
+                vec = [v / norm for v in vec]
             data.append({"object": "embedding", "index": i, "embedding": vec})
         return JSONResponse({"object": "list", "data": data, "model": m.name, "usage": {"prompt_tokens": 3, "total_tokens": 3}})
 

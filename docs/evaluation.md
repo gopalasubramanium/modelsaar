@@ -11,8 +11,29 @@ third-party data) across conversation, coding, agent/tools, math, extraction (st
 summarization, translation, RAG-style, decision, vision, a tool round trip, mixed-language and
 deliberately ambiguous prompts, plus a long-but-easy transformation. Splits: `calib` (15) and `test`
 (32) use different templates. Scorers: `nonempty`, `contains`, `contains_any`, `json_schema` (+field
-checks), `tool_call` (valid JSON arguments), `code_exec` (model code + harness in a disposable
-`python -I` subprocess with time/memory limits). No LLM judge is used.
+checks), `tool_call` (strict: non-empty id, expected name, JSON-object arguments that conform to the
+tool's declared parameter schema, contain every required parameter and the expected substrings),
+`code_exec` (a trusted runner executes the model code with its stdout captured, then the task
+harness with *its* stdout captured, and writes a result record keyed with a per-run nonce; the task
+passes only when that record says the harness completed and the harness output equals the
+expectation — text the model prints, including any "completion marker", is never evidence). `code_exec`
+runs **only** under bubblewrap (Linux; only the Python runtime and system libraries are visible),
+`sandbox-exec` (macOS; deny-by-default profile with runtime read roots — **unsupported in this alpha
+pending verification**: disabled unless `MODELSAAR_MACOS_SANDBOX=verify`, so on macOS `code_exec`
+tasks are skipped and the report says why) or Docker (`--network none --read-only`) with
+CPU/memory/output/time limits; without one of those the task is skipped and the report says so —
+there is no host-execution fallback. The sandbox is tested for writes, network,
+timeouts and reading a synthetic host file outside the work directory; it does not defend the
+evaluator against model code that targets the evaluator process itself. Scorer rules are versioned
+(`SCORER_VERSION`) and recorded in the report's `conditions`; checkpoint records (`--checkpoint`,
+`--resume`) are bound to the task content, the scorer version and request budgets, the routing
+configuration and the eligible deployment set (for routed policies: a new, removed or re-identified
+alternative re-runs the task) and the deployment fingerprint, and anything that no longer matches is
+re-run and counted under `resume_rejected` instead of being attributed to the new run. `--probe`
+runs the capability probes through the gateway's admission, one reservation per deployment; after an
+uncertain timeout the reservation is held and the remaining deployments are reported `deferred`
+rather than probed on top of work that may still be running.
+No LLM judge is used. See `src/modelsaar/evaluation/fixtures/README.md` for the exact rules.
 
 ## Procedure
 
@@ -38,9 +59,16 @@ modelsaar eval --mode simulated                 # no models needed; validates me
 modelsaar eval --mode live --probe --save-measurements --out eval-$(date +%F).json
 ```
 
-Live mode starts an in-process gateway from your config on a free port (your running instance is
-untouched). The report records exact deployments (model, parameter size, quantization, runtime,
-context, fingerprint), date, sample counts and every request's outcome.
+Live mode starts an in-process gateway from your config on a free port. Because that gateway's
+admission cannot coordinate with another instance using the same backends, the run refuses to start
+while a gateway listens on the configured port unless you pass `--allow-concurrent`. Long runs are
+resumable: `--checkpoint PATH` (default `<out>.records.jsonl` with `--out`) appends one sanitised
+record per request (ids, status, latency, scorer detail — never prompts), and `--resume` skips
+recorded tasks whose deployment fingerprint is unchanged. The report records exact deployments
+(model, parameter size, quantization, runtime, context, fingerprint, endpoint), the conditions
+(`max_tokens`, temperature, seed, scorer version, git commit, sandbox backend, dataset revision),
+date, sample counts and every request's outcome. `scripts/live_verify.sh` wraps probes, wire-level
+client checks and this evaluation into one resumable command.
 
 ## Acceptance targets for a reference configuration
 
@@ -54,7 +82,24 @@ Define before measuring; the harness reports against them.
 | routing overhead (deterministic path) | p95 < 5 ms; with classifier < `classifier.timeout_s` |
 | classifier timeouts | < 5 % of consulted requests |
 
-## Result on the simulated configuration (2026-10-11, this build)
+## Results — read the label before the table
+
+Every table below is tied to a scorer version and a source revision. The current scorer is
+`2026.10.12-3` (record-based `code_exec` completion evidence, tool-argument schema validation; see
+"Scorers" above). **No live evaluation has been run under the current scorer yet** (only the simulated smoke, which validates mechanics, not model quality). The numbers below were
+produced by the scorer named next to them and are kept as recorded; they are not relabelled, and a
+rerun — when it happens — will be reported as a separate run with its own scorer version.
+
+**Current reference result:** the GX10 run of 2026-10-11 at source `0f8af84` (scorer `2026.10.11-2`,
+3 deployments, 32 test tasks): `auto` and the strongest fixed model each 30/32; `auto` completed
+32/32 vs 31/32 and recorded 0 vs 1 capability violations; reported end-to-end p95 7.958 s vs 4.760 s;
+routing overhead p95 0.98 ms (a separate quantity). The `long-01` difference occurred on the same
+model and its cause has not been isolated; the live classifier was disabled. Full manifest, exact
+comparison and the 173 sanitised records: `live-runs/2026-10-11-gx10-hardening/MANIFEST.md` (the
+aggregates reproduce from the records with `scripts/eval_aggregate.py`; the run has
+`resumed_records = 0`). This is the result the website quotes.
+
+### Historical: simulated configuration (2026-10-11, source `c26ee44` — before scorer versioning)
 
 Three scripted fake deployments (`sim-small:1b`, `sim-code:7b` tagged `code`, `sim-large:27b` with
 vision/thinking), 15 calib / 32 test tasks, seed 7:
@@ -72,12 +117,15 @@ Routing overhead mean 0.43 ms, p95 0.52 ms; deterministic task-label accuracy 0.
 mistake (`math-06`, "Is 97 a prime number? Answer yes or no." — classified as ambiguous between
 math and decision; with only two calibration samples per category the blended quality difference did
 not outweigh the resident small model's latency/residency advantage). The rules baseline
-matches the oracle here only because it is handed the gold category label, which `auto` must infer. **This validates the harness and the policy mechanics only.** The fake backends
-answer correctly by script when the task is in their `good_at` list, so the numbers say nothing about
-real model quality. The identical procedure against real deployments is the NOT RUN item in the
-[verification report](verification-report.md).
+matches the oracle here only because it is handed the gold category label, which `auto` must infer.
+**This validates the harness and the policy mechanics only.** The fake backends answer correctly by
+script when the task is in their `good_at` list, so the numbers say nothing about real model quality.
+(CI re-runs a simulated smoke on every push; its numbers change with the scorer and are not quoted.)
 
-## Result on real hardware (GX10 / Ollama 0.32.13, 2026-10-11, 3-deployment subset)
+### Historical: first real-hardware run (GX10 / Ollama 0.32.13, 2026-10-11, source `1122e1f`, scorer before versioning)
+
+Superseded by the current reference result above; kept because the bugs it exposed are the subject
+of the 2026-10-11 review (F01–F18). 3-deployment subset:
 
 | policy | success | 95 % CI | completion | violations | p50 ms | p95 ms |
 |---|---|---|---|---|---|---|
@@ -88,10 +136,9 @@ real model quality. The identical procedure against real deployments is the NOT 
 | random | 0.688 | [0.51, 0.82] | 0.938 | 2 | 4 189 | 9 826 |
 | oracle | 0.969 | [0.84, 0.99] | 1.000 | 0 | 552 | 4 585 |
 
-`auto` did not beat the best fixed model here (it mostly chose that model); its measurable gains
-were coverage (no capability violations, 100 % completion) at the price of p95 latency when a
-thinking model was selected. Full context, caveats and the bugs this run exposed are in
-[verification-report.md](verification-report.md).
+In that run `auto` did not match the best fixed model (it mostly chose that model); its measurable
+gains were coverage (no capability violations, 100 % completion) at the price of p95 latency when a
+thinking model was selected. Context and the defects it exposed: [verification-report.md](verification-report.md).
 
 ## Reporting rules
 

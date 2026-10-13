@@ -1,0 +1,18 @@
+wrote /Users/sgopala/.modelsaar-live/repo/live-verify-0f8af84/home/config.yaml
+API key:   /Users/sgopala/.modelsaar-live/repo/live-verify-0f8af84/home/keys/api_keys
+admin key: /Users/sgopala/.modelsaar-live/repo/live-verify-0f8af84/home/keys/admin_key
+discovered 8 deployment(s):
+  ollama/muse-glimmer:latest               role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/qwen3.6:latest                    role=generative ctx=131072 tools=supported vision=supported locality=local
+  ollama/gemma4:31b                        role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/qwen3.8:latest                    role=generative ctx=131072 tools=supported vision=supported locality=local
+  ollama/qwen3-coder-next:latest           role=generative ctx=4096 tools=supported vision=unsupported locality=local
+  ollama/qwen3-coder:latest                role=generative ctx=4096 tools=supported vision=unsupported locality=local
+  ollama/qwen3.6-accurate:latest           role=generative ctx=131072 tools=supported vision=supported locality=local
+  ollama/qwen3.6-fast:latest               role=generative ctx=65536 tools=supported vision=supported locality=local
+
+next steps:
+  modelsaar doctor            # check reachability, context assumptions, unknown capabilities
+  modelsaar probe --all       # verify tools/json/vision/streaming on each model (uses local compute)
+  modelsaar serve             # start the gateway
+  modelsaar client-config open-webui|openclaw|opencode|opencode-v2|hermes

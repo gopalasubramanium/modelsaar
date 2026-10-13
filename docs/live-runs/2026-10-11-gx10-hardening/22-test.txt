@@ -1,0 +1,3 @@
+GET /v1/models -> 200: ['auto', 'auto-quality', 'auto-balanced', 'auto-fast', 'auto-code', 'auto-vision', 'ollama/muse-glimmer:latest', 'ollama/qwen3.6:latest', 'ollama/gemma4:31b', 'ollama/qwen3.8:latest', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest']
+POST /v1/chat/completions -> 200 in 1718ms; deployment=ollama/qwen3.8:latest request=req_9d03167a2c4b4b12
+content: ready

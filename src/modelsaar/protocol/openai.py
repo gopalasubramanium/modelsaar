@@ -86,6 +86,56 @@ class ToolCall(BaseModel):
     function: dict[str, Any]
 
 
+# Content part types the gateway understands. Everything else (audio_url, video_url, input_video,
+# file, input_file, refusal, ...) is rejected before any backend is contacted: a part the gateway
+# cannot classify could carry media or fetch instructions for a backend that is not allowed to
+# receive them.
+SUPPORTED_PART_TYPES = frozenset({"text", "image_url", "input_audio"})
+_PART_KEYS = {
+    "text": {"type", "text"},
+    "image_url": {"type", "image_url"},
+    "input_audio": {"type", "input_audio"},
+}
+
+
+def validate_content_parts(content: Any, where: str) -> None:
+    """Typed validation of multipart message content. Raises ProtocolError (400) on anything unknown."""
+    if content is None or isinstance(content, str):
+        return
+    if not isinstance(content, list):
+        raise ProtocolError(f"{where}: content must be a string or a list of content parts", param=where)
+    for i, part in enumerate(content):
+        loc = f"{where}.content[{i}]"
+        if not isinstance(part, dict):
+            raise ProtocolError(f"{loc}: content part must be an object", param=loc)
+        t = part.get("type")
+        if t not in SUPPORTED_PART_TYPES:
+            raise ProtocolError(
+                f"{loc}: unsupported content part type {t!r}; ModelSaar 0.1 accepts "
+                f"{sorted(SUPPORTED_PART_TYPES)} only (audio/video/file parts are not forwarded to any backend)",
+                param=loc,
+                code="unsupported_content_type",
+            )
+        extra = set(part.keys()) - _PART_KEYS[t]
+        if extra:
+            raise ProtocolError(f"{loc}: unexpected keys {sorted(extra)} in a {t} part", param=loc)
+        if t == "text" and not isinstance(part.get("text"), str):
+            raise ProtocolError(f"{loc}: text part requires a string 'text'", param=loc)
+        if t == "image_url":
+            iu = part.get("image_url")
+            url = iu.get("url") if isinstance(iu, dict) else iu
+            if not isinstance(url, str) or not url:
+                raise ProtocolError(f"{loc}: image_url part requires image_url.url (string)", param=loc)
+            if isinstance(iu, dict) and set(iu.keys()) - {"url", "detail"}:
+                raise ProtocolError(f"{loc}: unexpected keys in image_url", param=loc)
+        if t == "input_audio":
+            ia = part.get("input_audio")
+            if not isinstance(ia, dict) or not isinstance(ia.get("data"), str) or not isinstance(ia.get("format"), str):
+                raise ProtocolError(f"{loc}: input_audio part requires inline input_audio.data and .format", param=loc)
+            if set(ia.keys()) - {"data", "format"}:
+                raise ProtocolError(f"{loc}: unexpected keys in input_audio (remote audio is not fetched)", param=loc)
+
+
 class Message(BaseModel):
     model_config = ConfigDict(extra="allow")
     role: str
@@ -147,6 +197,9 @@ def parse_chat_request(body: dict[str, Any]) -> ChatRequest:
         first = e.errors()[0]
         loc = ".".join(str(x) for x in first.get("loc", ()))
         raise ProtocolError(f"invalid chat request: {first.get('msg')} at {loc}", param=loc or None) from e
+    for i, m in enumerate(body.get("messages") or []):
+        if isinstance(m, dict):
+            validate_content_parts(m.get("content"), f"messages[{i}]")
     unknown = set(body.keys()) - FORWARDABLE_CHAT_FIELDS - MODELSAAR_FIELDS
     if unknown:
         raise ProtocolError(

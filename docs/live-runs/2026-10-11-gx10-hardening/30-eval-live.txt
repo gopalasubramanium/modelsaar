@@ -1,0 +1,202 @@
+[eval] calib:ollama/qwen3.6:latest              conv-01      HTTP 200   12.8s
+[eval] calib:ollama/qwen3.6:latest              conv-02      HTTP 200    4.6s
+[eval] calib:ollama/qwen3.6:latest              code-01      HTTP 200    4.5s
+[eval] calib:ollama/qwen3.6:latest              code-02      HTTP 200    4.3s
+[eval] calib:ollama/qwen3.6:latest              agent-01     HTTP 200    2.2s
+[eval] calib:ollama/qwen3.6:latest              agent-02     HTTP 200    2.1s
+[eval] calib:ollama/qwen3.6:latest              math-01      HTTP 200    3.1s
+[eval] calib:ollama/qwen3.6:latest              math-02      HTTP 200    4.2s
+[eval] calib:ollama/qwen3.6:latest              extract-01   HTTP 200    4.4s
+[eval] calib:ollama/qwen3.6:latest              extract-02   HTTP 200    5.1s
+[eval] calib:ollama/qwen3.6:latest              sum-01       HTTP 200    4.5s
+[eval] calib:ollama/qwen3.6:latest              trans-01     HTTP 200    4.6s
+[eval] calib:ollama/qwen3.6:latest              rag-01       HTTP 200    4.3s
+[eval] calib:ollama/qwen3.6:latest              dec-01       HTTP 200    2.6s
+[eval] calib:ollama/qwen3.6:latest              vis-01       HTTP 200    1.6s
+[eval] calib:ollama/gemma4:31b                  conv-01      HTTP 200   46.2s
+[eval] calib:ollama/gemma4:31b                  conv-02      HTTP 200   38.0s
+[eval] calib:ollama/gemma4:31b                  code-01      HTTP 200   34.4s
+[eval] calib:ollama/gemma4:31b                  code-02      HTTP 200   38.0s
+[eval] calib:ollama/gemma4:31b                  agent-01     HTTP 200    5.0s
+[eval] calib:ollama/gemma4:31b                  agent-02     HTTP 200    7.0s
+[eval] calib:ollama/gemma4:31b                  math-01      HTTP 200    8.4s
+[eval] calib:ollama/gemma4:31b                  math-02      HTTP 200   16.4s
+[eval] calib:ollama/gemma4:31b                  extract-01   HTTP 200   27.2s
+[eval] calib:ollama/gemma4:31b                  extract-02   HTTP 200   16.3s
+[eval] calib:ollama/gemma4:31b                  sum-01       HTTP 200   27.2s
+[eval] calib:ollama/gemma4:31b                  trans-01     HTTP 200   29.4s
+[eval] calib:ollama/gemma4:31b                  rag-01       HTTP 200   17.8s
+[eval] calib:ollama/gemma4:31b                  dec-01       HTTP 200   10.2s
+[eval] calib:ollama/gemma4:31b                  vis-01       HTTP 200    8.4s
+[eval] calib:ollama/qwen3-coder:latest          conv-01      HTTP 200    8.6s
+[eval] calib:ollama/qwen3-coder:latest          conv-02      HTTP 200    2.8s
+[eval] calib:ollama/qwen3-coder:latest          code-01      HTTP 200    1.0s
+[eval] calib:ollama/qwen3-coder:latest          code-02      HTTP 200    1.3s
+[eval] calib:ollama/qwen3-coder:latest          agent-01     HTTP 200    0.7s
+[eval] calib:ollama/qwen3-coder:latest          agent-02     HTTP 200    0.6s
+[eval] calib:ollama/qwen3-coder:latest          math-01      HTTP 200    0.4s
+[eval] calib:ollama/qwen3-coder:latest          math-02      HTTP 200    0.3s
+[eval] calib:ollama/qwen3-coder:latest          extract-01   HTTP 200    0.7s
+[eval] calib:ollama/qwen3-coder:latest          extract-02   HTTP 200    0.7s
+[eval] calib:ollama/qwen3-coder:latest          sum-01       HTTP 200    0.7s
+[eval] calib:ollama/qwen3-coder:latest          trans-01     HTTP 200    0.4s
+[eval] calib:ollama/qwen3-coder:latest          rag-01       HTTP 200    0.5s
+[eval] calib:ollama/qwen3-coder:latest          dec-01       HTTP 200    0.4s
+[eval] calib:ollama/qwen3-coder:latest          vis-01       HTTP 422    0.0s
+[eval] test:ollama/qwen3.6:latest               conv-03      HTTP 200   12.3s
+[eval] test:ollama/qwen3.6:latest               conv-04      HTTP 200    3.1s
+[eval] test:ollama/qwen3.6:latest               conv-05      HTTP 200    2.0s
+[eval] test:ollama/qwen3.6:latest               code-03      HTTP 200    4.9s
+[eval] test:ollama/qwen3.6:latest               code-04      HTTP 200    4.5s
+[eval] test:ollama/qwen3.6:latest               code-05      HTTP 200    4.4s
+[eval] test:ollama/qwen3.6:latest               code-06      HTTP 200    4.5s
+[eval] test:ollama/qwen3.6:latest               agent-03     HTTP 200    4.5s
+[eval] test:ollama/qwen3.6:latest               agent-04     HTTP 200    1.9s
+[eval] test:ollama/qwen3.6:latest               agent-05     HTTP 200    1.2s
+[eval] test:ollama/qwen3.6:latest               math-03      HTTP 200    2.8s
+[eval] test:ollama/qwen3.6:latest               math-04      HTTP 200    3.2s
+[eval] test:ollama/qwen3.6:latest               math-05      HTTP 200    4.2s
+[eval] test:ollama/qwen3.6:latest               math-06      HTTP 200    4.3s
+[eval] test:ollama/qwen3.6:latest               extract-03   HTTP 200    4.5s
+[eval] test:ollama/qwen3.6:latest               extract-04   HTTP 200    4.6s
+[eval] test:ollama/qwen3.6:latest               sum-02       HTTP 200    4.3s
+[eval] test:ollama/qwen3.6:latest               sum-03       HTTP 200    4.6s
+[eval] test:ollama/qwen3.6:latest               trans-02     HTTP 200    4.4s
+[eval] test:ollama/qwen3.6:latest               trans-03     HTTP 200    4.3s
+[eval] test:ollama/qwen3.6:latest               multi-01     HTTP 200    3.9s
+[eval] test:ollama/qwen3.6:latest               multi-02     HTTP 200    3.3s
+[eval] test:ollama/qwen3.6:latest               ambig-01     HTTP 200    4.7s
+[eval] test:ollama/qwen3.6:latest               ambig-02     HTTP 200    4.7s
+[eval] test:ollama/qwen3.6:latest               ambig-03     HTTP 200    4.5s
+[eval] test:ollama/qwen3.6:latest               rag-02       HTTP 200    3.1s
+[eval] test:ollama/qwen3.6:latest               rag-03       HTTP 200    3.0s
+[eval] test:ollama/qwen3.6:latest               dec-02       HTTP 200    2.7s
+[eval] test:ollama/qwen3.6:latest               dec-03       HTTP 200    2.7s
+[eval] test:ollama/qwen3.6:latest               vis-02       HTTP 200    1.8s
+[eval] test:ollama/qwen3.6:latest               cont-01      HTTP 200    1.9s
+[eval] test:ollama/qwen3.6:latest               long-01      HTTP 200    4.7s
+[eval] test:ollama/gemma4:31b                   conv-03      HTTP 200   32.9s
+[eval] test:ollama/gemma4:31b                   conv-04      HTTP 200    8.7s
+[eval] test:ollama/gemma4:31b                   conv-05      HTTP 200    4.8s
+[eval] test:ollama/gemma4:31b                   code-03      HTTP 200   38.0s
+[eval] test:ollama/gemma4:31b                   code-04      HTTP 200   27.1s
+[eval] test:ollama/gemma4:31b                   code-05      HTTP 200   38.1s
+[eval] test:ollama/gemma4:31b                   code-06      HTTP 200   15.2s
+[eval] test:ollama/gemma4:31b                   agent-03     HTTP 200    5.3s
+[eval] test:ollama/gemma4:31b                   agent-04     HTTP 200    7.3s
+[eval] test:ollama/gemma4:31b                   agent-05     HTTP 200    5.1s
+[eval] test:ollama/gemma4:31b                   math-03      HTTP 200   12.2s
+[eval] test:ollama/gemma4:31b                   math-04      HTTP 200   16.6s
+[eval] test:ollama/gemma4:31b                   math-05      HTTP 200   18.4s
+[eval] test:ollama/gemma4:31b                   math-06      HTTP 200   34.9s
+[eval] test:ollama/gemma4:31b                   extract-03   HTTP 200   30.0s
+[eval] test:ollama/gemma4:31b                   extract-04   HTTP 200   24.4s
+[eval] test:ollama/gemma4:31b                   sum-02       HTTP 200   27.0s
+[eval] test:ollama/gemma4:31b                   sum-03       HTTP 200   29.4s
+[eval] test:ollama/gemma4:31b                   trans-02     HTTP 200   23.2s
+[eval] test:ollama/gemma4:31b                   trans-03     HTTP 200   31.3s
+[eval] test:ollama/gemma4:31b                   multi-01     HTTP 200   38.1s
+[eval] test:ollama/gemma4:31b                   multi-02     HTTP 200    9.9s
+[eval] test:ollama/gemma4:31b                   ambig-01     HTTP 200   37.9s
+[eval] test:ollama/gemma4:31b                   ambig-02     HTTP 200   28.2s
+[eval] test:ollama/gemma4:31b                   ambig-03     HTTP 200   38.0s
+[eval] test:ollama/gemma4:31b                   rag-02       HTTP 200   16.8s
+[eval] test:ollama/gemma4:31b                   rag-03       HTTP 200   13.7s
+[eval] test:ollama/gemma4:31b                   dec-02       HTTP 200   12.5s
+[eval] test:ollama/gemma4:31b                   dec-03       HTTP 200   11.9s
+[eval] test:ollama/gemma4:31b                   vis-02       HTTP 200    8.5s
+[eval] test:ollama/gemma4:31b                   cont-01      HTTP 200    6.8s
+[eval] test:ollama/gemma4:31b                   long-01      HTTP 200   22.2s
+[eval] test:ollama/qwen3-coder:latest           conv-03      HTTP 200    7.2s
+[eval] test:ollama/qwen3-coder:latest           conv-04      HTTP 200    0.6s
+[eval] test:ollama/qwen3-coder:latest           conv-05      HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           code-03      HTTP 200    1.7s
+[eval] test:ollama/qwen3-coder:latest           code-04      HTTP 200    0.9s
+[eval] test:ollama/qwen3-coder:latest           code-05      HTTP 200    1.5s
+[eval] test:ollama/qwen3-coder:latest           code-06      HTTP 200    0.8s
+[eval] test:ollama/qwen3-coder:latest           agent-03     HTTP 200    0.6s
+[eval] test:ollama/qwen3-coder:latest           agent-04     HTTP 200    0.6s
+[eval] test:ollama/qwen3-coder:latest           agent-05     HTTP 200    0.6s
+[eval] test:ollama/qwen3-coder:latest           math-03      HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           math-04      HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           math-05      HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           math-06      HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           extract-03   HTTP 200    0.6s
+[eval] test:ollama/qwen3-coder:latest           extract-04   HTTP 200    0.6s
+[eval] test:ollama/qwen3-coder:latest           sum-02       HTTP 200    0.7s
+[eval] test:ollama/qwen3-coder:latest           sum-03       HTTP 200    1.2s
+[eval] test:ollama/qwen3-coder:latest           trans-02     HTTP 200    0.5s
+[eval] test:ollama/qwen3-coder:latest           trans-03     HTTP 200    0.4s
+[eval] test:ollama/qwen3-coder:latest           multi-01     HTTP 200    2.0s
+[eval] test:ollama/qwen3-coder:latest           multi-02     HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           ambig-01     HTTP 200    4.8s
+[eval] test:ollama/qwen3-coder:latest           ambig-02     HTTP 200    1.1s
+[eval] test:ollama/qwen3-coder:latest           ambig-03     HTTP 200    1.2s
+[eval] test:ollama/qwen3-coder:latest           rag-02       HTTP 200    0.8s
+[eval] test:ollama/qwen3-coder:latest           rag-03       HTTP 200    0.5s
+[eval] test:ollama/qwen3-coder:latest           dec-02       HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           dec-03       HTTP 200    0.3s
+[eval] test:ollama/qwen3-coder:latest           vis-02       HTTP 422    0.0s
+[eval] test:ollama/qwen3-coder:latest           cont-01      HTTP 200    0.6s
+[eval] test:ollama/qwen3-coder:latest           long-01      HTTP 200    5.1s
+[eval] auto                                     conv-03      HTTP 200    0.5s
+[eval] auto                                     conv-04      HTTP 200    0.4s
+[eval] auto                                     conv-05      HTTP 200    0.3s
+[eval] auto                                     code-03      HTTP 200    1.6s
+[eval] auto                                     code-04      HTTP 200    0.9s
+[eval] auto                                     code-05      HTTP 200    1.4s
+[eval] auto                                     code-06      HTTP 200    0.7s
+[eval] auto                                     agent-03     HTTP 200    0.6s
+[eval] auto                                     agent-04     HTTP 200    0.5s
+[eval] auto                                     agent-05     HTTP 200    0.6s
+[eval] auto                                     math-03      HTTP 200    0.2s
+[eval] auto                                     math-04      HTTP 200    0.3s
+[eval] auto                                     math-05      HTTP 200    0.3s
+[eval] auto                                     math-06      HTTP 200    0.2s
+[eval] auto                                     extract-03   HTTP 200    0.6s
+[eval] auto                                     extract-04   HTTP 200    0.6s
+[eval] auto                                     sum-02       HTTP 200    0.7s
+[eval] auto                                     sum-03       HTTP 200    1.1s
+[eval] auto                                     trans-02     HTTP 200    0.4s
+[eval] auto                                     trans-03     HTTP 200    0.4s
+[eval] auto                                     multi-01     HTTP 200    2.0s
+[eval] auto                                     multi-02     HTTP 200    0.2s
+[eval] auto                                     ambig-01     HTTP 200    4.8s
+[eval] auto                                     ambig-02     HTTP 200    1.1s
+[eval] auto                                     ambig-03     HTTP 200    1.2s
+[eval] auto                                     rag-02       HTTP 200    0.7s
+[eval] auto                                     rag-03       HTTP 200    0.4s
+[eval] auto                                     dec-02       HTTP 200    0.3s
+[eval] auto                                     dec-03       HTTP 200    0.3s
+[eval] auto                                     vis-02       HTTP 200   16.6s
+[eval] auto                                     cont-01      HTTP 200   21.6s
+[eval] auto                                     long-01      HTTP 200    8.0s
+ModelSaar evaluation (live) - 2026-10-11T18:39:50
+
+deployments: ollama/qwen3.6:latest [35.5B Q4_K_M ctx=4096], ollama/gemma4:31b [31.3B Q4_K_M ctx=4096], ollama/qwen3-coder:latest [30.5B Q4_K_M ctx=131072]
+calibration: fixed-strong=ollama/qwen3-coder:latest  fixed-fast=ollama/qwen3-coder:latest  (n_calib=15, n_test=32)
+sandbox: sandbox-exec (macOS sandbox-exec at /usr/bin/sandbox-exec); code_exec tasks executed in isolation
+conditions: max_tokens=400 temperature=0 seed=7 scorer=2026.10.11-2 tasks_sha256=84c34596cb64 git=0f8af84b66df
+checkpoint: live-verify-0f8af84/eval-live.json.records.jsonl (resumed 0 record(s))
+
+policy                                                    success          95% CI  scored  skip  complete  viol   p50 ms   p95 ms
+auto (live routing)                                         0.938  [0.799, 0.983]      32     0     1.000     0    597.8   7957.8
+fixed-strong (calibrated)                                   0.938  [0.799, 0.983]      32     0     0.969     1    639.4   4760.3
+fixed-fast (calibrated)                                     0.938  [0.799, 0.983]      32     0     0.969     1    639.4   4760.3
+rules (gold label, specialist tags)                         0.812  [0.647, 0.911]      32     0     1.000     0    962.5   4859.0
+random (diagnostic)                                         0.719  [0.546, 0.844]      32     0     1.000     0   4319.8  24356.0
+oracle (offline upper bound, not available at runtime)      1.000    [0.893, 1.0]      32     0     1.000     0    639.1   4670.6
+
+per category (success over scored; -- = all skipped)         agent     coding conversati   decision document_v extraction       math        rag summarizat translatio
+auto (live routing)                                           1.00       1.00       1.00       1.00       1.00       1.00       0.83       1.00       0.67       1.00
+fixed-strong (calibrated)                                     1.00       1.00       1.00       1.00       0.00       1.00       0.83       1.00       1.00       1.00
+fixed-fast (calibrated)                                       1.00       1.00       1.00       1.00       0.00       1.00       0.83       1.00       1.00       1.00
+rules (gold label, specialist tags)                           1.00       0.00       1.00       1.00       1.00       1.00       0.83       1.00       1.00       1.00
+random (diagnostic)                                           1.00       0.40       1.00       1.00       1.00       0.50       0.67       1.00       0.67       0.00
+oracle (offline upper bound, not available at runtime)        1.00       1.00       1.00       1.00       1.00       1.00       1.00       1.00       1.00       1.00
+
+routing overhead: mean 0.67 ms, p95 0.98 ms; task-label accuracy 0.844; evidence levels {'measured:1': 7, 'measured:2': 25}
+routing mistakes (auto failed, oracle succeeded): ['math-05', 'long-01']
+classifier: {'used': 0, 'timeouts': 0}
+
+report written to live-verify-0f8af84/eval-live.json

@@ -131,7 +131,6 @@ async def chat_completions(request: Request) -> Response:
         state.requests_failed += 1
         return _no_eligible_response(e.decision)
 
-    response_model = dec.requested_model if state.cfg.server.response_model_field == "requested" else dec.chosen
     base_headers = {"X-ModelSaar-Request-Id": dec.request_id}
     attempts = 0
     max_attempts = 1 + (state.cfg.routing.max_failover_attempts if state.cfg.routing.pre_commit_failover else 0)
@@ -149,6 +148,8 @@ async def chat_completions(request: Request) -> Response:
         adapter = router.adapters[dep.backend_id]
         attempts += 1
         tried.append(dep_id)
+        # Attribution follows the deployment actually dispatched to (per attempt, not once).
+        response_model = dec.requested_model if state.cfg.server.response_model_field == "requested" else dep_id
         try:
             reservation = await router.admission.acquire(dep, timeout=None)
         except AdmissionRejected as e:
@@ -189,9 +190,19 @@ async def chat_completions(request: Request) -> Response:
                     except Exception:
                         payload = error_body(redact(text.decode("utf-8", "replace")[:500]), code="upstream_error")
                     return _json(upstream.status, payload, headers)
-                if circuit:
-                    circuit.record_success()
-                router.pin_session(dec, caller, dep_id)
+                ctype = (upstream.headers.get("content-type") or "").lower()
+                if "text/event-stream" not in ctype:
+                    # A 200 that is not an SSE stream (proxy HTML page, JSON error with 200) is not a
+                    # completion. Nothing has been sent to the client: typed error, no pin, no success.
+                    text = (await upstream.aread())[:300]
+                    await upstream.close()
+                    raise AdapterError(
+                        f"upstream returned 200 with content-type {ctype or 'missing'!r} instead of text/event-stream",
+                        status=502,
+                        retryable=False,
+                        kind="bad_envelope",
+                    )
+                # Circuit success and session pinning are recorded once the stream completes (see _relay).
                 return StreamingResponse(
                     _relay(state, router, dec, dep_id, upstream, reservation, response_model, caller),
                     status_code=200,
@@ -203,13 +214,16 @@ async def chat_completions(request: Request) -> Response:
                 await reservation.release()
                 if resp.status >= 500:
                     raise AdapterError(f"upstream {resp.status}", status=502, retryable=True)
-                if circuit:
-                    circuit.record_success()
                 if resp.status != 200:
                     dec.outcome = "upstream_error"
                     dec.outcome_detail = f"upstream {resp.status}"
                     router.record(dec)
                     return _json(resp.status, resp.body, headers)
+                why = _envelope_problem(resp.body)
+                if why:
+                    raise AdapterError(f"upstream returned 200 but {why}", status=502, retryable=False, kind="bad_envelope")
+                if circuit:
+                    circuit.record_success()
                 out = dict(resp.body)
                 out["model"] = response_model
                 router.pin_session(dec, caller, dep_id)
@@ -219,7 +233,14 @@ async def chat_completions(request: Request) -> Response:
                 router.record(dec)
                 return _json(200, out, headers)
         except Exception as e:  # noqa: BLE001 - every failure path must release the slot
-            await reservation.release()
+            if isinstance(e, AdapterError) and e.kind == "timeout":
+                # The backend did not answer in time but may still be generating: hold the slot.
+                await reservation.mark_uncertain()
+            elif isinstance(e, AdapterError) and e.kind == "connect":
+                # Proven pre-dispatch failure: nothing reached the runtime, so no weights were loaded.
+                await reservation.release(submitted=False)
+            else:
+                await reservation.release()
             if not isinstance(e, AdapterError):
                 state.requests_failed += 1
                 dec.outcome = "internal_error"
@@ -235,20 +256,28 @@ async def chat_completions(request: Request) -> Response:
                 router.record(dec)
                 return _json(400, error_body(e.message, code="unsupported_semantics", modelsaar={"request_id": dec.request_id}), headers)
             next_id = next((c for c in candidate_ids if c not in tried), None)
-            if e.retryable and attempts < max_attempts and next_id:
+            if e.retryable and attempts < max_attempts and next_id and dec.failover_allowed:
                 dec.reasons.append(f"failover: {dep_id} failed before response commitment ({e.kind}); trying {next_id}")
                 dec.chosen = next_id
                 continue
+            if e.retryable and next_id and not dec.failover_allowed:
+                dec.reasons.append(f"failover refused: {dec.failover_note}")
             state.requests_failed += 1
-            dec.outcome = "upstream_error"
+            dec.outcome = "upstream_bad_response" if e.kind == "bad_envelope" else "upstream_error"
             dec.outcome_detail = redact(e.message)[:200]
             router.record(dec)
             return _json(
                 e.status,
                 error_body(
                     f"backend failed before a response was committed: {redact(e.message)}",
-                    code="upstream_error",
-                    modelsaar={"request_id": dec.request_id, "deployment": dep_id, "failover": dec.failover},
+                    code="upstream_bad_response" if e.kind == "bad_envelope" else "upstream_error",
+                    modelsaar={
+                        "request_id": dec.request_id,
+                        "deployment": dep_id,
+                        "failover": dec.failover,
+                        "failover_allowed": dec.failover_allowed,
+                        "failover_note": dec.failover_note,
+                    },
                 ),
                 headers,
             )
@@ -256,6 +285,21 @@ async def chat_completions(request: Request) -> Response:
 
 class _UpstreamStreamError(Exception):
     """The upstream stream ended abnormally after the response was committed."""
+
+
+def _envelope_problem(body: Any) -> str | None:
+    """Return why ``body`` is not a chat completion envelope, or None if it is one."""
+    if not isinstance(body, dict):
+        return "body is not a JSON object"
+    if "error" in body and "choices" not in body:
+        return "body is an error object"
+    choices = body.get("choices")
+    if not isinstance(choices, list) or not choices:
+        return "choices is missing or empty"
+    first = choices[0]
+    if not isinstance(first, dict) or not isinstance(first.get("message"), dict):
+        return "choices[0].message is missing"
+    return None
 
 
 def _remember_tool_calls(router: Router, caller: str, dep_id: str, resp: dict[str, Any]) -> None:
@@ -281,17 +325,30 @@ async def _relay(
     response_model: str,
     caller: str,
 ) -> AsyncIterator[bytes]:
-    """Relay upstream SSE to the client. After the first byte the response is committed."""
+    """Relay upstream SSE to the client. After the first byte the response is committed.
+
+    Occupancy: the reservation is released only on confirmed completion or a confirmed upstream
+    failure (the backend ended the stream). A read timeout or client disconnect leaves the backend
+    possibly still generating, so the slot and the pool memory are held as *uncertain* until the
+    configured hold expires (admission.uncertain_hold_s) — the same rule as non-streaming timeouts."""
     parser = SSEParser()
     obs = StreamObserver()
     tool_ids: list[str] = []
     completed = False
+    uncertain = False
     try:
         async for chunk in upstream.aiter_bytes():
             if obs.first_byte_at is None:
                 obs.first_byte_at = time.monotonic()
             for ev in parser.feed(chunk):
                 obs.observe(ev)
+                if ev.kind == "malformed":
+                    # Not forwarded: it is not a completion structure. The stream is invalidated below.
+                    continue
+                if ev.kind == "done":
+                    # The upstream terminal marker is held back: the downstream [DONE] is emitted
+                    # exactly once, after validation, so any error frame precedes it.
+                    continue
                 obj = ev.json()
                 if obj:
                     for ch in obj.get("choices") or []:
@@ -301,15 +358,14 @@ async def _relay(
                 yield rewrite_model_field(ev, response_model)
         for ev in parser.flush():
             obs.observe(ev)
-            yield rewrite_model_field(ev, response_model)
-        if obs.error is not None:
-            raise _UpstreamStreamError(f"upstream emitted an error event: {obs.error[:160]}")
-        if not obs.saw_done and obs.finish_reason is None:
-            raise _UpstreamStreamError("upstream stream ended without a finish_reason or [DONE] (truncated)")
+            if ev.kind not in ("malformed", "done"):
+                yield rewrite_model_field(ev, response_model)
+        problem = obs.completion_problem()
+        if problem:
+            raise _UpstreamStreamError(problem)
         completed = True
-        if not obs.saw_done:
-            # Finish reason seen but no terminal sentinel: terminate the protocol so clients do not hang.
-            yield b"data: [DONE]\n\n"
+        # Exactly one terminal marker, after every validated event.
+        yield b"data: [DONE]\n\n"
     except (asyncio.CancelledError, GeneratorExit):
         # Client went away. The backend may still be generating: hold the slot as uncertain.
         dec.outcome = "client_disconnected"
@@ -319,7 +375,14 @@ async def _relay(
         router.record(dec)
         raise
     except Exception as e:  # upstream failure mid-stream: terminate, never switch.
-        dec.outcome = "stream_truncated_after_commit" if isinstance(e, _UpstreamStreamError) else "stream_failed_after_commit"
+        if isinstance(e, AdapterError) and e.kind == "timeout":
+            # The gateway stopped waiting; the backend did not end the stream and may still compute.
+            uncertain = True
+            dec.outcome = "stream_timeout_after_commit"
+        elif isinstance(e, _UpstreamStreamError):
+            dec.outcome = "stream_invalid_after_commit" if obs.malformed or not obs.valid_chunks else "stream_truncated_after_commit"
+        else:
+            dec.outcome = "stream_failed_after_commit"
         dec.outcome_detail = redact(str(e))[:200]
         c = router.admission.circuit(router.registry.get(dep_id).backend_id) if router.registry.get(dep_id) else None
         if c:
@@ -328,24 +391,34 @@ async def _relay(
             "upstream stream failed after the response was committed; the gateway does not switch models "
             f"mid-response ({redact(str(e))[:160]})",
             code="upstream_stream_error",
-            modelsaar={"request_id": dec.request_id, "deployment": dep_id, "events_delivered": obs.events},
+            modelsaar={"request_id": dec.request_id, "deployment": dep_id, "events_delivered": obs.events, "outcome": dec.outcome},
         )
         yield b"data: [DONE]\n\n"
     finally:
         if completed:
             dec.outcome = "ok"
             dec.outcome_detail = (
-                f"events={obs.events} finish={obs.finish_reason} tool_deltas={obs.tool_call_deltas} "
+                f"events={obs.events} chunks={obs.valid_chunks} finish={obs.finish_reason} tool_deltas={obs.tool_call_deltas} "
                 f"usage={'yes' if obs.usage else 'no'}"
             )
             await reservation.release()
             await upstream.close()
+            # Only a validated, complete stream counts as a success for the circuit and for pinning.
+            d = router.registry.get(dep_id)
+            c = router.admission.circuit(d.backend_id) if d else None
+            if c:
+                c.record_success()
+            router.pin_session(dec, caller, dep_id)
             if tool_ids:
                 router.affinity.remember_tool_calls(caller, tool_ids, dep_id)
                 for i in tool_ids:
                     router.affinity.remember_tool_calls(caller, [i], dep_id)
             router.record(dec)
-        elif dec.outcome in ("stream_failed_after_commit", "stream_truncated_after_commit"):
+        elif uncertain:
+            await reservation.mark_uncertain()
+            await upstream.close()
+            router.record(dec)
+        elif dec.outcome in ("stream_failed_after_commit", "stream_truncated_after_commit", "stream_invalid_after_commit"):
             await reservation.release()
             await upstream.close()
             router.record(dec)
@@ -373,6 +446,14 @@ async def embeddings(request: Request) -> Response:
     dep = router.registry.get(dec.chosen)  # type: ignore[arg-type]
     adapter = router.adapters[dep.backend_id]
     headers = {"X-ModelSaar-Request-Id": dec.request_id, "X-ModelSaar-Deployment": dep.id}
+    contract = next((c for c in state.cfg.embeddings if c.alias == dec.alias), None) if dec.alias else None
+    problem = router.embedding_request_problem(body, contract, dep)
+    if problem:
+        state.requests_failed += 1
+        dec.outcome = "unsupported_contract_option"
+        dec.outcome_detail = problem
+        router.record(dec)
+        return _json(400, error_body(problem, code="unsupported_contract_option", modelsaar={"request_id": dec.request_id}), headers)
     try:
         reservation = await router.admission.acquire(dep)
     except AdmissionRejected as e:
@@ -380,23 +461,98 @@ async def embeddings(request: Request) -> Response:
         router.record(dec)
         return _json(e.status, error_body(e.message, code="admission_rejected"), headers)
     try:
-        resp = await adapter.embeddings(dep, body)
+        # Same deadline rule as chat: the server request timeout or the backend timeout, whichever is tighter.
+        resp = await adapter.embeddings(dep, body, timeout=state.cfg.server.request_timeout_s)
     except AdapterError as e:
-        dec.outcome = "upstream_error"
+        if e.kind == "timeout":
+            # The backend may still be computing: hold the slot/memory as uncertain, do not release.
+            await reservation.mark_uncertain()
+        else:
+            await reservation.release(submitted=e.kind != "connect")
+        state.requests_failed += 1
+        dec.outcome = "upstream_timeout" if e.kind == "timeout" else "upstream_error"
         dec.outcome_detail = redact(e.message)[:200]
         router.record(dec)
-        return _json(e.status, error_body(redact(e.message), code="upstream_error"), headers)
-    finally:
+        return _json(e.status, error_body(redact(e.message), code="upstream_timeout" if e.kind == "timeout" else "upstream_error", modelsaar={"request_id": dec.request_id, "deployment": dep.id}), headers)
+    except Exception as e:  # noqa: BLE001 - every failure path must account for the slot
         await reservation.release()
+        state.requests_failed += 1
+        dec.outcome = "internal_error"
+        dec.outcome_detail = redact(f"{e.__class__.__name__}: {e}")[:200]
+        router.record(dec)
+        log.exception("unexpected error in embeddings dispatch to %s", dep.id)
+        return _json(500, error_body("internal gateway error", code="internal_error", modelsaar={"request_id": dec.request_id}), headers)
+    await reservation.release()
     if resp.status != 200:
         dec.outcome = "upstream_error"
         router.record(dec)
         return _json(resp.status, resp.body, headers)
+    expected_dims = (contract.dimensions if contract else None) or dep.embedding_dimensions
+    violation = _embedding_problem(resp.body, _embedding_input_count(body.get("input")), expected_dims, contract.normalized if contract else None)
+    if violation:
+        state.requests_failed += 1
+        dec.outcome = "embedding_contract_violation"
+        dec.outcome_detail = violation
+        router.record(dec)
+        return _json(
+            502,
+            error_body(
+                f"backend output violates the embedding contract: {violation}",
+                code="embedding_contract_violation",
+                modelsaar={"request_id": dec.request_id, "deployment": dep.id},
+            ),
+            headers,
+        )
     out = dict(resp.body)
     out["model"] = dec.requested_model if state.cfg.server.response_model_field == "requested" else dep.id
+    if contract:
+        router.record_embedding_identity(contract.alias, dep)
     dec.outcome = "ok"
     router.record(dec)
     return _json(200, out, headers)
+
+
+def _embedding_input_count(inp: Any) -> int:
+    if isinstance(inp, str):
+        return 1
+    if isinstance(inp, list):
+        if inp and all(isinstance(x, int) for x in inp):
+            return 1  # one token array
+        return len(inp)
+    return 1
+
+
+def _embedding_problem(body: Any, n_inputs: int, dims: int | None, normalized: bool | None) -> str | None:
+    """Validate count, indices, dimensions, finiteness and (when the contract says so) unit norm."""
+    import math
+
+    if not isinstance(body, dict) or not isinstance(body.get("data"), list):
+        return "response has no data list"
+    data = body["data"]
+    if len(data) != n_inputs:
+        return f"{len(data)} vectors returned for {n_inputs} inputs"
+    seen_dims: int | None = None
+    for i, item in enumerate(data):
+        if not isinstance(item, dict):
+            return f"data[{i}] is not an object"
+        if item.get("index") != i:
+            return f"data[{i}].index is {item.get('index')!r}"
+        vec = item.get("embedding")
+        if not isinstance(vec, list) or not vec:
+            return f"data[{i}].embedding is not a non-empty list (base64 encodings are not supported)"
+        if not all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in vec):
+            return f"data[{i}].embedding contains non-finite or non-numeric values"
+        if seen_dims is None:
+            seen_dims = len(vec)
+        elif len(vec) != seen_dims:
+            return f"data[{i}].embedding has {len(vec)} dimensions, data[0] has {seen_dims}"
+        if dims and len(vec) != dims:
+            return f"data[{i}].embedding has {len(vec)} dimensions; contract requires {dims}"
+        if normalized:
+            norm = math.sqrt(sum(v * v for v in vec))
+            if abs(norm - 1.0) > 1e-2:
+                return f"data[{i}].embedding has L2 norm {norm:.3f}; contract declares normalized vectors (set normalized: false if the model does not normalize)"
+    return None
 
 
 # --------------------------------------------------------------------------- #
@@ -412,7 +568,10 @@ async def list_models(request: Request) -> Response:
 
 
 async def healthz(request: Request) -> Response:
-    return _json(200, {"status": "ok", "version": __version__})
+    # Unauthenticated identification contract used by `modelsaar test` and the installer to tell a
+    # ModelSaar gateway from another service on the same port before any key is sent. It is a
+    # collision check, not authentication: anything can imitate it.
+    return _json(200, {"status": "ok", "service": "modelsaar", "version": __version__, "api": "openai-compatible"})
 
 
 async def readyz(request: Request) -> Response:
@@ -526,6 +685,50 @@ async def admin_refresh(request: Request) -> Response:
     return _json(200, {"registry_version": state.router.registry.version, "error": state.router.last_refresh_error})
 
 
+async def admin_probe(request: Request) -> Response:
+    """Run capability probes for one deployment under the gateway's own admission (slots, memory
+    budget, queue). This is the coordinated path `modelsaar probe` uses while a gateway is running,
+    so probe inference never overlaps with serving beyond the configured limits."""
+    state: GatewayState = request.app.state.gw
+    try:
+        _require_admin(state, request)
+        body = await _read_json(request, state.cfg.server.max_request_bytes)
+    except ProtocolError as e:
+        return _json(e.status, e.body())
+    from .probes import PROBE_NAMES, run_probes
+
+    router = state.router
+    dep_id = str(body.get("deployment", ""))
+    dep = router.registry.get(dep_id)
+    if dep is None:
+        return _json(404, error_body(f"deployment {dep_id!r} not found", code="unknown_deployment"))
+    if dep.role != "generative" or not dep.healthy:
+        return _json(422, error_body(f"{dep_id} is not a healthy generative deployment", code="not_probeable"))
+    if state.cfg.security.locality_mode == "local_only" and dep.locality != "local":
+        return _json(422, error_body(f"{dep_id} is not local; probes send prompts and are refused under local_only", code="locality"))
+    which = body.get("which") or None
+    if which is not None and (not isinstance(which, list) or any(w not in PROBE_NAMES for w in which)):
+        return _json(400, error_body(f"which must be a subset of {sorted(PROBE_NAMES)}", code="invalid_request_error"))
+    timeout = float(body.get("timeout") or 120.0)
+    try:
+        reservation = await router.admission.acquire(dep, timeout=None)
+    except AdmissionRejected as e:
+        return _json(e.status, error_body(e.message, code="admission_rejected"), {"Retry-After": "2"})
+    try:
+        rep = await run_probes(router.adapters[dep.backend_id], dep, state.store, which, timeout=timeout)
+    except BaseException:
+        await reservation.release()
+        raise
+    if rep.uncertain:
+        # A probe inference timed out: the runner stopped and the backend may still be computing.
+        # Hold the slot and the pool memory as uncertain (same rule as serving timeouts).
+        await reservation.mark_uncertain()
+    else:
+        await reservation.release()
+    await router.refresh()
+    return _json(200, rep.as_dict())
+
+
 async def admin_ui(request: Request) -> Response:
     page = Path(__file__).parent / "static" / "status.html"
     return HTMLResponse(page.read_text(encoding="utf-8"))
@@ -563,6 +766,7 @@ def build_app(cfg: Config, router: Router, auth: Auth, store: Store | None) -> S
             Route("/admin/decisions/{request_id}", admin_decisions, methods=["GET"]),
             Route("/admin/explain", admin_explain, methods=["POST"]),
             Route("/admin/refresh", admin_refresh, methods=["POST"]),
+            Route("/admin/probe", admin_probe, methods=["POST"]),
             Route("/admin/ui", admin_ui, methods=["GET"]),
         ],
         lifespan=lifespan,

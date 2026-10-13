@@ -1,0 +1,7 @@
+[client-check] chat                               HTTP 200 -> ollama/qwen3.8:latest {'response_model': 'auto', 'attribution_ok': True, 'finish': 'length'}
+[client-check] stream                             HTTP 200 -> ollama/qwen3-coder:latest {'frames': 12, 'done': True, 'finish': 'stop', 'model_fields': ['auto-fast'], 'content_type': 'text/event-stream; charset=utf-8'}
+[client-check] tools_emission                     HTTP 200 -> ollama/qwen3-coder:latest {'tool_calls': 1, 'finish': 'tool_calls'}
+[client-check] tool_result_continuation           HTTP 200 -> ollama/qwen3-coder:latest {'same_deployment': True, 'issuer': 'ollama/qwen3-coder:latest'}
+[client-check] session_header_pin                 HTTP 200 -> ollama/qwen3.8:latest {'first': 'ollama/qwen3.8:latest', 'pinned': True}
+[client-check] unsupported_part_400               HTTP 400 -> None {'code': 'unsupported_content_type'}
+[client-check] wrote live-verify-0f8af84/client-checks.json

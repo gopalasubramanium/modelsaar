@@ -1,0 +1,13 @@
+request req_d86df03bcce343b5: auto -> ollama/qwen3-coder:latest  (profile quality, 0.9 ms)
+task: coding {'coding': 0.85, 'agent': 0.8} ambiguous=False  tokens~3176
+  - task=coding (clear); required: tool support; context need ~3176 tokens
+  - ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2)), latency cost 0.04, resident
+candidates:
+  ollama/qwen3-coder:latest                score=+0.976 quality=1.00±0.50 [measured:2 (blend: coding=measured:2, agent=measured:2)] latency=0.04 residency=0.00 ['latency:measured', 'load:measured']
+  ollama/qwen3.8:latest                    score=+0.682 quality=0.71±0.25 [prior:catalogue (blend: coding=prior:catalogue, agent=prior:catalogue)] latency=0.07 residency=0.00 ['latency:measured-other-task', 'load:memory-heuristic']
+  ollama/muse-glimmer:latest               score=+0.615 quality=0.70±0.28 [prior-general:catalogue (blend: coding=prior-general:catalogue, agent=prior:catalogue)] latency=0.43 residency=0.02 ['latency:measured-other-task', 'load:measured']
+  ollama/gemma4:31b                        score=+0.573 quality=0.74±0.50 [measured:2 (blend: coding=measured:2, agent=measured:2)] latency=1.00 residency=0.00 ['latency:measured', 'load:measured']
+  ollama/qwen3-coder-next:latest           score=+0.542 quality=0.59±0.35 [uncalibrated:size-heuristic (blend: coding=uncalibrated:size-heuristic, agent=uncalibrated:size-heuristic)] latency=0.02 residency=0.01 ['latency:measured-other-task', 'load:measured']
+  ollama/qwen3.6-fast:latest               score=+0.539 quality=0.58±0.35 [uncalibrated:size-heuristic (blend: coding=uncalibrated:size-heuristic, agent=uncalibrated:size-heuristic)] latency=0.10 residency=0.01 ['latency:measured-other-task', 'load:measured']
+  ollama/qwen3.6-accurate:latest           score=+0.538 quality=0.58±0.35 [uncalibrated:size-heuristic (blend: coding=uncalibrated:size-heuristic, agent=uncalibrated:size-heuristic)] latency=0.12 residency=0.00 ['latency:measured-other-task', 'load:measured']
+  ollama/qwen3.6:latest                    score=+0.326 quality=0.48±0.50 [measured:2 (blend: coding=measured:2, agent=measured:2)] latency=0.24 residency=1.00 ['latency:measured', 'load:memory-heuristic']

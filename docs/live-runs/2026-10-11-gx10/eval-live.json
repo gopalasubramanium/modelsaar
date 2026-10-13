@@ -1,0 +1,3622 @@
+{
+  "generated_at": "2026-10-11T15:52:21",
+  "mode": "live",
+  "deployments": [
+    {
+      "id": "ollama/qwen3.6:latest",
+      "family": "qwen35moe",
+      "parameter_size": "35.5B",
+      "quantization": "Q4_K_M",
+      "runtime": "ollama",
+      "context_length": 4096,
+      "fingerprint": "57a54839803409d7"
+    },
+    {
+      "id": "ollama/gemma4:31b",
+      "family": "gemma4",
+      "parameter_size": "31.3B",
+      "quantization": "Q4_K_M",
+      "runtime": "ollama",
+      "context_length": 131072,
+      "fingerprint": "3193f29b78007007"
+    },
+    {
+      "id": "ollama/qwen3-coder:latest",
+      "family": "qwen3moe",
+      "parameter_size": "30.5B",
+      "quantization": "Q4_K_M",
+      "runtime": "ollama",
+      "context_length": 4096,
+      "fingerprint": "ad411b7922f42b0b"
+    }
+  ],
+  "n_calib": 15,
+  "n_test": 32,
+  "calibration": {
+    "per_deployment": {
+      "ollama/qwen3.6:latest": {
+        "n": 15,
+        "success": 0.4,
+        "ci95": [
+          0.198,
+          0.643
+        ],
+        "completion_rate": 0.867,
+        "capability_violations": 2,
+        "p50_ms": 4344.5,
+        "p95_ms": 4596.6,
+        "per_category": {
+          "agent": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "coding": {
+            "success": 0.0,
+            "n": 2,
+            "ci95": [
+              0.0,
+              0.658
+            ]
+          },
+          "conversation": {
+            "success": 0.0,
+            "n": 2,
+            "ci95": [
+              0.0,
+              0.658
+            ]
+          },
+          "decision": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "document_vision": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "extraction": {
+            "success": 0.0,
+            "n": 2,
+            "ci95": [
+              0.0,
+              0.658
+            ]
+          },
+          "math": {
+            "success": 0.5,
+            "n": 2,
+            "ci95": [
+              0.095,
+              0.905
+            ]
+          },
+          "rag": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "summarization": {
+            "success": 0.0,
+            "n": 1,
+            "ci95": [
+              0.0,
+              0.793
+            ]
+          },
+          "translation": {
+            "success": 0.0,
+            "n": 1,
+            "ci95": [
+              0.0,
+              0.793
+            ]
+          }
+        }
+      },
+      "ollama/gemma4:31b": {
+        "n": 15,
+        "success": 0.667,
+        "ci95": [
+          0.417,
+          0.848
+        ],
+        "completion_rate": 0.867,
+        "capability_violations": 2,
+        "p50_ms": 17737.7,
+        "p95_ms": 37878.8,
+        "per_category": {
+          "agent": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "coding": {
+            "success": 0.5,
+            "n": 2,
+            "ci95": [
+              0.095,
+              0.905
+            ]
+          },
+          "conversation": {
+            "success": 0.0,
+            "n": 2,
+            "ci95": [
+              0.0,
+              0.658
+            ]
+          },
+          "decision": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "document_vision": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "extraction": {
+            "success": 0.0,
+            "n": 2,
+            "ci95": [
+              0.0,
+              0.658
+            ]
+          },
+          "math": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "rag": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "summarization": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "translation": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          }
+        }
+      },
+      "ollama/qwen3-coder:latest": {
+        "n": 15,
+        "success": 0.933,
+        "ci95": [
+          0.702,
+          0.988
+        ],
+        "completion_rate": 0.933,
+        "capability_violations": 1,
+        "p50_ms": 686.7,
+        "p95_ms": 2738.4,
+        "per_category": {
+          "agent": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "coding": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "conversation": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "decision": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "document_vision": {
+            "success": 0.0,
+            "n": 1,
+            "ci95": [
+              0.0,
+              0.793
+            ]
+          },
+          "extraction": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "math": {
+            "success": 1.0,
+            "n": 2,
+            "ci95": [
+              0.342,
+              1.0
+            ]
+          },
+          "rag": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "summarization": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          },
+          "translation": {
+            "success": 1.0,
+            "n": 1,
+            "ci95": [
+              0.207,
+              1.0
+            ]
+          }
+        }
+      }
+    },
+    "fixed_strong": "ollama/qwen3-coder:latest",
+    "fixed_fast": "ollama/qwen3-coder:latest"
+  },
+  "results": {
+    "auto (live routing)": {
+      "n": 32,
+      "success": 0.875,
+      "ci95": [
+        0.719,
+        0.95
+      ],
+      "completion_rate": 1.0,
+      "capability_violations": 0,
+      "p50_ms": 692.5,
+      "p95_ms": 27135.7,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.6,
+          "n": 5,
+          "ci95": [
+            0.231,
+            0.882
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 1.0,
+          "n": 1,
+          "ci95": [
+            0.207,
+            1.0
+          ]
+        },
+        "extraction": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "math": {
+          "success": 0.833,
+          "n": 6,
+          "ci95": [
+            0.436,
+            0.97
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 0.667,
+          "n": 3,
+          "ci95": [
+            0.208,
+            0.939
+          ]
+        },
+        "translation": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        }
+      }
+    },
+    "fixed-strong (calibrated)": {
+      "n": 32,
+      "success": 0.906,
+      "ci95": [
+        0.758,
+        0.968
+      ],
+      "completion_rate": 0.969,
+      "capability_violations": 1,
+      "p50_ms": 645.8,
+      "p95_ms": 4848.5,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.8,
+          "n": 5,
+          "ci95": [
+            0.376,
+            0.964
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 0.0,
+          "n": 1,
+          "ci95": [
+            0.0,
+            0.793
+          ]
+        },
+        "extraction": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "math": {
+          "success": 0.833,
+          "n": 6,
+          "ci95": [
+            0.436,
+            0.97
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 1.0,
+          "n": 3,
+          "ci95": [
+            0.438,
+            1.0
+          ]
+        },
+        "translation": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        }
+      }
+    },
+    "fixed-fast (calibrated)": {
+      "n": 32,
+      "success": 0.906,
+      "ci95": [
+        0.758,
+        0.968
+      ],
+      "completion_rate": 0.969,
+      "capability_violations": 1,
+      "p50_ms": 645.8,
+      "p95_ms": 4848.5,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.8,
+          "n": 5,
+          "ci95": [
+            0.376,
+            0.964
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 0.0,
+          "n": 1,
+          "ci95": [
+            0.0,
+            0.793
+          ]
+        },
+        "extraction": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "math": {
+          "success": 0.833,
+          "n": 6,
+          "ci95": [
+            0.436,
+            0.97
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 1.0,
+          "n": 3,
+          "ci95": [
+            0.438,
+            1.0
+          ]
+        },
+        "translation": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        }
+      }
+    },
+    "rules (gold label, specialist tags)": {
+      "n": 32,
+      "success": 0.812,
+      "ci95": [
+        0.647,
+        0.911
+      ],
+      "completion_rate": 1.0,
+      "capability_violations": 0,
+      "p50_ms": 958.5,
+      "p95_ms": 4867.6,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.0,
+          "n": 5,
+          "ci95": [
+            0.0,
+            0.434
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 1.0,
+          "n": 1,
+          "ci95": [
+            0.207,
+            1.0
+          ]
+        },
+        "extraction": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "math": {
+          "success": 0.833,
+          "n": 6,
+          "ci95": [
+            0.436,
+            0.97
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 1.0,
+          "n": 3,
+          "ci95": [
+            0.438,
+            1.0
+          ]
+        },
+        "translation": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        }
+      }
+    },
+    "random (diagnostic)": {
+      "n": 32,
+      "success": 0.688,
+      "ci95": [
+        0.514,
+        0.82
+      ],
+      "completion_rate": 0.938,
+      "capability_violations": 2,
+      "p50_ms": 4188.9,
+      "p95_ms": 9826.1,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.4,
+          "n": 5,
+          "ci95": [
+            0.118,
+            0.769
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 1.0,
+          "n": 1,
+          "ci95": [
+            0.207,
+            1.0
+          ]
+        },
+        "extraction": {
+          "success": 0.0,
+          "n": 2,
+          "ci95": [
+            0.0,
+            0.658
+          ]
+        },
+        "math": {
+          "success": 0.667,
+          "n": 6,
+          "ci95": [
+            0.3,
+            0.903
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 0.667,
+          "n": 3,
+          "ci95": [
+            0.208,
+            0.939
+          ]
+        },
+        "translation": {
+          "success": 0.0,
+          "n": 2,
+          "ci95": [
+            0.0,
+            0.658
+          ]
+        }
+      }
+    },
+    "oracle (offline upper bound, not available at runtime)": {
+      "n": 32,
+      "success": 0.969,
+      "ci95": [
+        0.843,
+        0.994
+      ],
+      "completion_rate": 1.0,
+      "capability_violations": 0,
+      "p50_ms": 552.0,
+      "p95_ms": 4585.2,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.8,
+          "n": 5,
+          "ci95": [
+            0.376,
+            0.964
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 1.0,
+          "n": 1,
+          "ci95": [
+            0.207,
+            1.0
+          ]
+        },
+        "extraction": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "math": {
+          "success": 1.0,
+          "n": 6,
+          "ci95": [
+            0.61,
+            1.0
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 1.0,
+          "n": 3,
+          "ci95": [
+            0.438,
+            1.0
+          ]
+        },
+        "translation": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        }
+      }
+    }
+  },
+  "per_deployment_test": {
+    "ollama/qwen3.6:latest": {
+      "n": 32,
+      "success": 0.5,
+      "ci95": [
+        0.336,
+        0.664
+      ],
+      "completion_rate": 0.938,
+      "capability_violations": 2,
+      "p50_ms": 4188.9,
+      "p95_ms": 4724.1,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.0,
+          "n": 5,
+          "ci95": [
+            0.0,
+            0.434
+          ]
+        },
+        "conversation": {
+          "success": 0.6,
+          "n": 5,
+          "ci95": [
+            0.231,
+            0.882
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 1.0,
+          "n": 1,
+          "ci95": [
+            0.207,
+            1.0
+          ]
+        },
+        "extraction": {
+          "success": 0.0,
+          "n": 2,
+          "ci95": [
+            0.0,
+            0.658
+          ]
+        },
+        "math": {
+          "success": 0.667,
+          "n": 6,
+          "ci95": [
+            0.3,
+            0.903
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 0.0,
+          "n": 3,
+          "ci95": [
+            0.0,
+            0.562
+          ]
+        },
+        "translation": {
+          "success": 0.0,
+          "n": 2,
+          "ci95": [
+            0.0,
+            0.658
+          ]
+        }
+      }
+    },
+    "ollama/gemma4:31b": {
+      "n": 32,
+      "success": 0.875,
+      "ci95": [
+        0.719,
+        0.95
+      ],
+      "completion_rate": 0.938,
+      "capability_violations": 2,
+      "p50_ms": 17494.9,
+      "p95_ms": 37799.9,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.6,
+          "n": 5,
+          "ci95": [
+            0.231,
+            0.882
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 1.0,
+          "n": 1,
+          "ci95": [
+            0.207,
+            1.0
+          ]
+        },
+        "extraction": {
+          "success": 0.0,
+          "n": 2,
+          "ci95": [
+            0.0,
+            0.658
+          ]
+        },
+        "math": {
+          "success": 1.0,
+          "n": 6,
+          "ci95": [
+            0.61,
+            1.0
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 1.0,
+          "n": 3,
+          "ci95": [
+            0.438,
+            1.0
+          ]
+        },
+        "translation": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        }
+      }
+    },
+    "ollama/qwen3-coder:latest": {
+      "n": 32,
+      "success": 0.906,
+      "ci95": [
+        0.758,
+        0.968
+      ],
+      "completion_rate": 0.969,
+      "capability_violations": 1,
+      "p50_ms": 645.8,
+      "p95_ms": 4848.5,
+      "per_category": {
+        "agent": {
+          "success": 1.0,
+          "n": 4,
+          "ci95": [
+            0.51,
+            1.0
+          ]
+        },
+        "coding": {
+          "success": 0.8,
+          "n": 5,
+          "ci95": [
+            0.376,
+            0.964
+          ]
+        },
+        "conversation": {
+          "success": 1.0,
+          "n": 5,
+          "ci95": [
+            0.566,
+            1.0
+          ]
+        },
+        "decision": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "document_vision": {
+          "success": 0.0,
+          "n": 1,
+          "ci95": [
+            0.0,
+            0.793
+          ]
+        },
+        "extraction": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "math": {
+          "success": 0.833,
+          "n": 6,
+          "ci95": [
+            0.436,
+            0.97
+          ]
+        },
+        "rag": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        },
+        "summarization": {
+          "success": 1.0,
+          "n": 3,
+          "ci95": [
+            0.438,
+            1.0
+          ]
+        },
+        "translation": {
+          "success": 1.0,
+          "n": 2,
+          "ci95": [
+            0.342,
+            1.0
+          ]
+        }
+      }
+    }
+  },
+  "routing": {
+    "overhead_ms_mean": 0.53,
+    "overhead_ms_p95": 0.72,
+    "choices": {
+      "conv-03": "ollama/gemma4:31b",
+      "conv-04": "ollama/gemma4:31b",
+      "conv-05": "ollama/gemma4:31b",
+      "code-03": "ollama/gemma4:31b",
+      "code-04": "ollama/gemma4:31b",
+      "code-05": "ollama/qwen3-coder:latest",
+      "code-06": "ollama/qwen3-coder:latest",
+      "agent-03": "ollama/qwen3-coder:latest",
+      "agent-04": "ollama/qwen3-coder:latest",
+      "agent-05": "ollama/qwen3-coder:latest",
+      "math-03": "ollama/qwen3-coder:latest",
+      "math-04": "ollama/qwen3-coder:latest",
+      "math-05": "ollama/qwen3-coder:latest",
+      "math-06": "ollama/qwen3-coder:latest",
+      "extract-03": "ollama/qwen3-coder:latest",
+      "extract-04": "ollama/qwen3-coder:latest",
+      "sum-02": "ollama/qwen3-coder:latest",
+      "sum-03": "ollama/qwen3-coder:latest",
+      "trans-02": "ollama/qwen3-coder:latest",
+      "trans-03": "ollama/qwen3-coder:latest",
+      "multi-01": "ollama/qwen3-coder:latest",
+      "multi-02": "ollama/qwen3-coder:latest",
+      "ambig-01": "ollama/qwen3-coder:latest",
+      "ambig-02": "ollama/qwen3-coder:latest",
+      "ambig-03": "ollama/qwen3-coder:latest",
+      "rag-02": "ollama/qwen3-coder:latest",
+      "rag-03": "ollama/qwen3-coder:latest",
+      "dec-02": "ollama/qwen3-coder:latest",
+      "dec-03": "ollama/qwen3-coder:latest",
+      "vis-02": "ollama/qwen3.6:latest",
+      "cont-01": "ollama/gemma4:31b",
+      "long-01": "ollama/qwen3-coder:latest"
+    },
+    "evidence_levels": {
+      "measured:1": 7,
+      "measured:2": 20,
+      "uncalibrated:size-heuristic": 5
+    },
+    "task_label_accuracy": 0.844,
+    "routing_mistakes": [
+      "code-03",
+      "math-05",
+      "long-01"
+    ],
+    "classifier": {
+      "used": 0,
+      "timeouts": 0
+    }
+  },
+  "records": [
+    {
+      "task": "conv-01",
+      "category": "conversation",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_94728358da044f41",
+      "latency_ms": 13136.6,
+      "ok": false,
+      "detail": "empty"
+    },
+    {
+      "task": "conv-02",
+      "category": "conversation",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_234e7c8050944ded",
+      "latency_ms": 4596.6,
+      "ok": false,
+      "detail": "empty"
+    },
+    {
+      "task": "code-01",
+      "category": "coding",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_1c10ccbc251d463a",
+      "latency_ms": 4379.1,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'is_palindrome\\' is not defined'"
+    },
+    {
+      "task": "code-02",
+      "category": "coding",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_b9d53653dce649dd",
+      "latency_ms": 4361.9,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'fizzbuzz\\' is not defined'"
+    },
+    {
+      "task": "agent-01",
+      "category": "agent",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_900a38e24eec462c",
+      "latency_ms": 2205.8,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "agent-02",
+      "category": "agent",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_9d586f6c3e5448c5",
+      "latency_ms": 2109.8,
+      "ok": true,
+      "detail": "called read_file with valid JSON"
+    },
+    {
+      "task": "math-01",
+      "category": "math",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_b40b267650e44500",
+      "latency_ms": 3011.6,
+      "ok": true,
+      "detail": "contains '391'"
+    },
+    {
+      "task": "math-02",
+      "category": "math",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_b24bd5f6b3694295",
+      "latency_ms": 4176.4,
+      "ok": false,
+      "detail": "missing '72'"
+    },
+    {
+      "task": "extract-01",
+      "category": "extraction",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_2dd6f4cc096e4da5",
+      "latency_ms": 2.2,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "extract-02",
+      "category": "extraction",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_69923eae788b4ae2",
+      "latency_ms": 1.7,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "sum-01",
+      "category": "summarization",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_ebd6d32bad4c4788",
+      "latency_ms": 4539.9,
+      "ok": false,
+      "detail": "none of ['trial', 'approve', 'bicycle', 'bike']"
+    },
+    {
+      "task": "trans-01",
+      "category": "translation",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_969d7c4894c6467d",
+      "latency_ms": 4563.0,
+      "ok": false,
+      "detail": "none of ['biblioth\u00e8que', 'bibliotheque']"
+    },
+    {
+      "task": "rag-01",
+      "category": "rag",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_6b3fb566b9f54031",
+      "latency_ms": 4344.5,
+      "ok": true,
+      "detail": "contains '2019'"
+    },
+    {
+      "task": "dec-01",
+      "category": "decision",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_7170a7ee55744495",
+      "latency_ms": 2556.9,
+      "ok": true,
+      "detail": "contains 'negative'"
+    },
+    {
+      "task": "vis-01",
+      "category": "document_vision",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_52b1f1656e864930",
+      "latency_ms": 1642.3,
+      "ok": true,
+      "detail": "contains 'red'"
+    },
+    {
+      "task": "conv-01",
+      "category": "conversation",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_636ce2d2d3e647ea",
+      "latency_ms": 45960.7,
+      "ok": false,
+      "detail": "empty"
+    },
+    {
+      "task": "conv-02",
+      "category": "conversation",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_bebb8d2d83304189",
+      "latency_ms": 37861.2,
+      "ok": false,
+      "detail": "empty"
+    },
+    {
+      "task": "code-01",
+      "category": "coding",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_b21c9f79d55e4b2c",
+      "latency_ms": 34337.2,
+      "ok": true,
+      "detail": "stdout='True False'"
+    },
+    {
+      "task": "code-02",
+      "category": "coding",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_b03575fc78b840d1",
+      "latency_ms": 37878.8,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'fizzbuzz\\' is not defined'"
+    },
+    {
+      "task": "agent-01",
+      "category": "agent",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_23eff3e4ab0a41fa",
+      "latency_ms": 4966.6,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "agent-02",
+      "category": "agent",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_2d7f6f56b85e48ac",
+      "latency_ms": 6957.2,
+      "ok": true,
+      "detail": "called read_file with valid JSON"
+    },
+    {
+      "task": "math-01",
+      "category": "math",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_2f79147968b44698",
+      "latency_ms": 8328.8,
+      "ok": true,
+      "detail": "contains '391'"
+    },
+    {
+      "task": "math-02",
+      "category": "math",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_2fe0b436bb7441a1",
+      "latency_ms": 16447.7,
+      "ok": true,
+      "detail": "contains '72'"
+    },
+    {
+      "task": "extract-01",
+      "category": "extraction",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_9bcda27b613d4b85",
+      "latency_ms": 2.2,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "extract-02",
+      "category": "extraction",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_0012d7c877c54691",
+      "latency_ms": 2.1,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "sum-01",
+      "category": "summarization",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_a8f62a2af7f24541",
+      "latency_ms": 27241.6,
+      "ok": true,
+      "detail": "contains 'trial'"
+    },
+    {
+      "task": "trans-01",
+      "category": "translation",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_d54b04eda20f45fd",
+      "latency_ms": 29408.3,
+      "ok": true,
+      "detail": "contains 'biblioth\u00e8que'"
+    },
+    {
+      "task": "rag-01",
+      "category": "rag",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_2decbfde4ea6449d",
+      "latency_ms": 17737.7,
+      "ok": true,
+      "detail": "contains '2019'"
+    },
+    {
+      "task": "dec-01",
+      "category": "decision",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_4e96f8ee0b5b4673",
+      "latency_ms": 10159.6,
+      "ok": true,
+      "detail": "contains 'negative'"
+    },
+    {
+      "task": "vis-01",
+      "category": "document_vision",
+      "split": "calib",
+      "policy": "calib:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_c502652ceae54d51",
+      "latency_ms": 8431.7,
+      "ok": true,
+      "detail": "contains 'red'"
+    },
+    {
+      "task": "conv-01",
+      "category": "conversation",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_a1fe6ccd89a6497e",
+      "latency_ms": 8630.7,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "conv-02",
+      "category": "conversation",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_d007185ffeaa4f3b",
+      "latency_ms": 2738.4,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "code-01",
+      "category": "coding",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_152ca6ddb632440a",
+      "latency_ms": 977.1,
+      "ok": true,
+      "detail": "stdout='True False'"
+    },
+    {
+      "task": "code-02",
+      "category": "coding",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_2769e87c25664738",
+      "latency_ms": 1302.5,
+      "ok": true,
+      "detail": "stdout='FizzBuzz Fizz Buzz'"
+    },
+    {
+      "task": "agent-01",
+      "category": "agent",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_98276f6a52a347ca",
+      "latency_ms": 653.2,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "agent-02",
+      "category": "agent",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_fa4906db54ba4412",
+      "latency_ms": 1169.9,
+      "ok": true,
+      "detail": "called read_file with valid JSON"
+    },
+    {
+      "task": "math-01",
+      "category": "math",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_509bbd4b8f234942",
+      "latency_ms": 319.7,
+      "ok": true,
+      "detail": "contains '391'"
+    },
+    {
+      "task": "math-02",
+      "category": "math",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_1ffe1ebe2c404995",
+      "latency_ms": 308.9,
+      "ok": true,
+      "detail": "contains '72'"
+    },
+    {
+      "task": "extract-01",
+      "category": "extraction",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_4ba87a2bbf894f19",
+      "latency_ms": 720.1,
+      "ok": true,
+      "detail": "schema-conformant with correct fields"
+    },
+    {
+      "task": "extract-02",
+      "category": "extraction",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_cb70bb81666342c6",
+      "latency_ms": 630.6,
+      "ok": true,
+      "detail": "schema-conformant with correct fields"
+    },
+    {
+      "task": "sum-01",
+      "category": "summarization",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_cc5cbe8f41dc4be3",
+      "latency_ms": 807.7,
+      "ok": true,
+      "detail": "contains 'trial'"
+    },
+    {
+      "task": "trans-01",
+      "category": "translation",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_10dde69e8caf4c95",
+      "latency_ms": 481.8,
+      "ok": true,
+      "detail": "contains 'biblioth\u00e8que'"
+    },
+    {
+      "task": "rag-01",
+      "category": "rag",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_023bbf2dc1b94a91",
+      "latency_ms": 501.0,
+      "ok": true,
+      "detail": "contains '2019'"
+    },
+    {
+      "task": "dec-01",
+      "category": "decision",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_4a52da1b0d544a13",
+      "latency_ms": 277.6,
+      "ok": true,
+      "detail": "contains 'negative'"
+    },
+    {
+      "task": "vis-01",
+      "category": "document_vision",
+      "split": "calib",
+      "policy": "calib:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_c2803df8c48649b3",
+      "latency_ms": 3.2,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "conv-03",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_a2a9faac5c254587",
+      "latency_ms": 12538.1,
+      "ok": false,
+      "detail": "empty"
+    },
+    {
+      "task": "conv-04",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_15430e5490734b0b",
+      "latency_ms": 3002.9,
+      "ok": true,
+      "detail": "contains 'same'"
+    },
+    {
+      "task": "conv-05",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_841e01fbf9284578",
+      "latency_ms": 2077.6,
+      "ok": true,
+      "detail": "contains 'pineapple'"
+    },
+    {
+      "task": "code-03",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_f940654cadba422f",
+      "latency_ms": 4867.6,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'word_freq\\' is not defined'"
+    },
+    {
+      "task": "code-04",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_e0239e536b38428a",
+      "latency_ms": 4507.4,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'mean\\' is not defined'"
+    },
+    {
+      "task": "code-05",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_aaca0830bfd44d03",
+      "latency_ms": 4427.8,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'rle\\' is not defined'"
+    },
+    {
+      "task": "code-06",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_a0e5169f3a4344cb",
+      "latency_ms": 4537.7,
+      "ok": false,
+      "detail": "none of ['three digits', '3 digits', 'digits']"
+    },
+    {
+      "task": "agent-03",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_cf85ea884fac4120",
+      "latency_ms": 4508.5,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "agent-04",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_d92cff6cfa6742a3",
+      "latency_ms": 1928.4,
+      "ok": true,
+      "detail": "called read_file with valid JSON"
+    },
+    {
+      "task": "agent-05",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_0b1bc9cf3de44b44",
+      "latency_ms": 1129.8,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "math-03",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_9d14cf572add44d4",
+      "latency_ms": 2870.0,
+      "ok": true,
+      "detail": "contains '6'"
+    },
+    {
+      "task": "math-04",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_c22263b57ff9415e",
+      "latency_ms": 3222.3,
+      "ok": true,
+      "detail": "contains '55'"
+    },
+    {
+      "task": "math-05",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_c9fd8d8e39ea448d",
+      "latency_ms": 4119.7,
+      "ok": false,
+      "detail": "missing '50'"
+    },
+    {
+      "task": "math-06",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_6f484eac6b1a429e",
+      "latency_ms": 4337.6,
+      "ok": false,
+      "detail": "none of ['yes']"
+    },
+    {
+      "task": "extract-03",
+      "category": "extraction",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_7199f21049024908",
+      "latency_ms": 3.2,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "extract-04",
+      "category": "extraction",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_9a6ce608e053496a",
+      "latency_ms": 2.1,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "sum-02",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_653fae3d5da84ee0",
+      "latency_ms": 4325.6,
+      "ok": false,
+      "detail": "none of ['trial', 'approved', 'bicycle', 'bike', 'lane']"
+    },
+    {
+      "task": "sum-03",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_635dbe1a14484087",
+      "latency_ms": 4682.0,
+      "ok": false,
+      "detail": "none of ['parking', 'trial', '5-2', 'safety']"
+    },
+    {
+      "task": "trans-02",
+      "category": "translation",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_3c2b093d422c4ba9",
+      "latency_ms": 4408.5,
+      "ok": false,
+      "detail": "none of ['estaci\u00f3n', 'estacion']"
+    },
+    {
+      "task": "trans-03",
+      "category": "translation",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_568eb52524334129",
+      "latency_ms": 4258.0,
+      "ok": false,
+      "detail": "none of ['twenty minutes', '20 minutes']"
+    },
+    {
+      "task": "multi-01",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_24e8ee5f03e5491b",
+      "latency_ms": 3837.1,
+      "ok": true,
+      "detail": "contains 'luz'"
+    },
+    {
+      "task": "multi-02",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_eb9d242886a44ce8",
+      "latency_ms": 3358.9,
+      "ok": true,
+      "detail": "contains '144'"
+    },
+    {
+      "task": "ambig-01",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_56916f3538d94ff0",
+      "latency_ms": 4585.2,
+      "ok": false,
+      "detail": "none of ['javascript', 'function', 'undefined', 'call']"
+    },
+    {
+      "task": "ambig-02",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_d41e1c6334e541bb",
+      "latency_ms": 4500.1,
+      "ok": false,
+      "detail": "empty"
+    },
+    {
+      "task": "ambig-03",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_efece9d589fd4090",
+      "latency_ms": 4724.1,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "rag-02",
+      "category": "rag",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_7083e2985d0f46d9",
+      "latency_ms": 3054.3,
+      "ok": true,
+      "detail": "contains '410'"
+    },
+    {
+      "task": "rag-03",
+      "category": "rag",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_adc7b1a29c04488a",
+      "latency_ms": 2980.9,
+      "ok": true,
+      "detail": "contains 'harbour blue'"
+    },
+    {
+      "task": "dec-02",
+      "category": "decision",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_80fa2a1f38084dcd",
+      "latency_ms": 2762.0,
+      "ok": true,
+      "detail": "contains 'account'"
+    },
+    {
+      "task": "dec-03",
+      "category": "decision",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_635f22ef7abd4f15",
+      "latency_ms": 2665.1,
+      "ok": true,
+      "detail": "contains 'sports'"
+    },
+    {
+      "task": "vis-02",
+      "category": "document_vision",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_3ce8fa9e54414e68",
+      "latency_ms": 1650.2,
+      "ok": true,
+      "detail": "contains 'red'"
+    },
+    {
+      "task": "cont-01",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_efc8a484c06e45b7",
+      "latency_ms": 1819.6,
+      "ok": true,
+      "detail": "contains '4'"
+    },
+    {
+      "task": "long-01",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/qwen3.6:latest",
+      "model": "ollama/qwen3.6:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_c3977717de3648b3",
+      "latency_ms": 4650.5,
+      "ok": false,
+      "detail": "missing 'LINE 0: THE QUICK BROWN'"
+    },
+    {
+      "task": "conv-03",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_4058eee3662c4350",
+      "latency_ms": 32790.6,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "conv-04",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_47d4706070764bcf",
+      "latency_ms": 8689.5,
+      "ok": true,
+      "detail": "contains 'same'"
+    },
+    {
+      "task": "conv-05",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_58df9c0a08d64f25",
+      "latency_ms": 4709.8,
+      "ok": true,
+      "detail": "contains 'pineapple'"
+    },
+    {
+      "task": "code-03",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_6c50027b5ab243e3",
+      "latency_ms": 37860.3,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'word_freq\\' is not defined'"
+    },
+    {
+      "task": "code-04",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_23efc99c5dfe4239",
+      "latency_ms": 26975.3,
+      "ok": true,
+      "detail": "stdout='4.0'"
+    },
+    {
+      "task": "code-05",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_c0f3c756c7c64f49",
+      "latency_ms": 37895.1,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'rle\\' is not defined'"
+    },
+    {
+      "task": "code-06",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_a383ddba50ee444d",
+      "latency_ms": 15096.4,
+      "ok": true,
+      "detail": "contains 'three digits'"
+    },
+    {
+      "task": "agent-03",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_35bcf1057feb4e31",
+      "latency_ms": 5268.0,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "agent-04",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_e10cf3ecf85640f5",
+      "latency_ms": 7350.1,
+      "ok": true,
+      "detail": "called read_file with valid JSON"
+    },
+    {
+      "task": "agent-05",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_113ac17018d84a5d",
+      "latency_ms": 5121.0,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "math-03",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_07e65228227a45ae",
+      "latency_ms": 12178.5,
+      "ok": true,
+      "detail": "contains '6'"
+    },
+    {
+      "task": "math-04",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_4e6618cc3cb04186",
+      "latency_ms": 16500.5,
+      "ok": true,
+      "detail": "contains '55'"
+    },
+    {
+      "task": "math-05",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_f397d0dae314449f",
+      "latency_ms": 18250.1,
+      "ok": true,
+      "detail": "contains '50'"
+    },
+    {
+      "task": "math-06",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_377b078763304da6",
+      "latency_ms": 34660.2,
+      "ok": true,
+      "detail": "contains 'yes'"
+    },
+    {
+      "task": "extract-03",
+      "category": "extraction",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_5de37dc80e0f4904",
+      "latency_ms": 3.5,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "extract-04",
+      "category": "extraction",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_7d54a480c7d04c09",
+      "latency_ms": 2.3,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "sum-02",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_57a6f409b0204962",
+      "latency_ms": 26804.2,
+      "ok": true,
+      "detail": "contains 'trial'"
+    },
+    {
+      "task": "sum-03",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_c8555e8d26a74607",
+      "latency_ms": 29241.1,
+      "ok": true,
+      "detail": "contains 'parking'"
+    },
+    {
+      "task": "trans-02",
+      "category": "translation",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_d97f8e368e7248c4",
+      "latency_ms": 23119.4,
+      "ok": true,
+      "detail": "contains 'estaci\u00f3n'"
+    },
+    {
+      "task": "trans-03",
+      "category": "translation",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_bfe8ecf935a145eb",
+      "latency_ms": 31020.2,
+      "ok": true,
+      "detail": "contains 'twenty minutes'"
+    },
+    {
+      "task": "multi-01",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_3278cc04490b489e",
+      "latency_ms": 37760.4,
+      "ok": true,
+      "detail": "contains 'luz'"
+    },
+    {
+      "task": "multi-02",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_c5c310a9a5fe478c",
+      "latency_ms": 9826.1,
+      "ok": true,
+      "detail": "contains '144'"
+    },
+    {
+      "task": "ambig-01",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_88026ddc354246c3",
+      "latency_ms": 37725.6,
+      "ok": true,
+      "detail": "contains 'javascript'"
+    },
+    {
+      "task": "ambig-02",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_3f9815f95b2044ae",
+      "latency_ms": 30918.9,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "ambig-03",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_1f87f0057a894dd3",
+      "latency_ms": 37799.9,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "rag-02",
+      "category": "rag",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_3f2dcbdd110a4e89",
+      "latency_ms": 16739.8,
+      "ok": true,
+      "detail": "contains '410'"
+    },
+    {
+      "task": "rag-03",
+      "category": "rag",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_852be7b2e9e2417c",
+      "latency_ms": 13530.7,
+      "ok": true,
+      "detail": "contains 'harbour blue'"
+    },
+    {
+      "task": "dec-02",
+      "category": "decision",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_16b34d790ec9429c",
+      "latency_ms": 12499.9,
+      "ok": true,
+      "detail": "contains 'account'"
+    },
+    {
+      "task": "dec-03",
+      "category": "decision",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_ed9b93d2f34945d2",
+      "latency_ms": 11799.0,
+      "ok": true,
+      "detail": "contains 'sports'"
+    },
+    {
+      "task": "vis-02",
+      "category": "document_vision",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_545a57b8729845d0",
+      "latency_ms": 8410.8,
+      "ok": true,
+      "detail": "contains 'red'"
+    },
+    {
+      "task": "cont-01",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_77a09685a5f74016",
+      "latency_ms": 6800.5,
+      "ok": true,
+      "detail": "contains '4'"
+    },
+    {
+      "task": "long-01",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/gemma4:31b",
+      "model": "ollama/gemma4:31b",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_efe3c83862a7417c",
+      "latency_ms": 22150.2,
+      "ok": true,
+      "detail": "contains 'LINE 0: THE QUICK BROWN'"
+    },
+    {
+      "task": "conv-03",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_9160b675dbd7423d",
+      "latency_ms": 7443.9,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "conv-04",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_8dcf03ade1ca4f50",
+      "latency_ms": 394.2,
+      "ok": true,
+      "detail": "contains 'same'"
+    },
+    {
+      "task": "conv-05",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_e48a0044ff9e4228",
+      "latency_ms": 299.3,
+      "ok": true,
+      "detail": "contains 'pineapple'"
+    },
+    {
+      "task": "code-03",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_a9606cec62c04eef",
+      "latency_ms": 1619.3,
+      "ok": true,
+      "detail": "stdout='True'"
+    },
+    {
+      "task": "code-04",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_ed2cfe30cbd844ff",
+      "latency_ms": 905.6,
+      "ok": true,
+      "detail": "stdout='4.0'"
+    },
+    {
+      "task": "code-05",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_ebab441f1bbb48f3",
+      "latency_ms": 1541.4,
+      "ok": false,
+      "detail": "stdout='a3b1c2'"
+    },
+    {
+      "task": "code-06",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_dfbf8ac084fd4c0a",
+      "latency_ms": 675.6,
+      "ok": true,
+      "detail": "contains '3 digits'"
+    },
+    {
+      "task": "agent-03",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_a7237a553cf54ad3",
+      "latency_ms": 621.0,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "agent-04",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_de9753a1bdca4248",
+      "latency_ms": 739.6,
+      "ok": true,
+      "detail": "called read_file with valid JSON"
+    },
+    {
+      "task": "agent-05",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_ac9e0c14a63a4869",
+      "latency_ms": 540.3,
+      "ok": true,
+      "detail": "called bash with valid JSON"
+    },
+    {
+      "task": "math-03",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_adfb83fd5fec443d",
+      "latency_ms": 378.7,
+      "ok": true,
+      "detail": "contains '6'"
+    },
+    {
+      "task": "math-04",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_0b3b2dfb81c54532",
+      "latency_ms": 319.4,
+      "ok": true,
+      "detail": "contains '55'"
+    },
+    {
+      "task": "math-05",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_171b25f8dd604e68",
+      "latency_ms": 339.5,
+      "ok": false,
+      "detail": "missing '50'"
+    },
+    {
+      "task": "math-06",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_370a831b610148cc",
+      "latency_ms": 323.3,
+      "ok": true,
+      "detail": "contains 'yes'"
+    },
+    {
+      "task": "extract-03",
+      "category": "extraction",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_e2253c7686154a2e",
+      "latency_ms": 645.8,
+      "ok": true,
+      "detail": "schema-conformant with correct fields"
+    },
+    {
+      "task": "extract-04",
+      "category": "extraction",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_d2eb6313d6124835",
+      "latency_ms": 660.3,
+      "ok": true,
+      "detail": "schema-conformant with correct fields"
+    },
+    {
+      "task": "sum-02",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_a1118ef9f9df41ee",
+      "latency_ms": 679.8,
+      "ok": true,
+      "detail": "contains 'trial'"
+    },
+    {
+      "task": "sum-03",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_a4dcec3280e942f3",
+      "latency_ms": 1230.1,
+      "ok": true,
+      "detail": "contains 'parking'"
+    },
+    {
+      "task": "trans-02",
+      "category": "translation",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_ba382a054e884db1",
+      "latency_ms": 419.6,
+      "ok": true,
+      "detail": "contains 'estaci\u00f3n'"
+    },
+    {
+      "task": "trans-03",
+      "category": "translation",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_76a66ee766694c93",
+      "latency_ms": 391.7,
+      "ok": true,
+      "detail": "contains 'twenty minutes'"
+    },
+    {
+      "task": "multi-01",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_f17cd2ec4ac242ff",
+      "latency_ms": 2027.4,
+      "ok": true,
+      "detail": "contains 'luz'"
+    },
+    {
+      "task": "multi-02",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_c35d91f74fa34495",
+      "latency_ms": 291.1,
+      "ok": true,
+      "detail": "contains '144'"
+    },
+    {
+      "task": "ambig-01",
+      "category": "coding",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_4a99fbe27bb64dad",
+      "latency_ms": 4848.5,
+      "ok": true,
+      "detail": "contains 'javascript'"
+    },
+    {
+      "task": "ambig-02",
+      "category": "conversation",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_6406eefd59534f7e",
+      "latency_ms": 1141.2,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "ambig-03",
+      "category": "math",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_e8d6e0875ab4440b",
+      "latency_ms": 2650.7,
+      "ok": true,
+      "detail": "nonempty"
+    },
+    {
+      "task": "rag-02",
+      "category": "rag",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_19991e78d4f74fd1",
+      "latency_ms": 787.2,
+      "ok": true,
+      "detail": "contains '410'"
+    },
+    {
+      "task": "rag-03",
+      "category": "rag",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_33d5daea762444e3",
+      "latency_ms": 480.4,
+      "ok": true,
+      "detail": "contains 'harbour blue'"
+    },
+    {
+      "task": "dec-02",
+      "category": "decision",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_e1dfce1e67234523",
+      "latency_ms": 311.3,
+      "ok": true,
+      "detail": "contains 'account'"
+    },
+    {
+      "task": "dec-03",
+      "category": "decision",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_ec7cd8f1bbcd42b6",
+      "latency_ms": 311.0,
+      "ok": true,
+      "detail": "contains 'sports'"
+    },
+    {
+      "task": "vis-02",
+      "category": "document_vision",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 422,
+      "deployment": null,
+      "request_id": "req_8c63d0f811ce4f96",
+      "latency_ms": 3.2,
+      "ok": false,
+      "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+      "violation": true
+    },
+    {
+      "task": "cont-01",
+      "category": "agent",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_f38a4c7362ee40e7",
+      "latency_ms": 563.8,
+      "ok": true,
+      "detail": "contains '4'"
+    },
+    {
+      "task": "long-01",
+      "category": "summarization",
+      "split": "test",
+      "policy": "test:ollama/qwen3-coder:latest",
+      "model": "ollama/qwen3-coder:latest",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_18ee5a07dd574cd0",
+      "latency_ms": 5139.3,
+      "ok": true,
+      "detail": "contains 'LINE 0: THE QUICK BROWN'"
+    },
+    {
+      "task": "conv-03",
+      "category": "conversation",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_7bb0cd2c23664340",
+      "latency_ms": 32381.6,
+      "ok": true,
+      "detail": "nonempty",
+      "overhead_ms": 0.66,
+      "evidence": "uncalibrated:size-heuristic",
+      "inferred_task": "conversation",
+      "classifier": {}
+    },
+    {
+      "task": "conv-04",
+      "category": "conversation",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_135db7d3bc554df2",
+      "latency_ms": 8756.7,
+      "ok": true,
+      "detail": "contains 'same'",
+      "overhead_ms": 0.52,
+      "evidence": "uncalibrated:size-heuristic",
+      "inferred_task": "conversation",
+      "classifier": {}
+    },
+    {
+      "task": "conv-05",
+      "category": "conversation",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_d25ccf5c144949a0",
+      "latency_ms": 4774.0,
+      "ok": true,
+      "detail": "contains 'pineapple'",
+      "overhead_ms": 0.53,
+      "evidence": "uncalibrated:size-heuristic",
+      "inferred_task": "conversation",
+      "classifier": {}
+    },
+    {
+      "task": "code-03",
+      "category": "coding",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_2edd7c3fd8bb44f5",
+      "latency_ms": 37869.9,
+      "ok": false,
+      "detail": "stdout='' err='Traceback (most recent call last):\\n  File \"<stdin>\", line 3, in <module>\\nNameError: name \\'word_freq\\' is not defined'",
+      "overhead_ms": 0.72,
+      "evidence": "uncalibrated:size-heuristic",
+      "inferred_task": "coding",
+      "classifier": {}
+    },
+    {
+      "task": "code-04",
+      "category": "coding",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_da15a07f6ca9435b",
+      "latency_ms": 27135.7,
+      "ok": true,
+      "detail": "stdout='4.0'",
+      "overhead_ms": 0.38,
+      "evidence": "uncalibrated:size-heuristic",
+      "inferred_task": "coding",
+      "classifier": {}
+    },
+    {
+      "task": "code-05",
+      "category": "coding",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_b68cc423e946465f",
+      "latency_ms": 8208.9,
+      "ok": false,
+      "detail": "stdout='a3b1c2'",
+      "overhead_ms": 0.36,
+      "evidence": "measured:2",
+      "inferred_task": "coding",
+      "classifier": {}
+    },
+    {
+      "task": "code-06",
+      "category": "coding",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_b633bc54893645ca",
+      "latency_ms": 716.6,
+      "ok": true,
+      "detail": "contains '3 digits'",
+      "overhead_ms": 0.32,
+      "evidence": "measured:2",
+      "inferred_task": "coding",
+      "classifier": {}
+    },
+    {
+      "task": "agent-03",
+      "category": "agent",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_25c10ade417d47aa",
+      "latency_ms": 638.3,
+      "ok": true,
+      "detail": "called bash with valid JSON",
+      "overhead_ms": 0.36,
+      "evidence": "measured:2",
+      "inferred_task": "coding",
+      "classifier": {}
+    },
+    {
+      "task": "agent-04",
+      "category": "agent",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_7fce2367cbfe4909",
+      "latency_ms": 668.4,
+      "ok": true,
+      "detail": "called read_file with valid JSON",
+      "overhead_ms": 0.41,
+      "evidence": "measured:2",
+      "inferred_task": "agent",
+      "classifier": {}
+    },
+    {
+      "task": "agent-05",
+      "category": "agent",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_3a9b098a949e41e9",
+      "latency_ms": 557.8,
+      "ok": true,
+      "detail": "called bash with valid JSON",
+      "overhead_ms": 0.36,
+      "evidence": "measured:2",
+      "inferred_task": "coding",
+      "classifier": {}
+    },
+    {
+      "task": "math-03",
+      "category": "math",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_96f7a09effaf4b2e",
+      "latency_ms": 429.2,
+      "ok": true,
+      "detail": "contains '6'",
+      "overhead_ms": 0.36,
+      "evidence": "measured:2",
+      "inferred_task": "math",
+      "classifier": {}
+    },
+    {
+      "task": "math-04",
+      "category": "math",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_b6b4cfb776a749af",
+      "latency_ms": 328.8,
+      "ok": true,
+      "detail": "contains '55'",
+      "overhead_ms": 0.38,
+      "evidence": "measured:2",
+      "inferred_task": "math",
+      "classifier": {}
+    },
+    {
+      "task": "math-05",
+      "category": "math",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_01f256bc900b4dd2",
+      "latency_ms": 317.0,
+      "ok": false,
+      "detail": "missing '50'",
+      "overhead_ms": 0.35,
+      "evidence": "measured:2",
+      "inferred_task": "math",
+      "classifier": {}
+    },
+    {
+      "task": "math-06",
+      "category": "math",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_c3703e19009f4bb1",
+      "latency_ms": 280.2,
+      "ok": true,
+      "detail": "contains 'yes'",
+      "overhead_ms": 0.32,
+      "evidence": "measured:2",
+      "inferred_task": "math",
+      "classifier": {}
+    },
+    {
+      "task": "extract-03",
+      "category": "extraction",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_f83b3bd0d2cc41b7",
+      "latency_ms": 607.8,
+      "ok": true,
+      "detail": "schema-conformant with correct fields",
+      "overhead_ms": 0.4,
+      "evidence": "measured:2",
+      "inferred_task": "extraction",
+      "classifier": {}
+    },
+    {
+      "task": "extract-04",
+      "category": "extraction",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_404bba59a7fa4660",
+      "latency_ms": 647.8,
+      "ok": true,
+      "detail": "schema-conformant with correct fields",
+      "overhead_ms": 0.4,
+      "evidence": "measured:2",
+      "inferred_task": "extraction",
+      "classifier": {}
+    },
+    {
+      "task": "sum-02",
+      "category": "summarization",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_0b34c0686cdd4009",
+      "latency_ms": 667.5,
+      "ok": true,
+      "detail": "contains 'trial'",
+      "overhead_ms": 0.75,
+      "evidence": "measured:1",
+      "inferred_task": "summarization",
+      "classifier": {}
+    },
+    {
+      "task": "sum-03",
+      "category": "summarization",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_82048855c2d6402b",
+      "latency_ms": 1249.1,
+      "ok": true,
+      "detail": "contains 'parking'",
+      "overhead_ms": 0.72,
+      "evidence": "measured:1",
+      "inferred_task": "summarization",
+      "classifier": {}
+    },
+    {
+      "task": "trans-02",
+      "category": "translation",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_4a2a5946f9c94ffc",
+      "latency_ms": 478.3,
+      "ok": true,
+      "detail": "contains 'estaci\u00f3n'",
+      "overhead_ms": 0.38,
+      "evidence": "measured:1",
+      "inferred_task": "translation",
+      "classifier": {}
+    },
+    {
+      "task": "trans-03",
+      "category": "translation",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_de883d8ac5fd4f77",
+      "latency_ms": 417.3,
+      "ok": true,
+      "detail": "contains 'twenty minutes'",
+      "overhead_ms": 0.44,
+      "evidence": "measured:1",
+      "inferred_task": "translation",
+      "classifier": {}
+    },
+    {
+      "task": "multi-01",
+      "category": "conversation",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_f2166b501baa4626",
+      "latency_ms": 2048.0,
+      "ok": true,
+      "detail": "contains 'luz'",
+      "overhead_ms": 0.38,
+      "evidence": "measured:2",
+      "inferred_task": "conversation",
+      "classifier": {}
+    },
+    {
+      "task": "multi-02",
+      "category": "math",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_9ecf5352514b467d",
+      "latency_ms": 339.4,
+      "ok": true,
+      "detail": "contains '144'",
+      "overhead_ms": 0.32,
+      "evidence": "measured:2",
+      "inferred_task": "math",
+      "classifier": {}
+    },
+    {
+      "task": "ambig-01",
+      "category": "coding",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_377d454a851a41dd",
+      "latency_ms": 4879.1,
+      "ok": true,
+      "detail": "contains 'javascript'",
+      "overhead_ms": 0.36,
+      "evidence": "measured:2",
+      "inferred_task": "coding",
+      "classifier": {}
+    },
+    {
+      "task": "ambig-02",
+      "category": "conversation",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_a46617543b7a48ff",
+      "latency_ms": 1118.7,
+      "ok": true,
+      "detail": "nonempty",
+      "overhead_ms": 0.31,
+      "evidence": "measured:2",
+      "inferred_task": "conversation",
+      "classifier": {}
+    },
+    {
+      "task": "ambig-03",
+      "category": "math",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_6ec41ed600224307",
+      "latency_ms": 1167.1,
+      "ok": true,
+      "detail": "nonempty",
+      "overhead_ms": 0.29,
+      "evidence": "measured:2",
+      "inferred_task": "math",
+      "classifier": {}
+    },
+    {
+      "task": "rag-02",
+      "category": "rag",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_dfd23552db4e455c",
+      "latency_ms": 798.1,
+      "ok": true,
+      "detail": "contains '410'",
+      "overhead_ms": 0.53,
+      "evidence": "measured:1",
+      "inferred_task": "rag",
+      "classifier": {}
+    },
+    {
+      "task": "rag-03",
+      "category": "rag",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_41bb37610b8d43f1",
+      "latency_ms": 499.1,
+      "ok": true,
+      "detail": "contains 'harbour blue'",
+      "overhead_ms": 0.54,
+      "evidence": "measured:1",
+      "inferred_task": "rag",
+      "classifier": {}
+    },
+    {
+      "task": "dec-02",
+      "category": "decision",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_7b2987f2985b469a",
+      "latency_ms": 261.0,
+      "ok": true,
+      "detail": "contains 'account'",
+      "overhead_ms": 0.44,
+      "evidence": "measured:2",
+      "inferred_task": "conversation",
+      "classifier": {}
+    },
+    {
+      "task": "dec-03",
+      "category": "decision",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_2f95db1049174f2c",
+      "latency_ms": 304.9,
+      "ok": true,
+      "detail": "contains 'sports'",
+      "overhead_ms": 0.43,
+      "evidence": "measured:2",
+      "inferred_task": "conversation",
+      "classifier": {}
+    },
+    {
+      "task": "vis-02",
+      "category": "document_vision",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3.6:latest",
+      "request_id": "req_396984790131427b",
+      "latency_ms": 9869.4,
+      "ok": true,
+      "detail": "contains 'red'",
+      "overhead_ms": 0.34,
+      "evidence": "measured:1",
+      "inferred_task": "document_vision",
+      "classifier": {}
+    },
+    {
+      "task": "cont-01",
+      "category": "agent",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/gemma4:31b",
+      "request_id": "req_506adcf3811b4164",
+      "latency_ms": 21420.0,
+      "ok": true,
+      "detail": "contains '4'",
+      "overhead_ms": 0.4,
+      "evidence": "measured:2",
+      "inferred_task": "agent",
+      "classifier": {}
+    },
+    {
+      "task": "long-01",
+      "category": "summarization",
+      "split": "test",
+      "policy": "auto",
+      "model": "auto",
+      "status": 200,
+      "deployment": "ollama/qwen3-coder:latest",
+      "request_id": "req_085e94e8f7244c42",
+      "latency_ms": 7645.7,
+      "ok": false,
+      "detail": "missing 'LINE 0: THE QUICK BROWN'",
+      "overhead_ms": 3.58,
+      "evidence": "measured:2",
+      "inferred_task": "conversation",
+      "classifier": {}
+    }
+  ],
+  "deployment_filter": [
+    "ollama/qwen3.6:latest",
+    "ollama/gemma4:31b",
+    "ollama/qwen3-coder:latest"
+  ],
+  "probes": [],
+  "note": "LIVE: real backends from your config; results are specific to the exact deployments/fingerprints listed."
+}

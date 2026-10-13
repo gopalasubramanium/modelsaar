@@ -2,7 +2,7 @@
 
 Discovery via ``GET /models`` yields names only; capabilities stay ``unknown``
 until declared by the operator (``backends[].models``) or verified by probes.
-vLLM's ``/tokenize`` endpoint is used for exact token counts when present.
+vLLM's ``/tokenize`` endpoint is used for tokenizer-based text counts when present (template overhead stays estimated).
 """
 
 from __future__ import annotations
@@ -53,6 +53,7 @@ class OpenAICompatAdapter(BaseAdapter):
                 backend_type="openai_compatible",
                 model=name,
                 runtime="openai_compatible",
+                endpoint=self.endpoint,
                 resource_pool=self.cfg.resource_pool,
                 discovered=name in names,
                 available_on_disk=ok,
@@ -77,6 +78,9 @@ class OpenAICompatAdapter(BaseAdapter):
                 dep.catalogue_id = d.catalogue_id
                 dep.memory_gb_estimate = d.memory_gb_estimate
                 dep.embedding_dimensions = d.embedding_dimensions
+                if d.identity:
+                    dep.identity = d.identity
+                    dep.identity_source = "operator declaration"
                 if d.memory_gb_estimate:
                     dep.memory_estimate_provenance = "operator declaration"
                 merge_capabilities(
@@ -129,7 +133,7 @@ class OpenAICompatAdapter(BaseAdapter):
             return await self._post_stream("/chat/completions", fwd, timeout=timeout)
         return await self._post_json("/chat/completions", fwd, timeout=timeout)
 
-    async def embeddings(self, dep: Deployment, body: dict[str, Any]) -> UpstreamResponse:
+    async def embeddings(self, dep: Deployment, body: dict[str, Any], timeout: float | None = None) -> UpstreamResponse:
         fwd = {k: v for k, v in body.items() if k in ("input", "encoding_format", "dimensions", "user")}
         fwd["model"] = dep.model
-        return await self._post_json("/embeddings", fwd)
+        return await self._post_json("/embeddings", fwd, timeout=timeout)

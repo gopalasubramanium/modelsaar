@@ -87,5 +87,6 @@ and never change a request midway. Configuration changes take effect by restarti
   hard filters. Only chat completions (stateless, repeatable) are retried.
 * After the first byte: no retries, no switching. Upstream failure ends the stream with an SSE
   `error` frame and `[DONE]`; the decision records `stream_failed_after_commit`.
-* Client disconnect mid-stream: the reservation becomes *uncertain* for `admission.uncertain_hold_s`
-  because the backend may still be generating.
+* Client disconnect or read timeout mid-stream: the reservation becomes *uncertain* for
+  `admission.uncertain_hold_s` because the backend may still be generating (same for embedding
+  timeouts and probe timeouts; a probe run stops after one).
