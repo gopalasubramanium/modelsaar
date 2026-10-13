@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=dfbf140a">
+<link rel="stylesheet" href="/assets/site.css?v=ad168b00">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Troubleshooting", "description": "Common failures when installing or running ModelSaar and what to do about them.", "url": "https://modelsaar.com/docs/troubleshooting/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Troubleshooting", "item": "https://modelsaar.com/docs/troubleshooting/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Troubleshooting</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Troubleshooting</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/dfbf140a549d203916bb8904c0776140efded5af/docs/troubleshooting.md"><code>docs/troubleshooting.md</code></a> at commit <code>dfbf140a549d</code>. The repository file is authoritative.</p></header><p>Start with <code>modelsaar doctor</code> — it checks most of the items below and prints a remedy per finding.</p>
+<article class="doc"><header class="doc-head"><h1>Troubleshooting</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/ad168b00110fa35e9dda16217af2b2865beac087/docs/troubleshooting.md"><code>docs/troubleshooting.md</code></a> at commit <code>ad168b00110f</code>. The repository file is authoritative.</p></header><p>Start with <code>modelsaar doctor</code> — it checks most of the items below and prints a remedy per finding.</p>
 <table tabindex="0">
 <thead>
 <tr>
@@ -160,6 +160,11 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <td><code>modelsaar serve</code> in another terminal (or under launchd/systemd), then <code>modelsaar test</code></td>
 </tr>
 <tr>
+<td><code>error: externally-managed-environment</code> from the one-line installer</td>
+<td>the installer served before 2026-10-13 fell back to <code>pip install --user</code> into the OS interpreter (Debian/Ubuntu refuse that, PEP 668)</td>
+<td>re-run <code>curl -fsSL https://modelsaar.com/install.sh \| sh</code>: the current installer creates its own virtual environment (or fetches a pinned <code>uv</code> when your Python cannot) and never installs into the OS Python</td>
+</tr>
+<tr>
 <td><code>ModuleNotFoundError: No module named 'httpcore…'</code> (or another dependency) right after a <code>uv tool install</code></td>
 <td>a corrupt entry in uv's wheel cache (seen on macOS)</td>
 <td><code>uv cache clean httpcore</code> (or <code>UV_NO_CACHE=1 uv tool install --force …</code>), then re-run the installer</td>
@@ -174,7 +179,7 @@ prompt content unless <code>security.log_prompts: true</code>, which is for debu
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/dfbf140a549d203916bb8904c0776140efded5af">dfbf140a549d</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/ad168b00110fa35e9dda16217af2b2865beac087">ad168b00110f</a> on 2026-10-13. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -186,6 +191,6 @@ prompt content unless <code>security.log_prompts: true</code>, which is for debu
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=dfbf140a" defer></script>
+<script src="/assets/site.js?v=ad168b00" defer></script>
 </body>
 </html>

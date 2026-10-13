@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=dfbf140a">
+<link rel="stylesheet" href="/assets/site.css?v=ad168b00">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Get started", "description": "Prerequisites, installation, first request and client connection for ModelSaar on macOS, Linux and WSL.", "url": "https://modelsaar.com/get-started/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Get started", "item": "https://modelsaar.com/get-started/"}]}</script>
 </head>
 <body>
@@ -59,7 +59,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
   <h2 id="prereq-title">Before you start</h2>
   <ul>
     <li><strong>An inference backend with at least one model.</strong> Ollama is the first-class path: <code>ollama serve</code> running and a model pulled (for example <code>ollama pull gemma4:e4b</code>). Any OpenAI-compatible server (vLLM, llama.cpp server, LM Studio) also works; you will declare its models in the config. ModelSaar never downloads models and never accepts a model's licence for you.</li>
-    <li><strong>Python 3.10 or newer</strong>, or the <code>uv</code> tool (which fetches a suitable Python itself). Check with <code>python3 --version</code> or <code>uv --version</code>.</li>
+    <li><strong>Python 3.10 or newer is helpful but not required.</strong> The one-line installer uses your <code>uv</code> or <code>pipx</code> if you have one; otherwise it creates its own virtual environment with your Python 3.10+, and if your Python cannot do that (no <code>python3-venv</code> on Debian/Ubuntu, or an older Python) it downloads one pinned, checksum-verified <code>uv</code> binary into <code>~/.local/share/modelsaar</code> and lets it create the environment. Nothing is installed into the operating system's Python and <code>sudo</code> is never used.</li>
     <li><strong>macOS (Apple silicon or Intel), Linux, or Windows through WSL2.</strong> macOS arm64 and Linux x86_64 are the platforms the project has actually run on; native Windows is untested.</li>
     <li><strong>Hardware:</strong> whatever your backend needs for the models you chose. ModelSaar itself is a small Python process.</li>
   </ul>
@@ -69,7 +69,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
   <h2 id="install-title">1. Install</h2>
   <h3>Beginner path: one command</h3>
   <div class="cmd"><pre tabindex="0"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh | sh</code></pre></div>
-  <p>The script is short and does only this: checks your platform and Python; installs the ModelSaar package at the pinned commit with <code>uv tool install</code>, <code>pipx</code> or <code>python3 -m pip install --user</code> (first one found; it does not install those tools for you); runs <code>modelsaar init</code> if you have no config yet (it looks for Ollama on <code>127.0.0.1:11434</code> and other documented loopback ports, writes <code>~/.modelsaar/config.yaml</code> and private keys with mode 600); then starts a temporary gateway, sends one request through <code>auto</code>, stops it and prints the result with your next step. Existing config, keys and state are never overwritten; an occupied gateway port is reported, not fought over.</p>
+  <p>The script is short and does only this: checks your platform; installs the ModelSaar package at the pinned commit from its GitHub source archive (no <code>git</code> needed) into an isolated environment — with your <code>uv</code> or <code>pipx</code> if present, otherwise into a user-owned virtual environment under <code>~/.local/share/modelsaar</code> created by your Python 3.10+ or, when that is not possible, by a pinned <code>uv</code> it downloads and checksum-verifies for your platform (Linux x86_64/arm64, macOS; announced before the download) — then links <code>~/.local/bin/modelsaar</code> if nothing else is there; runs <code>modelsaar init</code> if you have no config yet (it looks for Ollama on <code>127.0.0.1:11434</code> and other documented loopback ports, writes <code>~/.modelsaar/config.yaml</code> and private keys with mode 600); then starts a temporary gateway, sends one request through <code>auto</code>, stops it and prints the result with your next step. Existing config, keys and state are never overwritten; an occupied gateway port is reported, not fought over.</p>
   <p id="inspect">To read it before running it:</p>
   <div class="cmd"><pre tabindex="0"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh -o install.sh &amp;&amp; less install.sh &amp;&amp; sh install.sh</code></pre></div>
   <p>Options are environment variables: <code>MODELSAAR_ENDPOINT=http://host:port</code> (backend other than local Ollama), <code>MODELSAAR_PORT=8484</code>, <code>MODELSAAR_NO_CHECK=1</code> (skip the verification request), <code>MODELSAAR_REF=&lt;sha&gt;</code> (install a different commit — you take responsibility for it).</p>
@@ -79,8 +79,8 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
   <div class="cmd"><pre tabindex="0"><code class="language-bash">uv tool install git+https://github.com/gopalasubramanium/modelsaar@d6e09e770da6e8bd560da7132cb263eb02ec7151</code></pre></div>
   <p>With <code>pipx</code>:</p>
   <div class="cmd"><pre tabindex="0"><code class="language-bash">pipx install git+https://github.com/gopalasubramanium/modelsaar@d6e09e770da6e8bd560da7132cb263eb02ec7151</code></pre></div>
-  <p>With plain pip (user install; needs Python ≥ 3.10 and <code>~/.local/bin</code> on your PATH):</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">python3 -m pip install --user git+https://github.com/gopalasubramanium/modelsaar@d6e09e770da6e8bd560da7132cb263eb02ec7151</code></pre></div>
+  <p>With plain Python ≥ 3.10 and pip, in a virtual environment of your own (the command is then <code>~/modelsaar-env/bin/modelsaar</code>; a <code>pip install --user</code> into the operating system's Python is refused on Debian/Ubuntu and not recommended anywhere):</p>
+  <div class="cmd"><pre tabindex="0"><code class="language-bash">python3 -m venv ~/modelsaar-env &amp;&amp; ~/modelsaar-env/bin/pip install git+https://github.com/gopalasubramanium/modelsaar@d6e09e770da6e8bd560da7132cb263eb02ec7151</code></pre></div>
   <p>From a source checkout (what the test suite and the verification scripts use):</p>
   <div class="cmd"><pre tabindex="0"><code class="language-bash">git clone https://github.com/gopalasubramanium/modelsaar &amp;&amp; cd modelsaar &amp;&amp; git checkout d6e09e770da6e8bd560da7132cb263eb02ec7151 &amp;&amp; python3 -m venv .venv &amp;&amp; . .venv/bin/activate &amp;&amp; pip install -e .</code></pre></div>
   <p>All four give you the <code>modelsaar</code> command and nothing else; nothing starts automatically.</p>
@@ -118,17 +118,17 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
 <section aria-labelledby="ops-title">
   <h2 id="ops-title">Running it day to day</h2>
   <dl>
-    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/dfbf140a549d203916bb8904c0776140efded5af/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
+    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/ad168b00110fa35e9dda16217af2b2865beac087/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
     <dt>Stop / restart</dt><dd>Ctrl-C in the terminal, or your service manager's stop/restart. Configuration changes need a restart; in-flight requests finish on the old config.</dd>
-    <dt>Update</dt><dd>Re-run the installer (it pins the newer candidate commit), or with uv/pipx/pip re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
+    <dt>Update</dt><dd>Re-run the installer (it pins the newer candidate commit and replaces its environment only after the new one installed), or with uv/pipx re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
     <dt>Troubleshoot</dt><dd><code>modelsaar doctor</code> first; then <code>modelsaar decisions --limit 10</code> for the last routing records and <code>modelsaar explain -m "…" [--tools --image --json-schema]</code> to dry-run a request. More in <a href="/docs/troubleshooting/">Troubleshooting</a>.</dd>
-    <dt>Uninstall</dt><dd><code>modelsaar uninstall</code> removes only the files ModelSaar created under <code>~/.modelsaar</code> (config, its backups, keys, state DB) and lists anything it left in place. Then <code>uv tool uninstall modelsaar</code>, <code>pipx uninstall modelsaar</code> or <code>pip uninstall modelsaar</code>. Models and client configurations are never touched; applied client configs have <code>.bak-&lt;timestamp&gt;</code> copies next to them.</dd>
+    <dt>Uninstall</dt><dd><code>modelsaar uninstall</code> removes only the files ModelSaar created under <code>~/.modelsaar</code> (config, its backups, keys, state DB) and lists anything it left in place. Then remove the package the way it was installed: <code>uv tool uninstall modelsaar</code>, <code>pipx uninstall modelsaar</code>, or — for the installer's own environment — <code>rm -rf ~/.local/share/modelsaar</code> and the <code>~/.local/bin/modelsaar</code> link (the installer prints the exact lines). Models and client configurations are never touched; applied client configs have <code>.bak-&lt;timestamp&gt;</code> copies next to them.</dd>
   </dl>
 </section>
 
 <section aria-labelledby="tested-title">
   <h2 id="tested-title">What has actually been tested</h2>
-  <p>Two kinds of evidence, stated separately. <strong>At the current pinned commit</strong> the installer and the CLI were exercised end to end on Linux with the package-manager step stubbed (fresh install, repeat install, an unrelated service on the port, a running gateway, <code>serve</code>, <code>test</code>, one client configuration — <code>docs/live-runs/2026-10-12-installer-scenarios/</code>). <strong>At an earlier pin</strong> (<code>80276bb</code>) the real installer paths — uv, pipx and <code>pip --user</code> on Linux x86_64, uv on macOS arm64 against the owner's Ollama host — were executed with real package installation (<code>docs/live-runs/2026-10-11-installer/</code>). A real package-manager installation at the current pin, and a real-client walkthrough, have not been run yet; both are listed in the <a href="/docs/verification-report/">verification report</a>. WSL2 follows the Linux path and has not been executed by the project. Native Windows is not supported.</p>
+  <p>Two kinds of evidence, stated separately. <strong>At the current pinned commit</strong> the installer was run end to end with real package installations on Ubuntu 24.04 whose Python is externally managed (PEP 668), as an unprivileged user with no <code>uv</code>, <code>pipx</code> or <code>git</code> on PATH: user-owned virtual environment; venv support removed (pinned <code>uv</code> downloaded and checksum-verified, a wrong checksum refused); existing uv and pipx paths; repeat run with config and keys byte-identical; a failed attempt leaving the working installation intact; a backend outage reported with exit code 2 — against the repository's controlled fake backend, not a real model (<code>scripts/installer_fallback_tests.py</code>, run in CI on x86_64 and arm64). The installer and the CLI were also exercised with the package-manager step stubbed (<code>docs/live-runs/2026-10-12-installer-scenarios/</code>). <strong>At an earlier pin</strong> (<code>80276bb</code>) the then-current installer's uv, pipx and <code>pip --user</code> paths were executed on Linux x86_64 and uv on macOS arm64 against the owner's Ollama host (<code>docs/live-runs/2026-10-11-installer/</code>); the <code>pip --user</code> path no longer exists. A real-client walkthrough has not been run yet; it is listed in the <a href="/docs/verification-report/">verification report</a>. WSL2 follows the Linux path and has not been executed by the project. Native Windows is not supported.</p>
 </section>
 
 </main>
@@ -137,7 +137,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/dfbf140a549d203916bb8904c0776140efded5af">dfbf140a549d</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/ad168b00110fa35e9dda16217af2b2865beac087">ad168b00110f</a> on 2026-10-13. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -149,6 +149,6 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=dfbf140a" defer></script>
+<script src="/assets/site.js?v=ad168b00" defer></script>
 </body>
 </html>

@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=dfbf140a">
+<link rel="stylesheet" href="/assets/site.css?v=ad168b00">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Installation, upgrade, rollback, uninstall", "description": "Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.", "url": "https://modelsaar.com/docs/installation/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Installation, upgrade, rollback, uninstall", "item": "https://modelsaar.com/docs/installation/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Installation, upgrade, rollback, uninstall</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Installation, upgrade, rollback, uninstall</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/dfbf140a549d203916bb8904c0776140efded5af/docs/installation.md"><code>docs/installation.md</code></a> at commit <code>dfbf140a549d</code>. The repository file is authoritative.</p></header><h2 id="native-recommended">Native (recommended)</h2>
+<article class="doc"><header class="doc-head"><h1>Installation, upgrade, rollback, uninstall</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/ad168b00110fa35e9dda16217af2b2865beac087/docs/installation.md"><code>docs/installation.md</code></a> at commit <code>ad168b00110f</code>. The repository file is authoritative.</p></header><h2 id="native-recommended">Native (recommended)</h2>
 <p>Prerequisites: Python 3.10+ (<code>python3 --version</code>), <code>git</code>, and a running inference server with at
 least one model (e.g. <code>ollama serve</code> + <code>ollama pull gemma4:e4b</code>). ModelSaar never downloads models.</p>
 <pre tabindex="0"><code class="language-bash">git clone &lt;repository&gt; modelsaar &amp;&amp; cd modelsaar
@@ -149,9 +149,27 @@ major version; if a migration changed your file, restore <code>config.yaml.bak-*
 <h2 id="service-management-optional">Service management (optional)</h2>
 <p>Run <code>modelsaar serve</code> under your service manager. A minimal <code>launchd</code> plist (macOS) and <code>systemd</code>
 unit (Linux) are in <code>examples/</code>. Remove the unit/plist to stop auto-starting.</p>
+<h2 id="the-one-line-installer-curl-fssl-httpsmodelsaarcominstallsh-sh">The one-line installer (<code>curl -fsSL https://modelsaar.com/install.sh | sh</code>)</h2>
+<p>The website's installer installs the pinned commit from its GitHub source archive (no <code>git</code> needed) into
+an isolated environment and never into the operating system's Python — it does not use <code>sudo</code>,
+<code>pip install --user</code>, <code>--break-system-packages</code> or the <code>EXTERNALLY-MANAGED</code> marker. In order: your <code>uv</code>
+(<code>uv tool install</code>) or <code>pipx</code> if present; otherwise a user-owned virtual environment created by your
+Python 3.10+ at <code>~/.local/share/modelsaar/envs/&lt;commit&gt;</code>; and if that Python cannot create one (missing
+<code>python3-venv</code>/<code>ensurepip</code>, or an older Python) it downloads one pinned, checksum-verified official <code>uv</code>
+release binary for your platform into <code>~/.local/share/modelsaar/uv</code> and lets it create the environment (uv
+fetches a Python of its own, 3.10–3.13, into <code>~/.local/share/modelsaar/python</code> only when no Python 3.10+ exists).
+<code>~/.local/share/modelsaar/envs/current</code> points at the active environment and <code>~/.local/bin/modelsaar</code> is
+linked to it unless that name is already taken by something else, in which case the installer prints the
+full path to use. The runtime directory (<code>MODELSAAR_RUNTIME_DIR</code>) is separate from the configuration
+directory (<code>MODELSAAR_HOME</code>); re-running the installer reuses a complete environment and replaces one only
+after the new one has installed. Exit codes: 0 installed + configured + routed check passed (or skipped),
+1 package or configuration not set up, 2 package and configuration in place but the routing check failed.</p>
 <h2 id="uninstall">Uninstall</h2>
 <pre tabindex="0"><code class="language-bash">modelsaar uninstall        # removes ModelSaar's own files under ~/.modelsaar after confirmation
-pip uninstall modelsaar    # or: uv tool uninstall modelsaar
+pip uninstall modelsaar    # or: uv tool uninstall modelsaar / pipx uninstall modelsaar
+# installed by the website's one-line installer into its own environment:
+rm -rf ~/.local/share/modelsaar      # the environment, and the uv/Python it downloaded, if any
+rm ~/.local/bin/modelsaar            # only if it is the link the installer created
 </code></pre>
 <p>Uninstall removes only the files ModelSaar created (<code>config.yaml</code> and its backups, its key files, its
 state database) and then the directories if they are empty; anything else under <code>~/.modelsaar</code> is
@@ -177,7 +195,7 @@ and runs in CI.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/dfbf140a549d203916bb8904c0776140efded5af">dfbf140a549d</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/ad168b00110fa35e9dda16217af2b2865beac087">ad168b00110f</a> on 2026-10-13. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -189,6 +207,6 @@ and runs in CI.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=dfbf140a" defer></script>
+<script src="/assets/site.js?v=ad168b00" defer></script>
 </body>
 </html>

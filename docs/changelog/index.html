@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=dfbf140a">
+<link rel="stylesheet" href="/assets/site.css?v=ad168b00">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Changelog", "description": "What changed in each ModelSaar revision.", "url": "https://modelsaar.com/docs/changelog/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Changelog", "item": "https://modelsaar.com/docs/changelog/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,28 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Changelog</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/dfbf140a549d203916bb8904c0776140efded5af/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>dfbf140a549d</code>. The repository file is authoritative.</p></header><h2 id="unreleased-alpha-closure-pass-2026-10-12-correction-review-r1-c-r2-ab-r4-c-r7-c">Unreleased — alpha closure pass, 2026-10-12 (correction review R1-C, R2-A/B, R4-C, R7-C)</h2>
+<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/ad168b00110fa35e9dda16217af2b2865beac087/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>ad168b00110f</code>. The repository file is authoritative.</p></header><h2 id="unreleased-one-line-installer-isolated-installation-on-externally-managed-python-2026-10-13">Unreleased — one-line installer: isolated installation on externally managed Python, 2026-10-13</h2>
+<ul>
+<li><strong>Installer (<code>site/static/install.sh</code>):</strong> the <code>python3 -m pip install --user</code> fallback is gone — on
+  Debian/Ubuntu (PEP 668) it failed with <code>error: externally-managed-environment</code>. The installer now uses
+  your <code>uv</code> or <code>pipx</code> if present, otherwise a user-owned virtual environment under
+  <code>~/.local/share/modelsaar/envs/&lt;commit&gt;</code> created by your Python 3.10+, and when that Python cannot
+  create one (no <code>python3-venv</code>, older Python) it downloads one pinned, checksum-verified official <code>uv</code>
+  release binary (0.12.24; Linux x86_64/aarch64 gnu+musl, macOS) into <code>~/.local/share/modelsaar/uv</code> and
+  lets it build the environment (uv fetches a Python of its own, 3.10–3.13, only when none exists). The package is installed from the pinned commit's GitHub source archive
+  (no <code>git</code> needed). The exact installed executable is used for <code>init</code> and the routed check; a
+  <code>~/.local/bin/modelsaar</code> link is created only when that name is free; repeat runs reuse a complete
+  environment and a working installation is replaced only after the new one installed; exit codes 0/1/2
+  distinguish installed+configured+routed, not installed, and routing check failed. Gateway package pin
+  unchanged (<code>d6e09e7</code>).</li>
+<li><strong>Tests:</strong> <code>scripts/installer_fallback_tests.py</code> runs the real installer with real package
+  installations on externally managed Ubuntu 24.04 (reproduction of the old failure with the kept
+  fixture, venv path, no-ensurepip bootstrap with checksum tamper check, uv/pipx paths, repeat and
+  failed-attempt preservation, exit codes) against the controlled fake backend; CI job <code>installer</code> runs
+  it on <code>ubuntu-24.04</code> and <code>ubuntu-24.04-arm</code>; <code>installer-public</code> (manual) runs the literal
+  <code>curl -fsSL https://modelsaar.com/install.sh | sh</code> on both.</li>
+</ul>
+<h2 id="unreleased-alpha-closure-pass-2026-10-12-correction-review-r1-c-r2-ab-r4-c-r7-c">Unreleased — alpha closure pass, 2026-10-12 (correction review R1-C, R2-A/B, R4-C, R7-C)</h2>
 <ul>
 <li><strong>Residency (R2-A/B):</strong> a failed <code>/api/ps</code> query is no longer an empty observation — known and
   assumed occupancy is kept until the query succeeds (<code>loaded_models()</code> returns <code>None</code> on failure);
@@ -137,7 +158,7 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/dfbf140a549d203916bb8904c0776140efded5af">dfbf140a549d</a> on 2026-10-12. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/ad168b00110fa35e9dda16217af2b2865beac087">ad168b00110f</a> on 2026-10-13. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -149,6 +170,6 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=dfbf140a" defer></script>
+<script src="/assets/site.js?v=ad168b00" defer></script>
 </body>
 </html>
