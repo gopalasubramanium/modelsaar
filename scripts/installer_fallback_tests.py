@@ -426,14 +426,25 @@ class Harness:
         if not self.a.repo or not shutil.which("git"):
             self.record("7_archive_install_matches_git_install", None, why="--repo not given or git absent")
             return
+        repo = Path(self.a.repo).resolve()
+        if subprocess.run(["git", "-C", str(repo), "cat-file", "-e", f"{self.ref}^{{commit}}"], capture_output=True).returncode != 0:
+            self.record("7_archive_install_matches_git_install", None, why=f"{self.ref[:12]} is not present in {repo} (shallow clone?)")
+            return
         py = shutil.which(self.a.managed_python) or sys.executable
         envs = {}
-        for name, spec in (("git", f"git+file://{Path(self.a.repo).resolve()}@{self.ref}"), ("archive", f"modelsaar @ {self.source}")):
-            v = self.work / f"cmp-{name}"
-            subprocess.run([py, "-m", "venv", str(v)], check=True, capture_output=True)
-            subprocess.run([str(v / "bin/python"), "-m", "pip", "install", "-q", "--disable-pip-version-check", spec], check=True, capture_output=True, env={**os.environ})
-            site = next((v / "lib").glob("python3.*/site-packages/modelsaar"))
-            envs[name] = {str(p.relative_to(site)): sha256_path(p) for p in site.rglob("*.py")}
+        try:
+            for name, spec in (("git", f"git+file://{repo}@{self.ref}"), ("archive", f"modelsaar @ {self.source}")):
+                v = self.work / f"cmp-{name}"
+                subprocess.run([py, "-m", "venv", str(v)], check=True, capture_output=True, text=True)
+                r = subprocess.run([str(v / "bin/python"), "-m", "pip", "install", "-q", "--disable-pip-version-check", spec], capture_output=True, text=True, env={**os.environ})
+                if r.returncode != 0:
+                    self.say("  ! " + (r.stderr or r.stdout).strip()[-600:])
+                    raise RuntimeError(f"pip install of {name} source failed")
+                site = next((v / "lib").glob("python3.*/site-packages/modelsaar"))
+                envs[name] = {str(p.relative_to(site)): sha256_path(p) for p in site.rglob("*.py")}
+        except (RuntimeError, subprocess.CalledProcessError, StopIteration) as exc:
+            self.record("7_archive_install_matches_git_install", False, error=str(exc))
+            return
         same = envs["git"] == envs["archive"]
         self.record("7_archive_install_matches_git_install", same and len(envs["git"]) > 10, files=len(envs["git"]), identical=same)
 

@@ -83,6 +83,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0   # case 7 installs the pinned commit from this clone (git+file) and from the archive
       - name: Harness dependencies (a separate venv; the OS Python under test is untouched)
         run: |
           python3 -m venv ~/harness && ~/harness/bin/pip install -q -e . && ~/harness/bin/pip install -q starlette uvicorn
