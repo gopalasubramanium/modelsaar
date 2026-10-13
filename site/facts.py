@@ -21,8 +21,8 @@ VERSION_STRING = "0.1.0 (unreleased public alpha)"
 
 # The revision the public installer pins. Must be a commit that is PUBLIC on GitHub and whose CI checks
 # passed. Update this together with install.sh after each verified hardening-branch update.
-INSTALL_SHA = "d6e09e770da6e8bd560da7132cb263eb02ec7151"  # hardening/review-2026-10-11 head; build.py embeds it in install.sh
-INSTALL_BRANCH = "hardening/review-2026-10-11"
+INSTALL_SHA = "cf56cdd3416d8c853b64111b9b40211e5b126031"  # main: Odysseus session_id/cache_prompt compatibility (PR #4); build.py embeds it in install.sh
+INSTALL_BRANCH = "main"
 
 HOSTING_NOTE = ("The site is published as static files from the project repository through GitHub Pages (GitHub, Inc.), whose "
     "servers keep the access logs described above. The domain's DNS is managed at Cloudflare; no Cloudflare proxy "
@@ -81,7 +81,7 @@ class _Counts(dict):
     __getattr__ = dict.__getitem__
 
 
-TEST_COUNTS = _Counts(total=208, reviewer=29, sandbox=6)  # pytest --collect-only -m 'not live' at the pinned revision
+TEST_COUNTS = _Counts(total=217, reviewer=29, sandbox=6)  # pytest --collect-only -m 'not live' at the pinned revision
 
 
 # ---- support matrix: one row per claim, with the kind of evidence behind it ------------------------
