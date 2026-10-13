@@ -77,10 +77,17 @@ For ambiguous requests quality is blended across the candidate task labels weigh
 
 ## E. Affinity and continuity
 
-* Session keys come only from explicit sources, in order: `modelsaar.session` in the body,
-  configured headers (`X-ModelSaar-Session`, `X-OpenWebUI-Chat-Id`, …), configured body fields
-  (`prompt_cache_key`). Keys are scoped to the authenticated caller. API keys and system prompts
+* Session keys come only from explicit sources, in a fixed order of precedence: `modelsaar.session`
+  in the body, the client-compatibility body field `session_id` (llama.cpp-style clients such as
+  Odysseus; validated as a non-empty printable string ≤ 256 characters), configured headers
+  (`X-ModelSaar-Session`, `X-OpenWebUI-Chat-Id`, …), configured body fields (`prompt_cache_key`).
+  When sources carry different ids the first wins and the rest appear in the decision as
+  `affinity.ignored_hints`. Keys are scoped to the authenticated caller. API keys and system prompts
   are never session ids. Entries expire after `affinity.ttl_s`.
+* `cache_prompt` (same clients) is consumed, never forwarded: `true` is an advisory hint recorded in
+  the decision (`compat.cache_prompt`; the backend manages its own prompt cache, no hit is promised);
+  `false` is refused with `400 unsupported_capability` because no shipped backend path can guarantee
+  a per-request cache bypass. See [Odysseus](clients/odysseus.md).
 * Tool round trips keep their deployment even without a session id: the gateway remembers the
   tool-call ids it returned and pins the follow-up carrying their results. If the pinned deployment
   is no longer eligible, the request fails (`affinity_broken`) rather than handing a tool workflow

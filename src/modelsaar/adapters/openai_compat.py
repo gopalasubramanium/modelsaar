@@ -120,6 +120,12 @@ class OpenAICompatAdapter(BaseAdapter):
         notes: list[str] = []
         for k in ("modelsaar",):
             out.pop(k, None)
+        # llama.cpp-style hints are consumed by the gateway; a private address does not mean the server
+        # implements llama.cpp's extensions, so they are not forwarded to any OpenAI-compatible backend.
+        for k in ("session_id", "cache_prompt"):
+            if k in out:
+                out.pop(k)
+                notes.append(f"client-compatibility field {k} consumed by the gateway; not forwarded")
         return out, notes
 
     async def chat(self, dep: Deployment, body: dict[str, Any], stream: bool, timeout: float | None = None):

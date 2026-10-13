@@ -198,3 +198,19 @@ class BaseAdapter:
     def unsupported_fields(self) -> frozenset[str]:
         """Fields that this backend path cannot honour; the router rejects requests using them."""
         return frozenset()
+
+    def cache_prompt_policy(self, value: bool) -> tuple[bool, str]:
+        """Disposition of the client-compatibility hint ``cache_prompt`` for this backend path.
+
+        Returns (accepted, note). No shipped backend path offers per-request cache control through the
+        OpenAI-compatible surface the gateway uses: the backend manages its own prompt cache. ``true`` is
+        therefore an advisory no-op (nothing is forwarded, no cache hit is promised); ``false`` asks for a
+        guaranteed bypass that cannot be honoured, so it is refused with a precise explanation rather than
+        silently accepted."""
+        kind = getattr(self.cfg, "type", "backend")
+        if value:
+            return True, f"advisory; prompt caching is managed by the {kind} backend itself (not forwarded, no cache hit promised)"
+        return False, (
+            f"cache_prompt=false asks for a guaranteed prompt-cache bypass, which the {kind} backend path cannot honour "
+            "per request (its cache is backend-managed); omit the field or send cache_prompt=true"
+        )

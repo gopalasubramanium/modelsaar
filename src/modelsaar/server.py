@@ -148,6 +148,21 @@ async def chat_completions(request: Request) -> Response:
         adapter = router.adapters[dep.backend_id]
         attempts += 1
         tried.append(dep_id)
+        # Client-compatibility hint `cache_prompt`: decided per backend path BEFORE anything is sent. `true` is
+        # advisory (recorded, not forwarded); `false` is refused unless this path can guarantee a cache bypass.
+        if req.cache_prompt is not None:
+            accepted, note = adapter.cache_prompt_policy(req.cache_prompt)
+            dec.compat["cache_prompt"] = f"{dep_id}: {note}"
+            if not accepted:
+                state.requests_failed += 1
+                dec.outcome = "unsupported_capability"
+                dec.outcome_detail = note
+                router.record(dec)
+                return _json(
+                    400,
+                    error_body(note, code="unsupported_capability", param="cache_prompt", modelsaar={"request_id": dec.request_id, "deployment": dep_id}),
+                    base_headers,
+                )
         # Attribution follows the deployment actually dispatched to (per attempt, not once).
         response_model = dec.requested_model if state.cfg.server.response_model_field == "requested" else dep_id
         try:

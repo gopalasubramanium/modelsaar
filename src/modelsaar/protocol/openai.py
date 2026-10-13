@@ -52,6 +52,15 @@ FORWARDABLE_CHAT_FIELDS = frozenset(
 # Fields that are ModelSaar-specific and must never be forwarded.
 MODELSAAR_FIELDS = frozenset({"modelsaar"})
 
+# Client-compatibility fields the gateway CONSUMES and never forwards. Some clients that know they talk to a
+# self-hosted OpenAI-compatible server add llama.cpp-style hints (Odysseus's ``_apply_local_cache_affinity``
+# sends ``session_id`` and ``cache_prompt=true``). The gateway gives them a defined meaning instead of either
+# rejecting the request or passing them to a backend that may not implement them:
+#   session_id   -> caller-scoped conversation affinity (same semantics as ``modelsaar.session``)
+#   cache_prompt -> advisory performance hint; the backend manages its own prompt cache, nothing is promised
+CLIENT_COMPAT_FIELDS = frozenset({"session_id", "cache_prompt"})
+SESSION_ID_MAX_LEN = 256
+
 
 class ProtocolError(Exception):
     def __init__(self, message: str, status: int = 400, code: str = "invalid_request_error", param: str | None = None):
@@ -172,12 +181,35 @@ class ChatRequest(BaseModel):
     user: str | None = None
     prompt_cache_key: str | None = None
     modelsaar: dict[str, Any] | None = None  # per-request routing hints (session, profile)
+    session_id: Any = None  # client-compat conversation id (validated below; consumed, never forwarded)
+    cache_prompt: Any = None  # client-compat advisory cache hint (validated below; consumed, never forwarded)
 
     @field_validator("n")
     @classmethod
     def _n(cls, v: int | None) -> int | None:
         if v is not None and v != 1:
             raise ValueError("n > 1 is not supported by the gateway")
+        return v
+
+    @field_validator("session_id")
+    @classmethod
+    def _session_id(cls, v: Any) -> str | None:
+        if v is None:
+            return None
+        if not isinstance(v, str) or not v.strip() or len(v) > SESSION_ID_MAX_LEN or any(ord(ch) < 32 or ch == "\x7f" for ch in v):
+            raise ValueError(
+                f"session_id must be a non-empty printable string of at most {SESSION_ID_MAX_LEN} characters "
+                "(a client conversation id; the gateway uses it as caller-scoped conversation affinity)"
+            )
+        return v
+
+    @field_validator("cache_prompt")
+    @classmethod
+    def _cache_prompt(cls, v: Any) -> bool | None:
+        if v is None:
+            return None
+        if not isinstance(v, bool):
+            raise ValueError("cache_prompt must be a JSON boolean (an advisory prompt-cache hint; the gateway does not coerce strings or numbers)")
         return v
 
 
@@ -200,7 +232,7 @@ def parse_chat_request(body: dict[str, Any]) -> ChatRequest:
     for i, m in enumerate(body.get("messages") or []):
         if isinstance(m, dict):
             validate_content_parts(m.get("content"), f"messages[{i}]")
-    unknown = set(body.keys()) - FORWARDABLE_CHAT_FIELDS - MODELSAAR_FIELDS
+    unknown = set(body.keys()) - FORWARDABLE_CHAT_FIELDS - MODELSAAR_FIELDS - CLIENT_COMPAT_FIELDS
     if unknown:
         raise ProtocolError(
             f"unsupported request field(s): {sorted(unknown)}; the gateway forwards only allow-listed fields "

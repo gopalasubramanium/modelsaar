@@ -212,6 +212,10 @@ class OllamaAdapter(BaseAdapter):
             if k in out:
                 out.pop(k)
                 notes.append(f"non-semantic field {k} not forwarded")
+        for k in ("session_id", "cache_prompt"):
+            if k in out:
+                out.pop(k)
+                notes.append(f"client-compatibility field {k} consumed by the gateway; not forwarded")
         return out, notes
 
     async def chat(self, dep: Deployment, body: dict[str, Any], stream: bool, timeout: float | None = None):

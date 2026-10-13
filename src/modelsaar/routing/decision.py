@@ -37,6 +37,8 @@ class Decision:
     failover_note: str = ""
     translation_notes: list[str] = field(default_factory=list)
     requirements_note: str = ""
+    # Client-compatibility fields the gateway consumed (session_id, cache_prompt) and what became of them.
+    compat: dict[str, str] = field(default_factory=dict)
     stream: bool = False
     endpoint: str = "chat"
 
@@ -69,6 +71,7 @@ class Decision:
             "failover_note": self.failover_note,
             "translation_notes": self.translation_notes,
             "requirements_note": self.requirements_note,
+            "compat": self.compat,
         }
 
     def summary_line(self) -> str:
