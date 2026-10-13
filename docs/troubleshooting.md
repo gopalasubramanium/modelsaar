@@ -24,6 +24,7 @@ Start with `modelsaar doctor` — it checks most of the items below and prints a
 | Missing tool/reasoning parser (vLLM) | server started without `--enable-auto-tool-choice --tool-call-parser` | restart vLLM with the flags; probe reports `tools unsupported` until then |
 | `config version N is not supported` | config written by a newer/older build | `modelsaar config migrate` or upgrade the package |
 | `modelsaar test`: `no gateway is listening at …` | the gateway is not running on the configured port | `modelsaar serve` in another terminal (or under launchd/systemd), then `modelsaar test` |
+| `error: externally-managed-environment` from the one-line installer | the installer served before 2026-10-13 fell back to `pip install --user` into the OS interpreter (Debian/Ubuntu refuse that, PEP 668) | re-run `curl -fsSL https://modelsaar.com/install.sh \| sh`: the current installer creates its own virtual environment (or fetches a pinned `uv` when your Python cannot) and never installs into the OS Python |
 | `ModuleNotFoundError: No module named 'httpcore…'` (or another dependency) right after a `uv tool install` | a corrupt entry in uv's wheel cache (seen on macOS) | `uv cache clean httpcore` (or `UV_NO_CACHE=1 uv tool install --force …`), then re-run the installer |
 
 Logs: `modelsaar serve` prints warnings only; set `observability.log_level: DEBUG` for more (still no

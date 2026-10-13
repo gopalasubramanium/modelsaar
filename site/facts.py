@@ -40,7 +40,7 @@ INSTALL_ONE_LINER = "curl -fsSL https://modelsaar.com/install.sh | sh"
 INSTALL_INSPECT = "curl -fsSL https://modelsaar.com/install.sh -o install.sh && less install.sh && sh install.sh"
 INSTALL_UV = f"uv tool install git+{REPO_URL}@{{sha}}"
 INSTALL_PIPX = f"pipx install git+{REPO_URL}@{{sha}}"
-INSTALL_PIP = f"python3 -m pip install --user git+{REPO_URL}@{{sha}}"
+INSTALL_PIP = f"python3 -m venv ~/modelsaar-env && ~/modelsaar-env/bin/pip install git+{REPO_URL}@{{sha}}"
 INSTALL_SOURCE = f"git clone {REPO_URL} && cd modelsaar && git checkout {{sha}} && python3 -m venv .venv && . .venv/bin/activate && pip install -e ."
 # After the one-line installer `init` has already run (it wrote config + keys and discovered models), so
 # the next command is `serve`; `init` belongs to the manual-install path only (it refuses to overwrite

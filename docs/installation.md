@@ -105,11 +105,31 @@ major version; if a migration changed your file, restore `config.yaml.bak-*` wri
 Run `modelsaar serve` under your service manager. A minimal `launchd` plist (macOS) and `systemd`
 unit (Linux) are in `examples/`. Remove the unit/plist to stop auto-starting.
 
+## The one-line installer (`curl -fsSL https://modelsaar.com/install.sh | sh`)
+
+The website's installer installs the pinned commit from its GitHub source archive (no `git` needed) into
+an isolated environment and never into the operating system's Python — it does not use `sudo`,
+`pip install --user`, `--break-system-packages` or the `EXTERNALLY-MANAGED` marker. In order: your `uv`
+(`uv tool install`) or `pipx` if present; otherwise a user-owned virtual environment created by your
+Python 3.10+ at `~/.local/share/modelsaar/envs/<commit>`; and if that Python cannot create one (missing
+`python3-venv`/`ensurepip`, or an older Python) it downloads one pinned, checksum-verified official `uv`
+release binary for your platform into `~/.local/share/modelsaar/uv` and lets it create the environment (uv
+fetches a Python of its own, 3.10–3.13, into `~/.local/share/modelsaar/python` only when no Python 3.10+ exists).
+`~/.local/share/modelsaar/envs/current` points at the active environment and `~/.local/bin/modelsaar` is
+linked to it unless that name is already taken by something else, in which case the installer prints the
+full path to use. The runtime directory (`MODELSAAR_RUNTIME_DIR`) is separate from the configuration
+directory (`MODELSAAR_HOME`); re-running the installer reuses a complete environment and replaces one only
+after the new one has installed. Exit codes: 0 installed + configured + routed check passed (or skipped),
+1 package or configuration not set up, 2 package and configuration in place but the routing check failed.
+
 ## Uninstall
 
 ```bash
 modelsaar uninstall        # removes ModelSaar's own files under ~/.modelsaar after confirmation
-pip uninstall modelsaar    # or: uv tool uninstall modelsaar
+pip uninstall modelsaar    # or: uv tool uninstall modelsaar / pipx uninstall modelsaar
+# installed by the website's one-line installer into its own environment:
+rm -rf ~/.local/share/modelsaar      # the environment, and the uv/Python it downloaded, if any
+rm ~/.local/bin/modelsaar            # only if it is the link the installer created
 ```
 
 Uninstall removes only the files ModelSaar created (`config.yaml` and its backups, its key files, its
