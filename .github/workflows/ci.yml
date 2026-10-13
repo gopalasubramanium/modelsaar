@@ -98,6 +98,10 @@ jobs:
           tar -xzf /tmp/uv.tgz -C /tmp && cp /tmp/uv-$T/uv /tmp/uv-pinned && /tmp/uv-pinned --version
       - name: Cases 1, 2, 4, 5, 6, 7 (externally managed /usr/bin/python3.12; no uv/pipx/git on the installer's PATH unless the case provides them)
         run: |
+          # GitHub's runner image ships a pip configuration that sets break-system-packages=true, which a stock
+          # Debian/Ubuntu does not have; the OS default (PEP 668 enforced) is restored for the installer under test.
+          echo "--- runner pip config:"; python3 -m pip config list -v 2>/dev/null | head -20; cat /etc/pip.conf 2>/dev/null || true
+          export PIP_CONFIG_FILE=/dev/null
           REF=$(sed -n 's/^INSTALL_SHA = "\([0-9a-f]*\)".*/\1/p' site/facts.py)
           ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
             --old-install scripts/fixtures/install-2026-10-12-pip-user.sh --uv-binary /tmp/uv-pinned --repo "$PWD" --cases 1,2,4,5,7 --out installer-cases-${{ matrix.os }}
@@ -105,6 +109,7 @@ jobs:
         run: |
           sudo apt-get remove -y -qq python3.12-venv python3-venv >/dev/null
           (python3.12 -m venv /tmp/should-fail && echo "unexpected: venv still works" && exit 1) || true
+          export PIP_CONFIG_FILE=/dev/null
           REF=$(sed -n 's/^INSTALL_SHA = "\([0-9a-f]*\)".*/\1/p' site/facts.py)
           ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
             --no-ensurepip-python /usr/bin/python3.12 --cases 3 --out installer-case3-${{ matrix.os }}

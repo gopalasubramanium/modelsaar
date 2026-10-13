@@ -49,7 +49,8 @@ sys.path.insert(0, str(ROOT / "src"))
 from modelsaar.testing.fakebackend import FakeBackend, FakeModel  # noqa: E402
 
 PASS_ENV = ("HTTPS_PROXY", "https_proxy", "NO_PROXY", "no_proxy", "SSL_CERT_FILE", "PIP_CERT", "CURL_CA_BUNDLE",
-            "REQUESTS_CA_BUNDLE", "UV_NATIVE_TLS", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "UV_INDEX_URL", "LANG", "LC_ALL", "TERM")
+            "REQUESTS_CA_BUNDLE", "UV_NATIVE_TLS", "PIP_INDEX_URL", "PIP_EXTRA_INDEX_URL", "UV_INDEX_URL", "PIP_CONFIG_FILE",
+            "LANG", "LC_ALL", "TERM")
 REDACT = re.compile(r"msk_[A-Za-z0-9_-]+")
 
 
@@ -250,6 +251,13 @@ class Harness:
         fake = self.backend()
         try:
             e = self.install_env(home, path, fake, free_port())
+            # Does this machine's pip honour the marker? (GitHub's runner images, for one, ship a pip.conf with
+            # break-system-packages=true; a stock Debian/Ubuntu does not. PIP_CONFIG_FILE=/dev/null restores the OS default.)
+            probe = self.run("python3 -m pip install --user --dry-run --no-index modelsaar-no-such-package-probe 2>&1 | head -3; true", e)
+            if "externally-managed-environment" not in probe.stdout:
+                self.record("1_old_installer_externally_managed_failure", None,
+                            why="pip on this machine does not enforce PEP 668 (a pip.conf/env override?); set PIP_CONFIG_FILE=/dev/null to test the OS default")
+                return
             r = self.sh_pipe(self.old_install, e)
             out = r.stdout + r.stderr
             self.record("1_old_installer_externally_managed_failure",
