@@ -104,7 +104,8 @@ jobs:
           export PIP_CONFIG_FILE=/dev/null
           REF=$(sed -n 's/^INSTALL_SHA = "\([0-9a-f]*\)".*/\1/p' site/facts.py)
           ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
-            --old-install scripts/fixtures/install-2026-10-12-pip-user.sh --uv-binary /tmp/uv-pinned --repo "$PWD" --cases 1,2,4,5,7 --out installer-cases-${{ matrix.os }}
+            --old-install scripts/fixtures/install-2026-10-12-pip-user.sh --uv-binary /tmp/uv-pinned --repo "$PWD" \
+            --prior-ref d6e09e770da6e8bd560da7132cb263eb02ec7151 --cases 1,2,4,5,7 --out installer-cases-${{ matrix.os }}
       - name: Case 3 — the OS venv package removed (python3 -m venv then fails for lack of ensurepip, as on a minimal Debian/Ubuntu); no git
         run: |
           sudo apt-get remove -y -qq python3.12-venv python3-venv >/dev/null

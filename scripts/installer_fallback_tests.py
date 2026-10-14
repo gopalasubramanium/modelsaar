@@ -18,7 +18,9 @@ Cases (the numbers follow the acceptance list of the 2026-10-13 fix):
      checksum-verified, used; the venv is built on the SYSTEM interpreter (no managed Python download)
   4. existing uv path and existing pipx path still work
   5. repeat run reuses the environment and keeps config/keys/state byte-identical; a failed attempt (bad commit)
-     leaves the working installation and configuration untouched; a backend outage after installation exits 2
+     leaves the working installation and configuration untouched; a backend outage after installation exits 2;
+     (5d) upgrading from an earlier commit switches envs/current atomically, keeps the previous environment,
+     removes older ones
   6. (inside 2) `init` and one `auto` request through the exact installed executable
   7. optional: the package installed from the source archive is file-for-file identical to a git checkout install
 
@@ -350,6 +352,62 @@ class Harness:
         self.record("5c_backend_unavailable_exits_2_not_success", r3.returncode == 2 and "Routing check:      FAILED" in out3 and "verification: FAILED" in out3
                     and "verification: OK" not in out3, exit=r3.returncode)
 
+    def case5d_upgrade_from_prior_revision(self) -> None:
+        """Installation A (prior commit) exists; installing B must switch envs/current to B atomically, B must run,
+        and A must remain available (a running service and rollback use it); environments older than A go."""
+        if not self.a.prior_ref:
+            self.record("5d_upgrade_from_prior_revision", None, why="--prior-ref not given")
+            return
+        prior_src = self.a.prior_source or f"https://github.com/gopalasubramanium/modelsaar/archive/{self.a.prior_ref}.tar.gz"
+        home = self.mkhome("c5d")
+        path = self.mkpath("c5d", python3=self.a.managed_python, fail_shims={"git"})
+        fake = self.backend()
+        port = free_port()
+        try:
+            envs = home / ".local/share/modelsaar/envs"
+            e_a = self.install_env(home, path, fake, port, MODELSAAR_REF=self.a.prior_ref)
+            if prior_src != f"https://github.com/gopalasubramanium/modelsaar/archive/{self.a.prior_ref}.tar.gz":
+                e_a["MODELSAAR_SOURCE"] = prior_src
+            else:
+                e_a.pop("MODELSAAR_SOURCE", None)
+            r_a = self.sh_pipe(self.install, e_a)
+            a_ok = r_a.returncode == 0 and envs.is_dir() and os.readlink(envs / "current") == self.a.prior_ref
+            cfg = home / ".modelsaar/config.yaml"
+            keys = home / ".modelsaar/keys/api_keys"
+            before = (sha256_path(cfg), sha256_path(keys)) if a_ok else None
+            # an even older complete environment that should be cleaned up (only A, the previous one, is retained)
+            stale = envs / ("0" * 40)
+            stale.mkdir()
+            (stale / ".modelsaar-installed").write_text("stale\n")
+            if self.user:
+                pw = pwd.getpwnam(self.user)
+                os.chown(stale, pw.pw_uid, pw.pw_gid)
+                os.chown(stale / ".modelsaar-installed", pw.pw_uid, pw.pw_gid)
+            e_b = self.install_env(home, path, fake, port)
+            r_b = self.sh_pipe(self.install, e_b)
+            out = r_b.stdout + r_b.stderr
+            cur = envs / "current"
+            b_exe = envs / self.ref / "bin/modelsaar"
+            a_exe = envs / self.a.prior_ref / "bin/modelsaar"
+            run_b = subprocess.run([str(b_exe), "--version"], capture_output=True, text=True) if b_exe.exists() else None
+            run_a = subprocess.run([str(a_exe), "--version"], capture_output=True, text=True) if a_exe.exists() else None
+            checks = {
+                "a_installed_first": a_ok,
+                "b_exit_0": r_b.returncode == 0,
+                "current_is_symlink_to_b": cur.is_symlink() and os.readlink(cur) == self.ref,
+                "no_stray_link_inside_a": not list((envs / self.a.prior_ref).glob("current.tmp.*")) if a_ok else False,
+                "b_executes": bool(run_b) and run_b.returncode == 0,
+                "a_remains_available": bool(run_a) and run_a.returncode == 0 and (envs / self.a.prior_ref / ".modelsaar-installed").exists(),
+                "older_env_removed": not stale.exists(),
+                "previous_kept_message": "previous environment kept" in out,
+                "launcher_via_current": (home / ".local/bin/modelsaar").is_symlink() and os.readlink(home / ".local/bin/modelsaar") == str(cur / "bin/modelsaar"),
+                "config_keys_unchanged": before is not None and (sha256_path(cfg), sha256_path(keys)) == before,
+                "verification_ok": "verification: OK" in out,
+            }
+            self.record("5d_upgrade_from_prior_revision", all(checks.values()), prior=self.a.prior_ref[:12], new=self.ref[:12], **checks)
+        finally:
+            fake.stop()
+
     def case3_no_ensurepip_bootstrap(self) -> None:
         py = self.a.no_ensurepip_python
         if not py or not shutil.which(py):
@@ -475,6 +533,7 @@ class Harness:
             ctx = self.case2_venv_install() if "2" in want else None
             if "5" in want:
                 self.case5_repeat_and_failure(ctx)
+                self.case5d_upgrade_from_prior_revision()
             elif ctx:
                 ctx[2].stop()
             if "3" in want:
@@ -508,6 +567,8 @@ def main() -> int:
     ap.add_argument("--managed-python", default="python3.12", help="the externally managed interpreter to expose as python3 (default python3.12)")
     ap.add_argument("--no-ensurepip-python", default=None, help="an interpreter whose `-m venv` fails for lack of ensurepip (case 3)")
     ap.add_argument("--uv-binary", default=None, help="a real uv binary to expose for case 4a")
+    ap.add_argument("--prior-ref", default=None, help="an earlier commit to install first for the different-revision upgrade case (5d)")
+    ap.add_argument("--prior-source", default=None, help="archive path or URL of --prior-ref (default: GitHub's archive)")
     ap.add_argument("--repo", default=None, help="git checkout containing --ref, for case 7")
     ap.add_argument("--cases", default=None, help="comma-separated subset, e.g. 1,2,5 (P = the public URL case)")
     ap.add_argument("--public-url", default=None, help="run the literal `curl -fsSL URL | sh` case against this served installer")

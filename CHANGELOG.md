@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased — installer: atomic `envs/current` switch, previous environment retained, 2026-10-14
+
+* **Installer defect (upgrade between commits):** `activate_env` replaced the `envs/current` symlink with
+  `mv -f tmp current`; on GNU/Linux and macOS, when `current` points at an existing directory, that moves the
+  temporary link *inside* the old environment and leaves `current` unchanged (exit 0), and the following
+  cleanup removed the older environment the running service still used. Fixed: the symlink itself is
+  replaced atomically with `os.replace` run by the newly installed environment's Python (the environment
+  directory is never renamed — entry points carry absolute paths); the previous complete environment is kept
+  for the running service and as rollback target; only environments older than that are removed; config,
+  keys and state are untouched. New harness case 5d (install A, install B: `current` → B, B runs, A still
+  runs, older environments removed) runs in CI on x86_64 and arm64; it fails against the previous script.
+
 ## Unreleased — client compatibility: `session_id` / `cache_prompt` (Odysseus), 2026-10-13
 
 * **Gateway:** Odysseus adds llama.cpp-style `session_id` and `cache_prompt: true` to requests it sends to a
