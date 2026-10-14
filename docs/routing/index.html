@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=ad168b00">
+<link rel="stylesheet" href="/assets/site.css?v=1d865639">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Routing: requirements, eligibility, ranking", "description": "How ModelSaar analyses a request, which hard filters apply, how candidates are ranked and how embeddings, memory budgets and failover behave.", "url": "https://modelsaar.com/docs/routing/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Routing: requirements, eligibility, ranking", "item": "https://modelsaar.com/docs/routing/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Routing: requirements, eligibility, ranking</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Routing: requirements, eligibility, ranking</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/ad168b00110fa35e9dda16217af2b2865beac087/docs/routing.md"><code>docs/routing.md</code></a> at commit <code>ad168b00110f</code>. The repository file is authoritative.</p></header><h2 id="a-requirements">A. Requirements</h2>
+<article class="doc"><header class="doc-head"><h1>Routing: requirements, eligibility, ranking</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/1d8656394ca70693f7b16e8c43dade6504ad8b19/docs/routing.md"><code>docs/routing.md</code></a> at commit <code>1d8656394ca7</code>. The repository file is authoritative.</p></header><h2 id="a-requirements">A. Requirements</h2>
 <p><code>routing/requirements.py</code> reads the whole request structurally (never the model's output, never
 instructions inside prompts):</p>
 <ul>
@@ -145,10 +145,17 @@ measurements, <code>auto</code> prefers the cheaper of effectively-tied models. 
 <p>For ambiguous requests quality is blended across the candidate task labels weighted by confidence.</p>
 <h2 id="e-affinity-and-continuity">E. Affinity and continuity</h2>
 <ul>
-<li>Session keys come only from explicit sources, in order: <code>modelsaar.session</code> in the body,
-  configured headers (<code>X-ModelSaar-Session</code>, <code>X-OpenWebUI-Chat-Id</code>, …), configured body fields
-  (<code>prompt_cache_key</code>). Keys are scoped to the authenticated caller. API keys and system prompts
+<li>Session keys come only from explicit sources, in a fixed order of precedence: <code>modelsaar.session</code>
+  in the body, the client-compatibility body field <code>session_id</code> (llama.cpp-style clients such as
+  Odysseus; validated as a non-empty printable string ≤ 256 characters), configured headers
+  (<code>X-ModelSaar-Session</code>, <code>X-OpenWebUI-Chat-Id</code>, …), configured body fields (<code>prompt_cache_key</code>).
+  When sources carry different ids the first wins and the rest appear in the decision as
+  <code>affinity.ignored_hints</code>. Keys are scoped to the authenticated caller. API keys and system prompts
   are never session ids. Entries expire after <code>affinity.ttl_s</code>.</li>
+<li><code>cache_prompt</code> (same clients) is consumed, never forwarded: <code>true</code> is an advisory hint recorded in
+  the decision (<code>compat.cache_prompt</code>; the backend manages its own prompt cache, no hit is promised);
+  <code>false</code> is refused with <code>400 unsupported_capability</code> because no shipped backend path can guarantee
+  a per-request cache bypass. See <a href="/docs/clients/odysseus/">Odysseus</a>.</li>
 <li>Tool round trips keep their deployment even without a session id: the gateway remembers the
   tool-call ids it returned and pins the follow-up carrying their results. If the pinned deployment
   is no longer eligible, the request fails (<code>affinity_broken</code>) rather than handing a tool workflow
@@ -244,7 +251,7 @@ not a completion is <code>502 upstream_bad_response</code>.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/ad168b00110fa35e9dda16217af2b2865beac087">ad168b00110f</a> on 2026-10-13. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/1d8656394ca70693f7b16e8c43dade6504ad8b19">1d8656394ca7</a> on 2026-10-14. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -256,6 +263,6 @@ not a completion is <code>502 upstream_bad_response</code>.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=ad168b00" defer></script>
+<script src="/assets/site.js?v=1d865639" defer></script>
 </body>
 </html>

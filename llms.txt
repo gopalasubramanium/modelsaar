@@ -30,6 +30,7 @@ ModelSaar is Apache-2.0-licensed open source (https://github.com/gopalasubramani
 - [OpenClaw](https://modelsaar.com/docs/clients/openclaw/): Connecting OpenClaw to ModelSaar.
 - [OpenCode](https://modelsaar.com/docs/clients/opencode/): Connecting OpenCode (V1 and V2 config schemas) to ModelSaar.
 - [Hermes Agent](https://modelsaar.com/docs/clients/hermes/): Connecting NousResearch Hermes Agent to ModelSaar.
+- [Odysseus](https://modelsaar.com/docs/clients/odysseus/): Connecting Odysseus to ModelSaar: the session_id / cache_prompt compatibility contract.
 - [Changelog](https://modelsaar.com/docs/changelog/): What changed in each ModelSaar revision.
 - [Contributing](https://modelsaar.com/docs/contributing/): How to report problems, propose changes and run the test suite.
 - [Security policy](https://modelsaar.com/docs/security-policy/): How to report a vulnerability in ModelSaar.

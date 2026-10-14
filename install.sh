@@ -23,8 +23,9 @@
 #      prints the result and your next step.
 # It never downloads a model, never accepts a model licence, never overwrites an existing config, keys or
 # state, never edits your shell profile, and never changes a client's configuration.
-# Repeat runs are safe: a complete installation of the same commit is reused; a working installation is
-# replaced only after the new one has installed successfully.
+# Repeat runs are safe: a complete installation of the same commit is reused; envs/current is switched to a
+# new commit only after it has installed successfully, and the previous environment is kept (a running
+# service keeps working until it is restarted; it is also the rollback target).
 #
 # Options (environment variables):
 #   MODELSAAR_REF=<sha>          install another commit (you take responsibility for it)
@@ -42,7 +43,7 @@
 set -eu
 
 REPO="https://github.com/gopalasubramanium/modelsaar"
-REF="${MODELSAAR_REF:-d6e09e770da6e8bd560da7132cb263eb02ec7151}"
+REF="${MODELSAAR_REF:-cf56cdd3416d8c853b64111b9b40211e5b126031}"
 PORT="${MODELSAAR_PORT:-8484}"
 HOME_DIR="${MODELSAAR_HOME:-$HOME/.modelsaar}"
 RUNTIME="${MODELSAAR_RUNTIME_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/modelsaar}"
@@ -164,11 +165,25 @@ ours_link() {  # true when $1 is a symlink into this installer's runtime directo
   case "$(readlink "$1")" in "$RUNTIME"/*) return 0 ;; *) return 1 ;; esac
 }
 
-activate_env() {  # point envs/current at $ENV_DIR atomically, then drop other complete versions
-  ln -sfn "$ENV_NAME" "$ENVS/current.tmp.$$" && mv -f "$ENVS/current.tmp.$$" "$ENVS/current"
+replace_link() {  # target link — atomically replace the symlink `link` itself (never descend into what it points to)
+  # `mv -f tmp link` is NOT suitable: on GNU/Linux and macOS, when `link` is a symlink to a directory the
+  # temporary link is moved INSIDE that directory. os.replace renames over the symlink atomically.
+  tmp="$2.tmp.$$"
+  rm -f "$tmp"
+  ln -s "$1" "$tmp" || return 1
+  "$ENV_DIR/bin/python" -c 'import os, sys; os.replace(sys.argv[1], sys.argv[2])' "$tmp" "$2" || { rm -f "$tmp"; return 1; }
+  [ "$(readlink "$2")" = "$1" ]
+}
+
+activate_env() {  # point envs/current at $ENV_DIR atomically; keep the previous environment; drop older ones
+  prev="$(readlink "$ENVS/current" 2>/dev/null || true)"
+  replace_link "$ENV_NAME" "$ENVS/current" || die "could not switch $ENVS/current to $ENV_NAME (the new environment is complete at $ENV_DIR; the previous one is untouched)"
+  # The previous complete environment stays (a running service still uses it until restarted, and it is the
+  # rollback target); only environments older than that are removed, never config, keys or state.
   for d in "$ENVS"/*; do
-    case "$(basename "$d")" in "$ENV_NAME"|current|current.tmp.*) ;; *) [ -d "$d" ] && [ -f "$d/.modelsaar-installed" ] && rm -rf "$d" ;; esac
+    case "$(basename "$d")" in "$ENV_NAME"|"$prev"|current|current.tmp.*) ;; *) [ -d "$d" ] && [ -f "$d/.modelsaar-installed" ] && rm -rf "$d" ;; esac
   done
+  [ -n "$prev" ] && [ "$prev" != "$ENV_NAME" ] && [ -d "$ENVS/$prev" ] && say "previous environment kept for the running service and rollback: $ENVS/$prev"
   MS="$ENVS/current/bin/modelsaar"
   # Stable user-level command, never over an unrelated executable.
   mkdir -p "$LAUNCHER_DIR"
@@ -178,7 +193,7 @@ activate_env() {  # point envs/current at $ENV_DIR atomically, then drop other c
   elif [ -L "$L" ] && [ "$(readlink "$L")" = "$MS" ]; then
     LAUNCHER_STATE="linked"
   elif ours_link "$L"; then
-    ln -sfn "$MS" "$L.tmp.$$" && mv -f "$L.tmp.$$" "$L" && LAUNCHER_STATE="linked"
+    replace_link "$MS" "$L" && LAUNCHER_STATE="linked"
   else
     LAUNCHER_STATE="kept"; say "note: $L already exists and is not ModelSaar's launcher; it was left alone."
   fi

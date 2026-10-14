@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=ad168b00">
+<link rel="stylesheet" href="/assets/site.css?v=1d865639">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Changelog", "description": "What changed in each ModelSaar revision.", "url": "https://modelsaar.com/docs/changelog/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Changelog", "item": "https://modelsaar.com/docs/changelog/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,32 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Changelog</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/ad168b00110fa35e9dda16217af2b2865beac087/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>ad168b00110f</code>. The repository file is authoritative.</p></header><h2 id="unreleased-one-line-installer-isolated-installation-on-externally-managed-python-2026-10-13">Unreleased — one-line installer: isolated installation on externally managed Python, 2026-10-13</h2>
+<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/1d8656394ca70693f7b16e8c43dade6504ad8b19/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>1d8656394ca7</code>. The repository file is authoritative.</p></header><h2 id="unreleased-installer-atomic-envscurrent-switch-previous-environment-retained-2026-10-14">Unreleased — installer: atomic <code>envs/current</code> switch, previous environment retained, 2026-10-14</h2>
+<ul>
+<li><strong>Installer defect (upgrade between commits):</strong> <code>activate_env</code> replaced the <code>envs/current</code> symlink with
+  <code>mv -f tmp current</code>; on GNU/Linux and macOS, when <code>current</code> points at an existing directory, that moves the
+  temporary link <em>inside</em> the old environment and leaves <code>current</code> unchanged (exit 0), and the following
+  cleanup removed the older environment the running service still used. Fixed: the symlink itself is
+  replaced atomically with <code>os.replace</code> run by the newly installed environment's Python (the environment
+  directory is never renamed — entry points carry absolute paths); the previous complete environment is kept
+  for the running service and as rollback target; only environments older than that are removed; config,
+  keys and state are untouched. New harness case 5d (install A, install B: <code>current</code> → B, B runs, A still
+  runs, older environments removed) runs in CI on x86_64 and arm64; it fails against the previous script.</li>
+</ul>
+<h2 id="unreleased-client-compatibility-session_id-cache_prompt-odysseus-2026-10-13">Unreleased — client compatibility: <code>session_id</code> / <code>cache_prompt</code> (Odysseus), 2026-10-13</h2>
+<ul>
+<li><strong>Gateway:</strong> Odysseus adds llama.cpp-style <code>session_id</code> and <code>cache_prompt: true</code> to requests it sends to a
+  self-hosted endpoint; the gateway rejected them as unknown fields. Both now have a defined, gateway-owned
+  meaning and are never forwarded: <code>session_id</code> (validated: non-empty printable string ≤ 256 chars) is
+  caller-scoped conversation affinity with a fixed precedence among session hints
+  (<code>modelsaar.session</code> → <code>session_id</code> → configured headers → configured body fields; conflicting ids are
+  reported as <code>affinity.ignored_hints</code>); <code>cache_prompt: true</code> is an advisory hint whose disposition is
+  recorded in the decision (<code>compat.cache_prompt</code>); <code>cache_prompt: false</code> is refused with
+  <code>400 unsupported_capability</code> before dispatch because no shipped backend path can guarantee a per-request
+  cache bypass. Non-boolean <code>cache_prompt</code> and invalid <code>session_id</code> values are <code>400</code> naming the field; every
+  other unknown field is still rejected. Decisions carry a <code>compat</code> map. Docs: <code>docs/clients/odysseus.md</code>.</li>
+</ul>
+<h2 id="unreleased-one-line-installer-isolated-installation-on-externally-managed-python-2026-10-13">Unreleased — one-line installer: isolated installation on externally managed Python, 2026-10-13</h2>
 <ul>
 <li><strong>Installer (<code>site/static/install.sh</code>):</strong> the <code>python3 -m pip install --user</code> fallback is gone — on
   Debian/Ubuntu (PEP 668) it failed with <code>error: externally-managed-environment</code>. The installer now uses
@@ -158,7 +183,7 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/ad168b00110fa35e9dda16217af2b2865beac087">ad168b00110f</a> on 2026-10-13. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/1d8656394ca70693f7b16e8c43dade6504ad8b19">1d8656394ca7</a> on 2026-10-14. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -170,6 +195,6 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=ad168b00" defer></script>
+<script src="/assets/site.js?v=1d865639" defer></script>
 </body>
 </html>

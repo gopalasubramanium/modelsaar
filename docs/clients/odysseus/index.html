@@ -1,0 +1,128 @@
+<!doctype html>
+<!--
+ModelSaar. Created by Gopala Subramanium: https://me.sgopala.com
+Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
+-->
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Odysseus · ModelSaar</title>
+<meta name="description" content="Connecting Odysseus to ModelSaar: the session_id / cache_prompt compatibility contract.">
+<meta name="author" content="Gopala Subramanium">
+<link rel="canonical" href="https://modelsaar.com/docs/clients/odysseus/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Odysseus · ModelSaar">
+<meta property="og:description" content="Connecting Odysseus to ModelSaar: the session_id / cache_prompt compatibility contract.">
+<meta property="og:url" content="https://modelsaar.com/docs/clients/odysseus/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Odysseus · ModelSaar">
+<meta name="twitter:description" content="Connecting Odysseus to ModelSaar: the session_id / cache_prompt compatibility contract.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=1d865639">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Odysseus", "description": "Connecting Odysseus to ModelSaar: the session_id / cache_prompt compatibility contract.", "url": "https://modelsaar.com/docs/clients/odysseus/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "clients", "item": "https://modelsaar.com/docs/clients/"}, {"@type": "ListItem", "position": 4, "name": "Odysseus", "item": "https://modelsaar.com/docs/clients/odysseus/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Odysseus</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Odysseus</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/1d8656394ca70693f7b16e8c43dade6504ad8b19/docs/clients/odysseus.md"><code>docs/clients/odysseus.md</code></a> at commit <code>1d8656394ca7</code>. The repository file is authoritative.</p></header><p>Status: the <strong>request shape is supported and fixture-tested</strong> (<code>tests/test_client_compat_odysseus.py</code>,
+2026-10-13); a chat through the installed Odysseus client itself was <strong>NOT RUN by the project</strong> — it ran
+on the owner's GX10 and is recorded in the verification report when executed.</p>
+<p>Odysseus talks plain OpenAI Chat Completions, so it needs no generator: point it at the gateway
+(<code>http://&lt;gateway-host&gt;:8484/v1</code>, API key = the line printed by <code>head -1 ~/.modelsaar/keys/api_keys</code>,
+model <code>auto</code>). Model discovery (<code>/v1/models</code>) worked unchanged.</p>
+<h2 id="what-was-failing">What was failing</h2>
+<p>For an endpoint it considers self-hosted, Odysseus's <code>src/llm_core.py</code> (<code>_apply_local_cache_affinity()</code>)
+adds two llama.cpp-style fields to every chat request: <code>session_id</code> (its conversation id) and
+<code>cache_prompt: true</code>. ModelSaar forwards only allow-listed fields and does not drop unknown ones
+silently, so the gateway answered <code>HTTP 400: unsupported request field(s): ['cache_prompt', 'session_id']</code>.</p>
+<h2 id="the-compatibility-contract-gateway-owned-nothing-to-edit-in-odysseus">The compatibility contract (gateway-owned; nothing to edit in Odysseus)</h2>
+<table tabindex="0">
+<thead>
+<tr>
+<th>field</th>
+<th>validation</th>
+<th>meaning in ModelSaar</th>
+<th>forwarded?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>session_id</code></td>
+<td>non-empty printable string, ≤ 256 characters; anything else → <code>400</code> naming the field</td>
+<td><strong>conversation affinity</strong>, scoped to the authenticated caller (same semantics as <code>modelsaar.session</code>): follow-up turns with the same id stay on the deployment that answered, revalidated against health and policy every time; tool round-trip continuity is unchanged</td>
+<td>never</td>
+</tr>
+<tr>
+<td><code>cache_prompt: true</code></td>
+<td>must be a JSON boolean; strings/numbers → <code>400</code></td>
+<td><strong>advisory</strong> hint; the backend manages its own prompt cache, the gateway promises no cache hit and records the disposition in the routing decision (<code>compat.cache_prompt</code>)</td>
+<td>never</td>
+</tr>
+<tr>
+<td><code>cache_prompt: false</code></td>
+<td>JSON boolean</td>
+<td>asks for a guaranteed cache bypass; no shipped backend path (Ollama, generic OpenAI-compatible) can honour that per request, so the gateway answers <code>400 unsupported_capability</code> naming <code>cache_prompt</code> <strong>before anything is sent</strong></td>
+<td>never</td>
+</tr>
+</tbody>
+</table>
+<p>Precedence when several session hints are present (fixed, independent of field order):
+<code>modelsaar.session</code> → <code>session_id</code> → configured headers (<code>X-ModelSaar-Session</code>, <code>X-OpenWebUI-Chat-Id</code>) →
+configured body fields (<code>prompt_cache_key</code>). Other sources carrying a <em>different</em> id are listed in the
+decision as <code>affinity.ignored_hints</code>; identical values are not a conflict.</p>
+<p>Everything else stays strict: any other unknown field (for example llama.cpp's <code>id_slot</code>) is still
+rejected, and the request Ollama receives contains only the fields its adapter supports.</p>
+<p>A private address does not mean the backend implements llama.cpp's extensions, so neither field is
+passed through to any backend; a llama.cpp slot identity is not guaranteed by the gateway.</p>
+<h2 id="check-it">Check it</h2>
+<pre tabindex="0"><code class="language-bash">curl -sS http://127.0.0.1:8484/v1/chat/completions -H &quot;Authorization: Bearer $(head -1 ~/.modelsaar/keys/api_keys)&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d '{&quot;model&quot;:&quot;auto&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;Hello&quot;}],&quot;session_id&quot;:&quot;demo-1&quot;,&quot;cache_prompt&quot;:true}'
+modelsaar decisions --limit 1     # shows session_source=body:session_id and the cache_prompt disposition
+</code></pre></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/1d8656394ca70693f7b16e8c43dade6504ad8b19">1d8656394ca7</a> on 2026-10-14. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=1d865639" defer></script>
+</body>
+</html>
