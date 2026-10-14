@@ -348,8 +348,8 @@ class Run:
                 self.fail(f"{path} @{width}: clipboard value differs from the code text for block {i}: {got!r} != {expected!r}")
             if i == 0 and path in ("/", "/get-started/") and got != facts.INSTALL_ONE_LINER:
                 self.fail(f"{path}: install one-liner copied as {got!r}, canonical is {facts.INSTALL_ONE_LINER!r}")
-            if "\n" in got and "wrap" in (await box.locator("pre").get_attribute("class") or ""):
-                self.fail(f"{path}: a wrapped single-line command copied with a newline (block {i})")
+            if got.count("\n") != expected.count("\n"):
+                self.fail(f"{path}: visual wrapping changed the number of newlines in the copied value (block {i})")
             label = await box.locator(".copy").text_content()
             if label != "Copied":
                 self.fail(f"{path}: button label after copy is {label!r}")

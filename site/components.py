@@ -116,14 +116,14 @@ def walkthrough(site) -> str:  # type: ignore[no-untyped-def]
     return "\n".join(out)
 
 
-def cmd(text: str, note: str | None = None, lang: str = "bash") -> str:
+def cmd(text: str, note: str | None = None, lang: str = "bash", scroll: bool = False) -> str:
     """A command block: a toolbar row (what the block is; the Copy button lands there when JS runs) above a
-    dedicated code area, so text and button never share space. Shell commands wrap visually (``wrap``);
-    structured multi-line text keeps its columns and scrolls inside the block (``scroll``, keyboard-focusable).
+    dedicated code area, so text and button never share space. Text wraps visually (``wrap``, the default,
+    readable on phones); ``scroll=True`` keeps columns and scrolls inside the block (keyboard-focusable).
     The clipboard value is the code element's exact text, independent of visual wrapping."""
     n = f'<p class="cmd-note">{note}</p>' if note else ""
     label = {"bash": "Terminal", "sh": "Terminal", "text": "Values to paste"}.get(lang, lang)
-    mode = "wrap" if lang in ("bash", "sh") else "scroll"
+    mode = "scroll" if scroll else "wrap"
     pre_attr = ' tabindex="0"' if mode == "scroll" else ' class="wrap"'
     return (
         f'<div class="cmd cmd-{mode}"><div class="cmd-bar"><span class="cmd-label">{esc(label)}</span></div>'
