@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased — installer: one-command upgrades with managed-service handling, 2026-10-14
+
+* **Upgrade mode:** an existing configuration means upgrade — `init` never runs again; config, keys, state,
+  backend, listening address and port are preserved (verified byte-identical and reported). The new revision is
+  validated against the existing configuration *before* it becomes `envs/current`; the previous environment
+  stays as the rollback target; concurrent runs are refused by a lock.
+* **Linux user service:** `modelsaar.service` is restarted only when it belongs to this installation (ExecStart
+  into the runtime directory or the installed executable) and uses this configuration; bounded readiness wait
+  ("Waiting for service…"), the running revision is read from the process's mapped files, the routed check uses
+  the restarted service, no temporary gateway is started. Already-current services are not restarted, stopped
+  services stay stopped, foreign units are reported and left alone; a replacement that does not start is rolled
+  back (previous environment + service), exit 3. A backend outage after a good restart is exit 2, never a rollback.
+* **Effective address:** the health check and the summary use `server.host`/`server.port` from the configuration
+  (e.g. `http://<lan-address>:8484/v1`), not a hard-coded loopback; "loopback only" is said only when it is true;
+  `modelsaar serve` is suggested only when no managed service runs.
+* **Summary:** installed and running revision, service state, endpoint, configuration/keys preservation, routing
+  check, and what (if anything) is still required. Tests: harness cases for upgrade of an active matching service,
+  same-revision repeat, inactive service preserved, failed replacement rolled back, unrelated unit refused — run
+  against a real systemd user unit in CI (x86_64 and arm64), plus the existing fresh/repeat/failed-install cases.
+
 ## Unreleased — installer: atomic `envs/current` switch, previous environment retained, 2026-10-14
 
 * **Installer defect (upgrade between commits):** `activate_env` replaced the `envs/current` symlink with
