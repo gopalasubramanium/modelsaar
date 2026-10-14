@@ -557,8 +557,10 @@ class Harness:
             bdir = envs / broken
             (bdir / "bin").mkdir(parents=True)
             os.symlink(cur.resolve() / "bin/python", bdir / "bin/python")
-            # passes every pre-activation check (runs, validates, shows the config, ensures keys) but cannot serve
-            (bdir / "bin/modelsaar").write_text('#!/bin/sh\ncase "$1" in --version) echo "modelsaar 0.1.0-broken-test"; exit 0;; config) [ "$2" = show ] && cat "$MODELSAAR_HOME/config.yaml"; exit 0;; keys) exit 0;; esac\necho "broken replacement: refusing to serve" >&2; exit 7\n')
+            # passes every pre-activation check (runs, validates, shows the config, ensures keys) but cannot serve:
+            # it lingers a few seconds first (like a gateway that dies during startup), so the bounded wait has to
+            # report progress ("Waiting for service…") before systemd marks the unit failed and the installer gives up
+            (bdir / "bin/modelsaar").write_text('#!/bin/sh\ncase "$1" in --version) echo "modelsaar 0.1.0-broken-test"; exit 0;; config) [ "$2" = show ] && cat "$MODELSAAR_HOME/config.yaml"; exit 0;; keys) exit 0;; esac\nsleep 7; echo "broken replacement: refusing to serve" >&2; exit 7\n')
             (bdir / "bin/modelsaar").chmod(0o755)
             # the marker must name the spec the installer itself derives for MODELSAAR_REF=<broken>, otherwise the
             # environment is treated as "installed from a different source" and reinstalled instead of reused
@@ -573,10 +575,21 @@ class Harness:
             r4 = self.sh_pipe(self.install, e_bad)
             out4 = r4.stdout + r4.stderr
             pid_e = self._svc_prop("MainPID")
-            self.record(f"{tag}_4_failed_replacement_rolls_back", r4.returncode == 3 and "replacement did not start cleanly" in out4
-                        and "Rollback:            restored " + self.ref in out4 and os.readlink(cur) == self.ref and self._svc_prop("ActiveState") == "active"
-                        and self._running_env(pid_e).endswith(self.ref) and (bdir / ".modelsaar-failed").exists() and "Waiting for service" in out4
-                        and "finished with issues (exit 3)" in out4, exit=r4.returncode, state=self._svc_prop("ActiveState"), pid_before=pid_d, pid_after=pid_e)
+            checks4 = {
+                "exit_3": r4.returncode == 3,
+                "not_started_cleanly": "replacement did not start cleanly" in out4,
+                "rollback_line": "Rollback:            restored " + self.ref in out4,
+                "current_restored": os.readlink(cur) == self.ref,
+                "service_active_again": self._svc_prop("ActiveState") == "active",
+                "running_previous_revision": self._running_env(pid_e).endswith(self.ref),
+                "broken_env_marked_failed": (bdir / ".modelsaar-failed").exists() and not (bdir / ".modelsaar-installed").exists(),
+                "waiting_progress_shown": "Waiting for service" in out4,
+                "diagnostics_retained": "journal:" in out4 and "refusing to serve" in out4,
+                "routing_check_skipped": "Routing check:       skipped (replacement rolled back)" in out4,
+                "summary_issues_exit_3": "finished with issues (exit 3)" in out4,
+            }
+            self.record(f"{tag}_4_failed_replacement_rolls_back", all(checks4.values()), exit=r4.returncode, state=self._svc_prop("ActiveState"),
+                        pid_before=pid_d, pid_after=pid_e, **checks4)
             # --- 5. unrelated unit of the same name is refused, not touched ---
             self._svc("stop", "modelsaar.service")
             self._write_unit("/bin/sleep 300", None)
