@@ -106,6 +106,17 @@ jobs:
           ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
             --old-install scripts/fixtures/install-2026-10-12-pip-user.sh --uv-binary /tmp/uv-pinned --repo "$PWD" \
             --prior-ref d6e09e770da6e8bd560da7132cb263eb02ec7151 --cases 1,2,4,5,7 --out installer-cases-${{ matrix.os }}
+      - name: Service cases — a REAL systemd user unit (modelsaar.service) on the runner (upgrade of an active matching service, same-revision repeat, inactive service preserved, failed replacement rolled back, unrelated unit refused; LAN bind address like the owner's GX10)
+        run: |
+          sudo loginctl enable-linger "$(id -un)"
+          export XDG_RUNTIME_DIR="/run/user/$(id -u)" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+          for i in $(seq 1 30); do systemctl --user show-environment >/dev/null 2>&1 && break; sleep 1; done
+          systemctl --user show-environment >/dev/null
+          export PIP_CONFIG_FILE=/dev/null
+          REF=$(sed -n 's/^INSTALL_SHA = "\([0-9a-f]*\)".*/\1/p' site/facts.py)
+          ~/harness/bin/python scripts/installer_fallback_tests.py --ref "$REF" --managed-python /usr/bin/python3.12 \
+            --prior-ref d6e09e770da6e8bd560da7132cb263eb02ec7151 --cases S --out installer-service-${{ matrix.os }}
+          journalctl --user -u modelsaar.service --no-pager -n 40 || true
       - name: Case 3 — the OS venv package removed (python3 -m venv then fails for lack of ensurepip, as on a minimal Debian/Ubuntu); no git
         run: |
           sudo apt-get remove -y -qq python3.12-venv python3-venv >/dev/null

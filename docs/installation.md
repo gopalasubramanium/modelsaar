@@ -118,9 +118,26 @@ fetches a Python of its own, 3.10–3.13, into `~/.local/share/modelsaar/python`
 `~/.local/share/modelsaar/envs/current` points at the active environment and `~/.local/bin/modelsaar` is
 linked to it unless that name is already taken by something else, in which case the installer prints the
 full path to use. The runtime directory (`MODELSAAR_RUNTIME_DIR`) is separate from the configuration
-directory (`MODELSAAR_HOME`); re-running the installer reuses a complete environment and replaces one only
-after the new one has installed. Exit codes: 0 installed + configured + routed check passed (or skipped),
-1 package or configuration not set up, 2 package and configuration in place but the routing check failed.
+directory (`MODELSAAR_HOME`).
+
+**Upgrades are the same command.** With an existing configuration the installer runs in *upgrade* mode:
+`init` is never run again; configuration, keys, state, backend, listening address and port stay as they
+are. The new revision is installed next to the old one, checked against the existing configuration
+(`config validate`, `keys ensure`, `config show`) *before* it becomes `envs/current`; the previous
+environment is kept as the rollback target. On Linux, a user unit named `modelsaar.service` is restarted
+automatically **only** when it demonstrably belongs to this installation (its `ExecStart` resolves into
+`~/.local/share/modelsaar` or to the installed executable) and uses this configuration (`MODELSAAR_HOME`
+/ `--config`, or the default home): the installer waits for readiness (bounded), reads which environment
+the restarted process executes from (`/proc/<pid>/maps`), and runs the ordinary routed check against the
+**effective** address from the configuration (for a LAN-bound gateway that is e.g.
+`http://<lan-address>:8484/v1`, not loopback). A service that already runs the installed revision is not
+restarted; an intentionally stopped service is left stopped; a unit that starts something else is reported
+and never touched; if the replacement does not come up, the previous environment is restored and the
+service restarted on it. A model/backend outage after a successful restart is reported as a failed routing
+check (exit 2) — healthy gateway code is never rolled back for it. Two concurrent installer runs are
+refused (`~/.local/share/modelsaar.lock`). Exit codes: 0 installed/upgraded + configured + routed check
+passed (or skipped), 1 package or configuration not set up (nothing activated), 2 gateway in place but the
+routing check failed, 3 the managed service could not be upgraded (rolled back or not restarted).
 
 ## Uninstall
 
