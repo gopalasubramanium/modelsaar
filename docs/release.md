@@ -20,3 +20,22 @@
 
 Publishing to PyPI/GHCR and creating the public repository are owner decisions; the repository was
 made public on 2026-10-11 with the owner's authorization.
+
+## Readiness for the first versioned alpha release (checked 2026-10-14)
+
+A list against the steps above. Tagging, PyPI and GHCR publication remain separate owner decisions;
+`release.yml` is not triggered by anything in this list.
+
+| step | state | what remains |
+|---|---|---|
+| 1. CI green on `main` | **ready** — every merged PR (#1–#6) ran lint, tests on 3.10/3.12/3.13, pip-audit, gitleaks, the container build and the installer job (real systemd user unit, x86_64 + arm64) green; the last merge is `56cea65` | re-check the run on the exact commit that will be tagged |
+| 2. CHANGELOG and version | **partly** — `CHANGELOG.md` has five dated "Unreleased" entries since 0.1.0; `pyproject.toml` and `src/modelsaar/__init__.py` still say `0.1.0`, the version already used by the untagged 2026-10-11 revision | choose `0.1.1` (or `0.2.0`, the installer and the `session_id`/`cache_prompt` contract are user-visible changes), roll the "Unreleased" entries into that heading, bump both files in one commit |
+| 3. Evaluation reports | **partly** — `--mode simulated` runs in CI; the only live report is the 2026-10-11 run at `0f8af84` with scorer `2026.10.11-2`; no live run at the current revision | either release with the report labelled "earlier revision, earlier scorer" (as the site does today) or run the Measured Routing Quality plan first; the release notes must say which |
+| 4. Client documentation dates | **partly** — `docs/clients/*.md` are dated 2026-10-11/13; `docs/clients/odysseus.md` records the owner-reported status (2026-10-14) | re-read each client page's date line before tagging |
+| 5. One-time publishing setup | **not done** — no Trusted Publisher is configured on pypi.org for `release.yml` / environment `pypi`, and the `pypi` GitHub environment does not exist; GHCR needs nothing before the first push | owner: configure the Trusted Publisher and the `pypi` environment (optionally with a required reviewer); a TestPyPI dry run is optional |
+| 6. Tag | **not done** by design | `git tag vX.Y.Z && git push origin vX.Y.Z` after 1–5 |
+| 7. Installation docs | **not applicable until published** — `docs/installation.md` and the website describe the pinned-commit installer; `pip install modelsaar` and the image are mentioned nowhere | add them only after the first successful publication |
+
+Also before tagging: the public installer's pin (`site/static/install.sh`, `REF=`) stays on a commit
+that exists on `origin`; a release tag does not move it — decide separately whether the installer should
+pin the tagged commit. The GX10 and the owner's service are not part of the release process.

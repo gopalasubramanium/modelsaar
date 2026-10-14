@@ -1,5 +1,35 @@
 # Changelog
 
+## Unreleased — website: layout repair, rendered-layout checks, roadmap refresh, 2026-10-14
+
+* **Command blocks:** the Copy button was positioned over the scrolling code and covered the end of the
+  installation command, the API-key command and the connection example (3 of 5 home and 5 of 12 Get-started
+  blocks at 1280 px; more at phone widths; in every label state). Each block is now a toolbar row (label +
+  Copy) above a dedicated code area; shell commands wrap visually, structured text keeps its columns in a
+  keyboard-focusable scroller; the clipboard value is the code's exact text (the install one-liner is
+  checked byte for byte against `site/facts.py`).
+* **"Where it fits" diagram:** the SVG's subtitle and step 4 ran past the gateway box (x 704). The page now
+  uses semantic HTML cards with decorative connectors (theme-aware, stacked on narrow screens, accessible
+  description); the downloadable SVG is repaired at source (wider box, two-line subtitle, fallback-font
+  margins). Wording: "route the request; preserve continuity" replaces "forward unchanged" (the gateway
+  consumes `session_id`/`cache_prompt`), also in How-it-works step 4 and the README.
+* **Also found and fixed:** at 200 % text the home decision-record tables were clipped by the card's
+  rounded-corner overflow (now a scroll wrapper) and the request-id header overflowed; the apps/backends/
+  models definition list could not shrink on narrow screens; body text size is now in `rem` so browser
+  text-size preferences apply.
+* **Checks:** `site/browser_checks.py` is tiered — every sitemap route at 320/390/768/1024/1280/1440 px in
+  both themes (console, document and element overflow, clipped text, Copy-button/code geometry in every
+  label state, diagram labels inside their containers, the SVG's text boxes), breakpoint boundaries, 200 %
+  text, 320 px reflow at device scale 4, fallback fonts, JavaScript disabled, expanded `<details>`, exact
+  clipboard values, keyboard focus; Firefox and WebKit on representative pages; unavailable engines are
+  reported NOT RUN. The `site` workflow gains a `browsers` job that requires all three engines and uploads
+  screenshots. Regressions fail on the previous site (112 failures) and pass after the repair.
+* **Roadmap and status:** completed work (hardening merged 2026-10-13, publication, installer, Odysseus
+  contract, one-command upgrades) is no longer presented as future; independent reviews are attributed to
+  the revisions they covered; owner-reported Odysseus chat on the GX10 (2026-10-14) is recorded as such;
+  the Measured Routing Quality plan (`docs/plans/measured-routing-quality.md`) and a release-readiness list
+  (`docs/release.md`) are added. Gateway package and public installer bytes are unchanged.
+
 ## Unreleased — installer: one-command upgrades with managed-service handling, 2026-10-14
 
 * **Upgrade mode:** an existing configuration means upgrade — `init` never runs again; config, keys, state,

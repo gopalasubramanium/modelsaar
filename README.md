@@ -10,7 +10,8 @@ ModelSaar is a small, local-first, OpenAI-compatible gateway. Your applications 
 OpenClaw, OpenCode, Hermes Agent, anything that speaks Chat Completions) connect once and ask for a
 virtual model such as `auto`. ModelSaar inspects each request, keeps only the deployments that can
 *actually* satisfy it (tools, images, strict JSON schemas, context size, locality, health, capacity),
-ranks the rest on evidence, forwards the request unchanged, and records a decision you can inspect.
+ranks the rest on evidence, routes the request to the winner (the body passes through except documented
+client-compatibility translations), and records a decision you can inspect.
 
 ```
 client ──/v1/chat/completions (model: auto)──▶ ModelSaar ──▶ ollama/qwen3.8:27b

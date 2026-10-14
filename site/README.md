@@ -14,7 +14,7 @@ status and benchmark numbers cannot drift from the code.
 | `assets/` | one stylesheet, one optional script, self-hosted IBM Plex (OFL), icons, OG image, diagram SVG |
 | `static/` | copied verbatim: `install.sh` (pin substituted at build), `_headers` (Cloudflare Pages only), `llms.txt` (generated) |
 | `check_site.py` | static regression checks: links/assets, one `<h1>`, title/description/canonical, JSON-LD, sitemap ⟷ pages, robots, 404, installer pin + `sh -n`, commands match `facts.py`, CLI subcommands exist |
-| `browser_checks.py` | Playwright checks: console errors, horizontal overflow at 390 px, keyboard focus order, reduced-motion, copy buttons, tabs; axe-core accessibility scan |
+| `browser_checks.py` | Playwright checks, tiered: every sitemap route at 320/390/768/1024/1280/1440 px in both themes (console, document and element overflow, clipped text, Copy-button/code geometry in every label state, diagram labels inside their containers), breakpoint boundaries, 200 % text, 320 px reflow at device scale 4, fallback fonts, no-JS, exact clipboard values, keyboard focus; Firefox/WebKit on representative pages (`--engines`, `--require`); axe-core (`--axe`); component screenshots (`--shots`). Unavailable engines are reported NOT RUN. |
 | `publish_pages.py` | builds production and commits the output to the `gh-pages` branch (`build`), restores an earlier build (`rollback <commit>`), lists deployments (`log`) |
 
 Documentation pages under `/docs/` are rendered from `docs/*.md`, `CHANGELOG.md`, `CONTRIBUTING.md`,
@@ -27,7 +27,7 @@ pip install -e . markdown            # the site imports facts from the package a
 python site/build.py                 # production build
 python site/check_site.py            # must print "ok: …"
 python -m http.server -d site/dist 8765   # then open http://127.0.0.1:8765/
-pip install playwright && playwright install chromium && python site/browser_checks.py http://127.0.0.1:8765
+pip install playwright && playwright install chromium firefox webkit && python site/browser_checks.py http://127.0.0.1:8765 --engines chromium,firefox,webkit
 ```
 
 ## Hosting and deployment (GitHub Pages, "deploy from a branch")
