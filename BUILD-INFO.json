@@ -1,11 +1,11 @@
 {
-  "source_commit": "56cea65ca438c8ee47e47a6aba798ef7a41e361e",
+  "source_commit": "f18b2f195478d9a6591e7c637c321a46d9420e7e",
   "source_branch": "HEAD",
-  "source_tree": "a71bad580db30a454f007ceb725f1cc5edd7624a",
+  "source_tree": "469bd40d4ebf17d682dd395b79e53a4fd34f8268",
   "inputs": "git archive of source_commit (committed files only)",
   "generator": "site/build.py",
-  "built_at": "2026-10-14T06:09:38+00:00",
-  "output_sha256": "1820f77ec94dac2b5d4b6dce421bd78adbc5dd03d12e8a9185e56e6d02e218c7",
+  "built_at": "2026-10-14T10:17:31+00:00",
+  "output_sha256": "34cf4d3dd2ba6d0aa3a423cb9cacef40bb99201e482e6fdd9a1fc674deafb7c9",
   "installer_pin": "cf56cdd3416d8c853b64111b9b40211e5b126031",
   "canonical": "https://modelsaar.com"
 }

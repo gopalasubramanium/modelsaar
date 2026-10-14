@@ -1,0 +1,145 @@
+<!doctype html>
+<!--
+ModelSaar. Created by Gopala Subramanium: https://me.sgopala.com
+Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
+-->
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Release process and readiness · ModelSaar</title>
+<meta name="description" content="How a versioned release is produced and what is ready for the first tagged alpha release.">
+<meta name="author" content="Gopala Subramanium">
+<link rel="canonical" href="https://modelsaar.com/docs/release/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Release process and readiness · ModelSaar">
+<meta property="og:description" content="How a versioned release is produced and what is ready for the first tagged alpha release.">
+<meta property="og:url" content="https://modelsaar.com/docs/release/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Release process and readiness · ModelSaar">
+<meta name="twitter:description" content="How a versioned release is produced and what is ready for the first tagged alpha release.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=f18b2f19">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Release process and readiness", "description": "How a versioned release is produced and what is ready for the first tagged alpha release.", "url": "https://modelsaar.com/docs/release/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Release process and readiness", "item": "https://modelsaar.com/docs/release/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/" aria-current="page">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="docs">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Release process and readiness</li></ol></nav>
+<article class="doc"><header class="doc-head"><h1>Release process and readiness</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/f18b2f195478d9a6591e7c637c321a46d9420e7e/docs/release.md"><code>docs/release.md</code></a> at commit <code>f18b2f195478</code>. The repository file is authoritative.</p></header><ol>
+<li><code>python -m pytest</code> green locally; CI (<code>ci.yml</code>) green on <code>main</code> (lint, tests on 3.10/3.12/3.13,
+   pip-audit of runtime dependencies, gitleaks secret scan, local Docker image build + smoke).</li>
+<li>Update <code>CHANGELOG.md</code>; bump <code>version</code> in <code>pyproject.toml</code> and <code>src/modelsaar/__init__.py</code>
+   (the release workflow refuses a tag that does not match the package version).</li>
+<li>Re-run <code>modelsaar eval --mode simulated</code> and, where hardware exists, <code>--mode live</code>; attach the JSON
+   reports and update <code>docs/verification-report.md</code> (NOT RUN items stay labelled).</li>
+<li>Re-check client documentation dates in <code>docs/clients/*.md</code>.</li>
+<li>One-time setup for publishing (owner action):
+   * PyPI: create the project name by configuring a <strong>Trusted Publisher</strong> on pypi.org for
+     <code>gopalasubramanium/modelsaar</code>, workflow <code>release.yml</code>, environment <code>pypi</code>; create the <code>pypi</code>
+     environment in the GitHub repository settings (optionally with required reviewers). Do a dry run
+     against TestPyPI first if desired (same workflow with the TestPyPI repository URL).
+   * GHCR: nothing to configure; <code>release.yml</code> pushes <code>ghcr.io/gopalasubramanium/modelsaar:&lt;tag&gt;</code>
+     with the workflow's <code>GITHUB_TOKEN</code> (<code>packages: write</code>). Make the package public in the GitHub
+     package settings after the first push.</li>
+<li><code>git tag vX.Y.Z &amp;&amp; git push origin vX.Y.Z</code> → <code>release.yml</code> builds, tests, publishes to PyPI and GHCR.</li>
+<li>Update <code>docs/installation.md</code> to mention <code>pip install modelsaar</code> and the image once they exist.</li>
+</ol>
+<p>Publishing to PyPI/GHCR and creating the public repository are owner decisions; the repository was
+made public on 2026-10-11 with the owner's authorization.</p>
+<h2 id="readiness-for-the-first-versioned-alpha-release-checked-2026-10-14">Readiness for the first versioned alpha release (checked 2026-10-14)</h2>
+<p>A list against the steps above. Tagging, PyPI and GHCR publication remain separate owner decisions;
+<code>release.yml</code> is not triggered by anything in this list.</p>
+<table tabindex="0">
+<thead>
+<tr>
+<th>step</th>
+<th>state</th>
+<th>what remains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. CI green on <code>main</code></td>
+<td><strong>ready</strong> — every merged PR (#1–#6) ran lint, tests on 3.10/3.12/3.13, pip-audit, gitleaks, the container build and the installer job (real systemd user unit, x86_64 + arm64) green; the last merge is <code>56cea65</code></td>
+<td>re-check the run on the exact commit that will be tagged</td>
+</tr>
+<tr>
+<td>2. CHANGELOG and version</td>
+<td><strong>partly</strong> — <code>CHANGELOG.md</code> has five dated "Unreleased" entries since 0.1.0; <code>pyproject.toml</code> and <code>src/modelsaar/__init__.py</code> still say <code>0.1.0</code>, the version already used by the untagged 2026-10-11 revision</td>
+<td>choose <code>0.1.1</code> (or <code>0.2.0</code>, the installer and the <code>session_id</code>/<code>cache_prompt</code> contract are user-visible changes), roll the "Unreleased" entries into that heading, bump both files in one commit</td>
+</tr>
+<tr>
+<td>3. Evaluation reports</td>
+<td><strong>partly</strong> — <code>--mode simulated</code> runs in CI; the only live report is the 2026-10-11 run at <code>0f8af84</code> with scorer <code>2026.10.11-2</code>; no live run at the current revision</td>
+<td>either release with the report labelled "earlier revision, earlier scorer" (as the site does today) or run the Measured Routing Quality plan first; the release notes must say which</td>
+</tr>
+<tr>
+<td>4. Client documentation dates</td>
+<td><strong>partly</strong> — <code>docs/clients/*.md</code> are dated 2026-10-11/13; <code>docs/clients/odysseus.md</code> records the owner-reported status (2026-10-14)</td>
+<td>re-read each client page's date line before tagging</td>
+</tr>
+<tr>
+<td>5. One-time publishing setup</td>
+<td><strong>not done</strong> — no Trusted Publisher is configured on pypi.org for <code>release.yml</code> / environment <code>pypi</code>, and the <code>pypi</code> GitHub environment does not exist; GHCR needs nothing before the first push</td>
+<td>owner: configure the Trusted Publisher and the <code>pypi</code> environment (optionally with a required reviewer); a TestPyPI dry run is optional</td>
+</tr>
+<tr>
+<td>6. Tag</td>
+<td><strong>not done</strong> by design</td>
+<td><code>git tag vX.Y.Z &amp;&amp; git push origin vX.Y.Z</code> after 1–5</td>
+</tr>
+<tr>
+<td>7. Installation docs</td>
+<td><strong>not applicable until published</strong> — <code>docs/installation.md</code> and the website describe the pinned-commit installer; <code>pip install modelsaar</code> and the image are mentioned nowhere</td>
+<td>add them only after the first successful publication</td>
+</tr>
+</tbody>
+</table>
+<p>Also before tagging: the public installer's pin (<code>site/static/install.sh</code>, <code>REF=</code>) stays on a commit
+that exists on <code>origin</code>; a release tag does not move it — decide separately whether the installer should
+pin the tagged commit. The GX10 and the owner's service are not part of the release process.</p></article>
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/f18b2f195478d9a6591e7c637c321a46d9420e7e">f18b2f195478</a> on 2026-10-14. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=f18b2f19" defer></script>
+</body>
+</html>

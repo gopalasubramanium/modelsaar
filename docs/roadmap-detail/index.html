@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=56cea65c">
+<link rel="stylesheet" href="/assets/site.css?v=f18b2f19">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Roadmap (repository)", "description": "Planned work as recorded in the repository.", "url": "https://modelsaar.com/docs/roadmap-detail/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Roadmap (repository)", "item": "https://modelsaar.com/docs/roadmap-detail/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,33 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Roadmap (repository)</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Roadmap (repository)</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/56cea65ca438c8ee47e47a6aba798ef7a41e361e/docs/roadmap.md"><code>docs/roadmap.md</code></a> at commit <code>56cea65ca438</code>. The repository file is authoritative.</p></header><p>Later milestones, each with its own tests before being described as supported:</p>
+<article class="doc"><header class="doc-head"><h1>Roadmap (repository)</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/f18b2f195478d9a6591e7c637c321a46d9420e7e/docs/roadmap.md"><code>docs/roadmap.md</code></a> at commit <code>f18b2f195478</code>. The repository file is authoritative.</p></header><h2 id="status-2026-10-14">Status, 2026-10-14</h2>
+<p>Done (evidence in <code>CHANGELOG.md</code>, <code>docs/verification-report.md</code> and the repository's CI runs):</p>
+<ul>
+<li>Hardening accepted and merged on 2026-10-13 (PR #1); the three independent reviews covered
+  <code>1122e1f</code> (F01–F18), <code>80276bb</code> (R1–R8) and <code>5cb7443</code> (alpha closure). Everything merged after that —
+  website (PR #2), isolated installer (PR #3), Odysseus <code>session_id</code>/<code>cache_prompt</code> compatibility (PR #4),
+  atomic environment switch (PR #5), one-command upgrades (PR #6) — was verified by the project's test
+  suite and CI (installer cases against a real systemd user unit on x86_64 and arm64) and by live checks
+  on the owner's hardware, not by an independent reviewer.</li>
+<li>Website published from the <code>gh-pages</code> output branch with a recorded build identity; the public
+  installer pins gateway <code>cf56cdd3416d8c853b64111b9b40211e5b126031</code>, which the owner's GX10 runs.</li>
+<li>Owner-reported: Odysseus chat through ModelSaar on the GX10 is working, reported by the owner in
+  conversation on 2026-10-14. Owner-reported use, not a project-recorded workflow; no client version or
+  transcript is recorded and tool, vision, streaming and agent workflows through Odysseus were not reported.</li>
+</ul>
+<p>Still open (unchanged limitations): the published benchmark used scorer <code>2026.10.11-2</code> at an earlier
+revision; the optional live classifier was disabled; real-model embeddings, vLLM/llama.cpp backends and
+the other client workflows are unverified; the macOS code-evaluation sandbox stays disabled pending
+verification. See <code>docs/backlog-post-alpha.md</code>.</p>
+<h2 id="next-milestone-measured-routing-quality">Next milestone: Measured Routing Quality</h2>
+<p>Evaluate the current revision with the existing harness on a representative subset of the GX10's installed
+models, with separate calibration and held-out splits, fixed-model and deterministic-rule baselines and an
+optional classifier off/on comparison. Plan and commands: <code>docs/plans/measured-routing-quality.md</code>. The
+run starts only with the owner's approval of a GX10 window; the simpler router stays if extra
+classification does not demonstrate value.</p>
+<h2 id="later-milestones-not-implemented">Later milestones (not implemented)</h2>
+<p>Each with its own tests before being described as supported:</p>
 <ul>
 <li>Native decision-model adapters (Ollama <code>/v1/systemone</code>: clef, nimble, laya) as routing classifiers
   and as a <code>/v1/decisions</code>-style endpoint.</li>
@@ -70,7 +96,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/56cea65ca438c8ee47e47a6aba798ef7a41e361e">56cea65ca438</a> on 2026-10-14. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/f18b2f195478d9a6591e7c637c321a46d9420e7e">f18b2f195478</a> on 2026-10-14. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -82,6 +108,6 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=56cea65c" defer></script>
+<script src="/assets/site.js?v=f18b2f19" defer></script>
 </body>
 </html>

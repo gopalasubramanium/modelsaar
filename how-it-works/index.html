@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=56cea65c">
+<link rel="stylesheet" href="/assets/site.css?v=f18b2f19">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "How it works", "description": "How ModelSaar turns a chat request into a routing decision: requirements, hard filters, evidence-based ranking, continuity and the decision record.", "url": "https://modelsaar.com/how-it-works/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "How it works", "item": "https://modelsaar.com/how-it-works/"}]}</script>
 </head>
 <body>
@@ -52,11 +52,43 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <section aria-labelledby="hiw-title">
   <h1 id="hiw-title">How it works</h1>
   <p class="lede">ModelSaar is one Python process that speaks the OpenAI Chat Completions API on one side and talks to your inference backends on the other. In between, every request passes through the same deterministic pipeline, and every outcome is written down.</p>
-  <figure>
-    <div class="diagram">
-      <img src="/assets/where-it-fits.svg" width="1100" height="420" alt="Diagram: apps (Open WebUI, OpenCode, scripts) send OpenAI-compatible requests to one ModelSaar address; ModelSaar runs requirements, hard filters, ranking and a decision record; it forwards the request unchanged to one of the configured backends (Ollama, vLLM/llama.cpp) which serve the model weights.">
+  <figure class="fits-figure">
+    <div class="fits" aria-describedby="fits-desc">
+      <p id="fits-desc" class="sr-only">Apps on the left send OpenAI-compatible requests for the model auto to ModelSaar in the middle, which reads the request's requirements, crosses out deployments that cannot do the job, ranks the rest on evidence, routes the request to the winner while preserving conversation continuity, and records the decision without the prompt. The inference backends on the right (Ollama, vLLM, llama.cpp server) keep the model weights, licences and hardware; ModelSaar never downloads a model.</p>
+      <div class="fits-col fits-apps">
+        <h3 class="fits-head">Apps you already use</h3>
+        <ul class="fits-cards">
+          <li>Open WebUI</li>
+          <li>OpenCode · OpenClaw</li>
+          <li>Hermes Agent</li>
+          <li>Your scripts and SDKs</li>
+        </ul>
+        <p class="fits-note">one address · model: <code>auto</code></p>
+      </div>
+      <div class="fits-arrow" aria-hidden="true"></div>
+      <div class="fits-col fits-gw">
+        <h3 class="fits-head fits-head-gw">ModelSaar</h3>
+        <p class="fits-sub">OpenAI-compatible gateway on your machine</p>
+        <ol class="fits-steps">
+          <li>read the request's requirements</li>
+          <li>cross out what cannot do the job</li>
+          <li>rank the rest on evidence</li>
+          <li>route the request; preserve continuity</li>
+          <li>record the decision (no prompt)</li>
+        </ol>
+        <p class="fits-chip"><code>X-ModelSaar-Deployment: ollama/…</code></p>
+      </div>
+      <div class="fits-arrow" aria-hidden="true"></div>
+      <div class="fits-col fits-backends">
+        <h3 class="fits-head">Inference backends you run</h3>
+        <ul class="fits-cards">
+          <li>Ollama <span class="small">your pulled models</span></li>
+          <li>vLLM · llama.cpp server <span class="small">declared models</span></li>
+        </ul>
+        <p class="fits-note">Weights, licences and hardware stay here. ModelSaar never downloads a model.</p>
+      </div>
     </div>
-    <figcaption>Where ModelSaar fits. Apps keep their tools, memory and loops; backends keep the weights and the hardware; ModelSaar selects, forwards and explains.</figcaption>
+    <figcaption>Where ModelSaar fits. Apps keep their tools, memory and loops; backends keep the weights and the hardware; ModelSaar selects, routes and explains. Decision records: <code>modelsaar decisions</code> · <code>modelsaar explain</code> · <code>/admin/ui</code>. <a href="/assets/where-it-fits.svg" download>Download this diagram as SVG</a>.</figcaption>
   </figure>
 </section>
 
@@ -66,7 +98,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     <li><strong>Read the request.</strong> Does it carry tools, an image, a required output schema, a long history, a half-finished tool call? Roughly how many tokens will it need, including the answer?</li>
     <li><strong>Cross out what cannot do the job.</strong> Each configured model is checked against those needs and against your policy: is it healthy, local (if you require local), able to call tools, able to read images, big enough in context, allowed by the alias, not over capacity? A model with an <em>unknown</em> capability is crossed out for requests that need it — unknown never counts as yes.</li>
     <li><strong>Rank what is left.</strong> Measured task success where you have run the evaluation, otherwise labelled priors, minus costs for latency, loading an unloaded model and switching away from the model a conversation is already on.</li>
-    <li><strong>Send the request unchanged</strong> to the winner, stream the answer back, and keep the conversation and its tool calls on that model.</li>
+    <li><strong>Route the request to the winner; preserve continuity.</strong> The body passes through except the documented client-compatibility fields the gateway consumes or translates (for example <code>session_id</code> and <code>cache_prompt</code>, which are recorded in the decision); the answer streams back, and the conversation and its tool calls stay on that model.</li>
     <li><strong>Write the decision down</strong> — which models were excluded and why, who won and on what evidence, how long the decision took — without the prompt.</li>
   </ol>
   <p>Below, the same thing for people evaluating the design. Terms link to the repository documentation, which is authoritative.</p>
@@ -136,7 +168,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/56cea65ca438c8ee47e47a6aba798ef7a41e361e">56cea65ca438</a> on 2026-10-14. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/f18b2f195478d9a6591e7c637c321a46d9420e7e">f18b2f195478</a> on 2026-10-14. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -148,6 +180,6 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=56cea65c" defer></script>
+<script src="/assets/site.js?v=f18b2f19" defer></script>
 </body>
 </html>

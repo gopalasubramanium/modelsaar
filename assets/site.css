@@ -28,7 +28,7 @@
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
 img,svg{max-width:100%;height:auto}
 a{color:var(--brand);text-decoration-thickness:1px;text-underline-offset:.15em}
 a:hover{color:var(--brand-ink)}
@@ -92,11 +92,17 @@ section:last-of-type{border-bottom:0}
 .status{display:inline-flex;align-items:center;gap:.5em;font-size:.88rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.25em .8em .25em .6em}
 .status::before{content:"";width:.6em;height:.6em;border-radius:50%;background:var(--accent)}
 
-/* command block with copy button */
-.cmd{position:relative;margin:1rem 0 1.4rem;max-width:var(--measure)}
-.cmd pre{margin:0;padding-right:5.6rem}
-.cmd .copy{position:absolute;top:8px;right:8px;font:600 .8rem var(--sans);padding:.35em .7em;border-radius:4px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:var(--code-ink);cursor:pointer}
+/* command block: a toolbar row (label + Copy button) above a dedicated code area, so text and button
+   never share space in any state. Shell commands wrap visually; structured text scrolls inside the block.
+   The copied value is the code element's text, never the visual wrapping. */
+.cmd{margin:1rem 0 1.4rem;max-width:var(--measure);min-width:0;border-radius:var(--radius);background:var(--code-bg);color:var(--code-ink);overflow:hidden}
+.cmd-bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem 1rem;flex-wrap:wrap;padding:.35rem .6rem .35rem 1rem;border-bottom:1px solid rgba(255,255,255,.12);min-height:2.2rem}
+.cmd-label{font:600 .74rem/1.4 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:rgba(233,238,233,.7)}
+.cmd pre{margin:0;background:none;border-radius:0;padding:12px 16px 14px}
+.cmd pre.wrap{white-space:pre-wrap;overflow-wrap:anywhere;overflow:visible}
+.cmd .copy{font:600 .8rem/1 var(--sans);padding:.45em .8em;border-radius:4px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:var(--code-ink);cursor:pointer;white-space:nowrap;margin-left:auto}
 .cmd .copy:hover{background:rgba(255,255,255,.18)}
+.cmd .copy:focus-visible{outline-offset:1px}
 .cmd .copy[hidden]{display:none}
 .cmd-note{font-size:.88rem;color:var(--muted);margin:-.8rem 0 1.4rem}
 
@@ -109,13 +115,13 @@ section:last-of-type{border-bottom:0}
 
 /* the decision record — the one memorable element */
 .decision{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:.92rem}
-.decision-head{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding:.8rem 1rem;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.decision-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.3rem 1rem;align-items:baseline;padding:.8rem 1rem;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.82rem;color:var(--muted);overflow-wrap:anywhere}
 .decision-head strong{color:var(--ink);font-weight:600}
 .decision-req{padding:.9rem 1rem;border-bottom:1px solid var(--line)}
 .decision-req p{margin:0 0 .3rem}
 .facts{display:flex;flex-wrap:wrap;gap:.35rem .5rem;margin:.4rem 0 0;padding:0;list-style:none}
 .facts li{background:var(--surface-2);border-radius:4px;padding:.15em .55em;font-size:.84rem;font-family:var(--mono)}
-.decision table{margin:0}
+.decision .table-wrap{margin:0}.decision table{margin:0}
 .decision th,.decision td{padding:.55rem 1rem;border-bottom:1px solid var(--line)}
 .decision tr:last-child td{border-bottom:0}
 .decision .chosen td{background:var(--accent-soft);border-left:4px solid var(--accent)}
@@ -157,6 +163,7 @@ details.scenario .decision{border:0;border-top:1px solid var(--line);border-radi
 .evidence.fixture{background:var(--surface-2)}
 .evidence.docs{background:var(--accent-soft)}
 .evidence.not-run{background:var(--no-soft);color:var(--no)}
+.evidence.owner{background:var(--surface-2);border:1px dashed var(--line)}
 .faq details{border-bottom:1px solid var(--line);padding:.6rem 0}
 .faq summary{cursor:pointer;font-weight:600;padding:.3rem 0}
 .faq details p{margin:.6rem 0 .4rem}
@@ -171,8 +178,35 @@ details.scenario .decision{border:0;border-top:1px solid var(--line);border-radi
 .docs-list p{margin:.2rem 0 0;font-size:.92rem;color:var(--muted)}
 figure{margin:0 0 1.5rem}figcaption{font-size:.88rem;color:var(--muted);margin-top:.4rem}
 .diagram{background:#fbfbf9;border:1px solid var(--line);border-radius:8px;padding:1rem}
-.kv{display:grid;grid-template-columns:max-content 1fr;gap:.3rem 1.2rem;font-size:.95rem}
-.kv dt{font-weight:600}.kv dd{margin:0}
+
+/* "where it fits" diagram: semantic cards with decorative connectors; three columns, stacked when narrow */
+.fits{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.35fr) auto minmax(0,1fr);gap:0 .6rem;align-items:center;border:1px solid var(--line);border-radius:8px;padding:1.2rem;background:var(--surface);font-size:.95rem}
+.fits-col{min-width:0}
+.fits-head{font-size:.8rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 .6rem}
+.fits-cards{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.fits-cards li{max-width:none;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);padding:.55rem .8rem;font-weight:600;overflow-wrap:anywhere}
+.fits-cards .small{display:block;font-weight:400}
+.fits-note{font-size:.85rem;color:var(--muted);margin:.7rem 0 0;max-width:none}
+.fits-arrow{width:1.6rem;height:2px;background:var(--muted);position:relative;justify-self:center}
+.fits-arrow::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-left:8px solid var(--muted);border-right:0}
+.fits-gw{background:var(--brand);color:#fff;border-radius:8px;padding:1rem 1.1rem 1.1rem}
+.fits-head-gw{color:#fff;text-transform:none;letter-spacing:-.01em;font-size:1.25rem;margin-bottom:.1rem}
+.fits-sub{color:#cfe6df;font-size:.85rem;margin:0 0 .8rem;max-width:none}
+.fits-steps{margin:0 0 .9rem;padding-left:1.4em;display:grid;gap:.3rem}
+.fits-steps li{max-width:none;overflow-wrap:anywhere}
+.fits-steps li::marker{color:#f0b84a;font-weight:600}
+.fits-chip{margin:0;max-width:none}
+.fits-chip code{display:inline-block;max-width:100%;background:var(--accent);color:#1a1400;font-size:.8rem;padding:.25em .6em;border-radius:4px;overflow-wrap:anywhere}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fits-gw{color:#07211c}:root:not([data-theme="light"]) .fits-head-gw{color:#07211c}:root:not([data-theme="light"]) .fits-sub{color:#0b4238}:root:not([data-theme="light"]) .fits-steps li::marker{color:#7a4f00}}
+:root[data-theme="dark"] .fits-gw{color:#07211c}:root[data-theme="dark"] .fits-head-gw{color:#07211c}:root[data-theme="dark"] .fits-sub{color:#0b4238}:root[data-theme="dark"] .fits-steps li::marker{color:#7a4f00}
+@media (max-width:860px){
+  .fits{grid-template-columns:minmax(0,1fr);gap:.6rem 0}
+  .fits-arrow{width:2px;height:1.4rem;margin:0 auto}
+  .fits-arrow::after{right:-5px;top:auto;bottom:-1px;border:6px solid transparent;border-top:8px solid var(--muted);border-bottom:0}
+}
+.kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:.3rem 1.2rem;font-size:.95rem}
+.kv dt{font-weight:600}.kv dd{margin:0;min-width:0}
+@media (max-width:480px){.kv{grid-template-columns:minmax(0,1fr);gap:.1rem 0}.kv dd{margin-bottom:.6rem}}
 .toc{font-size:.92rem;background:var(--surface);border-radius:var(--radius);padding:.8rem 1rem;margin:0 0 1.6rem;max-width:var(--measure)}
 .toc ul{margin:0;padding-left:1.1em}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

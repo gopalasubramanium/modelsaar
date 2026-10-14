@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=56cea65c">
+<link rel="stylesheet" href="/assets/site.css?v=f18b2f19">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Get started", "description": "Prerequisites, installation, first request and client connection for ModelSaar on macOS, Linux and WSL.", "url": "https://modelsaar.com/get-started/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Get started", "item": "https://modelsaar.com/get-started/"}]}</script>
 </head>
 <body>
@@ -68,21 +68,21 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <section aria-labelledby="install-title">
   <h2 id="install-title">1. Install</h2>
   <h3>Beginner path: one command</h3>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh | sh</code></pre></div>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh | sh</code></pre></div>
   <p>The script is short and does only this: checks your platform; installs the ModelSaar package at the pinned commit from its GitHub source archive (no <code>git</code> needed) into an isolated environment — with your <code>uv</code> or <code>pipx</code> if present, otherwise into a user-owned virtual environment under <code>~/.local/share/modelsaar</code> created by your Python 3.10+ or, when that is not possible, by a pinned <code>uv</code> it downloads and checksum-verifies for your platform (Linux x86_64/arm64, macOS; announced before the download) — then links <code>~/.local/bin/modelsaar</code> if nothing else is there; runs <code>modelsaar init</code> if you have no config yet (it looks for Ollama on <code>127.0.0.1:11434</code> and other documented loopback ports, writes <code>~/.modelsaar/config.yaml</code> and private keys with mode 600); then starts a temporary gateway, sends one request through <code>auto</code>, stops it and prints the result with your next step. Existing config, keys and state are never overwritten; an occupied gateway port is reported, not fought over.</p>
   <p id="inspect">To read it before running it:</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh -o install.sh &amp;&amp; less install.sh &amp;&amp; sh install.sh</code></pre></div>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">curl -fsSL https://modelsaar.com/install.sh -o install.sh &amp;&amp; less install.sh &amp;&amp; sh install.sh</code></pre></div>
   <p>Options are environment variables: <code>MODELSAAR_ENDPOINT=http://host:port</code> (backend other than local Ollama), <code>MODELSAAR_PORT=8484</code>, <code>MODELSAAR_NO_CHECK=1</code> (skip the verification request), <code>MODELSAAR_REF=&lt;sha&gt;</code> (install a different commit — you take responsibility for it).</p>
 
   <h3 id="manual">Expert path: install by hand</h3>
   <p>With <code>uv</code> (recommended; isolated, fetches Python 3.12 if needed):</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">uv tool install git+https://github.com/gopalasubramanium/modelsaar@cf56cdd3416d8c853b64111b9b40211e5b126031</code></pre></div>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">uv tool install git+https://github.com/gopalasubramanium/modelsaar@cf56cdd3416d8c853b64111b9b40211e5b126031</code></pre></div>
   <p>With <code>pipx</code>:</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">pipx install git+https://github.com/gopalasubramanium/modelsaar@cf56cdd3416d8c853b64111b9b40211e5b126031</code></pre></div>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">pipx install git+https://github.com/gopalasubramanium/modelsaar@cf56cdd3416d8c853b64111b9b40211e5b126031</code></pre></div>
   <p>With plain Python ≥ 3.10 and pip, in a virtual environment of your own (the command is then <code>~/modelsaar-env/bin/modelsaar</code>; a <code>pip install --user</code> into the operating system's Python is refused on Debian/Ubuntu and not recommended anywhere):</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">python3 -m venv ~/modelsaar-env &amp;&amp; ~/modelsaar-env/bin/pip install git+https://github.com/gopalasubramanium/modelsaar@cf56cdd3416d8c853b64111b9b40211e5b126031</code></pre></div>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">python3 -m venv ~/modelsaar-env &amp;&amp; ~/modelsaar-env/bin/pip install git+https://github.com/gopalasubramanium/modelsaar@cf56cdd3416d8c853b64111b9b40211e5b126031</code></pre></div>
   <p>From a source checkout (what the test suite and the verification scripts use):</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">git clone https://github.com/gopalasubramanium/modelsaar &amp;&amp; cd modelsaar &amp;&amp; git checkout cf56cdd3416d8c853b64111b9b40211e5b126031 &amp;&amp; python3 -m venv .venv &amp;&amp; . .venv/bin/activate &amp;&amp; pip install -e .</code></pre></div>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">git clone https://github.com/gopalasubramanium/modelsaar &amp;&amp; cd modelsaar &amp;&amp; git checkout cf56cdd3416d8c853b64111b9b40211e5b126031 &amp;&amp; python3 -m venv .venv &amp;&amp; . .venv/bin/activate &amp;&amp; pip install -e .</code></pre></div>
   <p>All four give you the <code>modelsaar</code> command and nothing else; nothing starts automatically.</p>
 </section>
 
@@ -90,22 +90,22 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
   <h2 id="first-title">2. Configure and run</h2>
   <p><strong>Before this step</strong> an inference server with at least one model must be running (for example <code>ollama serve</code> after <code>ollama pull …</code>); ModelSaar never downloads models.</p>
   <p>If you used the one-line installer, <code>modelsaar init</code> has already run (the installer printed the models it discovered) — skip to <code>modelsaar doctor</code>. With uv, pipx, pip or a source checkout, run it once:</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">modelsaar init</code></pre></div><p class="cmd-note">Finds Ollama on 127.0.0.1:11434 (or pass --endpoint URL --type ollama|openai_compatible), writes ~/.modelsaar/config.yaml and keys, discovers your models. Refuses to overwrite an existing config without --force; after the installer, do not run it again.</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">modelsaar doctor</code></pre></div><p class="cmd-note">Reachability, assumed context lengths, unknown capabilities, cloud-forwarded aliases — with a remedy per warning.</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">modelsaar serve</code></pre></div><p class="cmd-note">Starts the gateway at http://127.0.0.1:8484/v1 (loopback only). Leave it running; stop with Ctrl-C.</p>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">modelsaar init</code></pre></div><p class="cmd-note">Finds Ollama on 127.0.0.1:11434 (or pass --endpoint URL --type ollama|openai_compatible), writes ~/.modelsaar/config.yaml and keys, discovers your models. Refuses to overwrite an existing config without --force; after the installer, do not run it again.</p>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">modelsaar doctor</code></pre></div><p class="cmd-note">Reachability, assumed context lengths, unknown capabilities, cloud-forwarded aliases — with a remedy per warning.</p>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">modelsaar serve</code></pre></div><p class="cmd-note">Starts the gateway at http://127.0.0.1:8484/v1 (loopback only). Leave it running; stop with Ctrl-C.</p>
   <p>Optional but recommended once: <code>modelsaar probe --all</code> verifies streaming, tool calling, JSON schema and image input on each model with short real requests (it uses your backend's compute). Run it while the gateway is up; the probes go through the gateway so they never collide with your own traffic.</p>
   <h3>Verify</h3>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">modelsaar test</code></pre></div><p class="cmd-note">In a second terminal. Identifies the listener on the configured port (GET /healthz must answer the ModelSaar health contract before any key is sent), lists the models the gateway advertises and sends one chat completion through auto; prints the deployment that answered and the request id.</p>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">modelsaar test</code></pre></div><p class="cmd-note">In a second terminal. Identifies the listener on the configured port (GET /healthz must answer the ModelSaar health contract before any key is sent), lists the models the gateway advertises and sends one chat completion through auto; prints the deployment that answered and the request id.</p>
   <p>If it prints an HTTP 422, no model qualified — the body says which blocker applies to each deployment and what to change. If it cannot connect, the gateway is not running on the configured port; the message says so. If something else is listening on that port, it says "not a ModelSaar gateway" and sends nothing: change <code>server.port</code> or stop the other service.</p>
 </section>
 
 <section aria-labelledby="client-title">
   <h2 id="client-title">3. Connect an app</h2>
   <p>Any app that speaks the OpenAI Chat Completions API needs three values. First print the key in a terminal:</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-bash">head -1 ~/.modelsaar/keys/api_keys</code></pre></div><p class="cmd-note">Prints one line starting with msk_. That printed line is the API key to paste into a GUI field; the command itself is shell syntax, not a key.</p>
-  <div class="cmd"><pre tabindex="0"><code class="language-text">Base URL:  http://127.0.0.1:8484/v1
-Model:     auto        # or auto-fast, auto-code, auto-vision, or a concrete deployment id
-API key:   msk_…  (the line printed by the command above)</code></pre></div>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre class="wrap"><code class="language-bash">head -1 ~/.modelsaar/keys/api_keys</code></pre></div><p class="cmd-note">Prints one line starting with msk_. That printed line is the API key to paste into a GUI field; the command itself is shell syntax, not a key.</p>
+  <div class="cmd cmd-wrap"><div class="cmd-bar"><span class="cmd-label">Values to paste</span></div><pre class="wrap"><code class="language-text">Base URL:  http://127.0.0.1:8484/v1
+Model:     auto
+API key:   msk_…  (the line printed by the command above)</code></pre></div><p class="cmd-note">Model alternatives: <code>auto-fast</code>, <code>auto-code</code>, <code>auto-vision</code>, or a concrete deployment id.</p>
   <p>Or let ModelSaar print the exact settings for your app — one command per app:</p>
   <ul><li>Open WebUI: <code>modelsaar client-config open-webui</code></li><li>OpenCode: <code>modelsaar client-config opencode</code></li><li>OpenCode (V2 config): <code>modelsaar client-config opencode-v2</code></li><li>OpenClaw: <code>modelsaar client-config openclaw</code></li><li>Hermes Agent: <code>modelsaar client-config hermes</code></li></ul>
   <p><code>--apply</code> merges file-based configs with a backup and keeps the file's permissions. The key never leaves your machine unless you send it somewhere.</p>
@@ -118,7 +118,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
 <section aria-labelledby="ops-title">
   <h2 id="ops-title">Running it day to day</h2>
   <dl>
-    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/56cea65ca438c8ee47e47a6aba798ef7a41e361e/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
+    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/f18b2f195478d9a6591e7c637c321a46d9420e7e/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
     <dt>Stop / restart</dt><dd>Ctrl-C in the terminal, or your service manager's stop/restart. Configuration changes need a restart; in-flight requests finish on the old config.</dd>
     <dt>Update</dt><dd>Re-run the same installer command. With an existing configuration it upgrades in place: nothing is re-initialised, the new revision is validated against your configuration before it becomes current, the previous environment is kept for rollback, and on Linux a <code>modelsaar.service</code> user unit that belongs to the installation is restarted and checked at the address it actually listens on (details in <a href="/docs/installation/">Installation</a>). With uv/pipx re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
     <dt>Troubleshoot</dt><dd><code>modelsaar doctor</code> first; then <code>modelsaar decisions --limit 10</code> for the last routing records and <code>modelsaar explain -m "…" [--tools --image --json-schema]</code> to dry-run a request. More in <a href="/docs/troubleshooting/">Troubleshooting</a>.</dd>
@@ -137,7 +137,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/56cea65ca438c8ee47e47a6aba798ef7a41e361e">56cea65ca438</a> on 2026-10-14. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/f18b2f195478d9a6591e7c637c321a46d9420e7e">f18b2f195478</a> on 2026-10-14. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -149,6 +149,6 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=56cea65c" defer></script>
+<script src="/assets/site.js?v=f18b2f19" defer></script>
 </body>
 </html>
