@@ -1,0 +1,161 @@
+{
+  "findings": [
+    {
+      "level": "ok",
+      "area": "config",
+      "message": "loaded ~/.modelsaar-stage-a/.modelsaar/config.yaml (version 1, hash c58ce04fa1ed9902)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "auth",
+      "message": "api keys present (~/.modelsaar-stage-a/.modelsaar/keys/api_keys)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "auth",
+      "message": "admin key present (~/.modelsaar-stage-a/.modelsaar/keys/admin_key)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "network",
+      "message": "gateway binds to loopback 127.0.0.1:50824",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "backend:ollama",
+      "message": "ollama reachable at http://100.83.54.124:11434",
+      "remedy": ""
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/muse-glimmer:latest",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/muse-glimmer:latest` to verify"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/muse-glimmer:latest",
+      "message": "served context length is assumed (4096); trained max is 131072",
+      "remedy": "set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3.6:latest",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/qwen3.6:latest` to verify"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3.6:latest",
+      "message": "served context length is assumed (4096); trained max is 262144",
+      "remedy": "set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/gemma4:31b",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/gemma4:31b` to verify"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/gemma4:31b",
+      "message": "served context length is assumed (4096); trained max is 262144",
+      "remedy": "set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3.8:latest",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/qwen3.8:latest` to verify"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3.8:latest",
+      "message": "served context length is assumed (4096); trained max is 262144",
+      "remedy": "set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3-coder-next:latest",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/qwen3-coder-next:latest` to verify"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3-coder-next:latest",
+      "message": "served context length is assumed (4096); trained max is 262144",
+      "remedy": "set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3-coder:latest",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/qwen3-coder:latest` to verify"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3-coder:latest",
+      "message": "served context length is assumed (4096); trained max is 262144",
+      "remedy": "set num_ctx in the Modelfile or OLLAMA_CONTEXT_LENGTH, or add a deployments[] override with context_length"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3.6-accurate:latest",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/qwen3.6-accurate:latest` to verify"
+    },
+    {
+      "level": "warn",
+      "area": "deployment:ollama/qwen3.6-fast:latest",
+      "message": "capabilities unknown: ['json_schema'] (requests needing them will not route here)",
+      "remedy": "run `modelsaar probe ollama/qwen3.6-fast:latest` to verify"
+    },
+    {
+      "level": "ok",
+      "area": "classifier",
+      "message": "optional classifier disabled (deterministic routing only)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "alias:auto",
+      "message": "advertised with 8 deployment(s)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "alias:auto-quality",
+      "message": "advertised with 8 deployment(s)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "alias:auto-balanced",
+      "message": "advertised with 8 deployment(s)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "alias:auto-fast",
+      "message": "advertised with 8 deployment(s)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "alias:auto-code",
+      "message": "advertised with 3 deployment(s)",
+      "remedy": ""
+    },
+    {
+      "level": "ok",
+      "area": "alias:auto-vision",
+      "message": "advertised with 6 deployment(s)",
+      "remedy": ""
+    }
+  ],
+  "failures": 0
+}

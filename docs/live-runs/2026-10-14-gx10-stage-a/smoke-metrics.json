@@ -1,0 +1,640 @@
+{
+ "generated_at": "2026-10-14T16:49:29+0530",
+ "gateway": "Mac-local modelsaar cf56cdd (loopback, max_concurrent 1)",
+ "backend": "GX10 Ollama 0.40.3 at 100.83.54.124:11434 over Tailscale",
+ "prompts": {
+  "chat": "Reply with the single word: ready (max_tokens 256, temperature 0, stream)",
+  "throughput": "Count from 1 to 60 \u2026 (max_tokens 200, stream)",
+  "json_object": "Return a JSON object with keys city and country for Paris. (max_tokens 128, response_format json_object)",
+  "tool_call": "What is the weather in Paris right now? Use the tool. (one function get_weather(city), max_tokens 128)"
+ },
+ "caveats": [
+  "all latencies include the Mac->GX10 Tailscale path (not measured separately: NOT RUN)",
+  "ttft_ms = time to the first CONTENT delta; reasoning/thinking deltas are excluded, so for thinking models TTFT \u2248 total for short answers",
+  "throughput is content stream chunks per second after the first content chunk (chunk \u2260 token; usage tokens are available only on the non-streamed json/tool requests)",
+  "'cold' means the model was not in /api/ps before the first request of this run; the GX10 was otherwise idle (nothing resident at 16:37; qwen3.6-fast and qwen3.8 were resident from the probes when the smoke set began)",
+  "memory: Ollama /api/ps size_vram is the only figure exposed over the API; host RAM/VRAM totals NOT EXPOSED",
+  "no quality conclusions are drawn from these requests"
+ ],
+ "deployments": [
+  {
+   "deployment": "ollama/muse-glimmer:latest",
+   "fingerprint": "31f1aafa7391ca95",
+   "resident_before_first_request": false,
+   "resident_set_before": [
+    "qwen3.6-fast:latest",
+    "qwen3.8:latest"
+   ],
+   "first_request": {
+    "request_id": "req_255609490424454f",
+    "ttft_ms": 13590,
+    "total_ms": 13665,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "cold (not resident; includes model load)"
+   },
+   "chat_warm": {
+    "request_id": "req_3db1334b1324480f",
+    "ttft_ms": 7009,
+    "total_ms": 7092,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_55eab0f9775845a0",
+    "ttft_ms": null,
+    "total_ms": 15770,
+    "content_chunks": 0,
+    "content_chars": 0,
+    "chunks_per_s_after_first": null,
+    "finish_reason": "length",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_740280bb6e0346bc",
+    "total_ms": 10139,
+    "usage": {
+     "prompt_tokens": 68,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 128,
+     "total_tokens": 196
+    },
+    "finish_reason": "length",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": "req_cf848182f00f4822",
+    "total_ms": 8601,
+    "usage": {
+     "prompt_tokens": 407,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 103,
+     "total_tokens": 510
+    },
+    "tool_calls": [
+     "get_weather"
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "skipped": null
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 17578149805,
+    "expires_at": "2026-10-14T23:17:08.985477763+08:00",
+    "resident_set_after": [
+     "muse-glimmer:latest",
+     "qwen3.8:latest"
+    ]
+   },
+   "estimated_cold_load_ms": 6573
+  },
+  {
+   "deployment": "ollama/qwen3.6:latest",
+   "fingerprint": "7495ed65fbf1dbd5",
+   "resident_before_first_request": false,
+   "resident_set_before": [
+    "muse-glimmer:latest",
+    "qwen3.8:latest"
+   ],
+   "first_request": {
+    "request_id": "req_95cc343d1a4b4258",
+    "ttft_ms": 8950,
+    "total_ms": 8953,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "cold (not resident; includes model load)"
+   },
+   "chat_warm": {
+    "request_id": "req_ef94a9873d3a45ea",
+    "ttft_ms": 1301,
+    "total_ms": 1304,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_bcc7ede9b15f49e8",
+    "ttft_ms": null,
+    "total_ms": 2309,
+    "content_chunks": 0,
+    "content_chars": 0,
+    "chunks_per_s_after_first": null,
+    "finish_reason": "length",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_04ba124bffc64c6a",
+    "total_ms": 1531,
+    "usage": {
+     "prompt_tokens": 22,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 128,
+     "total_tokens": 150
+    },
+    "finish_reason": "length",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": "req_6c51ee3a6c8442af",
+    "total_ms": 1672,
+    "usage": {
+     "prompt_tokens": 279,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 128,
+     "total_tokens": 407
+    },
+    "tool_calls": [],
+    "finish_reason": "length",
+    "error": null,
+    "skipped": null
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 22851323165,
+    "expires_at": "2026-10-14T23:17:25.153687137+08:00",
+    "resident_set_after": [
+     "qwen3.6:latest",
+     "qwen3.8:latest"
+    ]
+   },
+   "estimated_cold_load_ms": 7649
+  },
+  {
+   "deployment": "ollama/gemma4:31b",
+   "fingerprint": "c2a3b30b88068a13",
+   "resident_before_first_request": false,
+   "resident_set_before": [
+    "qwen3.6:latest",
+    "qwen3.8:latest"
+   ],
+   "first_request": {
+    "request_id": "req_00296e915228497b",
+    "ttft_ms": 12639,
+    "total_ms": 12743,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "cold (not resident; includes model load)"
+   },
+   "chat_warm": {
+    "request_id": "req_9b3d68b73e83456c",
+    "ttft_ms": 4540,
+    "total_ms": 4633,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_076b821078504a48",
+    "ttft_ms": null,
+    "total_ms": 18320,
+    "content_chunks": 0,
+    "content_chars": 0,
+    "chunks_per_s_after_first": null,
+    "finish_reason": "length",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_aa4f90e3d5d34eeb",
+    "total_ms": 9764,
+    "usage": {
+     "prompt_tokens": 28,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 105,
+     "total_tokens": 133
+    },
+    "finish_reason": "stop",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": "req_199489f65a504d7c",
+    "total_ms": 5318,
+    "usage": {
+     "prompt_tokens": 71,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 56,
+     "total_tokens": 127
+    },
+    "tool_calls": [
+     "get_weather"
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "skipped": null
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 22629119425,
+    "expires_at": "2026-10-14T23:18:16.32655077+08:00",
+    "resident_set_after": [
+     "gemma4:31b",
+     "qwen3.8:latest"
+    ]
+   },
+   "estimated_cold_load_ms": 8110
+  },
+  {
+   "deployment": "ollama/qwen3.8:latest",
+   "fingerprint": "06621e3e0e6844f0",
+   "resident_before_first_request": true,
+   "resident_set_before": [
+    "gemma4:31b",
+    "qwen3.8:latest"
+   ],
+   "first_request": {
+    "request_id": "req_0c6e283066ce400b",
+    "ttft_ms": 899,
+    "total_ms": 1016,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "warm (already resident)"
+   },
+   "chat_warm": {
+    "request_id": "req_ea4fe75cd8694d12",
+    "ttft_ms": 899,
+    "total_ms": 1001,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_f856057bb1c44ece",
+    "ttft_ms": 1549,
+    "total_ms": 5020,
+    "content_chunks": 101,
+    "content_chars": 155,
+    "chunks_per_s_after_first": 29.1,
+    "finish_reason": "length",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_2cd9f7723627432c",
+    "total_ms": 1642,
+    "usage": {
+     "prompt_tokens": 22,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 44,
+     "total_tokens": 66
+    },
+    "finish_reason": "stop",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": "req_ca52a2e3b3434968",
+    "total_ms": 2459,
+    "usage": {
+     "prompt_tokens": 279,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 64,
+     "total_tokens": 343
+    },
+    "tool_calls": [
+     "get_weather"
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "skipped": null
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 18488198429,
+    "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+    "resident_set_after": [
+     "qwen3.8:latest",
+     "gemma4:31b"
+    ]
+   },
+   "estimated_cold_load_ms": null
+  },
+  {
+   "deployment": "ollama/qwen3-coder-next:latest",
+   "fingerprint": "3403278e77d95723",
+   "resident_before_first_request": false,
+   "resident_set_before": [
+    "qwen3.8:latest",
+    "gemma4:31b"
+   ],
+   "first_request": {
+    "request_id": "req_94f313fd8b594be5",
+    "ttft_ms": 12952,
+    "total_ms": 12982,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "cold (not resident; includes model load)"
+   },
+   "chat_warm": {
+    "request_id": "req_4e39eec735844e71",
+    "ttft_ms": 122,
+    "total_ms": 142,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_84048409156e4abc",
+    "ttft_ms": 318,
+    "total_ms": 3019,
+    "content_chunks": 111,
+    "content_chars": 170,
+    "chunks_per_s_after_first": 41.3,
+    "finish_reason": "stop",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_19ac20ce70e64eb1",
+    "total_ms": 492,
+    "usage": {
+     "prompt_tokens": 20,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 17,
+     "total_tokens": 37
+    },
+    "finish_reason": "stop",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": "req_60f0ab1c1bf74cee",
+    "total_ms": 770,
+    "usage": {
+     "prompt_tokens": 289,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 22,
+     "total_tokens": 311
+    },
+    "tool_calls": [
+     "get_weather"
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "skipped": null
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 55390932826,
+    "expires_at": "2026-10-14T23:18:45.643636808+08:00",
+    "resident_set_after": [
+     "qwen3-coder-next:latest",
+     "qwen3.8:latest"
+    ]
+   },
+   "estimated_cold_load_ms": 12840
+  },
+  {
+   "deployment": "ollama/qwen3-coder:latest",
+   "fingerprint": "4eacb9bbc87cccbf",
+   "resident_before_first_request": false,
+   "resident_set_before": [
+    "qwen3-coder-next:latest",
+    "qwen3.8:latest"
+   ],
+   "first_request": {
+    "request_id": "req_4049078dc22e4b97",
+    "ttft_ms": 6718,
+    "total_ms": 6722,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "cold (not resident; includes model load)"
+   },
+   "chat_warm": {
+    "request_id": "req_a3610cebb5f14722",
+    "ttft_ms": 93,
+    "total_ms": 113,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_6d3589adeaec41b2",
+    "ttft_ms": 267,
+    "total_ms": 2130,
+    "content_chunks": 111,
+    "content_chars": 170,
+    "chunks_per_s_after_first": 60.0,
+    "finish_reason": "stop",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_b0d4d191d0db4cb8",
+    "total_ms": 331,
+    "usage": {
+     "prompt_tokens": 20,
+     "prompt_tokens_details": {
+      "cached_tokens": 3
+     },
+     "completion_tokens": 17,
+     "total_tokens": 37
+    },
+    "finish_reason": "stop",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": "req_4a2da2bf21264403",
+    "total_ms": 469,
+    "usage": {
+     "prompt_tokens": 289,
+     "prompt_tokens_details": {
+      "cached_tokens": 1
+     },
+     "completion_tokens": 22,
+     "total_tokens": 311
+    },
+    "tool_calls": [
+     "get_weather"
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "skipped": null
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 32149832990,
+    "expires_at": "2026-10-14T23:18:55.785180851+08:00",
+    "resident_set_after": [
+     "qwen3-coder:latest",
+     "qwen3.8:latest"
+    ]
+   },
+   "estimated_cold_load_ms": 6609
+  },
+  {
+   "deployment": "ollama/qwen3.6-accurate:latest",
+   "fingerprint": "e972c9b803aecfc4",
+   "resident_before_first_request": false,
+   "resident_set_before": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest"
+   ],
+   "first_request": {
+    "request_id": "req_dfbff27b5c0f422e",
+    "ttft_ms": 9091,
+    "total_ms": 9112,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "cold (not resident; includes model load)"
+   },
+   "chat_warm": {
+    "request_id": "req_1481bfec11d54ac6",
+    "ttft_ms": 1566,
+    "total_ms": 1589,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_37fc062436034c51",
+    "ttft_ms": null,
+    "total_ms": 2817,
+    "content_chunks": 0,
+    "content_chars": 0,
+    "chunks_per_s_after_first": null,
+    "finish_reason": "length",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_3954e1fd23e54f95",
+    "total_ms": 1902,
+    "usage": {
+     "prompt_tokens": 72,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 128,
+     "total_tokens": 200
+    },
+    "finish_reason": "length",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": "req_45c1764df80042b1",
+    "total_ms": 2003,
+    "usage": {
+     "prompt_tokens": 325,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 128,
+     "total_tokens": 453
+    },
+    "tool_calls": [],
+    "finish_reason": "length",
+    "error": null,
+    "skipped": null
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 26172761045,
+    "expires_at": "2026-10-14T23:19:13.630733761+08:00",
+    "resident_set_after": [
+     "qwen3.6-accurate:latest",
+     "qwen3.8:latest"
+    ]
+   },
+   "estimated_cold_load_ms": 7523
+  },
+  {
+   "deployment": "ollama/qwen3.6-fast:latest",
+   "fingerprint": "9274883c38d48361",
+   "resident_before_first_request": false,
+   "resident_set_before": [
+    "qwen3.6-accurate:latest",
+    "qwen3.8:latest"
+   ],
+   "first_request": {
+    "request_id": "req_97f22619cc4a4b29",
+    "ttft_ms": 8829,
+    "total_ms": 8852,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null,
+    "state": "cold (not resident; includes model load)"
+   },
+   "chat_warm": {
+    "request_id": "req_f921d1ef7a104119",
+    "ttft_ms": 1609,
+    "total_ms": 1623,
+    "finish_reason": "stop",
+    "content_chunks": 1,
+    "error": null
+   },
+   "throughput_warm": {
+    "request_id": "req_80ea8cc3bd5445ea",
+    "ttft_ms": null,
+    "total_ms": 2810,
+    "content_chunks": 0,
+    "content_chars": 0,
+    "chunks_per_s_after_first": null,
+    "finish_reason": "length",
+    "error": null
+   },
+   "json_object_warm": {
+    "request_id": "req_c192e8ba04104bd7",
+    "total_ms": 1860,
+    "usage": {
+     "prompt_tokens": 43,
+     "prompt_tokens_details": {
+      "cached_tokens": 0
+     },
+     "completion_tokens": 128,
+     "total_tokens": 171
+    },
+    "finish_reason": "length",
+    "error": null,
+    "skipped": null
+   },
+   "tool_call_warm": {
+    "request_id": null,
+    "total_ms": null,
+    "usage": null,
+    "tool_calls": null,
+    "finish_reason": null,
+    "error": null,
+    "skipped": "tools=unsupported per probe"
+   },
+   "resident_after_run": {
+    "resident": true,
+    "size_vram_bytes": 24562148309,
+    "expires_at": "2026-10-14T23:19:29.156876496+08:00",
+    "resident_set_after": [
+     "qwen3.6-fast:latest",
+     "qwen3.8:latest"
+    ]
+   },
+   "estimated_cold_load_ms": 7229
+  }
+ ]
+}

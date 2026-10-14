@@ -1,0 +1,126 @@
+{
+ "stage": "A",
+ "generated_at_local": "2026-10-14T16:37:01+05:30 (IST)",
+ "collection_window_local": "16:37\u201316:49 IST",
+ "repository": {
+  "url": "https://github.com/gopalasubramanium/modelsaar",
+  "main": "f18b2f195478d9a6591e7c637c321a46d9420e7e",
+  "evidence_branch": "evidence/stage-a"
+ },
+ "gateway_package": {
+  "installed_on_gx10": {
+   "revision": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+   "evidence": "owner-reported upgrade completion 2026-10-14 (installer summary: Installed revision cf56cdd\u2026, service restarted, health check OK at http://192.168.0.12:8484); NOT re-verified in Stage A \u2014 the GX10 gateway port 8484 is not reachable from the Mac (LAN-bound; Tailscale address refused connection)"
+  },
+  "used_for_stage_a_measurements": {
+   "revision": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+   "version": "modelsaar 0.1.0",
+   "where": "Mac-local gateway from ~/.modelsaar-install-test/public-20261013-145747 (public installer, 2026-10-13), separate Stage A home ~/.modelsaar-stage-a, loopback port 50824, max_concurrent 1"
+  }
+ },
+ "gx10_service": {
+  "state": "owner-reported active (2026-10-14 upgrade summary); NOT OBSERVED in Stage A",
+  "effective_endpoint": "http://192.168.0.12:8484/v1 (LAN; owner-reported). From the Mac: http://100.83.54.124:8484 and http://192.168.0.12:8484 \u2192 connection refused/unreachable (curl exit, HTTP 000)"
+ },
+ "ollama": {
+  "version": "0.40.3",
+  "endpoint_used": "http://100.83.54.124:11434 (Tailscale; the GX10's Ollama, reachable)",
+  "note": "the 2026-10-11 published run used Ollama 0.32.13; the runtime has changed since",
+  "model_count": 8,
+  "resident_before_stage_a": []
+ },
+ "gx10_host": {
+  "hardware_identity": "NOT EXPOSED over the Ollama API (owner-reported: ASUS GX10)",
+  "os_kernel_arch": "NOT EXPOSED (no shell access; Ollama reports only its version)",
+  "total_unified_memory": "NOT EXPOSED",
+  "storage": "NOT EXPOSED",
+  "gpu_runtime_visibility": "NOT EXPOSED; /api/ps size_vram equals size for every loaded model (fully resident in accelerator memory as Ollama reports it)"
+ },
+ "mac_measurement_host": {
+  "os": "macOS 27.0.1",
+  "arch": "arm64",
+  "path_to_gx10": "Tailscale (latencies include this path; NOT separately measured)"
+ },
+ "modelsaar_config_stage_a": {
+  "file": "~/.modelsaar-stage-a/.modelsaar/config.yaml",
+  "sha256_prefix": "c58ce04fa1ed9902",
+  "hash_as_reported_by_doctor": "c58ce04fa1ed9902",
+  "server": {
+   "host": "127.0.0.1",
+   "port": 50824
+  },
+  "security": {
+   "allow_lan": false,
+   "locality_mode": "local_only",
+   "log_prompts": false
+  },
+  "resource_pool": {
+   "id": "local-machine",
+   "kind": "unified",
+   "max_concurrent": 1,
+   "max_queue": 16
+  },
+  "backend": {
+   "id": "ollama",
+   "type": "ollama",
+   "base_url": "http://100.83.54.124:11434",
+   "locality": "local (operator-declared by init)",
+   "discover": true
+  },
+  "secrets": "api_keys and admin_key exist in the Stage A home; never printed or copied"
+ },
+ "modelsaar_config_gx10": "NOT READABLE from here (no shell; owner's installer summary 2026-10-14 reported config/keys preserved byte-identical across the upgrade); the hash is unknown",
+ "routing_defaults_at_cf56cdd": {
+  "default_profile": "quality",
+  "profiles": {
+   "quality": {
+    "quality": 1.0,
+    "latency": 0.15,
+    "residency": 0.1,
+    "overhead": 0.05
+   },
+   "balanced": {
+    "quality": 1.0,
+    "latency": 0.45,
+    "residency": 0.3,
+    "overhead": 0.1
+   },
+   "fast": {
+    "quality": 0.6,
+    "latency": 1.0,
+    "residency": 0.6,
+    "overhead": 0.2
+   }
+  },
+  "switching_penalty": 0.08,
+  "uncalibrated_prior": 0.5,
+  "pre_commit_failover": true,
+  "max_failover_attempts": 1,
+  "token_estimate": {
+   "chars_per_token": 3.0,
+   "default_max_output": 1024,
+   "reasoning_budget": 2048,
+   "safety_margin": 0.05
+  }
+ },
+ "classifier": {
+  "enabled": false,
+  "backend": null,
+  "model": null,
+  "timeout_s": 2.0,
+  "max_input_chars": 1500,
+  "only_when_ambiguous": true,
+  "max_output_tokens": 64,
+  "allow_remote": false,
+  "note": "defaults from `config show` at cf56cdd on the Stage A home; the GX10's own config was not readable \u2014 its value is UNKNOWN (default is disabled and the owner has not reported enabling it)"
+ },
+ "evidence_files": {
+  "raw/ollama-tags.json": "961e9c6da5f8daeadec455da9ff053eb96c68f62d557e09c08442570e94a9bc8",
+  "raw/ollama-version.json": "390eeacbb33026a8ac714dd132b267c54afe570bef37e0cc313e0de45a779945",
+  "raw/discover.json": "92273fd71ee3dbec901815b85ea373ab4c32a186981bfad597912d32ce872e2d",
+  "raw/doctor.json": "4ced0632a50c2e42ae369c434b85eeeb6ef4b0f6873c59c3c58cc0293ea2cdef",
+  "raw/probe-all.clean.json": "82a9d9fe14067fba744b7555c92424cecbc610aa074ba65d1215a51fbedbfaa3",
+  "raw/smoke-metrics-raw.json": "a7e06b8001381677f48f498e4575239322aa7c398a3c7acb541394a4bac9aac9",
+  "raw/decisions.txt": "13788dadfb9520aee3734aefb711038ff13e1bcb7f59854c565010f76f4c3e57"
+ }
+}

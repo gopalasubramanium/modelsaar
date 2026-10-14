@@ -1,0 +1,193 @@
+{
+  "request_id": "req_3b5d29fdf3a24073",
+  "created_at": 1791976031.2326558,
+  "config_hash": "c58ce04fa1ed9902",
+  "registry_version": 1,
+  "endpoint": "chat",
+  "requested_model": "auto",
+  "alias": "auto",
+  "explicit": false,
+  "profile": "quality",
+  "stream": false,
+  "requirements": {
+    "role": "generative",
+    "needs_tools": true,
+    "tool_choice_mode": "auto",
+    "needs_parallel_tools": false,
+    "needs_json_schema": false,
+    "needs_json_object": false,
+    "needs_streaming": false,
+    "needs_vision": false,
+    "needs_audio": false,
+    "has_remote_image_url": false,
+    "needs_continuation": false,
+    "outstanding_tool_call_ids": [],
+    "is_tool_result_turn": false,
+    "tasks": {
+      "coding": 0.5,
+      "agent": 0.8
+    },
+    "primary_task": "agent",
+    "ambiguous": false,
+    "multilingual": false,
+    "languages": [
+      "en"
+    ],
+    "signals": [
+      "agent:agent-style tools/system prompt",
+      "coding:agent tools imply code work"
+    ],
+    "tokens": {
+      "input_estimate": 107,
+      "output_allowance": 1024,
+      "reasoning_allowance": 2048,
+      "images": 0,
+      "method": "estimate:chars/3+overheads",
+      "total": 3179
+    }
+  },
+  "exclusions": {},
+  "remedies": [],
+  "candidates": [
+    {
+      "deployment": "ollama/qwen3-coder:latest",
+      "quality": 0.762,
+      "uncertainty": 0.25,
+      "evidence": "prior:catalogue (blend: coding=prior:catalogue, agent=prior:catalogue)",
+      "latency_cost": 0.407,
+      "residency_cost": 0.359,
+      "overhead_cost": 0.359,
+      "affinity_adjust": 0.0,
+      "score": 0.6466,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/qwen3.8:latest",
+      "quality": 0.708,
+      "uncertainty": 0.25,
+      "evidence": "prior:catalogue (blend: coding=prior:catalogue, agent=prior:catalogue)",
+      "latency_cost": 0.369,
+      "residency_cost": 0.343,
+      "overhead_cost": 0.343,
+      "affinity_adjust": 0.0,
+      "score": 0.6009,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/muse-glimmer:latest",
+      "quality": 0.7,
+      "uncertainty": 0.269,
+      "evidence": "prior:catalogue (blend: coding=prior-general:catalogue, agent=prior:catalogue)",
+      "latency_cost": 0.376,
+      "residency_cost": 0.351,
+      "overhead_cost": 0.351,
+      "affinity_adjust": 0.0,
+      "score": 0.5909,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/qwen3.6:latest",
+      "quality": 0.688,
+      "uncertainty": 0.25,
+      "evidence": "prior:catalogue (blend: coding=prior:catalogue, agent=prior:catalogue)",
+      "latency_cost": 0.468,
+      "residency_cost": 0.437,
+      "overhead_cost": 0.437,
+      "affinity_adjust": 0.0,
+      "score": 0.552,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/gemma4:31b",
+      "quality": 0.575,
+      "uncertainty": 0.35,
+      "evidence": "uncalibrated:size-heuristic (blend: coding=uncalibrated:size-heuristic, agent=uncalibrated:size-heuristic)",
+      "latency_cost": 0.417,
+      "residency_cost": 0.384,
+      "overhead_cost": 0.384,
+      "affinity_adjust": 0.0,
+      "score": 0.4553,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/qwen3.6-accurate:latest",
+      "quality": 0.578,
+      "uncertainty": 0.35,
+      "evidence": "uncalibrated:size-heuristic (blend: coding=uncalibrated:size-heuristic, agent=uncalibrated:size-heuristic)",
+      "latency_cost": 0.474,
+      "residency_cost": 0.463,
+      "overhead_cost": 0.463,
+      "affinity_adjust": 0.0,
+      "score": 0.438,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/qwen3.6-fast:latest",
+      "quality": 0.578,
+      "uncertainty": 0.35,
+      "evidence": "uncalibrated:size-heuristic (blend: coding=uncalibrated:size-heuristic, agent=uncalibrated:size-heuristic)",
+      "latency_cost": 0.474,
+      "residency_cost": 0.463,
+      "overhead_cost": 0.463,
+      "affinity_adjust": 0.0,
+      "score": 0.438,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/qwen3-coder-next:latest",
+      "quality": 0.595,
+      "uncertainty": 0.35,
+      "evidence": "uncalibrated:size-heuristic (blend: coding=uncalibrated:size-heuristic, agent=uncalibrated:size-heuristic)",
+      "latency_cost": 1.0,
+      "residency_cost": 1.0,
+      "overhead_cost": 1.0,
+      "affinity_adjust": 0.0,
+      "score": 0.2953,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    }
+  ],
+  "chosen": "ollama/qwen3-coder:latest",
+  "evidence": "prior:catalogue",
+  "classifier": {},
+  "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+  },
+  "reasons": [
+    "task=agent (clear); required: tool support; context need ~3179 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 0.76 (prior:catalogue (blend: coding=prior:catalogue, agent=prior:catalogue)), latency cost 0.41, not resident"
+  ],
+  "overhead_ms": 0.56,
+  "outcome": "explain_only",
+  "outcome_detail": "",
+  "failover": [],
+  "failover_allowed": true,
+  "failover_note": "",
+  "translation_notes": [],
+  "requirements_note": "",
+  "compat": {}
+}

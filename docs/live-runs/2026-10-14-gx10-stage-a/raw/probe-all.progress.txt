@@ -1,0 +1,63 @@
+probing ollama/muse-glimmer:latest via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported      18366ms  events=144 content_chunks=9 reasoning_chunks=132 done=True finish=stop usage=yes
+  tools            supported       5448ms  tool call with id and JSON args
+  parallel_tools   supported      15659ms  two distinct tool calls in one turn
+  json_object      supported      12480ms  
+  json_schema      supported      28562ms  schema-conformant object
+  vision           unsupported    39810ms  image accepted but answer did not identify the colour ('white')
+  latency           p50=6921ms ttft=7345ms load~0.0ms (samples=2)
+probing ollama/qwen3.6:latest via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported       9737ms  events=194 content_chunks=5 reasoning_chunks=186 done=True finish=stop usage=yes
+  tools            supported       1879ms  tool call with id and JSON args
+  parallel_tools   supported       6739ms  two distinct tool calls in one turn
+  json_object      supported       2848ms  
+  json_schema      supported       9453ms  schema-conformant object
+  vision           supported       4677ms  accepted a base64 image and identified its colour
+  latency           p50=1251ms ttft=7154ms load~0.0ms (samples=2)
+probing ollama/gemma4:31b via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported      21403ms  events=59 content_chunks=9 reasoning_chunks=47 done=True finish=stop usage=yes
+  tools            supported       5579ms  tool call with id and JSON args
+  parallel_tools   supported       8488ms  two distinct tool calls in one turn
+  json_object      supported       4808ms  
+  json_schema      supported      13622ms  schema-conformant object
+  vision           supported       3795ms  accepted a base64 image and identified its colour
+  latency           p50=4530ms ttft=15120ms load~0.0ms (samples=2)
+probing ollama/qwen3.8:latest via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported       8956ms  events=32 content_chunks=5 reasoning_chunks=24 done=True finish=stop usage=yes
+  tools            supported       2121ms  tool call with id and JSON args
+  parallel_tools   supported       3190ms  two distinct tool calls in one turn
+  json_object      supported       1398ms  
+  json_schema      supported       5560ms  schema-conformant object
+  vision           supported       3698ms  accepted a base64 image and identified its colour
+  latency           p50=1054ms ttft=7694ms load~0.0ms (samples=2)
+probing ollama/qwen3-coder-next:latest via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported      13036ms  events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes
+  tools            supported        889ms  tool call with id and JSON args
+  parallel_tools   supported       1241ms  two distinct tool calls in one turn
+  json_object      supported        389ms  
+  json_schema      supported       2429ms  schema-conformant object
+  vision           unsupported        0ms  skipped: backend metadata says vision unsupported
+  latency           p50=140ms ttft=12876ms load~0.0ms (samples=2)
+probing ollama/qwen3-coder:latest via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported       6887ms  events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes
+  tools            supported        481ms  tool call with id and JSON args
+  parallel_tools   supported        739ms  two distinct tool calls in one turn
+  json_object      supported        269ms  
+  json_schema      supported       2330ms  schema-conformant object
+  vision           unsupported        0ms  skipped: backend metadata says vision unsupported
+  latency           p50=101ms ttft=6776ms load~1937ms (samples=2)
+probing ollama/qwen3.6-accurate:latest via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported      10776ms  events=149 content_chunks=5 reasoning_chunks=141 done=True finish=stop usage=yes
+  tools            supported       2367ms  tool call with id and JSON args
+  parallel_tools   supported       2231ms  two distinct tool calls in one turn
+  json_object      supported       2951ms  
+  json_schema      supported       9358ms  schema-conformant object
+  vision           supported       2220ms  accepted a base64 image and identified its colour
+  latency           p50=1607ms ttft=8155ms load~0.0ms (samples=2)
+probing ollama/qwen3.6-fast:latest via gateway http://127.0.0.1:50824 (admission-coordinated) ...
+  streaming        supported      10147ms  events=141 content_chunks=5 reasoning_chunks=133 done=True finish=stop usage=yes
+  tools            unsupported    13746ms  no tool_calls returned for an explicit tool request
+  json_object      supported       3136ms  
+  json_schema      supported       8607ms  schema-conformant object
+  vision           supported       1492ms  accepted a base64 image and identified its colour
+  latency           p50=1561ms ttft=7635ms load~0.0ms (samples=2)
