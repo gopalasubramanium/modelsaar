@@ -1,8 +1,10 @@
 # Odysseus → ModelSaar
 
 Status: the **request shape is supported and fixture-tested** (`tests/test_client_compat_odysseus.py`,
-2026-10-13); a chat through the installed Odysseus client itself was **NOT RUN by the project** — it ran
-on the owner's GX10 and is recorded in the verification report when executed.
+2026-10-13). **Owner-reported:** Odysseus chat through ModelSaar on the GX10 is working, reported by the
+owner in conversation on 2026-10-14, after the gateway was upgraded to `cf56cdd`. That is use reported by
+the owner, not a run executed or recorded by the project: no Odysseus version, transcript or decision
+record is on file, and tool, vision, streaming and agent workflows through Odysseus were not reported.
 
 Odysseus talks plain OpenAI Chat Completions, so it needs no generator: point it at the gateway
 (`http://<gateway-host>:8484/v1`, API key = the line printed by `head -1 ~/.modelsaar/keys/api_keys`,

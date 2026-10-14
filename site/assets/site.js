@@ -9,14 +9,17 @@
   document.body.appendChild(live);
   document.querySelectorAll(".cmd").forEach(function (box) {
     var pre = box.querySelector("pre");
-    if (!pre || !navigator.clipboard) return;
+    var bar = box.querySelector(".cmd-bar");
+    if (!pre || !bar || !navigator.clipboard) return;
+    var code = pre.querySelector("code") || pre;
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "copy";
     btn.textContent = "Copy";
     btn.setAttribute("aria-label", "Copy command to clipboard");
     btn.addEventListener("click", function () {
-      navigator.clipboard.writeText(pre.textContent.replace(/\n$/, "")).then(function () {
+      // The exact canonical text: visual wrapping never adds newlines, prompts or labels to the value.
+      navigator.clipboard.writeText(code.textContent.replace(/\n$/, "")).then(function () {
         btn.textContent = "Copied";
         live.textContent = "Command copied to clipboard";
         setTimeout(function () { btn.textContent = "Copy"; live.textContent = ""; }, 1800);
@@ -25,7 +28,7 @@
         live.textContent = "Clipboard unavailable; select the text to copy it";
       });
     });
-    box.appendChild(btn);
+    bar.appendChild(btn);
   });
 
   // Routing walkthrough: turn the <details> scenarios into tabs (content stays in the page without JS)

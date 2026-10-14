@@ -52,7 +52,7 @@
   <h2 id="client-title">3. Connect an app</h2>
   <p>Any app that speaks the OpenAI Chat Completions API needs three values. First print the key in a terminal:</p>
   {{ cmd(facts.KEY_COMMAND, 'Prints one line starting with msk_. That printed line is the API key to paste into a GUI field; the command itself is shell syntax, not a key.') }}
-  {{ cmd('Base URL:  ' + facts.GATEWAY_URL + '\nModel:     auto        # or auto-fast, auto-code, auto-vision, or a concrete deployment id\nAPI key:   ' + facts.KEY_PLACEHOLDER, lang='text') }}
+  {{ cmd('Base URL:  ' + facts.GATEWAY_URL + '\nModel:     auto\nAPI key:   ' + facts.KEY_PLACEHOLDER, 'Model alternatives: <code>auto-fast</code>, <code>auto-code</code>, <code>auto-vision</code>, or a concrete deployment id.', lang='text') }}
   <p>Or let ModelSaar print the exact settings for your app — one command per app:</p>
   {{ facts.client_config_list_html() }}
   <p><code>--apply</code> merges file-based configs with a backup and keeps the file's permissions. The key never leaves your machine unless you send it somewhere.</p>

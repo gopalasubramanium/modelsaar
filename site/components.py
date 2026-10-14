@@ -98,7 +98,7 @@ def decision_record(sc: dict, req_id: str) -> str:
 <div class="decision" aria-label="Decision record (illustration)">
   <div class="decision-head"><span>decision {esc(req_id)}</span><span>{esc(sc['alias'])} → {outcome}</span></div>
   <div class="decision-req"><p>{esc(sc['request'])}</p><ul class="facts">{facts_html}</ul></div>
-  <table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody>{''.join(rows)}</tbody></table>
+  <div class="table-wrap" tabindex="0"><table><thead><tr><th scope="col">deployment</th><th scope="col">hard checks</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
   <div class="decision-why"><p>{sc['why']}</p></div>
   <div class="decision-foot">Evidence: {esc(sc['evidence'])}. Illustration based on the three models of the 2026-10-11 run; not a live result.</div>
 </div>"""
@@ -116,9 +116,19 @@ def walkthrough(site) -> str:  # type: ignore[no-untyped-def]
     return "\n".join(out)
 
 
-def cmd(text: str, note: str | None = None, lang: str = "bash") -> str:
+def cmd(text: str, note: str | None = None, lang: str = "bash", scroll: bool = False) -> str:
+    """A command block: a toolbar row (what the block is; the Copy button lands there when JS runs) above a
+    dedicated code area, so text and button never share space. Text wraps visually (``wrap``, the default,
+    readable on phones); ``scroll=True`` keeps columns and scrolls inside the block (keyboard-focusable).
+    The clipboard value is the code element's exact text, independent of visual wrapping."""
     n = f'<p class="cmd-note">{note}</p>' if note else ""
-    return f'<div class="cmd"><pre><code class="language-{lang}">{esc(text)}</code></pre></div>{n}'
+    label = {"bash": "Terminal", "sh": "Terminal", "text": "Values to paste"}.get(lang, lang)
+    mode = "scroll" if scroll else "wrap"
+    pre_attr = ' tabindex="0"' if mode == "scroll" else ' class="wrap"'
+    return (
+        f'<div class="cmd cmd-{mode}"><div class="cmd-bar"><span class="cmd-label">{esc(label)}</span></div>'
+        f'<pre{pre_attr}><code class="language-{lang}">{esc(text)}</code></pre></div>{n}'
+    )
 
 
 def support_matrix(site) -> str:  # type: ignore[no-untyped-def]
@@ -126,8 +136,8 @@ def support_matrix(site) -> str:  # type: ignore[no-untyped-def]
         parts = [p.strip() for p in ev.split(",")]
         out = []
         for p in parts:
-            cls = {"live": "live", "fixture": "fixture", "docs": "docs", "not-run": "not-run"}[p]
-            label = {"live": "live", "fixture": "fixture tests", "docs": "documented", "not-run": "not run"}[p]
+            cls = {"live": "live", "fixture": "fixture", "docs": "docs", "not-run": "not-run", "owner": "owner"}[p]
+            label = {"live": "live", "fixture": "fixture tests", "docs": "documented", "not-run": "not run", "owner": "owner-reported"}[p]
             out.append(f'<span class="evidence {cls}">{label}</span>')
         return " ".join(out)
 
