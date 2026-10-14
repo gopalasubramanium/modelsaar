@@ -560,7 +560,14 @@ class Harness:
             # passes every pre-activation check (runs, validates, shows the config, ensures keys) but cannot serve
             (bdir / "bin/modelsaar").write_text('#!/bin/sh\ncase "$1" in --version) echo "modelsaar 0.1.0-broken-test"; exit 0;; config) [ "$2" = show ] && cat "$MODELSAAR_HOME/config.yaml"; exit 0;; keys) exit 0;; esac\necho "broken replacement: refusing to serve" >&2; exit 7\n')
             (bdir / "bin/modelsaar").chmod(0o755)
-            spec_b = f"modelsaar @ {self.source}" if not self.source.startswith("git+") else f"{self.source}@{broken}"
+            # the marker must name the spec the installer itself derives for MODELSAAR_REF=<broken>, otherwise the
+            # environment is treated as "installed from a different source" and reinstalled instead of reused
+            if self.source.startswith("git+"):
+                spec_b = f"{self.source}@{broken}"
+            elif self.source == f"https://github.com/gopalasubramanium/modelsaar/archive/{self.ref}.tar.gz":
+                spec_b = f"modelsaar @ https://github.com/gopalasubramanium/modelsaar/archive/{broken}.tar.gz"
+            else:
+                spec_b = f"modelsaar @ {self.source}"
             (bdir / ".modelsaar-installed").write_text(spec_b + "\n")
             e_bad = self.install_env(home, path, fake, port, MODELSAAR_REF=broken)
             r4 = self.sh_pipe(self.install, e_bad)
