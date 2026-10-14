@@ -1,0 +1,124 @@
+{
+  "request_id": "req_17f8b68d29184057",
+  "created_at": 1791976032.272037,
+  "config_hash": "c58ce04fa1ed9902",
+  "registry_version": 1,
+  "endpoint": "chat",
+  "requested_model": "auto",
+  "alias": "auto",
+  "explicit": false,
+  "profile": "quality",
+  "stream": false,
+  "requirements": {
+    "role": "generative",
+    "needs_tools": false,
+    "tool_choice_mode": "none",
+    "needs_parallel_tools": false,
+    "needs_json_schema": false,
+    "needs_json_object": false,
+    "needs_streaming": false,
+    "needs_vision": true,
+    "needs_audio": false,
+    "has_remote_image_url": false,
+    "needs_continuation": false,
+    "outstanding_tool_call_ids": [],
+    "is_tool_result_turn": false,
+    "tasks": {
+      "document_vision": 0.9
+    },
+    "primary_task": "document_vision",
+    "ambiguous": false,
+    "multilingual": false,
+    "languages": [
+      "en"
+    ],
+    "signals": [
+      "document_vision:image input present"
+    ],
+    "tokens": {
+      "input_estimate": 1277,
+      "output_allowance": 1024,
+      "reasoning_allowance": 2048,
+      "images": 1,
+      "method": "estimate:chars/3+overheads",
+      "total": 4349
+    }
+  },
+  "exclusions": {
+    "ollama/muse-glimmer:latest": [
+      "effective context 4096 < required 4349 (input~1277 + output 1024 + reasoning 2048; estimate:chars/3+overheads)"
+    ],
+    "ollama/qwen3.6:latest": [
+      "effective context 4096 < required 4349 (input~1277 + output 1024 + reasoning 2048; estimate:chars/3+overheads)"
+    ],
+    "ollama/gemma4:31b": [
+      "effective context 4096 < required 4349 (input~1277 + output 1024 + reasoning 2048; estimate:chars/3+overheads)"
+    ],
+    "ollama/qwen3.8:latest": [
+      "effective context 4096 < required 4349 (input~1277 + output 1024 + reasoning 2048; estimate:chars/3+overheads)"
+    ],
+    "ollama/qwen3-coder-next:latest": [
+      "image input required; capability vision is unsupported (source_claim)"
+    ],
+    "ollama/qwen3-coder:latest": [
+      "image input required; capability vision is unsupported (source_claim)"
+    ]
+  },
+  "remedies": [
+    "shorten the conversation, lower max_tokens, or serve the model with a larger context",
+    "use a deployment whose vision capability is supported"
+  ],
+  "candidates": [
+    {
+      "deployment": "ollama/qwen3.6-accurate:latest",
+      "quality": 0.578,
+      "uncertainty": 0.35,
+      "evidence": "uncalibrated:size-heuristic",
+      "latency_cost": 1.0,
+      "residency_cost": 1.0,
+      "overhead_cost": 1.0,
+      "affinity_adjust": 0.0,
+      "score": 0.2784,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    },
+    {
+      "deployment": "ollama/qwen3.6-fast:latest",
+      "quality": 0.578,
+      "uncertainty": 0.35,
+      "evidence": "uncalibrated:size-heuristic",
+      "latency_cost": 1.0,
+      "residency_cost": 1.0,
+      "overhead_cost": 1.0,
+      "affinity_adjust": 0.0,
+      "score": 0.2784,
+      "notes": [
+        "latency:size-heuristic",
+        "load:memory-heuristic"
+      ]
+    }
+  ],
+  "chosen": "ollama/qwen3.6-accurate:latest",
+  "evidence": "uncalibrated:size-heuristic",
+  "classifier": {},
+  "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+  },
+  "reasons": [
+    "task=document_vision (clear); required: image input; context need ~4349 tokens",
+    "6 deployment(s) excluded by hard filters; 2 eligible",
+    "ollama/qwen3.6-accurate:latest ranked first on profile quality: quality 0.58 (uncalibrated:size-heuristic), latency cost 1.00, not resident"
+  ],
+  "overhead_ms": 0.38,
+  "outcome": "explain_only",
+  "outcome_detail": "",
+  "failover": [],
+  "failover_allowed": true,
+  "failover_note": "",
+  "translation_notes": [],
+  "requirements_note": "",
+  "compat": {}
+}

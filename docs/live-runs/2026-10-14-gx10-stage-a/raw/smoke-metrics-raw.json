@@ -1,0 +1,1084 @@
+{
+ "generated_at": "2026-10-14T16:49:29+0530",
+ "gateway": "mac-local http://127.0.0.1:50824",
+ "backend": "http://100.83.54.124:11434",
+ "note": "latencies include the Mac->GX10 Tailscale path; cold = first request in this run (the model may already have been resident: see resident_before)",
+ "deployments": [
+  {
+   "deployment": "ollama/muse-glimmer:latest",
+   "fingerprint": "31f1aafa7391ca95",
+   "resident_before": [
+    {
+     "name": "qwen3.6-fast:latest",
+     "size": 24562148309,
+     "size_vram": 24562148309,
+     "expires_at": "2026-10-14T23:13:36.928681132+08:00",
+     "digest": "b6f8526faefe8b47eec"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "supported",
+    "parallel_tools": "supported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "unsupported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_255609490424454f",
+     "deployment": "ollama/muse-glimmer:latest",
+     "ttft_ms": 13590,
+     "total_ms": 13665,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_3db1334b1324480f",
+     "deployment": "ollama/muse-glimmer:latest",
+     "ttft_ms": 7009,
+     "total_ms": 7092,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_55eab0f9775845a0",
+     "deployment": "ollama/muse-glimmer:latest",
+     "ttft_ms": null,
+     "total_ms": 15770,
+     "content_chunks": 0,
+     "content_chars": 0,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "length",
+     "error": null,
+     "content_preview": ""
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_740280bb6e0346bc",
+     "deployment": "ollama/muse-glimmer:latest",
+     "total_ms": 10139,
+     "usage": {
+      "prompt_tokens": 68,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 128,
+      "total_tokens": 196
+     },
+     "finish_reason": "length",
+     "tool_calls": [],
+     "content_preview": ""
+    },
+    {
+     "label": "tool_call_warm",
+     "request_id": "req_cf848182f00f4822",
+     "deployment": "ollama/muse-glimmer:latest",
+     "total_ms": 8601,
+     "usage": {
+      "prompt_tokens": 407,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 103,
+      "total_tokens": 510
+     },
+     "finish_reason": "tool_calls",
+     "tool_calls": [
+      "get_weather"
+     ],
+     "content_preview": ""
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "muse-glimmer:latest",
+     "size": 17578149805,
+     "size_vram": 17578149805,
+     "expires_at": "2026-10-14T23:16:27.263274392+08:00",
+     "digest": "de878ce33ad81d06000"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "muse-glimmer:latest",
+     "size": 17578149805,
+     "size_vram": 17578149805,
+     "expires_at": "2026-10-14T23:17:08.985477763+08:00",
+     "digest": "de878ce33ad81d06000"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.6:latest",
+   "fingerprint": "7495ed65fbf1dbd5",
+   "resident_before": [
+    {
+     "name": "muse-glimmer:latest",
+     "size": 17578149805,
+     "size_vram": 17578149805,
+     "expires_at": "2026-10-14T23:17:08.985477763+08:00",
+     "digest": "de878ce33ad81d06000"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "supported",
+    "parallel_tools": "supported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "supported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_95cc343d1a4b4258",
+     "deployment": "ollama/qwen3.6:latest",
+     "ttft_ms": 8950,
+     "total_ms": 8953,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_ef94a9873d3a45ea",
+     "deployment": "ollama/qwen3.6:latest",
+     "ttft_ms": 1301,
+     "total_ms": 1304,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_bcc7ede9b15f49e8",
+     "deployment": "ollama/qwen3.6:latest",
+     "ttft_ms": null,
+     "total_ms": 2309,
+     "content_chunks": 0,
+     "content_chars": 0,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "length",
+     "error": null,
+     "content_preview": ""
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_04ba124bffc64c6a",
+     "deployment": "ollama/qwen3.6:latest",
+     "total_ms": 1531,
+     "usage": {
+      "prompt_tokens": 22,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 128,
+      "total_tokens": 150
+     },
+     "finish_reason": "length",
+     "tool_calls": [],
+     "content_preview": ""
+    },
+    {
+     "label": "tool_call_warm",
+     "request_id": "req_6c51ee3a6c8442af",
+     "deployment": "ollama/qwen3.6:latest",
+     "total_ms": 1672,
+     "usage": {
+      "prompt_tokens": 279,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 128,
+      "total_tokens": 407
+     },
+     "finish_reason": "length",
+     "tool_calls": [],
+     "content_preview": ""
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "qwen3.6:latest",
+     "size": 22851323165,
+     "size_vram": 22851323165,
+     "expires_at": "2026-10-14T23:17:18.215042717+08:00",
+     "digest": "096fdbd02fe620fc10c"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "qwen3.6:latest",
+     "size": 22851323165,
+     "size_vram": 22851323165,
+     "expires_at": "2026-10-14T23:17:25.153687137+08:00",
+     "digest": "096fdbd02fe620fc10c"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ]
+  },
+  {
+   "deployment": "ollama/gemma4:31b",
+   "fingerprint": "c2a3b30b88068a13",
+   "resident_before": [
+    {
+     "name": "qwen3.6:latest",
+     "size": 22851323165,
+     "size_vram": 22851323165,
+     "expires_at": "2026-10-14T23:17:25.153687137+08:00",
+     "digest": "096fdbd02fe620fc10c"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "supported",
+    "parallel_tools": "supported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "supported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_00296e915228497b",
+     "deployment": "ollama/gemma4:31b",
+     "ttft_ms": 12639,
+     "total_ms": 12743,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_9b3d68b73e83456c",
+     "deployment": "ollama/gemma4:31b",
+     "ttft_ms": 4540,
+     "total_ms": 4633,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_076b821078504a48",
+     "deployment": "ollama/gemma4:31b",
+     "ttft_ms": null,
+     "total_ms": 18320,
+     "content_chunks": 0,
+     "content_chars": 0,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "length",
+     "error": null,
+     "content_preview": ""
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_aa4f90e3d5d34eeb",
+     "deployment": "ollama/gemma4:31b",
+     "total_ms": 9764,
+     "usage": {
+      "prompt_tokens": 28,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 105,
+      "total_tokens": 133
+     },
+     "finish_reason": "stop",
+     "tool_calls": [],
+     "content_preview": "{\n  \"city\": \"Paris\",\n  \"country\": \"France\"\n}"
+    },
+    {
+     "label": "tool_call_warm",
+     "request_id": "req_199489f65a504d7c",
+     "deployment": "ollama/gemma4:31b",
+     "total_ms": 5318,
+     "usage": {
+      "prompt_tokens": 71,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 56,
+      "total_tokens": 127
+     },
+     "finish_reason": "tool_calls",
+     "tool_calls": [
+      "get_weather"
+     ],
+     "content_preview": ""
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "gemma4:31b",
+     "size": 22629119425,
+     "size_vram": 22629119425,
+     "expires_at": "2026-10-14T23:17:38.150605413+08:00",
+     "digest": "6316f0629137b426c9d"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "gemma4:31b",
+     "size": 22629119425,
+     "size_vram": 22629119425,
+     "expires_at": "2026-10-14T23:18:16.32655077+08:00",
+     "digest": "6316f0629137b426c9d"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.8:latest",
+   "fingerprint": "06621e3e0e6844f0",
+   "resident_before": [
+    {
+     "name": "gemma4:31b",
+     "size": 22629119425,
+     "size_vram": 22629119425,
+     "expires_at": "2026-10-14T23:18:16.32655077+08:00",
+     "digest": "6316f0629137b426c9d"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:11:46.457831781+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "supported",
+    "parallel_tools": "supported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "supported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_0c6e283066ce400b",
+     "deployment": "ollama/qwen3.8:latest",
+     "ttft_ms": 899,
+     "total_ms": 1016,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_ea4fe75cd8694d12",
+     "deployment": "ollama/qwen3.8:latest",
+     "ttft_ms": 899,
+     "total_ms": 1001,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_f856057bb1c44ece",
+     "deployment": "ollama/qwen3.8:latest",
+     "ttft_ms": 1549,
+     "total_ms": 5020,
+     "content_chunks": 101,
+     "content_chars": 155,
+     "chunks_per_s_after_first": 29.1,
+     "finish_reason": "length",
+     "error": null,
+     "content_preview": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 "
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_2cd9f7723627432c",
+     "deployment": "ollama/qwen3.8:latest",
+     "total_ms": 1642,
+     "usage": {
+      "prompt_tokens": 22,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 44,
+      "total_tokens": 66
+     },
+     "finish_reason": "stop",
+     "tool_calls": [],
+     "content_preview": "{\"city\": \"Paris\", \"country\": \"France\"}"
+    },
+    {
+     "label": "tool_call_warm",
+     "request_id": "req_ca52a2e3b3434968",
+     "deployment": "ollama/qwen3.8:latest",
+     "total_ms": 2459,
+     "usage": {
+      "prompt_tokens": 279,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 64,
+      "total_tokens": 343
+     },
+     "finish_reason": "tool_calls",
+     "tool_calls": [
+      "get_weather"
+     ],
+     "content_preview": ""
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:17.594661768+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    },
+    {
+     "name": "gemma4:31b",
+     "size": 22629119425,
+     "size_vram": 22629119425,
+     "expires_at": "2026-10-14T23:18:16.32655077+08:00",
+     "digest": "6316f0629137b426c9d"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    },
+    {
+     "name": "gemma4:31b",
+     "size": 22629119425,
+     "size_vram": 22629119425,
+     "expires_at": "2026-10-14T23:18:16.32655077+08:00",
+     "digest": "6316f0629137b426c9d"
+    }
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3-coder-next:latest",
+   "fingerprint": "3403278e77d95723",
+   "resident_before": [
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    },
+    {
+     "name": "gemma4:31b",
+     "size": 22629119425,
+     "size_vram": 22629119425,
+     "expires_at": "2026-10-14T23:18:16.32655077+08:00",
+     "digest": "6316f0629137b426c9d"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "supported",
+    "parallel_tools": "supported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "unsupported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_94f313fd8b594be5",
+     "deployment": "ollama/qwen3-coder-next:latest",
+     "ttft_ms": 12952,
+     "total_ms": 12982,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_4e39eec735844e71",
+     "deployment": "ollama/qwen3-coder-next:latest",
+     "ttft_ms": 122,
+     "total_ms": 142,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_84048409156e4abc",
+     "deployment": "ollama/qwen3-coder-next:latest",
+     "ttft_ms": 318,
+     "total_ms": 3019,
+     "content_chunks": 111,
+     "content_chars": 170,
+     "chunks_per_s_after_first": 41.3,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 "
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_19ac20ce70e64eb1",
+     "deployment": "ollama/qwen3-coder-next:latest",
+     "total_ms": 492,
+     "usage": {
+      "prompt_tokens": 20,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 17,
+      "total_tokens": 37
+     },
+     "finish_reason": "stop",
+     "tool_calls": [],
+     "content_preview": "{\n  \"city\": \"Paris\",\n  \"country\": \"France\"\n}"
+    },
+    {
+     "label": "tool_call_warm",
+     "request_id": "req_60f0ab1c1bf74cee",
+     "deployment": "ollama/qwen3-coder-next:latest",
+     "total_ms": 770,
+     "usage": {
+      "prompt_tokens": 289,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 22,
+      "total_tokens": 311
+     },
+     "finish_reason": "tool_calls",
+     "tool_calls": [
+      "get_weather"
+     ],
+     "content_preview": ""
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "qwen3-coder-next:latest",
+     "size": 55390932826,
+     "size_vram": 55390932826,
+     "expires_at": "2026-10-14T23:18:41.086440691+08:00",
+     "digest": "ca06e9e4087c714d443"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "qwen3-coder-next:latest",
+     "size": 55390932826,
+     "size_vram": 55390932826,
+     "expires_at": "2026-10-14T23:18:45.643636808+08:00",
+     "digest": "ca06e9e4087c714d443"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3-coder:latest",
+   "fingerprint": "4eacb9bbc87cccbf",
+   "resident_before": [
+    {
+     "name": "qwen3-coder-next:latest",
+     "size": 55390932826,
+     "size_vram": 55390932826,
+     "expires_at": "2026-10-14T23:18:45.643636808+08:00",
+     "digest": "ca06e9e4087c714d443"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "supported",
+    "parallel_tools": "supported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "unsupported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_4049078dc22e4b97",
+     "deployment": "ollama/qwen3-coder:latest",
+     "ttft_ms": 6718,
+     "total_ms": 6722,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_a3610cebb5f14722",
+     "deployment": "ollama/qwen3-coder:latest",
+     "ttft_ms": 93,
+     "total_ms": 113,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_6d3589adeaec41b2",
+     "deployment": "ollama/qwen3-coder:latest",
+     "ttft_ms": 267,
+     "total_ms": 2130,
+     "content_chunks": 111,
+     "content_chars": 170,
+     "chunks_per_s_after_first": 60.0,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 "
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_b0d4d191d0db4cb8",
+     "deployment": "ollama/qwen3-coder:latest",
+     "total_ms": 331,
+     "usage": {
+      "prompt_tokens": 20,
+      "prompt_tokens_details": {
+       "cached_tokens": 3
+      },
+      "completion_tokens": 17,
+      "total_tokens": 37
+     },
+     "finish_reason": "stop",
+     "tool_calls": [],
+     "content_preview": "{\n  \"city\": \"Paris\",\n  \"country\": \"France\"\n}"
+    },
+    {
+     "label": "tool_call_warm",
+     "request_id": "req_4a2da2bf21264403",
+     "deployment": "ollama/qwen3-coder:latest",
+     "total_ms": 469,
+     "usage": {
+      "prompt_tokens": 289,
+      "prompt_tokens_details": {
+       "cached_tokens": 1
+      },
+      "completion_tokens": 22,
+      "total_tokens": 311
+     },
+     "finish_reason": "tool_calls",
+     "tool_calls": [
+      "get_weather"
+     ],
+     "content_preview": ""
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "qwen3-coder:latest",
+     "size": 32149832990,
+     "size_vram": 32149832990,
+     "expires_at": "2026-10-14T23:18:52.629871334+08:00",
+     "digest": "06c1097efce0431c204"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "qwen3-coder:latest",
+     "size": 32149832990,
+     "size_vram": 32149832990,
+     "expires_at": "2026-10-14T23:18:55.785180851+08:00",
+     "digest": "06c1097efce0431c204"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.6-accurate:latest",
+   "fingerprint": "e972c9b803aecfc4",
+   "resident_before": [
+    {
+     "name": "qwen3-coder:latest",
+     "size": 32149832990,
+     "size_vram": 32149832990,
+     "expires_at": "2026-10-14T23:18:55.785180851+08:00",
+     "digest": "06c1097efce0431c204"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "supported",
+    "parallel_tools": "supported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "supported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_dfbff27b5c0f422e",
+     "deployment": "ollama/qwen3.6-accurate:latest",
+     "ttft_ms": 9091,
+     "total_ms": 9112,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_1481bfec11d54ac6",
+     "deployment": "ollama/qwen3.6-accurate:latest",
+     "ttft_ms": 1566,
+     "total_ms": 1589,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_37fc062436034c51",
+     "deployment": "ollama/qwen3.6-accurate:latest",
+     "ttft_ms": null,
+     "total_ms": 2817,
+     "content_chunks": 0,
+     "content_chars": 0,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "length",
+     "error": null,
+     "content_preview": ""
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_3954e1fd23e54f95",
+     "deployment": "ollama/qwen3.6-accurate:latest",
+     "total_ms": 1902,
+     "usage": {
+      "prompt_tokens": 72,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 128,
+      "total_tokens": 200
+     },
+     "finish_reason": "length",
+     "tool_calls": [],
+     "content_preview": ""
+    },
+    {
+     "label": "tool_call_warm",
+     "request_id": "req_45c1764df80042b1",
+     "deployment": "ollama/qwen3.6-accurate:latest",
+     "total_ms": 2003,
+     "usage": {
+      "prompt_tokens": 325,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 128,
+      "total_tokens": 453
+     },
+     "finish_reason": "length",
+     "tool_calls": [],
+     "content_preview": ""
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "qwen3.6-accurate:latest",
+     "size": 26172761045,
+     "size_vram": 26172761045,
+     "expires_at": "2026-10-14T23:19:05.171916265+08:00",
+     "digest": "6561b007fb01198bef1"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "qwen3.6-accurate:latest",
+     "size": 26172761045,
+     "size_vram": 26172761045,
+     "expires_at": "2026-10-14T23:19:13.630733761+08:00",
+     "digest": "6561b007fb01198bef1"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.6-fast:latest",
+   "fingerprint": "9274883c38d48361",
+   "resident_before": [
+    {
+     "name": "qwen3.6-accurate:latest",
+     "size": 26172761045,
+     "size_vram": 26172761045,
+     "expires_at": "2026-10-14T23:19:13.630733761+08:00",
+     "digest": "6561b007fb01198bef1"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "caps_from_probe": {
+    "streaming": "supported",
+    "tools": "unsupported",
+    "json_object": "supported",
+    "json_schema": "supported",
+    "vision": "supported"
+   },
+   "requests": [
+    {
+     "label": "chat_cold_or_current_state",
+     "request_id": "req_97f22619cc4a4b29",
+     "deployment": "ollama/qwen3.6-fast:latest",
+     "ttft_ms": 8829,
+     "total_ms": 8852,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "chat_warm",
+     "request_id": "req_f921d1ef7a104119",
+     "deployment": "ollama/qwen3.6-fast:latest",
+     "ttft_ms": 1609,
+     "total_ms": 1623,
+     "content_chunks": 1,
+     "content_chars": 5,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "stop",
+     "error": null,
+     "content_preview": "ready"
+    },
+    {
+     "label": "throughput_warm",
+     "request_id": "req_80ea8cc3bd5445ea",
+     "deployment": "ollama/qwen3.6-fast:latest",
+     "ttft_ms": null,
+     "total_ms": 2810,
+     "content_chunks": 0,
+     "content_chars": 0,
+     "chunks_per_s_after_first": null,
+     "finish_reason": "length",
+     "error": null,
+     "content_preview": ""
+    },
+    {
+     "label": "json_object_warm",
+     "request_id": "req_c192e8ba04104bd7",
+     "deployment": "ollama/qwen3.6-fast:latest",
+     "total_ms": 1860,
+     "usage": {
+      "prompt_tokens": 43,
+      "prompt_tokens_details": {
+       "cached_tokens": 0
+      },
+      "completion_tokens": 128,
+      "total_tokens": 171
+     },
+     "finish_reason": "length",
+     "tool_calls": [],
+     "content_preview": ""
+    },
+    {
+     "label": "tool_call_warm",
+     "skipped": "tools=unsupported per probe"
+    }
+   ],
+   "resident_after_first": [
+    {
+     "name": "qwen3.6-fast:latest",
+     "size": 24562148309,
+     "size_vram": 24562148309,
+     "expires_at": "2026-10-14T23:19:22.733650845+08:00",
+     "digest": "b6f8526faefe8b47eec"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ],
+   "resident_after": [
+    {
+     "name": "qwen3.6-fast:latest",
+     "size": 24562148309,
+     "size_vram": 24562148309,
+     "expires_at": "2026-10-14T23:19:29.156876496+08:00",
+     "digest": "b6f8526faefe8b47eec"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "size": 18488198429,
+     "size_vram": 18488198429,
+     "expires_at": "2026-10-14T23:18:27.842267873+08:00",
+     "digest": "aaee06c39dcf2437cde"
+    }
+   ]
+  }
+ ]
+}

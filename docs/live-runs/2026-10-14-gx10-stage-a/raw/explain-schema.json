@@ -1,0 +1,100 @@
+{
+  "request_id": "req_2386a3900f3e4063",
+  "created_at": 1791976033.3360589,
+  "config_hash": "c58ce04fa1ed9902",
+  "registry_version": 1,
+  "endpoint": "chat",
+  "requested_model": "auto",
+  "alias": "auto",
+  "explicit": false,
+  "profile": "quality",
+  "stream": false,
+  "requirements": {
+    "role": "generative",
+    "needs_tools": false,
+    "tool_choice_mode": "none",
+    "needs_parallel_tools": false,
+    "needs_json_schema": true,
+    "needs_json_object": false,
+    "needs_streaming": false,
+    "needs_vision": false,
+    "needs_audio": false,
+    "has_remote_image_url": false,
+    "needs_continuation": false,
+    "outstanding_tool_call_ids": [],
+    "is_tool_result_turn": false,
+    "tasks": {
+      "extraction": 0.8
+    },
+    "primary_task": "extraction",
+    "ambiguous": false,
+    "multilingual": false,
+    "languages": [
+      "en"
+    ],
+    "signals": [
+      "extraction:structured output requested"
+    ],
+    "tokens": {
+      "input_estimate": 55,
+      "output_allowance": 1024,
+      "reasoning_allowance": 2048,
+      "images": 0,
+      "method": "estimate:chars/3+overheads",
+      "total": 3127
+    }
+  },
+  "exclusions": {
+    "ollama/muse-glimmer:latest": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ],
+    "ollama/qwen3.6:latest": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ],
+    "ollama/gemma4:31b": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ],
+    "ollama/qwen3.8:latest": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ],
+    "ollama/qwen3-coder-next:latest": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ],
+    "ollama/qwen3-coder:latest": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ],
+    "ollama/qwen3.6-accurate:latest": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ],
+    "ollama/qwen3.6-fast:latest": [
+      "strict JSON schema output required; capability json_schema is unknown (treated conservatively as not eligible)"
+    ]
+  },
+  "remedies": [
+    "run `modelsaar probe ollama/gemma4:31b` to verify json_schema, or declare it in config under deployments[] overrides",
+    "run `modelsaar probe ollama/muse-glimmer:latest` to verify json_schema, or declare it in config under deployments[] overrides",
+    "run `modelsaar probe ollama/qwen3-coder-next:latest` to verify json_schema, or declare it in config under deployments[] overrides",
+    "run `modelsaar probe ollama/qwen3-coder:latest` to verify json_schema, or declare it in config under deployments[] overrides",
+    "run `modelsaar probe ollama/qwen3.6-accurate:latest` to verify json_schema, or declare it in config under deployments[] overrides",
+    "run `modelsaar probe ollama/qwen3.6-fast:latest` to verify json_schema, or declare it in config under deployments[] overrides",
+    "run `modelsaar probe ollama/qwen3.6:latest` to verify json_schema, or declare it in config under deployments[] overrides",
+    "run `modelsaar probe ollama/qwen3.8:latest` to verify json_schema, or declare it in config under deployments[] overrides"
+  ],
+  "candidates": [],
+  "chosen": null,
+  "evidence": "",
+  "classifier": {},
+  "affinity": {},
+  "reasons": [
+    "no deployment satisfies all hard requirements"
+  ],
+  "overhead_ms": 0.44,
+  "outcome": "no_eligible",
+  "outcome_detail": "",
+  "failover": [],
+  "failover_allowed": true,
+  "failover_note": "",
+  "translation_notes": [],
+  "requirements_note": "",
+  "compat": {}
+}

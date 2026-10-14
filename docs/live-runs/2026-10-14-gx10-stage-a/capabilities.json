@@ -1,0 +1,621 @@
+{
+ "generated_at": "2026-10-14T16:43+05:30",
+ "method": "modelsaar probe --all --timeout 180 through a Mac-local gateway (admission-coordinated, one deployment at a time; max_concurrent 1) at revision cf56cdd; backend GX10 Ollama 0.40.3 over Tailscale; probe order streaming, tools, parallel_tools, json_object, json_schema, vision, latency",
+ "duration_s": 382,
+ "deployments": [
+  {
+   "deployment": "ollama/muse-glimmer:latest",
+   "fingerprint": "31f1aafa7391ca95",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "supported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "supported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 18366,
+     "note": "events=144 content_chunks=9 reasoning_chunks=132 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "supported",
+     "latency_ms": 5448,
+     "note": "tool call with id and JSON args",
+     "uncertain": false
+    },
+    "parallel_tools": {
+     "value": "supported",
+     "latency_ms": 15659,
+     "note": "two distinct tool calls in one turn",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 12480,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 28562,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "unsupported",
+     "latency_ms": 39810,
+     "note": "image accepted but answer did not identify the colour ('white')",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 6921,
+    "p95_ms": 7577,
+    "ttft_ms": 7345,
+    "load_ms": 0,
+    "samples": 2
+   },
+   "resident_before_latency_probe": true,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.6:latest",
+   "fingerprint": "7495ed65fbf1dbd5",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "supported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "supported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 9737,
+     "note": "events=194 content_chunks=5 reasoning_chunks=186 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "supported",
+     "latency_ms": 1879,
+     "note": "tool call with id and JSON args",
+     "uncertain": false
+    },
+    "parallel_tools": {
+     "value": "supported",
+     "latency_ms": 6739,
+     "note": "two distinct tool calls in one turn",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 2848,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 9453,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "supported",
+     "latency_ms": 4677,
+     "note": "accepted a base64 image and identified its colour",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 1251,
+    "p95_ms": 3188,
+    "ttft_ms": 7154,
+    "load_ms": 0,
+    "samples": 2
+   },
+   "resident_before_latency_probe": true,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  },
+  {
+   "deployment": "ollama/gemma4:31b",
+   "fingerprint": "c2a3b30b88068a13",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "supported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "supported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 21403,
+     "note": "events=59 content_chunks=9 reasoning_chunks=47 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "supported",
+     "latency_ms": 5579,
+     "note": "tool call with id and JSON args",
+     "uncertain": false
+    },
+    "parallel_tools": {
+     "value": "supported",
+     "latency_ms": 8488,
+     "note": "two distinct tool calls in one turn",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 4808,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 13622,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "supported",
+     "latency_ms": 3795,
+     "note": "accepted a base64 image and identified its colour",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 4530,
+    "p95_ms": 4562,
+    "ttft_ms": 15120,
+    "load_ms": 0,
+    "samples": 2
+   },
+   "resident_before_latency_probe": true,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.8:latest",
+   "fingerprint": "06621e3e0e6844f0",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "supported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "supported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 8956,
+     "note": "events=32 content_chunks=5 reasoning_chunks=24 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "supported",
+     "latency_ms": 2121,
+     "note": "tool call with id and JSON args",
+     "uncertain": false
+    },
+    "parallel_tools": {
+     "value": "supported",
+     "latency_ms": 3190,
+     "note": "two distinct tool calls in one turn",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 1398,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 5560,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "supported",
+     "latency_ms": 3698,
+     "note": "accepted a base64 image and identified its colour",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 1054,
+    "p95_ms": 1054,
+    "ttft_ms": 7694,
+    "load_ms": 0,
+    "samples": 2
+   },
+   "resident_before_latency_probe": false,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3-coder-next:latest",
+   "fingerprint": "3403278e77d95723",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "tools"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "unsupported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "unsupported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 13036,
+     "note": "events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "supported",
+     "latency_ms": 889,
+     "note": "tool call with id and JSON args",
+     "uncertain": false
+    },
+    "parallel_tools": {
+     "value": "supported",
+     "latency_ms": 1241,
+     "note": "two distinct tool calls in one turn",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 389,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 2429,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "unsupported",
+     "latency_ms": 0,
+     "note": "skipped: backend metadata says vision unsupported",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 140,
+    "p95_ms": 2029,
+    "ttft_ms": 12876,
+    "load_ms": 0,
+    "samples": 2
+   },
+   "resident_before_latency_probe": true,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3-coder:latest",
+   "fingerprint": "4eacb9bbc87cccbf",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "tools"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "unsupported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "unsupported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 6887,
+     "note": "events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "supported",
+     "latency_ms": 481,
+     "note": "tool call with id and JSON args",
+     "uncertain": false
+    },
+    "parallel_tools": {
+     "value": "supported",
+     "latency_ms": 739,
+     "note": "two distinct tool calls in one turn",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 269,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 2330,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "unsupported",
+     "latency_ms": 0,
+     "note": "skipped: backend metadata says vision unsupported",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 101,
+    "p95_ms": 2038,
+    "ttft_ms": 6776,
+    "load_ms": 1937,
+    "samples": 2
+   },
+   "resident_before_latency_probe": false,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.6-accurate:latest",
+   "fingerprint": "e972c9b803aecfc4",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "supported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "supported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 10776,
+     "note": "events=149 content_chunks=5 reasoning_chunks=141 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "supported",
+     "latency_ms": 2367,
+     "note": "tool call with id and JSON args",
+     "uncertain": false
+    },
+    "parallel_tools": {
+     "value": "supported",
+     "latency_ms": 2231,
+     "note": "two distinct tool calls in one turn",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 2951,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 9358,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "supported",
+     "latency_ms": 2220,
+     "note": "accepted a base64 image and identified its colour",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 1607,
+    "p95_ms": 1643,
+    "ttft_ms": 8155,
+    "load_ms": 0,
+    "samples": 2
+   },
+   "resident_before_latency_probe": true,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  },
+  {
+   "deployment": "ollama/qwen3.6-fast:latest",
+   "fingerprint": "9274883c38d48361",
+   "declared_by_ollama_api_show": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "discovery_capabilities_before_probe": {
+    "tools": "supported (source_claim)",
+    "tool_choice_required": "unsupported (adapter)",
+    "parallel_tools": "unknown (none)",
+    "json_schema": "unknown (none)",
+    "json_object": "supported (adapter)",
+    "streaming": "supported (adapter)",
+    "vision": "supported (source_claim)",
+    "audio_in": "unsupported (source_claim)",
+    "thinking": "supported (source_claim)",
+    "continuation": "unknown (none)"
+   },
+   "measured_by_probe": {
+    "streaming": {
+     "value": "supported",
+     "latency_ms": 10147,
+     "note": "events=141 content_chunks=5 reasoning_chunks=133 done=True finish=stop usage=yes",
+     "uncertain": false
+    },
+    "tools": {
+     "value": "unsupported",
+     "latency_ms": 13746,
+     "note": "no tool_calls returned for an explicit tool request",
+     "uncertain": false
+    },
+    "json_object": {
+     "value": "supported",
+     "latency_ms": 3136,
+     "note": "",
+     "uncertain": false
+    },
+    "json_schema": {
+     "value": "supported",
+     "latency_ms": 8607,
+     "note": "schema-conformant object",
+     "uncertain": false
+    },
+    "vision": {
+     "value": "supported",
+     "latency_ms": 1492,
+     "note": "accepted a base64 image and identified its colour",
+     "uncertain": false
+    }
+   },
+   "probe_errors": [],
+   "probe_uncertain": false,
+   "probe_skipped": [],
+   "probe_latency_measurement": {
+    "p50_ms": 1561,
+    "p95_ms": 1596,
+    "ttft_ms": 7635,
+    "load_ms": 0,
+    "samples": 2
+   },
+   "resident_before_latency_probe": true,
+   "not_probed": [
+    "continuation",
+    "tool_choice_required",
+    "audio_in",
+    "thinking (declared only)",
+    "context assumptions (see deployments.json)"
+   ]
+  }
+ ]
+}
