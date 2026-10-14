@@ -199,10 +199,10 @@ activate_env() {  # point envs/current at $ENV_DIR atomically; keep the previous
   fi
 }
 
-install_into_env() {  # $1 = how ("venv" | "bootstrap")
+install_into_env() {  # $1 = how ("venv" | "bootstrap"); builds $ENV_DIR, does NOT activate it
   if env_complete; then
     say "existing installation of this commit reused: $ENV_DIR"
-    activate_env; return 0
+    ENV_REUSED=1; return 0
   fi
   if [ -d "$ENV_DIR" ]; then
     if [ -f "$MARKER" ]; then say "replacing the environment at $ENV_DIR (it was installed from a different source: $(cat "$MARKER"))"
@@ -228,15 +228,29 @@ install_into_env() {  # $1 = how ("venv" | "bootstrap")
   fi
   [ -x "$ENV_DIR/bin/modelsaar" ] && "$ENV_DIR/bin/modelsaar" --version >/dev/null 2>&1 || { rm -rf "$ENV_DIR"; die "the installed environment has no working 'modelsaar' command; it was removed."; }
   printf '%s\n' "$SPEC" > "$MARKER"
-  activate_env
 }
 
 # ---- 2. install ------------------------------------------------------------------------------------
+# Fresh installation or upgrade? An existing configuration means upgrade: init is never run again, the
+# configuration, keys, state, backend, listening address and port stay exactly as they are.
+if [ -f "$HOME_DIR/config.yaml" ]; then MODE="upgrade"; else MODE="fresh"; fi
+CFG_HASH_BEFORE="$(cat "$HOME_DIR/config.yaml" "$HOME_DIR/keys/api_keys" "$HOME_DIR/keys/admin_key" 2>/dev/null | sha256_of /dev/stdin 2>/dev/null || true)"
+# One installer at a time per runtime directory: two concurrent upgrades must not race on envs/current.
+mkdir -p "$(dirname "$RUNTIME")"
+LOCK="$RUNTIME.lock"   # sibling of the runtime directory; removed on exit, so nothing is left behind
+if ! mkdir "$LOCK" 2>/dev/null; then
+  other="$(cat "$LOCK/pid" 2>/dev/null)"
+  if [ -n "$other" ] && kill -0 "$other" 2>/dev/null; then die "another installer run (pid $other) is in progress for $RUNTIME; wait for it to finish"; fi
+  rm -rf "$LOCK"; mkdir "$LOCK" || die "cannot create $LOCK"
+fi
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
+say "mode: $MODE ($([ "$MODE" = upgrade ] && echo "existing configuration at $HOME_DIR/config.yaml is kept; init is not run" || echo "no configuration yet; init will run"))"
 METHOD="${MODELSAAR_METHOD:-}"
 if [ -z "$METHOD" ]; then
   if have uv; then METHOD="uv"; elif have pipx; then METHOD="pipx"; else METHOD="venv"; fi
 fi
-LAUNCHER_STATE=""
+LAUNCHER_STATE=""; ENV_REUSED=""; PREV_ENV=""; CFG_YAML=""
 case "$METHOD" in
   uv)
     say "installing with your uv (isolated tool environment; Python 3.12 is fetched by uv if needed)"
@@ -269,6 +283,21 @@ case "$METHOD" in
       bootstrap_uv
       install_into_env bootstrap
     fi
+    # Validate the replacement BEFORE it becomes current and before any service is touched: it must run and
+    # must accept the effective configuration (upgrade) — a replacement that cannot read the config is never activated.
+    "$ENV_DIR/bin/modelsaar" --version >/dev/null 2>&1 || die "the new environment's modelsaar does not run; nothing was activated"
+    if [ "$MODE" = upgrade ]; then
+      for sub in "config validate" "keys ensure"; do
+        # shellcheck disable=SC2086
+        MODELSAAR_HOME="$HOME_DIR" "$ENV_DIR/bin/modelsaar" $sub >/dev/null 2>"$ENV_DIR/.validate.err" \
+          || die "the new revision cannot work with the existing configuration ('modelsaar $sub' failed: $(head -c 300 "$ENV_DIR/.validate.err")); nothing was activated, the current installation is untouched"
+      done
+      CFG_YAML="$(MODELSAAR_HOME="$HOME_DIR" "$ENV_DIR/bin/modelsaar" config show 2>"$ENV_DIR/.validate.err" || true)"
+      printf '%s\n' "$CFG_YAML" | grep -q '^server:' || die "the new revision cannot read the existing configuration ('modelsaar config show' gave no server section: $(head -c 300 "$ENV_DIR/.validate.err")); nothing was activated, the current installation is untouched"
+      rm -f "$ENV_DIR/.validate.err"
+    fi
+    PREV_ENV="$(readlink "$ENVS/current" 2>/dev/null || true)"
+    activate_env
     BIN_DIR="$LAUNCHER_DIR" ;;
   *) die "MODELSAAR_METHOD must be uv, pipx, venv or bootstrap" ;;
 esac
@@ -291,7 +320,7 @@ fi
 
 # ---- 3. configure ------------------------------------------------------------------------------------
 export MODELSAAR_HOME="$HOME_DIR"
-if [ -f "$HOME_DIR/config.yaml" ]; then
+if [ "$MODE" = upgrade ]; then
   say "existing configuration kept: $HOME_DIR/config.yaml (keys and state untouched)"
   "$MS" keys ensure >/dev/null
 else
@@ -307,78 +336,206 @@ Start your backend (e.g. 'ollama serve' and 'ollama pull <model>') and run this 
     fi
   fi
 fi
-
-# ---- 4. verify ---------------------------------------------------------------------------------------
-GW_PORT="$("$MS" config show 2>/dev/null | awk '/^server:/{s=1} s && /^  port:/{print $2; exit}')"
-GW_PORT="${GW_PORT:-$PORT}"
-GW_URL="http://127.0.0.1:${GW_PORT}"
-CHECK_RC=0
-if [ "${MODELSAAR_NO_CHECK:-0}" = "1" ]; then
-  say "verification skipped (MODELSAAR_NO_CHECK=1)"
+# Effective listening address, read from the configuration through the application itself (never guessed).
+[ -n "${CFG_YAML:-}" ] || CFG_YAML="$("$MS" config show 2>/dev/null || true)"
+GW_HOST="$(printf '%s\n' "$CFG_YAML" | awk '/^server:/{s=1} s && /^  host:/{print $2; exit}' | tr -d "'\"")"
+GW_PORT="$(printf '%s\n' "$CFG_YAML" | awk '/^server:/{s=1} s && /^  port:/{print $2; exit}')"
+GW_HOST="${GW_HOST:-127.0.0.1}"; GW_PORT="${GW_PORT:-$PORT}"
+case "$GW_HOST" in
+  0.0.0.0|"::"|"[::]") CHECK_HOST="127.0.0.1"; GW_URL="http://$GW_HOST:$GW_PORT"; EXPOSURE="all interfaces (server.host=$GW_HOST); reachable from your network as configured" ;;
+  127.0.0.1|localhost|"::1") CHECK_HOST="$GW_HOST"; GW_URL="http://$GW_HOST:$GW_PORT"; EXPOSURE="loopback only; see modelsaar.com/privacy to expose it deliberately" ;;
+  *) CHECK_HOST="$GW_HOST"; GW_URL="http://$GW_HOST:$GW_PORT"; EXPOSURE="bound to $GW_HOST as configured" ;;
+esac
+CHECK_URL="http://$CHECK_HOST:$GW_PORT"
+CFG_HASH_AFTER="$(cat "$HOME_DIR/config.yaml" "$HOME_DIR/keys/api_keys" "$HOME_DIR/keys/admin_key" 2>/dev/null | sha256_of /dev/stdin 2>/dev/null || true)"
+if [ "$MODE" = upgrade ]; then
+  [ "$CFG_HASH_BEFORE" = "$CFG_HASH_AFTER" ] && CFG_STATE="preserved (config.yaml and keys byte-identical)" || CFG_STATE="CHANGED — unexpected; inspect $HOME_DIR"
 else
-  # Identify what listens on the port BEFORE anything is sent to it. Only the ModelSaar health
-  # contract (unauthenticated GET /healthz returning JSON with "service":"modelsaar") counts as a
-  # gateway; any other listener is a port collision. This is collision detection, not authentication.
-  HEALTH="$(curl -sS -m 3 -o - -w '\n%{http_code}' -H 'Accept: application/json' "$GW_URL/healthz" 2>/dev/null || true)"
-  HEALTH_CODE="$(printf '%s' "$HEALTH" | tail -n 1)"
-  HEALTH_BODY="$(printf '%s' "$HEALTH" | sed '$d')"
-  if [ "$HEALTH_CODE" = "200" ] && printf '%s' "$HEALTH_BODY" | grep -q '"service"[[:space:]]*:[[:space:]]*"modelsaar"'; then
-    say "a ModelSaar gateway is already listening on $GW_URL (identified by its health contract); using it for the check"
-    STARTED=""
-  elif [ -n "$HEALTH_CODE" ] && [ "$HEALTH_CODE" != "000" ]; then
-    die "port $GW_PORT is in use by something that is not a ModelSaar gateway (GET $GW_URL/healthz answered HTTP $HEALTH_CODE without the ModelSaar health contract). Nothing was sent to it. Choose another port: MODELSAAR_PORT=8585 sh install.sh (new config), or edit server.port in $HOME_DIR/config.yaml"
-  elif (command -v nc >/dev/null 2>&1 && nc -z 127.0.0.1 "$GW_PORT" 2>/dev/null); then
-    die "port $GW_PORT is in use by something that is not a ModelSaar gateway. Choose another port: MODELSAAR_PORT=8585 sh install.sh (new config), or edit server.port in $HOME_DIR/config.yaml"
-  else
-    say "starting a temporary gateway on $GW_URL for the check …"
-    "$MS" serve >"$HOME_DIR/install-check.log" 2>&1 &
-    STARTED=$!
-    i=0
-    until curl -fsS -m 2 "$GW_URL/healthz" 2>/dev/null | grep -q '"service"[[:space:]]*:[[:space:]]*"modelsaar"'; do
-      i=$((i+1)); if [ "$i" -gt 40 ]; then kill "$STARTED" 2>/dev/null; die "gateway did not start; see $HOME_DIR/install-check.log"; fi
-      sleep 0.5
-    done
-  fi
-  say ""
-  # `modelsaar test` re-identifies the gateway, sends the key only to it, and succeeds only when the
-  # response carries ModelSaar routing attribution (request id + deployment) for the `auto` request.
-  if "$MS" test --model auto; then
-    RESULT="OK — 'auto' was routed by ModelSaar to the deployment shown above (request id printed)"
-  else
-    RESULT="FAILED — the check did not pass (see the message above: no deployment qualified, the backend is unavailable, or the listener is not a ModelSaar gateway); '$CMD doctor' explains the remedies"
-    CHECK_RC=2
-  fi
-  if [ -n "${STARTED:-}" ]; then kill "$STARTED" 2>/dev/null || true; wait "$STARTED" 2>/dev/null || true; say "temporary gateway stopped"; fi
-  say ""
-  say "verification: $RESULT"
+  CFG_STATE="created by init ($HOME_DIR/config.yaml, keys mode 600)"
 fi
 
-# ---- 5. next steps -------------------------------------------------------------------------------------
-say ""
-say "Package installed:  yes ($("$MS" --version) via $METHOD at $MS)"
-say "Configuration:      ready ($HOME_DIR/config.yaml)"
-if [ "${MODELSAAR_NO_CHECK:-0}" = "1" ]; then say "Routing check:      skipped"; elif [ "$CHECK_RC" -eq 0 ]; then say "Routing check:      passed"; else say "Routing check:      FAILED (exit code 2; the package and configuration are in place)"; fi
-say ""
-say "Gateway address:  ${GW_URL}/v1       (loopback only; see modelsaar.com/privacy to expose it deliberately)"
-say "API key:          head -1 $HOME_DIR/keys/api_keys"
-say "Config:           $HOME_DIR/config.yaml"
-say ""
-say "Next:"
-say "  1. run the gateway:        $CMD serve        (keep it running; examples/ has launchd and systemd units)"
-say "                             (init has already run; do not run '$CMD init' again — it keeps your existing config)"
-say "  2. check it:               $CMD test         (in another terminal)"
-say "  3. connect an app, one command per app:"
-say "       $CMD client-config open-webui     $CMD client-config opencode   (or opencode-v2)"
-say "       $CMD client-config openclaw       $CMD client-config hermes"
-say "     or set Base URL ${GW_URL}/v1, model 'auto', and the API key in any OpenAI-compatible app:"
-say "     run 'head -1 $HOME_DIR/keys/api_keys' and paste the printed msk_… line into the key field"
-say "  verify capabilities once:  $CMD probe --all  (while the gateway runs; uses your backend's compute)"
-say "  diagnose:                  $CMD doctor · $CMD decisions · $CMD explain -m \"…\""
-case "$METHOD" in
-  uv)   say "  uninstall:                 $CMD uninstall; then: uv tool uninstall modelsaar" ;;
-  pipx) say "  uninstall:                 $CMD uninstall; then: pipx uninstall modelsaar" ;;
-  *)    say "  uninstall:                 $CMD uninstall; then remove the installer's own files: rm -rf $RUNTIME"
-        [ "$LAUNCHER_STATE" = "linked" ] && say "                             and the launcher link: rm $LAUNCHER_DIR/modelsaar   (nothing else is touched)" ;;
+# ---- 4. service -----------------------------------------------------------------------------------------
+# A Linux user unit named modelsaar.service is controlled ONLY when it demonstrably belongs to this installation
+# (its ExecStart resolves into this installer's runtime directory or to the installed executable) AND it uses this
+# configuration (MODELSAAR_HOME / --config, or the default home). Anything else is reported, never restarted.
+SVC="modelsaar.service"; SVC_STATE="unsupported"; SVC_REASON=""; SVC_PID=""; RUNNING_ENV=""
+svc_prop() { systemctl --user show "$SVC" -p "$1" --value 2>/dev/null; }
+is_ours_path() {  # does $1 (an executable path) run THIS installation?
+  [ -n "$1" ] || return 1
+  rp="$(cd "$(dirname "$1")" 2>/dev/null && pwd -P)/$(basename "$1")"
+  case "$1" in "$RUNTIME"/*) return 0 ;; esac
+  case "$rp" in "$RUNTIME"/*|"$(cd "$(dirname "$MS")" && pwd -P)/modelsaar") return 0 ;; esac
+  [ -L "$1" ] && case "$(readlink "$1")" in "$RUNTIME"/*|"$MS") return 0 ;; esac
+  return 1
+}
+svc_detect() {
+  [ "$OS" = Linux ] || { SVC_REASON="service management is only implemented for Linux user units (systemd); on $PLATFORM restart your gateway yourself"; return 0; }
+  have systemctl || { SVC_REASON="systemctl not found"; return 0; }
+  systemctl --user show-environment >/dev/null 2>&1 || { SVC_REASON="no systemd user manager reachable for this user (systemctl --user)"; return 0; }
+  if [ "$(svc_prop LoadState)" != "loaded" ]; then SVC_STATE="none"; return 0; fi
+  frag="$(svc_prop FragmentPath)"; execs="$(svc_prop ExecStart)"
+  exe="$(printf '%s' "$execs" | sed -n 's/.*path=\([^ ;]*\).*/\1/p' | head -1)"
+  argv="$(printf '%s' "$execs" | sed -n 's/.*argv\[\]=\([^;]*\);.*/\1/p' | head -1)"
+  envs_="$(svc_prop Environment)"
+  svc_home="$(printf '%s' "$envs_" | tr ' ' '\n' | sed -n 's/^MODELSAAR_HOME=//p' | head -1)"
+  cfgarg="$(printf '%s' "$argv" | sed -n 's/.*--config[= ]\([^ ]*\).*/\1/p')"
+  [ -n "$cfgarg" ] && svc_home="$(dirname "$cfgarg")"
+  svc_home="${svc_home:-$HOME/.modelsaar}"
+  if ! is_ours_path "$exe"; then SVC_STATE="foreign"; SVC_REASON="$SVC ($frag) starts '$exe', which is not this installation; not touched"; return 0; fi
+  if [ "$(cd "$svc_home" 2>/dev/null && pwd -P)" != "$(cd "$HOME_DIR" && pwd -P)" ]; then SVC_STATE="foreign"; SVC_REASON="$SVC uses configuration $svc_home, not $HOME_DIR; not touched"; return 0; fi
+  case "$(svc_prop ActiveState)" in
+    active|activating|reloading) SVC_STATE="active" ;;
+    failed) SVC_STATE="failed" ;;
+    *) SVC_STATE="inactive" ;;
+  esac
+  SVC_PID="$(svc_prop MainPID)"
+}
+running_env() {  # which environment does the service's main process execute from? (Linux: mapped files)
+  [ -n "$1" ] && [ "$1" != 0 ] && [ -r "/proc/$1/maps" ] || { echo ""; return 0; }
+  grep -o "$RUNTIME/envs/[0-9a-f]\{40\}" "/proc/$1/maps" 2>/dev/null | sort -u | head -1
+}
+healthy() { curl -fsS -m 3 -H 'Accept: application/json' "$1/healthz" 2>/dev/null | grep -q '"service"[[:space:]]*:[[:space:]]*"modelsaar"'; }
+wait_ready() {  # url seconds [service]  — bounded; a service that has already failed is not waited for
+  i=0
+  until healthy "$1"; do
+    i=$((i+1)); [ "$i" -gt "$(( $2 * 2 ))" ] && return 1
+    if [ -n "${3:-}" ] && [ $(( i % 4 )) -eq 0 ] && [ "$(svc_prop ActiveState)" = failed ]; then return 1; fi
+    if [ $(( i % 10 )) -eq 0 ]; then say "Waiting for service… ($(( i / 2 ))s)"; fi
+    sleep 0.5
+  done
+  return 0
+}
+svc_detect
+SERVICE_RESULT=""; ROLLED_BACK=""
+case "$SVC_STATE" in
+  active)
+    if [ -n "$ENV_REUSED" ] && [ "$(running_env "$SVC_PID")" = "$ENV_DIR" ]; then
+      RUNNING_ENV="$ENV_DIR"; SERVICE_RESULT="ok"
+      say "managed service: $SVC is active (pid $SVC_PID) and already runs this revision; not restarted"
+    else
+    say "managed service: $SVC is active (pid $SVC_PID) and belongs to this installation; restarting it on the new environment"
+    if ! systemctl --user restart "$SVC" 2>"$RUNTIME/.restart.err"; then
+      SERVICE_RESULT="restart command failed: $(head -c 200 "$RUNTIME/.restart.err")"
+    fi
+    rm -f "$RUNTIME/.restart.err"
+    if [ -z "$SERVICE_RESULT" ] && ! wait_ready "$CHECK_URL" 60 svc; then
+      SERVICE_RESULT="did not become ready after restart ($(svc_prop ActiveState)/$(svc_prop SubState) within 60s)"
+    fi
+    if [ -z "$SERVICE_RESULT" ]; then
+      SVC_PID="$(svc_prop MainPID)"; RUNNING_ENV="$(running_env "$SVC_PID")"
+      case "$METHOD" in
+        venv|bootstrap)
+          if [ "$RUNNING_ENV" = "$ENV_DIR" ]; then SERVICE_RESULT="ok"
+          elif [ -z "$RUNNING_ENV" ]; then SERVICE_RESULT="restarted and ready, but its revision could not be read from /proc/$SVC_PID/maps"
+          else SERVICE_RESULT="restarted, but it runs $(basename "$RUNNING_ENV") — its ExecStart points at a fixed environment path; point it at $LAUNCHER_DIR/modelsaar or $ENVS/current/bin/modelsaar and restart"; fi ;;
+        *) SERVICE_RESULT="ok" ;;
+      esac
+    fi
+    if [ "$SERVICE_RESULT" != "ok" ] && [ -n "$PREV_ENV" ] && [ "$PREV_ENV" != "$ENV_NAME" ] && [ -d "$ENVS/$PREV_ENV" ] && [ "$RUNNING_ENV" != "$ENV_DIR" ]; then
+      # The replacement did not come up: restore the previous environment and the running service.
+      say "replacement did not start cleanly ($SERVICE_RESULT); restoring the previous environment $PREV_ENV"
+      journalctl --user -u "$SVC" -n 20 --no-pager 2>/dev/null | sed 's/^/    journal: /' | tail -n 20
+      mv -f "$MARKER" "$ENV_DIR/.modelsaar-failed" 2>/dev/null
+      ENV_NAME_SAVE="$ENV_NAME"; ENV_NAME="$PREV_ENV"; ENV_DIR_SAVE="$ENV_DIR"; ENV_DIR="$ENVS/$PREV_ENV"
+      replace_link "$PREV_ENV" "$ENVS/current" || true
+      ENV_NAME="$ENV_NAME_SAVE"; ENV_DIR="$ENV_DIR_SAVE"
+      systemctl --user restart "$SVC" 2>/dev/null || true
+      if wait_ready "$CHECK_URL" 60 svc; then ROLLED_BACK="restored $PREV_ENV; $SVC is active again on the previous revision"
+      else ROLLED_BACK="restored $PREV_ENV but $SVC is still not ready; see: journalctl --user -u $SVC"; fi
+    fi
+    fi ;;
+  inactive|failed)
+    say "managed service: $SVC belongs to this installation but is $SVC_STATE; left as it is (not started)"
+    SERVICE_RESULT="$SVC_STATE (not started; start it with: systemctl --user start $SVC)" ;;
+  foreign) say "note: $SVC_REASON"; SERVICE_RESULT="not managed by this installer: $SVC_REASON" ;;
+  none) SERVICE_RESULT="none (no modelsaar.service user unit)" ;;
+  unsupported) SERVICE_RESULT="$SVC_REASON" ;;
 esac
-[ -n "${PATH_NOTE:-}" ] && say "" && say "note: $PATH_NOTE"
+
+# ---- 5. verify ---------------------------------------------------------------------------------------
+CHECK_RC=0; ROUTING="not run"
+if [ "${MODELSAAR_NO_CHECK:-0}" = "1" ]; then
+  ROUTING="skipped (MODELSAAR_NO_CHECK=1)"
+elif [ -n "$ROLLED_BACK" ]; then
+  ROUTING="skipped (replacement rolled back)"
+else
+  # Identify what listens at the effective address BEFORE anything is sent to it. Only the ModelSaar health
+  # contract (unauthenticated GET /healthz returning JSON with "service":"modelsaar") counts as a gateway;
+  # any other listener is a port collision. This is collision detection, not authentication.
+  HEALTH="$(curl -sS -m 3 -o - -w '\n%{http_code}' -H 'Accept: application/json' "$CHECK_URL/healthz" 2>/dev/null || true)"
+  HEALTH_CODE="$(printf '%s' "$HEALTH" | tail -n 1)"
+  HEALTH_BODY="$(printf '%s' "$HEALTH" | sed '$d')"
+  STARTED=""
+  if [ "$HEALTH_CODE" = "200" ] && printf '%s' "$HEALTH_BODY" | grep -q '"service"[[:space:]]*:[[:space:]]*"modelsaar"'; then
+    if [ "$SVC_STATE" = active ] && [ "$SERVICE_RESULT" = ok ]; then
+      say "checking the restarted service at $CHECK_URL"
+    elif [ "$SVC_STATE" = foreign ] || { [ "$SVC_STATE" = active ] && [ "$SERVICE_RESULT" != ok ]; }; then
+      say "a ModelSaar gateway is listening at $CHECK_URL but it was NOT restarted by this run; checking it anyway (it runs the previous code until you restart it)"
+    else
+      say "a ModelSaar gateway is already listening at $CHECK_URL (identified by its health contract); using it for the check"
+    fi
+  elif [ -n "$HEALTH_CODE" ] && [ "$HEALTH_CODE" != "000" ]; then
+    die "port $GW_PORT is in use by something that is not a ModelSaar gateway (GET $CHECK_URL/healthz answered HTTP $HEALTH_CODE without the ModelSaar health contract). Nothing was sent to it. Choose another port: MODELSAAR_PORT=8585 sh install.sh (new config), or edit server.port in $HOME_DIR/config.yaml"
+  elif (command -v nc >/dev/null 2>&1 && nc -z "$CHECK_HOST" "$GW_PORT" 2>/dev/null); then
+    die "port $GW_PORT is in use by something that is not a ModelSaar gateway. Choose another port: MODELSAAR_PORT=8585 sh install.sh (new config), or edit server.port in $HOME_DIR/config.yaml"
+  else
+    say "starting a temporary gateway at $GW_URL for the check …"
+    "$MS" serve >"$HOME_DIR/install-check.log" 2>&1 &
+    STARTED=$!
+    if ! wait_ready "$CHECK_URL" 20; then kill "$STARTED" 2>/dev/null; die "gateway did not start; see $HOME_DIR/install-check.log"; fi
+  fi
+  say ""
+  # `modelsaar test` re-identifies the gateway at the configured address, sends the key only to it, and succeeds
+  # only when the response carries ModelSaar routing attribution (request id + deployment) for the `auto` request.
+  if "$MS" test --model auto; then
+    ROUTING="passed — 'auto' was routed to the deployment shown above (request id printed)"
+    say ""; say "verification: OK — 'auto' was routed by ModelSaar to the deployment shown above (request id printed)"
+  else
+    # The gateway answered its health contract; a failed routed request means the backend/model side is unavailable
+    # or no deployment qualified — that is not a broken gateway upgrade and nothing is rolled back.
+    ROUTING="FAILED — gateway is up but the routed request did not pass (backend/model unavailable or no eligible deployment; '$CMD doctor' explains); exit code 2"
+    CHECK_RC=2
+    say ""; say "verification: FAILED — the gateway answered its health contract but the routed request did not pass; this is a backend/model problem, not a broken gateway (nothing is rolled back)"
+  fi
+  if [ -n "${STARTED:-}" ]; then kill "$STARTED" 2>/dev/null || true; wait "$STARTED" 2>/dev/null || true; say "temporary gateway stopped"; fi
+fi
+[ -n "$ROLLED_BACK" ] && CHECK_RC=3
+case "$SVC_STATE:$SERVICE_RESULT" in active:ok|none:*|unsupported:*|inactive:*|failed:*|foreign:*) ;; *) [ "$CHECK_RC" -eq 0 ] && CHECK_RC=3 ;; esac
+
+# ---- 6. result ---------------------------------------------------------------------------------------
+say ""
+say "ModelSaar — $MODE $([ "$CHECK_RC" -eq 0 ] && echo complete || echo "finished with issues (exit $CHECK_RC)")"
+if [ -n "$ROLLED_BACK" ]; then say "Installed revision:  $REF could not start and is NOT active; $ENVS/current -> $(readlink "$ENVS/current" 2>/dev/null) (previous revision)"
+else case "$METHOD" in venv|bootstrap) say "Installed revision:  $REF ($ENVS/current -> $(readlink "$ENVS/current" 2>/dev/null))" ;; *) say "Installed revision:  $REF via $METHOD ($MS)" ;; esac; fi
+if [ -n "$RUNNING_ENV" ]; then say "Running revision:    $(basename "$RUNNING_ENV") (service pid $SVC_PID, read from its mapped files)"
+elif [ "$SVC_STATE" = active ] && [ "$SERVICE_RESULT" = ok ]; then say "Running revision:    restarted on the freshly installed $METHOD environment (pid $(svc_prop MainPID))"; fi
+say "Service:             $SERVICE_RESULT"
+[ -n "$ROLLED_BACK" ] && say "Rollback:            $ROLLED_BACK"
+say "Endpoint:            $GW_URL/v1   ($EXPOSURE)"
+say "Configuration/keys:  $CFG_STATE"
+say "Routing check:       $ROUTING"
+say ""
+say "API key:   head -1 $HOME_DIR/keys/api_keys    (paste the printed msk_… line into your app; model 'auto')"
+NEED=""
+if [ "$SVC_STATE" = active ] && [ "$SERVICE_RESULT" = ok ]; then
+  say "Next:      the gateway is running under $SVC; connect an app: $CMD client-config open-webui | opencode | opencode-v2 | openclaw | hermes"
+elif [ "$SVC_STATE" = inactive ] || [ "$SVC_STATE" = failed ]; then
+  NEED="start the service when you want it: systemctl --user start $SVC"
+elif [ -n "$ROLLED_BACK" ]; then
+  NEED="the new revision did not start, so it was not kept active; look at: journalctl --user -u $SVC -n 50, then run this installer again (the previous revision keeps serving meanwhile)"
+elif [ "$SVC_STATE" = foreign ] || { [ "$SVC_STATE" = active ] && [ "$SERVICE_RESULT" != ok ]; }; then
+  NEED="restart your gateway yourself so it runs the new revision ($SERVICE_RESULT)"
+else
+  say "Next:      run the gateway:  $CMD serve   (keep it running; examples/ has launchd and systemd units)"
+  say "           check it:        $CMD test     (in another terminal)"
+  say "           connect an app:  $CMD client-config open-webui | opencode | opencode-v2 | openclaw | hermes"
+fi
+[ "$CHECK_RC" -eq 2 ] && NEED="${NEED:+$NEED; }fix the backend/model side, then: $CMD test"
+[ -n "$NEED" ] && say "Still required:      $NEED"
+case "$METHOD" in
+  uv)   say "Uninstall: $CMD uninstall; then: uv tool uninstall modelsaar" ;;
+  pipx) say "Uninstall: $CMD uninstall; then: pipx uninstall modelsaar" ;;
+  *)    say "Uninstall: $CMD uninstall; then rm -rf $RUNTIME$([ "$LAUNCHER_STATE" = linked ] && echo " and rm $LAUNCHER_DIR/modelsaar")" ;;
+esac
+[ -n "${PATH_NOTE:-}" ] && say "note: $PATH_NOTE"
 exit "$CHECK_RC"
