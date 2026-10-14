@@ -310,7 +310,9 @@ def test_sandbox_blocks_writes_outside_work(tmp_path):
 # `--network none` give ``OSError: [Errno 101] Network is unreachable``; macOS ``sandbox-exec`` with
 # ``(deny network*)`` gives ``PermissionError: [Errno 1] Operation not permitted``; a black-holed route
 # gives ``TimeoutError``. All of them mean "blocked"; a completed connection means "not blocked".
-_NETWORK_BLOCKED_EXCEPTIONS = ("OSError", "PermissionError", "ConnectionRefusedError", "TimeoutError")
+# ``ConnectionRefusedError`` is deliberately NOT accepted: a refusal means a peer answered, i.e. the
+# network was reachable — it is evidence against isolation, not for it.
+_NETWORK_BLOCKED_EXCEPTIONS = ("OSError", "PermissionError", "TimeoutError")
 
 
 def _network_attempt_blocked(rec: dict | None) -> bool:
@@ -419,6 +421,8 @@ def test_sandbox_negative_control_network_success_is_not_classified_as_blocked(t
     assert _network_attempt_blocked({"model_ran": False, "harness_completed": False, "error": "model code raised OSError: [Errno 101] Network is unreachable"})
     assert not _network_attempt_blocked({"model_ran": True, "harness_completed": True, "error": None})
     assert not _network_attempt_blocked({"model_ran": False, "harness_completed": False, "error": "model code raised ValueError: nope"})
+    # a refused connection proves a peer answered: reachable network, never isolation
+    assert not _network_attempt_blocked({"model_ran": False, "harness_completed": False, "error": "model code raised ConnectionRefusedError: [Errno 61] Connection refused"})
 
 
 @needs_sandbox
