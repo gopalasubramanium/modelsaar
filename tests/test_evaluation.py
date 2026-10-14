@@ -325,53 +325,96 @@ def _network_attempt_blocked(rec: dict | None) -> bool:
     return any(f"raised {name}:" in err for name in _NETWORK_BLOCKED_EXCEPTIONS) or "unreachable" in low or "timed out" in low
 
 
+class _LoopbackListener:
+    """A TCP listener on 127.0.0.1 with a dynamically allocated port that counts accepted connections.
+    Used as the controlled target for both the unsandboxed and the sandboxed connection attempts, so the
+    verdict never depends on external-network availability."""
+
+    def __init__(self) -> None:
+        import socket
+        import threading
+
+        self.sock = socket.socket()
+        self.sock.bind(("127.0.0.1", 0))
+        self.sock.listen(4)
+        self.sock.settimeout(0.2)
+        self.port = self.sock.getsockname()[1]
+        self.accepted = 0
+        self._stop = False
+        self._thread = threading.Thread(target=self._serve, daemon=True)
+        self._thread.start()
+
+    def _serve(self) -> None:
+
+        while not self._stop:
+            try:
+                conn, _ = self.sock.accept()
+            except TimeoutError:
+                continue
+            except OSError:
+                return
+            self.accepted += 1
+            conn.close()
+
+    def close(self) -> None:
+        self._stop = True
+        self._thread.join(2)
+        self.sock.close()
+
+    def connect_code(self) -> str:
+        return f"import socket\ns = socket.create_connection(('127.0.0.1', {self.port}), timeout=3)\ns.close()\nprint('connected')\n"
+
+
+def _run_unsandboxed(code: str, harness: str, workdir: Path) -> dict | None:
+    """Run the SAME runner program the sandbox executes (``sandbox._program``), but directly with this
+    interpreter and no isolation. Used only by the tests as the control arm."""
+    prog = workdir / "prog.py"
+    prog.write_text(sandbox._program(code, harness), encoding="utf-8")
+    nonce = "control-" + "0" * 24
+    p = subprocess.run([sys.executable, "-I", str(prog)], input=nonce + "\n", capture_output=True, text=True, timeout=30, cwd=workdir)
+    return sandbox.parse_result(p.stdout, nonce)
+
+
 @needs_sandbox
-def test_sandbox_blocks_network():
-    code = "import socket\ns = socket.create_connection(('1.1.1.1', 80), timeout=3)\nprint('connected')\n"
-    out, err, rc, backend = sandbox.run(code, "print('harness ran')", 15.0)
-    rec = sandbox.parse_result(out, sandbox.run.last_nonce)
-    assert "connected" not in out, (out, err, rc)
-    assert rec is not None and not rec["model_ran"] and not rec["harness_completed"], rec
-    assert _network_attempt_blocked(rec), (backend, rec["error"])
+def test_sandbox_blocks_network(tmp_path):
+    """Controlled-listener proof of network isolation. One loopback listener on a dynamic port:
+    (a) the runner program connects to it WITHOUT the sandbox (the listener counts the connection), so the
+    program and the listener are known to work; (b) the identical program through ``sandbox.run()`` must
+    NOT reach the listener, the model code must not complete, the harness must not run, and the recorded
+    error must be a network-denial/isolation error. An unreachable external host cannot make this pass."""
+    listener = _LoopbackListener()
+    try:
+        code = listener.connect_code()
+        control = _run_unsandboxed(code, "print('harness ran')", tmp_path)
+        assert listener.accepted == 1, f"control arm: the listener saw {listener.accepted} connection(s), expected exactly 1"
+        assert control is not None and control["model_ran"] and control["harness_completed"] and not control["error"], control
+        before = listener.accepted
+        out, err, rc, backend = sandbox.run(code, "print('harness ran')", 15.0)
+        rec = sandbox.parse_result(out, sandbox.run.last_nonce)
+        assert backend == BACKEND
+        assert listener.accepted == before, f"sandbox {backend} let model code reach the loopback listener ({listener.accepted - before} connection(s))"
+        assert "connected" not in out, (out, err, rc)
+        assert rec is not None, (out[-400:], err[-400:], rc)
+        assert not rec["model_ran"] and not rec["harness_completed"], rec
+        assert _network_attempt_blocked(rec), (backend, rec["error"])
+    finally:
+        listener.close()
 
 
 def test_sandbox_negative_control_network_success_is_not_classified_as_blocked(tmp_path):
-    """Negative control for the test above: the same runner program, executed WITHOUT the sandbox against
-    a loopback listener this test owns, completes its connection; the record then shows the model code ran
-    and the harness completed, and the blocked-classification must reject it. Proves the positive test
-    cannot pass merely because the record exists or because an error string looks vaguely network-like."""
-    import socket
-    import subprocess
-    import threading
-
-    srv = socket.socket()
-    srv.bind(("127.0.0.1", 0))
-    srv.listen(1)
-    port = srv.getsockname()[1]
-    accepted: list[bool] = []
-
-    def _accept() -> None:
-        try:
-            conn, _ = srv.accept()
-            accepted.append(True)
-            conn.close()
-        except OSError:
-            pass
-
-    t = threading.Thread(target=_accept, daemon=True)
-    t.start()
-    code = f"import socket\ns = socket.create_connection(('127.0.0.1', {port}), timeout=3)\ns.close()\nprint('connected')\n"
-    prog = tmp_path / "prog.py"
-    prog.write_text(sandbox._program(code, "print('harness ran')"), encoding="utf-8")
-    nonce = "negative-control-" + "0" * 16
-    p = subprocess.run([sys.executable, "-I", str(prog)], input=nonce + "\n", capture_output=True, text=True, timeout=30, cwd=tmp_path)
-    t.join(5)
-    srv.close()
-    rec = sandbox.parse_result(p.stdout, nonce)
-    assert accepted, "the loopback listener never saw the connection; the control did not exercise a real connect"
-    assert rec is not None and rec["model_ran"] and rec["harness_completed"] and not rec["error"], (p.stdout[-400:], p.stderr[-400:], rec)
-    assert not _network_attempt_blocked(rec), rec
-    # and the classifier's positive side only accepts failure records of the right shape
+    """Negative control: the runner program executed WITHOUT the sandbox against a loopback listener this
+    test owns completes its connection; the record then shows the model code ran and the harness
+    completed, and the blocked-classification must reject it. Proves the positive test cannot pass merely
+    because a record exists or because an error string looks vaguely network-like."""
+    listener = _LoopbackListener()
+    try:
+        rec = _run_unsandboxed(listener.connect_code(), "print('harness ran')", tmp_path)
+        assert listener.accepted == 1, "the loopback listener never saw the connection; the control did not exercise a real connect"
+        assert rec is not None and rec["model_ran"] and rec["harness_completed"] and not rec["error"], rec
+        assert not _network_attempt_blocked(rec), rec
+    finally:
+        listener.close()
+    # the classifier's positive side only accepts failure records of the right shape
     assert _network_attempt_blocked({"model_ran": False, "harness_completed": False, "error": "model code raised PermissionError: [Errno 1] Operation not permitted"})
     assert _network_attempt_blocked({"model_ran": False, "harness_completed": False, "error": "model code raised OSError: [Errno 101] Network is unreachable"})
     assert not _network_attempt_blocked({"model_ran": True, "harness_completed": True, "error": None})
