@@ -1,10 +1,14 @@
 """Session/run affinity, scoped to the authenticated caller.
 
-A session key comes only from explicit, documented sources: a configured
-request header (e.g. ``X-ModelSaar-Session``, ``X-OpenWebUI-Chat-Id``), a
-configured body field (``prompt_cache_key``), or the request's
-``modelsaar.session`` hint. API keys are never used as conversation ids and a
-shared system prompt is never treated as a session.
+A session key comes only from explicit, documented sources, in this fixed
+order of precedence: the request's ``modelsaar.session`` hint, the client-
+compatibility body field ``session_id`` (llama.cpp-style clients such as
+Odysseus), a configured request header (e.g. ``X-ModelSaar-Session``,
+``X-OpenWebUI-Chat-Id``), a configured body field (``prompt_cache_key``).
+When several sources carry *different* values the first one wins and the
+others are reported as ignored in the routing decision (``affinity.ignored_hints``);
+identical values are not a conflict. API keys are never used as conversation
+ids and a shared system prompt is never treated as a session.
 
 Tool round trips are kept on the same deployment even without a session id by
 remembering the tool_call ids issued in the previous assistant turn.
@@ -40,20 +44,42 @@ class AffinityStore:
     def _scope(caller_id: str, key: str) -> str:
         return hashlib.sha256(f"{caller_id}\x00{key}".encode()).hexdigest()[:32]
 
-    def extract_session_key(self, headers: dict[str, str], body: dict[str, Any]) -> tuple[str | None, str]:
+    def session_hints(self, headers: dict[str, str], body: dict[str, Any]) -> list[tuple[str, str]]:
+        """Every explicit session hint present, as (source, key), in precedence order."""
+        found: list[tuple[str, str]] = []
         hint = body.get("modelsaar") or {}
         if isinstance(hint, dict) and hint.get("session"):
-            return str(hint["session"])[:256], "body:modelsaar.session"
+            found.append(("body:modelsaar.session", str(hint["session"])[:256]))
+        sid = body.get("session_id")
+        if isinstance(sid, str) and sid.strip():
+            found.append(("body:session_id", sid[:256]))
         lower = {k.lower(): v for k, v in headers.items()}
         for h in self.cfg.session_headers:
             v = lower.get(h.lower())
             if v:
-                return str(v)[:256], f"header:{h}"
+                found.append((f"header:{h}", str(v)[:256]))
         for f in self.cfg.body_fields:
+            if f == "session_id":
+                continue  # built in above, with validation
             v = body.get(f)
             if isinstance(v, str) and v:
-                return v[:256], f"body:{f}"
-        return None, "none"
+                found.append((f"body:{f}", v[:256]))
+        return found
+
+    def extract_session(self, headers: dict[str, str], body: dict[str, Any]) -> tuple[str | None, str, list[str]]:
+        """(key, source, ignored_sources): the highest-precedence hint wins; other sources with a DIFFERENT value
+        are listed as ignored so the decision shows the conflict. Deterministic: precedence never depends on
+        the order of fields in the request."""
+        hints = self.session_hints(headers, body)
+        if not hints:
+            return None, "none", []
+        source, key = hints[0]
+        ignored = [src for src, k in hints[1:] if k != key]
+        return key, source, ignored
+
+    def extract_session_key(self, headers: dict[str, str], body: dict[str, Any]) -> tuple[str | None, str]:
+        key, source, _ = self.extract_session(headers, body)
+        return key, source
 
     def get(self, caller_id: str, session_key: str) -> AffinityEntry | None:
         k = self._scope(caller_id, session_key)

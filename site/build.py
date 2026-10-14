@@ -290,6 +290,7 @@ DOC_PAGES = [
     ("docs/clients/openclaw.md", "/docs/clients/openclaw/", "OpenClaw", "Connecting OpenClaw to ModelSaar."),
     ("docs/clients/opencode.md", "/docs/clients/opencode/", "OpenCode", "Connecting OpenCode (V1 and V2 config schemas) to ModelSaar."),
     ("docs/clients/hermes.md", "/docs/clients/hermes/", "Hermes Agent", "Connecting NousResearch Hermes Agent to ModelSaar."),
+    ("docs/clients/odysseus.md", "/docs/clients/odysseus/", "Odysseus", "Connecting Odysseus to ModelSaar: the session_id / cache_prompt compatibility contract."),
     ("CHANGELOG.md", "/docs/changelog/", "Changelog", "What changed in each ModelSaar revision."),
     ("CONTRIBUTING.md", "/docs/contributing/", "Contributing", "How to report problems, propose changes and run the test suite."),
     ("SECURITY.md", "/docs/security-policy/", "Security policy", "How to report a vulnerability in ModelSaar."),

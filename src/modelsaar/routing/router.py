@@ -379,7 +379,12 @@ class Router:
 
         # --- affinity ------------------------------------------------------
         affinity_dep: str | None = None
-        session_key, source = self.affinity.extract_session_key(headers, body)
+        session_key, source, ignored_hints = self.affinity.extract_session(headers, body)
+        if "session_id" in body:
+            dec.compat["session_id"] = (
+                "consumed as caller-scoped conversation affinity (client-compatibility field; not forwarded to the backend)"
+                if source == "body:session_id" else f"present but superseded by {source} (fixed precedence); not forwarded"
+            )
         if self.cfg.affinity.mode == "session" and session_key:
             e = self.affinity.get(caller_id, session_key)
             if e:
@@ -389,6 +394,8 @@ class Router:
                 dec.affinity = {"session_source": source, "status": "new"}
         else:
             dec.affinity = {"session_source": source, "status": "stateless" if not session_key else "disabled"}
+        if ignored_hints:
+            dec.affinity["ignored_hints"] = ignored_hints  # other sources carried a different id; precedence is fixed
         if self.cfg.affinity.tool_round_trip_affinity and req.is_tool_result_turn and req.outstanding_tool_call_ids:
             e = self.affinity.lookup_tool_round(caller_id, req.outstanding_tool_call_ids)
             if e:

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased — client compatibility: `session_id` / `cache_prompt` (Odysseus), 2026-10-13
+
+* **Gateway:** Odysseus adds llama.cpp-style `session_id` and `cache_prompt: true` to requests it sends to a
+  self-hosted endpoint; the gateway rejected them as unknown fields. Both now have a defined, gateway-owned
+  meaning and are never forwarded: `session_id` (validated: non-empty printable string ≤ 256 chars) is
+  caller-scoped conversation affinity with a fixed precedence among session hints
+  (`modelsaar.session` → `session_id` → configured headers → configured body fields; conflicting ids are
+  reported as `affinity.ignored_hints`); `cache_prompt: true` is an advisory hint whose disposition is
+  recorded in the decision (`compat.cache_prompt`); `cache_prompt: false` is refused with
+  `400 unsupported_capability` before dispatch because no shipped backend path can guarantee a per-request
+  cache bypass. Non-boolean `cache_prompt` and invalid `session_id` values are `400` naming the field; every
+  other unknown field is still rejected. Decisions carry a `compat` map. Docs: `docs/clients/odysseus.md`.
+
 ## Unreleased — one-line installer: isolated installation on externally managed Python, 2026-10-13
 
 * **Installer (`site/static/install.sh`):** the `python3 -m pip install --user` fallback is gone — on
