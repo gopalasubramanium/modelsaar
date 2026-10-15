@@ -327,17 +327,54 @@ def _network_attempt_blocked(rec: dict | None) -> bool:
     return any(f"raised {name}:" in err for name in _NETWORK_BLOCKED_EXCEPTIONS) or "unreachable" in low or "timed out" in low
 
 
-class _LoopbackListener:
-    """A TCP listener on 127.0.0.1 with a dynamically allocated port that counts accepted connections.
-    Used as the controlled target for both the unsandboxed and the sandboxed connection attempts, so the
-    verdict never depends on external-network availability."""
+# Backends that isolate model code in its own Linux network namespace. Such a namespace has its OWN loopback
+# interface, so 127.0.0.1 inside the sandbox is not the host's loopback: a connect there is answered by the
+# sandbox's loopback (ConnectionRefusedError) and says nothing about reachability of a host listener. For
+# these backends the controlled listener binds a host non-loopback interface address instead; from an
+# isolated namespace that address has no route and the attempt fails with "Network is unreachable".
+_NETNS_BACKENDS = ("bwrap", "docker")
 
-    def __init__(self) -> None:
+
+def _host_interface_address() -> str | None:
+    """A non-loopback IPv4 address of a host interface, or None when the host has none. Found from the
+    interface the kernel would route outbound traffic through (a UDP socket is connected, never sent on)
+    and, failing that, from the hostname's addresses."""
+    import socket
+
+    for target in ("10.255.255.255", "192.168.255.255", "198.51.100.1"):
+        probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            probe.connect((target, 9))
+            addr = probe.getsockname()[0]
+        except OSError:
+            continue
+        finally:
+            probe.close()
+        if addr and not addr.startswith("127.") and addr != "0.0.0.0":
+            return addr
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET, socket.SOCK_STREAM):
+            addr = info[4][0]
+            if not addr.startswith("127."):
+                return addr
+    except OSError:
+        pass
+    return None
+
+
+class _LoopbackListener:
+    """A TCP listener on a dynamically allocated port that counts accepted connections. It binds
+    127.0.0.1 unless ``host`` names another local interface address. Used as the controlled target for
+    both the unsandboxed and the sandboxed connection attempts, so the verdict never depends on
+    external-network availability."""
+
+    def __init__(self, host: str = "127.0.0.1") -> None:
         import socket
         import threading
 
+        self.host = host
         self.sock = socket.socket()
-        self.sock.bind(("127.0.0.1", 0))
+        self.sock.bind((host, 0))
         self.sock.listen(4)
         self.sock.settimeout(0.2)
         self.port = self.sock.getsockname()[1]
@@ -364,7 +401,7 @@ class _LoopbackListener:
         self.sock.close()
 
     def connect_code(self) -> str:
-        return f"import socket\ns = socket.create_connection(('127.0.0.1', {self.port}), timeout=3)\ns.close()\nprint('connected')\n"
+        return f"import socket\ns = socket.create_connection(({self.host!r}, {self.port}), timeout=3)\ns.close()\nprint('connected')\n"
 
 
 def _run_unsandboxed(code: str, harness: str, workdir: Path) -> dict | None:
@@ -379,12 +416,21 @@ def _run_unsandboxed(code: str, harness: str, workdir: Path) -> dict | None:
 
 @needs_sandbox
 def test_sandbox_blocks_network(tmp_path):
-    """Controlled-listener proof of network isolation. One loopback listener on a dynamic port:
-    (a) the runner program connects to it WITHOUT the sandbox (the listener counts the connection), so the
-    program and the listener are known to work; (b) the identical program through ``sandbox.run()`` must
-    NOT reach the listener, the model code must not complete, the harness must not run, and the recorded
-    error must be a network-denial/isolation error. An unreachable external host cannot make this pass."""
-    listener = _LoopbackListener()
+    """Controlled-listener proof of network isolation. One listener this test owns, on a dynamic port:
+    (a) the runner program connects to it WITHOUT the sandbox (the listener counts exactly one connection),
+    so the program and the listener are known to work; (b) the identical program through ``sandbox.run()``
+    must NOT reach the listener, the model code must not complete, the harness must not run, and the
+    recorded error must be the backend's specific network-denial result. The listener's address depends on
+    the backend: macOS ``sandbox-exec`` keeps the loopback target and must report the policy denial
+    (``PermissionError``); the Linux network-namespace backends (bwrap, Docker) target a host non-loopback
+    interface address and must report "Network is unreachable" — loopback would be the sandbox's own.
+    A refused connection is never accepted; an unreachable external host cannot make this pass."""
+    if BACKEND in _NETNS_BACKENDS:
+        host = _host_interface_address()
+        assert host is not None, f"backend {BACKEND}: no non-loopback host interface address is available for the controlled listener"
+        listener = _LoopbackListener(host)
+    else:
+        listener = _LoopbackListener()
     try:
         code = listener.connect_code()
         control = _run_unsandboxed(code, "print('harness ran')", tmp_path)
@@ -394,11 +440,15 @@ def test_sandbox_blocks_network(tmp_path):
         out, err, rc, backend = sandbox.run(code, "print('harness ran')", 15.0)
         rec = sandbox.parse_result(out, sandbox.run.last_nonce)
         assert backend == BACKEND
-        assert listener.accepted == before, f"sandbox {backend} let model code reach the loopback listener ({listener.accepted - before} connection(s))"
+        assert listener.accepted == before, f"sandbox {backend} let model code reach the listener at {listener.host}:{listener.port} ({listener.accepted - before} connection(s))"
         assert "connected" not in out, (out, err, rc)
         assert rec is not None, (out[-400:], err[-400:], rc)
         assert not rec["model_ran"] and not rec["harness_completed"], rec
         assert _network_attempt_blocked(rec), (backend, rec["error"])
+        if backend == "sandbox-exec":
+            assert "raised PermissionError:" in rec["error"], (backend, rec["error"])
+        else:
+            assert "Network is unreachable" in rec["error"], (backend, rec["error"])
     finally:
         listener.close()
 
