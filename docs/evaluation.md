@@ -86,7 +86,7 @@ Define before measuring; the harness reports against them.
 
 Every table below is tied to a scorer version and a source revision. The current scorer is
 `2026.10.12-3` (record-based `code_exec` completion evidence, tool-argument schema validation; see
-"Scorers" above). **No live evaluation has been run under the current scorer yet** (only the simulated smoke, which validates mechanics, not model quality). The numbers below were
+"Scorers" above). **One live evaluation has been run under the current scorer — Stage B Pass 1, 2026-10-15 (`live-runs/2026-10-15-gx10-stage-b-pass1/`), pending owner acceptance; its numbers are not quoted here or on the website until reviewed.** Before it, only the simulated smoke had run under this scorer (it validates mechanics, not model quality). The numbers below were
 produced by the scorer named next to them and are kept as recorded; they are not relabelled, and a
 rerun — when it happens — will be reported as a separate run with its own scorer version.
 

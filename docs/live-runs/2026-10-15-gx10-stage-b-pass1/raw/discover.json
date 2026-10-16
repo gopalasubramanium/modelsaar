@@ -1,0 +1,2310 @@
+{
+  "error": "",
+  "deployments": [
+    {
+      "id": "ollama/muse-glimmer:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "muse-glimmer:latest",
+      "role": "generative",
+      "family": "muse-glimmer",
+      "parameter_size": "27.9B",
+      "quantization": "Q4_K_M",
+      "identity": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "muse-glimmer:latest",
+        "digest": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+        "identity": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7065222,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.136842,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.70652,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.706518,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7065148,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.706521,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "unsupported",
+          "provenance": "probe",
+          "checked_at": 1792081917.706523,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.136839,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.1368399,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "general",
+        "agent",
+        "vision"
+      ],
+      "catalogue_id": "muse-glimmer-30b",
+      "memory_gb_estimate": 20.88,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "general": 0.7,
+        "agent": 0.7,
+        "document_vision": 0.65
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 6920.954499975778,
+          "p95_ms": 7576.884957990842,
+          "ttft_ms": 7344.629291008459,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1791976169.9997199,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "31f1aafa7391ca95",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3.6:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.6:latest",
+      "role": "generative",
+      "family": "qwen35moe",
+      "parameter_size": "35.5B",
+      "quantization": "Q4_K_M",
+      "identity": "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.6:latest",
+        "digest": "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+        "identity": "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7066538,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.257588,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.706652,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.706651,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.706649,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7066529,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.706655,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.257584,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.2575848,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "general",
+        "reasoning",
+        "code",
+        "vision"
+      ],
+      "catalogue_id": "qwen3.6",
+      "memory_gb_estimate": 26.01,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "general": 0.72,
+        "coding": 0.7,
+        "agent": 0.68,
+        "math": 0.7,
+        "document_vision": 0.68
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {
+        "agent": {
+          "task": "agent",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.831543,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "coding": {
+          "task": "coding",
+          "quality": 0.0,
+          "samples": 2,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.831867,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "conversation": {
+          "task": "conversation",
+          "quality": 0.0,
+          "samples": 2,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8320482,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "decision": {
+          "task": "decision",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.832309,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "document_vision": {
+          "task": "document_vision",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.832472,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "extraction": {
+          "task": "extraction",
+          "quality": 0.0,
+          "samples": 2,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8326411,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 1251.2369170144666,
+          "p95_ms": 3188.368957984494,
+          "ttft_ms": 7154.403082997305,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1791976210.662637,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        },
+        "math": {
+          "task": "math",
+          "quality": 0.5,
+          "samples": 2,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8328059,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "rag": {
+          "task": "rag",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8329742,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "summarization": {
+          "task": "summarization",
+          "quality": 0.0,
+          "samples": 1,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.833198,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "translation": {
+          "task": "translation",
+          "quality": 0.0,
+          "samples": 1,
+          "p50_ms": 4144.1,
+          "p95_ms": 4675.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8333728,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        }
+      },
+      "fingerprint": "7495ed65fbf1dbd5",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/gemma4:31b",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "gemma4:31b",
+      "role": "generative",
+      "family": "gemma4",
+      "parameter_size": "31.3B",
+      "quantization": "Q4_K_M",
+      "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "gemma4:31b",
+        "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+        "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7076638,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.3264902,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707662,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.70766,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707659,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707663,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707665,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.326485,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.326486,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 22.85,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {
+        "agent": {
+          "task": "agent",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8336089,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "coding": {
+          "task": "coding",
+          "quality": 0.5,
+          "samples": 2,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.833787,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "conversation": {
+          "task": "conversation",
+          "quality": 0.0,
+          "samples": 2,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.833964,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "decision": {
+          "task": "decision",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8341491,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "document_vision": {
+          "task": "document_vision",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.834269,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "extraction": {
+          "task": "extraction",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.83439,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 4529.706500004977,
+          "p95_ms": 4561.723958002403,
+          "ttft_ms": 15119.786208000733,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1791976278.3021219,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        },
+        "math": {
+          "task": "math",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8345149,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "rag": {
+          "task": "rag",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.834657,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "summarization": {
+          "task": "summarization",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.834832,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "translation": {
+          "task": "translation",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 20899.2,
+          "p95_ms": 36673.4,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8349519,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        }
+      },
+      "fingerprint": "c2a3b30b88068a13",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3.8:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.8:latest",
+      "role": "generative",
+      "family": "qwen35",
+      "parameter_size": "27.3B",
+      "quantization": "Q4_K_M",
+      "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.8:latest",
+        "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+        "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707818,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.4050891,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707816,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707815,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707813,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707817,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.707819,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.4050848,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.405086,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "general",
+        "reasoning",
+        "code",
+        "vision"
+      ],
+      "catalogue_id": "qwen3.8-27b",
+      "memory_gb_estimate": 20.4,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "general": 0.75,
+        "coding": 0.72,
+        "agent": 0.7,
+        "math": 0.75,
+        "extraction": 0.7,
+        "document_vision": 0.7,
+        "rag": 0.72
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {
+        "agent": {
+          "task": "agent",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.835082,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "coding": {
+          "task": "coding",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8352,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "conversation": {
+          "task": "conversation",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.835319,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "decision": {
+          "task": "decision",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8354912,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "document_vision": {
+          "task": "document_vision",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8356118,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "extraction": {
+          "task": "extraction",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.835732,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 1053.720958007034,
+          "p95_ms": 1053.720958007034,
+          "ttft_ms": 7694.343959010439,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1791976306.462102,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": false,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        },
+        "math": {
+          "task": "math",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8358521,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "rag": {
+          "task": "rag",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.835972,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "summarization": {
+          "task": "summarization",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.836143,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "translation": {
+          "task": "translation",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 3203.5,
+          "p95_ms": 15554.7,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.83626,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        }
+      },
+      "fingerprint": "06621e3e0e6844f0",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3-coder-next:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3-coder-next:latest",
+      "role": "generative",
+      "family": "qwen3next",
+      "parameter_size": "79.7B",
+      "quantization": "Q4_K_M",
+      "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3-coder-next:latest",
+        "digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+        "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708025,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.475837,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708023,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708022,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708019,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708024,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.4758332,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.4758341,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.4758348,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 59.5,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 140.49858401995152,
+          "p95_ms": 2028.764166025212,
+          "ttft_ms": 12876.124875008827,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1791976327.552852,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "3403278e77d95723",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3-coder:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3-coder:latest",
+      "role": "generative",
+      "family": "qwen3moe",
+      "parameter_size": "30.5B",
+      "quantization": "Q4_K_M",
+      "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3-coder:latest",
+        "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+        "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708102,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.5466309,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7081,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7080991,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708098,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708101,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.546627,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.546628,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.5466292,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "code",
+        "agent"
+      ],
+      "catalogue_id": "qwen3-coder-30b-a3b",
+      "memory_gb_estimate": 21.34,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "coding": 0.78,
+        "agent": 0.75,
+        "general": 0.6
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {
+        "agent": {
+          "task": "agent",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.836386,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "coding": {
+          "task": "coding",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.836501,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "conversation": {
+          "task": "conversation",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.836632,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "decision": {
+          "task": "decision",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8368099,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "document_vision": {
+          "task": "document_vision",
+          "quality": 0.0,
+          "samples": 1,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.836931,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "extraction": {
+          "task": "extraction",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.837058,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 101.17645797436126,
+          "p95_ms": 2037.9496250243392,
+          "ttft_ms": 6775.601624976844,
+          "load_ms": 1936.773167049978,
+          "source": "probe",
+          "measured_at": 1791976341.3043652,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": false,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        },
+        "math": {
+          "task": "math",
+          "quality": 1.0,
+          "samples": 2,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.8371751,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "rag": {
+          "task": "rag",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.837298,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "summarization": {
+          "task": "summarization",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.837472,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        },
+        "translation": {
+          "task": "translation",
+          "quality": 1.0,
+          "samples": 1,
+          "p50_ms": 502.4,
+          "p95_ms": 2392.2,
+          "ttft_ms": null,
+          "load_ms": null,
+          "source": "eval",
+          "measured_at": 1792044238.837596,
+          "conditions": {
+            "checkpoint_format": 2,
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+            "max_tokens": 400,
+            "routing_config_hash": "c58ce04fa1ed9902",
+            "runtime": "",
+            "sandbox_backend": "sandbox-exec",
+            "scorer_version": "2026.10.12-3",
+            "seed": 7,
+            "split": "calib",
+            "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+            "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+            "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1",
+            "temperature": 0
+          }
+        }
+      },
+      "fingerprint": "4eacb9bbc87cccbf",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3.6-accurate:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.6-accurate:latest",
+      "role": "generative",
+      "family": "qwen35moe",
+      "parameter_size": "36.0B",
+      "quantization": "Q4_K_M",
+      "identity": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.6-accurate:latest",
+        "digest": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+        "identity": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 131072,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7083688,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.6276731,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708367,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7083662,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708365,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7083678,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.70837,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.62767,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.627671,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 27.53,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 1606.9211670255754,
+          "p95_ms": 1643.0637919984292,
+          "ttft_ms": 8155.118292022962,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1791976375.3769531,
+          "conditions": {
+            "effective_context": 131072,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "e972c9b803aecfc4",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3.6-fast:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.6-fast:latest",
+      "role": "generative",
+      "family": "qwen35moe",
+      "parameter_size": "36.0B",
+      "quantization": "Q4_K_M",
+      "identity": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.6-fast:latest",
+        "digest": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+        "identity": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+        "runtime": "ollama",
+        "runtime_version": "0.40.3",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 65536,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "unsupported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708451,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792081917.7052171,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.7084491,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708448,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.70845,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792081917.708452,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.705214,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792081917.705215,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 27.53,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 1560.5796670133714,
+          "p95_ms": 1596.237583027687,
+          "ttft_ms": 7634.8908329964615,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1791976416.934912,
+          "conditions": {
+            "effective_context": 65536,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.3",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "9274883c38d48361",
+      "intended_use_note": ""
+    }
+  ],
+  "aliases": {
+    "auto": {
+      "id": "auto",
+      "profile": "quality",
+      "deployments": [
+        "ollama/muse-glimmer:latest",
+        "ollama/qwen3.6:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3.8:latest",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "supported",
+      "description": "Best expected quality within limits"
+    },
+    "auto-quality": {
+      "id": "auto-quality",
+      "profile": "quality",
+      "deployments": [
+        "ollama/muse-glimmer:latest",
+        "ollama/qwen3.6:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3.8:latest",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "supported",
+      "description": ""
+    },
+    "auto-balanced": {
+      "id": "auto-balanced",
+      "profile": "balanced",
+      "deployments": [
+        "ollama/muse-glimmer:latest",
+        "ollama/qwen3.6:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3.8:latest",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "supported",
+      "description": ""
+    },
+    "auto-fast": {
+      "id": "auto-fast",
+      "profile": "fast",
+      "deployments": [
+        "ollama/muse-glimmer:latest",
+        "ollama/qwen3.6:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3.8:latest",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "supported",
+      "description": ""
+    },
+    "auto-code": {
+      "id": "auto-code",
+      "profile": "quality",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/qwen3.8:latest",
+        "ollama/qwen3-coder:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 4096,
+      "tools": "supported",
+      "vision": "partial",
+      "json_schema": "supported",
+      "description": ""
+    },
+    "auto-vision": {
+      "id": "auto-vision",
+      "profile": "quality",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3.8:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "supported",
+      "json_schema": "supported",
+      "description": ""
+    }
+  }
+}
