@@ -63,37 +63,44 @@ refusal, not routing; its calibration split (complete) and the qwen3.6 sweep rem
    checkpoint (no health-refused record; every policy row complete) and the report.
 3. Budget-limited events are SUSPECTED (19, all on qwen3.6/gemma4 sweeps), never proven: no finish
    reason or token usage is recorded.
-4. The raw harness reports carry the Mac home path in `conditions.tasks_file` and `checkpoint` (kept
-   byte-identical for the hashes); other text outputs write it as `~`. No keys, prompts or application data
-   are included; the 34 stored decisions are the synthetic tasks' routing records only.
+4. **Path redaction (2026-10-16).** The public copies of `stage-b-pass1b.json`, `pass1-compromised/stage-b-pass1.json`
+   and `raw/discover.json` have the Mac absolute paths in `conditions.tasks_file`, `checkpoint` and the per-deployment
+   `tasks_file` fields replaced by the placeholders `<EVAL_CHECKOUT>` (the cf56cdd checkout) and `<RUN_ROOT>` (the
+   Mac run folder); nothing else in those files changed (verified by comparing the parsed objects after restoring
+   the placeholders), and `scripts/eval_aggregate.py` still reports "all aggregates in the report match the records".
+   The canonical Mac run files are unchanged and keep their original hashes (Pass 1b report `0f50675d9de15dfa…`,
+   Pass 1 report `d72ddc6695a0a856…`); both checkpoints are byte-identical to the Mac originals. The GX10 journal
+   extract lost its interactive shell header (ssh alias, GX10 home path) and has the prompt user/host neutralised;
+   the journal lines themselves are unchanged. Other text outputs write the Mac home as `~`. No keys, prompts or
+   application data are included; the 34 stored decisions are the synthetic tasks' routing records only.
 5. Two Pass 1 reports exist. `site/facts.py` and the website still quote the 2026-10-11 result.
 
-## F. Hashes (sha256; `raw/decisions/` 34 files omitted from the table — see `aggregate.json` for their count)
+## F. Hashes (sha256 of the files in this folder — the public copies; canonical Mac hashes in §E item 4 and `environment.json`; `raw/decisions/` 34 files omitted from the table)
 
 | file | bytes | sha256 |
 |---|---|---|
-| `STAGE-B-PASS1-RESULT.md` | 10118 | `202390faa3e85423d4cd5e394f31383cf439ef817592e108190da01d4c1e47d0` |
+| `STAGE-B-PASS1-RESULT.md` | 10474 | `6460af0f9c874d0c8f511c17a71e4502342b3c4e1e9bc111e7f3734506e7c9ab` |
 | `acceptance.json` | 1402 | `cf165cf7dbba0ee2e82de88cbefecc2cd4ae312f29fefd35222a968a6d701f25` |
 | `acceptance.md` | 3696 | `05a86d0dabf332069c0a68cec26618ef427454a265a337d496fb2d8118920038` |
-| `aggregate.json` | 29392 | `036efd82230adda71e2241d73c63500320de01cf222ac00363241bc7a15f0aac` |
+| `aggregate.json` | 29572 | `585aaac6230bfc2713858a285c79c5293ba3b7f260d8c4e9166e2710ff1a40ed` |
 | `capabilities.json` | 9270 | `e04d8a5dc70af4b2ffe0a53afb995670e62c4cdd0c381c3576d45069750b51c4` |
 | `deployments.json` | 2723 | `166caae9e24d3094ed06529e60cbc5ae1d3498b34f5f6d8f659e066dfb25f735` |
-| `environment.json` | 3332 | `5cd4da5a5699c07fd87a96505f91f59dc6e9b0466190d7e7851e03ebea34cc9f` |
+| `environment.json` | 4121 | `438e124e4474f4bfb16c31c7b99209eb2e1f958840a6a14710d96b6402c66b57` |
 | `pass1-compromised/50-pass1-launcher-console.txt` | 23128 | `4916910efc05b1457ecbad011fdab7fd1a2dd3fbecf316b1a576f65bca4e996a` |
 | `pass1-compromised/console-transcript.txt` | 20541 | `08f6e0d5a4bb262d55e31075b59ed65aa3eb5c424fac639c12932eb82f68198f` |
 | `pass1-compromised/decisions-422-audit.md` | 4028 | `de54814dc70db9596fe1620f6f404ad7c8378151d8ac00c20f41afe16eab7402` |
 | `pass1-compromised/diag/decision-timeline.tsv` | 27417 | `c692ad3bedbe4f7bacad047e92dec55a6c9bf77c1ace5d669ef49be339a316f8` |
 | `pass1-compromised/diag/flap-findings.md` | 9406 | `9803dc44bf51e11c6034dafaf4607ed47d761d0129f8838ff586f1516d7c0c66` |
-| `pass1-compromised/diag/gx10-journal-2026-10-15-0614-0618utc.txt` | 31174 | `527f46d57ba521cb81c939cff7c1e0d15bc8671b112bc7c323e554c765a0666e` |
+| `pass1-compromised/diag/gx10-journal-2026-10-15-0614-0618utc.txt` | 31293 | `c19652e069c556f0864e6d5e50a81c8595ca9b9e9edf8de802022b84fec6a6cb` |
 | `pass1-compromised/diag/mac-pmset-sleepwake.txt` | 5326 | `a32ea65a4366e0d986acfc52e5131fb219266ed5ef32215d3a8d602b75084cf1` |
 | `pass1-compromised/diag/mac-tailscale-extension-log-114730-114800.txt` | 3908 | `5b5586663d36c62e1567796714ee309517f4cae70b10dca57999e239c544facc` |
 | `pass1-compromised/pass1-identities.json` | 698 | `55610fac48e96fed6ea94ee7dc6df6291889091cf4f499457d27e7dd16b8fcd3` |
-| `pass1-compromised/stage-b-pass1.json` | 190913 | `d72ddc6695a0a8561392f32be32d83853ef56adbb46e1e902f7eba17fd8bd726` |
+| `pass1-compromised/stage-b-pass1.json` | 190797 | `dd611fa83e8e533c437cbdcbd2c14dca8107e2311a69f47cea12917f2071a189` |
 | `pass1-compromised/stage-b-pass1.records.jsonl` | 119919 | `6d1ca65c10c46cca5ead006c3e976c0f3c8ec3d1f4e12353f40790fc46e8803e` |
 | `raw/51-pass1b-launcher-console.txt` | 2598 | `39f27fb9ee4ae3c3f9378bdd6ea75d4012d9d5233927cb9a7f106759f8806646` |
 | `raw/51_stage_b_pass1b.command.txt` | 12140 | `99c18cc13f11ef671ecd7a111cb28ee7f2d0a03aa7bd9564169fac9c929413a5` |
 | `raw/console-transcript.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
-| `raw/discover.json` | 85566 | `af1f1b6f900e7e1b24470d3b8a8064db3e2d9cf6b19268b0eb5e27f4340232db` |
+| `raw/discover.json` | 84326 | `373e18ce456344eb0b2dc9e49358ace189cfdf545488bea15233def8912cf711` |
 | `raw/ollama-ps-after.json` | 836 | `27caa2264da5ae423d555e0eab7aae705b88820b3389d6eac199b56ca7b4c13b` |
 | `raw/ollama-ps-before.json` | 13 | `a6fe9ec6e26a38d99fca418b69826e0238b7a2bb319ff05eb153a6fcfd1fa28d` |
 | `raw/ollama-tags.json` | 3871 | `961e9c6da5f8daeadec455da9ff053eb96c68f62d557e09c08442570e94a9bc8` |
@@ -103,7 +110,7 @@ refusal, not routing; its calibration split (complete) and the qwen3.6 sweep rem
 | `raw/store-measurements-before.json` | 11803 | `a35b6686ff2d11e9736a7ca06ae7df6b5b44a006c2f4ddcfb0995c0c75dc850d` |
 | `reasoning-budget-analysis.json` | 16913 | `1099b75b2a2455c1e61b4dce7300d9a97f900f63a529a8fcd935d66763d79458` |
 | `routing-analysis.json` | 44785 | `f1cd32ca044ef6b8b93e0ea92197aa945d9c683513f5e4f6eb6de1624aa9c0ef` |
-| `stage-b-pass1b.json` | 190879 | `0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c` |
+| `stage-b-pass1b.json` | 190763 | `76285802cfeb4f9f454be2b3e98e741b8cb5c54b3d88e0f00a6f4dcf9f74d20e` |
 | `stage-b-pass1b.records.jsonl` | 119526 | `482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd` |
 
 Evaluator/gateway source revision `cf56cdd3416d8c853b64111b9b40211e5b126031` (identical `src/` on `main`

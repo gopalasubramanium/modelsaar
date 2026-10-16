@@ -114,10 +114,12 @@ fixed-strong is not statistically established (paired 95 % CI includes zero).
 
 ## Evidence
 Folder `docs/live-runs/2026-10-15-gx10-stage-b-pass1/` (`MANIFEST.md` lists every file and hash).
-Report `stage-b-pass1b.json` sha256 `0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c`;
+Canonical Mac run files: report `stage-b-pass1b.json` sha256 `0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c`;
 checkpoint `stage-b-pass1b.records.jsonl` sha256 `482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd`.
 Pass 1 (compromised): report `d72ddc6695a0a8561392f32be32d83853ef56adbb46e1e902f7eba17fd8bd726`,
-checkpoint `6d1ca65c10c46cca5ead006c3e976c0f3c8ec3d1f4e12353f40790fc46e8803e`. Ready PR: see MANIFEST §G.
+checkpoint `6d1ca65c10c46cca5ead006c3e976c0f3c8ec3d1f4e12353f40790fc46e8803e`. The public copies of the two
+reports in this folder are path-redacted (`<EVAL_CHECKOUT>`, `<RUN_ROOT>`; MANIFEST §E item 4) and hash
+`76285802cfeb4f9f454be2b3e98e741b8cb5c54b3d88e0f00a6f4dcf9f74d20e` and `dd611fa83e8e533c437cbdcbd2c14dca8107e2311a69f47cea12917f2071a189`; both checkpoints are byte-identical to the Mac originals. Ready PR: see MANIFEST §G.
 
 ## STOP — confirmed
 Pass 2 (qwen3-coder-next) was **not** run; no model added; the classifier remained **OFF**; routing was

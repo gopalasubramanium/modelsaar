@@ -63,11 +63,15 @@
  "stored_measurements_disclosure": "the Stage A home's state DB already held 48 measurement rows (Stage A probes/smoke and Pass 1's calibration) when Pass 1b started; no pre-Pass-1 snapshot exists; see raw/store-measurements-before.json and -after.json",
  "monitoring_limits": "console-transcript.txt is empty (harness stderr did not reach the file under caffeinate); the health sidecar recorded 0 samples \u2014 NOT evidence of health; health is evidenced by the checkpoint (no health-refused records) and the report",
  "hashes": {
-  "report_sha256": "0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c",
-  "checkpoint_sha256": "482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd",
-  "pass1_compromised_report_sha256": "d72ddc6695a0a8561392f32be32d83853ef56adbb46e1e902f7eba17fd8bd726",
-  "pass1_compromised_checkpoint_sha256": "6d1ca65c10c46cca5ead006c3e976c0f3c8ec3d1f4e12353f40790fc46e8803e",
+  "canonical_mac_report_sha256": "0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c",
+  "canonical_mac_checkpoint_sha256": "482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd",
+  "public_copy_report_sha256": "76285802cfeb4f9f454be2b3e98e741b8cb5c54b3d88e0f00a6f4dcf9f74d20e",
+  "public_copy_checkpoint_sha256": "482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd",
+  "pass1_compromised_canonical_report_sha256": "d72ddc6695a0a8561392f32be32d83853ef56adbb46e1e902f7eba17fd8bd726",
+  "pass1_compromised_canonical_checkpoint_sha256": "6d1ca65c10c46cca5ead006c3e976c0f3c8ec3d1f4e12353f40790fc46e8803e",
+  "pass1_compromised_public_copy_report_sha256": "dd611fa83e8e533c437cbdcbd2c14dca8107e2311a69f47cea12917f2071a189",
   "launcher_sha256_reviewed_candidate": "6ff32340aa5ef552",
-  "launcher_note": "the executed launcher = reviewed candidate + APPROVED=yes + an AC-power abort line"
+  "launcher_note": "the executed launcher = reviewed candidate + APPROVED=yes + an AC-power abort line",
+  "redaction": "public copies of the two harness reports and raw/discover.json have the Mac absolute paths in conditions.tasks_file / checkpoint / per-deployment tasks_file replaced by <EVAL_CHECKOUT> and <RUN_ROOT>; no other byte changed (verified by object comparison after placeholder restoration); checkpoints are byte-identical to the Mac originals; scoring data unchanged (scripts/eval_aggregate.py still matches)"
  }
 }

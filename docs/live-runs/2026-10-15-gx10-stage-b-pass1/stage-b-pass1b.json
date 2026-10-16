@@ -94,11 +94,11 @@
       "ollama/qwen3.8:latest": "06621e3e0e6844f0",
       "ollama/qwen3-coder:latest": "4eacb9bbc87cccbf"
     },
-    "tasks_file": "/Users/sgopala/.modelsaar-live/stage-b-cf56cdd/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+    "tasks_file": "<EVAL_CHECKOUT>/src/modelsaar/evaluation/fixtures/tasks.jsonl",
     "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
     "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1"
   },
-  "checkpoint": "/Users/sgopala/Documents/Documents - Gopala\u2019s MacBook Air M5/Projects/Model_Router/stage-a/pass1b/stage-b-pass1b.records.jsonl",
+  "checkpoint": "<RUN_ROOT>/pass1b/stage-b-pass1b.records.jsonl",
   "calibration": {
     "per_deployment": {
       "ollama/qwen3.6:latest": {

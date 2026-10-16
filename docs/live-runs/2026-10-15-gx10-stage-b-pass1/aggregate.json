@@ -6,8 +6,9 @@
   "decisions": "34 stored routing decisions (32 auto + 2 capability-422)"
  },
  "hashes": {
-  "report_sha256": "0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c",
-  "checkpoint_sha256": "482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd"
+  "canonical_mac_report_sha256": "0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c",
+  "canonical_mac_checkpoint_sha256": "482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd",
+  "note": "public copy of the report is path-redacted (see MANIFEST.md \u00a7E item 4 / environment.json hashes.redaction); checkpoint byte-identical"
  },
  "conditions": {
   "max_tokens": 400,

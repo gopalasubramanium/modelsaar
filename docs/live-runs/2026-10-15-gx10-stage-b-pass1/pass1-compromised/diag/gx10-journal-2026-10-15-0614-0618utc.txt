@@ -1,7 +1,7 @@
-Last login: Thu Oct 15 18:47:26 on ttys000
-ssh -t GX10_Remote "cd /home/gopalasubramanium/; bash -l"
-sgopala@Mac ~ % ssh -t GX10_Remote "cd /home/gopalasubramanium/; bash -l"
-gopalasubramanium@gx10-082d:~$ timedatectl | grep 'Time zone'
+# GX10 journal extract supplied by the owner (2026-10-15, 06:14:30-06:18:00 UTC window; GX10 clock Asia/Singapore +08).
+# Redacted for publication: the interactive shell header (ssh alias, GX10 home path) removed; shell prompt user/host neutralised.
+# Commands run on the GX10 (read-only journalctl):
+<gx10-user>@<gx10-host>:~$ timedatectl | grep 'Time zone'
 # Ollama (system unit; add sudo if journal access is denied)
 journalctl -u ollama --since '2026-10-15 06:14:30 UTC' --until '2026-10-15 06:18:00 UTC' -o short-iso --no-pager
 # ModelSaar production gateway (user unit)
@@ -215,4 +215,4 @@ journalctl -u ollama --since '2026-10-15 05:50 UTC' --until '2026-10-15 05:55 UT
 2026-10-15T13:50:14+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 13:50:14 | 200 |      23.824µs |       127.0.0.1 | GET      "/api/version"
 2026-10-15T13:50:14+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 13:50:14 | 200 |       4.176µs |       127.0.0.1 | GET      "/api/ps"
 2026-10-15T13:50:29+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 13:50:29 | 200 |      26.384µs |       127.0.0.1 | GET      "/api/version"
-gopalasubramanium@gx10-082d:~$ 
+<gx10-user>@<gx10-host>:~$ 
