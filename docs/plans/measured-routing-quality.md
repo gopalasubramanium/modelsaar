@@ -1,6 +1,6 @@
 # Plan: Measured Routing Quality
 
-Status: **Stage A complete** (2026-10-14; evidence in `docs/live-runs/2026-10-14-gx10-stage-a/`, summary `STAGE-A-RESULT.md`); **Stage B Pass 1 executed 2026-10-15** (evidence in `docs/live-runs/2026-10-15-gx10-stage-b-pass1/`, summary `STAGE-B-PASS1-RESULT.md`: the original run is preserved as compromised, the replacement run Pass 1b passes all predeclared targets; owner acceptance pending; Pass 2 and Stage C not started). It maps to the roadmap item "evaluation at
+Status: **Stage A complete** (2026-10-14; evidence in `docs/live-runs/2026-10-14-gx10-stage-a/`, summary `STAGE-A-RESULT.md`); **Stage B Pass 1 executed 2026-10-15** (evidence in `docs/live-runs/2026-10-15-gx10-stage-b-pass1/`, summary `STAGE-B-PASS1-RESULT.md`: the original run is preserved as compromised, the replacement run Pass 1b passes all predeclared targets and was accepted by the owner on 2026-10-16 as the Pass 1 result; auto's advantage over fixed-strong is not statistically established; Pass 2 and Stage C not started). It maps to the roadmap item "evaluation at
 the current revision" (`docs/roadmap.md`, `docs/backlog-post-alpha.md`) and starts only when the owner
 approves a GX10 window. It does not change production routing, does not download or load new models and
 does not touch the GX10's `modelsaar.service`.

@@ -3,7 +3,7 @@
 Deterministic routing measurement under the frozen Stage A contract (`../2026-10-14-gx10-stage-a/evaluation-contract.md`).
 This folder holds **two runs that are never combined**: the replacement run **Pass 1b** (top level; the
 candidate analysis dataset) and the original **Pass 1** (`pass1-compromised/`; preserved, labelled compromised).
-Acceptance of Pass 1b as the official Pass 1 result is an **owner decision** (`acceptance.md`). Nothing in
+**Owner decision 2026-10-16 11:40 IST: Pass 1b is accepted as the official Stage B Pass 1 result** (`acceptance.md`); Pass 1 stays preserved as compromised; runs are not combined. Nothing in
 routing, classifier, models, Ollama, configuration or the GX10 service was changed; the GX10's production
 `modelsaar.service` was not touched; the website is unchanged.
 
@@ -72,9 +72,9 @@ refusal, not routing; its calibration split (complete) and the qwen3.6 sweep rem
 
 | file | bytes | sha256 |
 |---|---|---|
-| `STAGE-B-PASS1-RESULT.md` | 9880 | `763911746a1611185752f96d3de5ec18b66e94ddbdc88fea482b27b23faf3475` |
-| `acceptance.json` | 864 | `97aee5d767214bc7e5bb422424431e42054fab3ef43e44f1e5c689623b791068` |
-| `acceptance.md` | 3186 | `9457a5c2c20e5eab517e5cc5f59a864ea0a3f59a743d9d2192c2f2244f049c2e` |
+| `STAGE-B-PASS1-RESULT.md` | 10118 | `202390faa3e85423d4cd5e394f31383cf439ef817592e108190da01d4c1e47d0` |
+| `acceptance.json` | 1402 | `cf165cf7dbba0ee2e82de88cbefecc2cd4ae312f29fefd35222a968a6d701f25` |
+| `acceptance.md` | 3696 | `05a86d0dabf332069c0a68cec26618ef427454a265a337d496fb2d8118920038` |
 | `aggregate.json` | 29392 | `036efd82230adda71e2241d73c63500320de01cf222ac00363241bc7a15f0aac` |
 | `capabilities.json` | 9270 | `e04d8a5dc70af4b2ffe0a53afb995670e62c4cdd0c381c3576d45069750b51c4` |
 | `deployments.json` | 2723 | `166caae9e24d3094ed06529e60cbc5ae1d3498b34f5f6d8f659e066dfb25f735` |

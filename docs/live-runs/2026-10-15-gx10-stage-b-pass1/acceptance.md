@@ -21,18 +21,27 @@ except `vis-02` the router scored qwen3-coder 0.9555 and qwen3.8 0.938 — both 
 outcomes on 31 tasks and avoids fixed-fast's one capability violation; against fixed-strong it is
 faster (p50 377 ms vs 3443 ms) with a success difference that the data cannot distinguish from zero.
 
+## Owner decision (2026-10-16 11:40 IST)
+
+**The owner accepts Pass 1b as the official Stage B Pass 1 result.** The original Pass 1 (11:21 IST)
+stays preserved under `pass1-compromised/`, labelled compromised, and the two runs are not combined.
+The predeclared criteria above, the reported limitations below, and the statistical reading are
+unchanged by this decision: auto's measured advantage over fixed-strong (+0.031) is **not statistically
+established** — the paired 95 % CI [−0.105, +0.168] includes zero — and the 19 budget-limited events
+remain SUSPECTED, not proven.
+
 ## Stage B disposition
 
-**1. DETERMINISTIC ROUTING BASELINE ACCEPTED** — on the Pass 1b evidence, all four applicable
+**1. DETERMINISTIC ROUTING BASELINE ACCEPTED** — on the accepted Pass 1b evidence, all four applicable
 predeclared targets pass; the classifier stays off (Stage C design remains prepared, not run).
 
-This disposition is **conditional on the owner accepting Pass 1b as the Pass 1 result**. The run is a
-separately labelled replacement for the compromised Pass 1 (Mac idle sleep → Tailscale relay
-re-establishment → one health-poll timeout → 103 refusals; see `pass1-compromised/diag/flap-findings.md`),
-executed under the identical frozen contract with the same identities. Taken on its own, the original
-Pass 1 would be disposition **3. STAGE B INVALID / MUST BE RERUN**, which is what Pass 1b is.
+Pass 1b is a separately labelled replacement for the compromised Pass 1 (Mac idle sleep → Tailscale
+relay re-establishment → one health-poll timeout → 103 refusals; see
+`pass1-compromised/diag/flap-findings.md`), executed under the identical frozen contract with the same
+identities. Taken on its own, the original Pass 1 would have been disposition **3. STAGE B INVALID /
+MUST BE RERUN**, which is what Pass 1b is.
 
-Material limits that the owner should weigh (details in `MANIFEST.md` §E): Pass 1's calibration
+Material limits, unchanged by the acceptance (details in `MANIFEST.md` §E): Pass 1's calibration
 measurements were already in the Stage A store when Pass 1b started; the run's console transcript is
 empty and the health sidecar recorded nothing (the report/checkpoint, with complete policy rows and
 no health-refused records, are the health evidence); 19 SUSPECTED budget-limited events on the qwen3.6

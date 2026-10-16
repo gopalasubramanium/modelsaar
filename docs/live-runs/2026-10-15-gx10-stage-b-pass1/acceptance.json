@@ -26,5 +26,16 @@
    "observed": "classifier disabled; consulted 0",
    "result": "NOT APPLICABLE (classifier off by contract)"
   }
- ]
+ ],
+ "disposition": "1. DETERMINISTIC ROUTING BASELINE ACCEPTED (on Pass 1b)",
+ "owner_decision": {
+  "date_local": "2026-10-16T11:40+05:30",
+  "decision": "Pass 1b accepted as the official Stage B Pass 1 result; original Pass 1 preserved as compromised; runs not combined",
+  "unchanged_by_decision": [
+   "predeclared criteria",
+   "reported limitations",
+   "auto vs fixed-strong difference +0.031 with paired 95% CI [-0.105, 0.168] \u2014 not statistically established",
+   "19 budget-limited events remain SUSPECTED, not proven"
+  ]
+ }
 }

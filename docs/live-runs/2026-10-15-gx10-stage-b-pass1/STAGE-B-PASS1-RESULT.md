@@ -1,4 +1,4 @@
-# STAGE B PASS 1: COMPLETE (as Pass 1b, 2026-10-15) — pending owner acceptance
+# STAGE B PASS 1: COMPLETE (as Pass 1b, 2026-10-15) — accepted by the owner 2026-10-16
 
 Two runs exist under the frozen Stage A contract. **Pass 1** (11:21–11:48 IST) is preserved and
 labelled **compromised**: the Mac idle-slept for 159 s mid-run, the Tailscale relay path was being
@@ -8,7 +8,7 @@ are accounted for by stored decision records; `pass1-compromised/`). **Pass 1b**
 IST, 1708 s, owner-approved 21:53 IST, run under `caffeinate -i`, lid open, AC) is the separately
 labelled replacement: 220 records, 218 × HTTP 200, 2 × HTTP 422 — both the legitimate vision
 exclusions on qwen3-coder (`vis-01` calib, `vis-02` test) — and no health refusal. The two runs are
-not combined. **Whether Pass 1b stands as the official Pass 1 result is the owner's decision.**
+not combined. **Owner decision 2026-10-16 11:40 IST: Pass 1b is accepted as the official Stage B Pass 1 result**; the predeclared criteria, the reported limitations and the statistical reading below are unchanged by that decision.
 
 Stage A evidence: PR #8, merged as `3733972649449d109c573b1be084d01351cd9eb1` (`main` at run time).
 
@@ -92,9 +92,9 @@ prerequisite for interpreting Pass 1b.
 ## Acceptance (Phase 7; `acceptance.md`)
 capability target **PASS** (0) · completion target **PASS** (1.000 ≥ 1.000) · success target **PASS**
 (0.938 ≥ 0.856) · overhead target **PASS** (p95 0.5 ms < 5 ms) · classifier-timeout target not applicable.
-**Disposition: 1 — DETERMINISTIC ROUTING BASELINE ACCEPTED on Pass 1b**, conditional on the owner
-accepting Pass 1b as the Pass 1 result (Pass 1 alone would be disposition 3, INVALID / MUST BE RERUN —
-which Pass 1b is).
+**Disposition: 1 — DETERMINISTIC ROUTING BASELINE ACCEPTED on the accepted Pass 1b result** (Pass 1
+alone would have been disposition 3, INVALID / MUST BE RERUN — which Pass 1b is). auto's +0.031 over
+fixed-strong is not statistically established (paired 95 % CI includes zero).
 
 ## Material limits (read before quoting)
 1. **Stored measurements at start.** Pass 1's calibration measurements (and Stage A probe evidence) were
@@ -108,8 +108,8 @@ which Pass 1b is).
    (every policy row complete; no health-refused record; the only 422s are the two vision exclusions)
    and by the report; the console table is reproduced by `scripts/eval_aggregate.py`.
 3. **Budget events are SUSPECTED, not proven** (no finish reason/usage recorded).
-4. **Two Pass 1 reports exist**; they are not merged, and the website still quotes the 2026-10-11 result
-   until the owner reviews this package (`site/facts.py` unchanged).
+4. **Two Pass 1 reports exist**; they are not merged. Pass 1b is the accepted result; the website still
+   quotes the 2026-10-11 result until a separate, owner-approved site update (`site/facts.py` unchanged).
 5. The Mac→GX10 path is DERP-relayed (no direct LAN/UDP path); every latency column includes it equally.
 
 ## Evidence
