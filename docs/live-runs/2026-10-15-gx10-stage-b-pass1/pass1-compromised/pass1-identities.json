@@ -1,0 +1,22 @@
+{
+ "ollama/gemma4:31b": {
+  "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+  "fingerprint": "c2a3b30b88068a13",
+  "context_length": 4096
+ },
+ "ollama/qwen3-coder:latest": {
+  "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+  "fingerprint": "4eacb9bbc87cccbf",
+  "context_length": 4096
+ },
+ "ollama/qwen3.6:latest": {
+  "digest": "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+  "fingerprint": "7495ed65fbf1dbd5",
+  "context_length": 4096
+ },
+ "ollama/qwen3.8:latest": {
+  "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+  "fingerprint": "06621e3e0e6844f0",
+  "context_length": 4096
+ }
+}

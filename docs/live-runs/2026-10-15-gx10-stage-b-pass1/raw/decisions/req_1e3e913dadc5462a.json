@@ -1,0 +1,131 @@
+{
+ "_checkpoint": {
+  "detail": "contains 'red'",
+  "index": 217,
+  "ok": true,
+  "policy": "auto",
+  "status": 200,
+  "task": "vis-02"
+ },
+ "affinity": {
+  "session_source": "none",
+  "status": "stateless"
+ },
+ "alias": "auto",
+ "candidates": [
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.8:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.152,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.784,
+   "quality": 1.0,
+   "residency_cost": 0.0,
+   "score": 0.938,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.193,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 1.0,
+   "quality": 1.0,
+   "residency_cost": 1.0,
+   "score": 0.821,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/gemma4:31b",
+   "evidence": "measured:1",
+   "latency_cost": 1.0,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.879,
+   "quality": 1.0,
+   "residency_cost": 0.879,
+   "score": 0.7182,
+   "uncertainty": 0.5
+  }
+ ],
+ "chosen": "ollama/qwen3.8:latest",
+ "classifier": {},
+ "compat": {},
+ "config_hash": "c58ce04fa1ed9902",
+ "created_at": 1792083616.330483,
+ "endpoint": "chat",
+ "evidence": "measured:1",
+ "exclusions": {
+  "ollama/qwen3-coder:latest": [
+   "image input required; capability vision is unsupported (source_claim)"
+  ]
+ },
+ "explicit": false,
+ "failover": [],
+ "failover_allowed": true,
+ "failover_note": "",
+ "outcome": "ok",
+ "outcome_detail": "2518ms",
+ "overhead_ms": 0.23,
+ "profile": "quality",
+ "reasons": [
+  "task=document_vision (clear); required: image input; context need ~3737 tokens",
+  "1 deployment(s) excluded by hard filters; 3 eligible",
+  "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+ ],
+ "registry_version": 15,
+ "remedies": [
+  "use a deployment whose vision capability is supported"
+ ],
+ "request_id": "req_1e3e913dadc5462a",
+ "requested_model": "auto",
+ "requirements": {
+  "ambiguous": false,
+  "has_remote_image_url": false,
+  "is_tool_result_turn": false,
+  "languages": [
+   "en"
+  ],
+  "multilingual": false,
+  "needs_audio": false,
+  "needs_continuation": false,
+  "needs_json_object": false,
+  "needs_json_schema": false,
+  "needs_parallel_tools": false,
+  "needs_streaming": false,
+  "needs_tools": false,
+  "needs_vision": true,
+  "outstanding_tool_call_ids": [],
+  "primary_task": "document_vision",
+  "role": "generative",
+  "signals": [
+   "document_vision:image input present"
+  ],
+  "tasks": {
+   "document_vision": 0.9
+  },
+  "tokens": {
+   "images": 1,
+   "input_estimate": 1289,
+   "method": "estimate:chars/3+overheads",
+   "output_allowance": 400,
+   "reasoning_allowance": 2048,
+   "total": 3737
+  },
+  "tool_choice_mode": "none"
+ },
+ "requirements_note": "",
+ "stream": false,
+ "translation_notes": []
+}

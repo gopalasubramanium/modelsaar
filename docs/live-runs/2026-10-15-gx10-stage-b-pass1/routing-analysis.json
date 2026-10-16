@@ -1,0 +1,1526 @@
+{
+ "policy": "auto (deterministic router, classifier off)",
+ "n_tasks": 32,
+ "categories": {
+  "auto selected another model and improved the result": 3,
+  "routing choice was irrelevant to the outcome (same result on either model)": 26,
+  "auto selected another model and worsened the result": 2,
+  "auto selected the same model as fixed-strong and both passed": 1
+ },
+ "selection_distribution": {
+  "qwen3-coder:latest": 31,
+  "qwen3.8:latest": 1
+ },
+ "overhead_ms": {
+  "n": 32,
+  "mean": 0.37,
+  "p50": 0.3,
+  "p95": 0.5,
+  "max": 3.18
+ },
+ "task_label_accuracy": 0.844,
+ "routing_mistakes_per_report": [
+  "math-05",
+  "long-01"
+ ],
+ "classifier": {
+  "used": 0,
+  "timeouts": 0
+ },
+ "evidence_levels": {
+  "measured:1": 7,
+  "measured:2": 25
+ },
+ "tasks": [
+  {
+   "task": "agent-03",
+   "category": "agent",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.4606,
+    "qwen3.6:latest": 0.3059
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.27,
+   "outcome": true,
+   "scorer_detail": "called bash with id, valid JSON object args ['command'], {'command': 'pytest'}",
+   "latency_ms": 450.0,
+   "fixed_strong_outcome": false,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": false,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "auto selected another model and improved the result",
+   "reasons": [
+    "task=coding (clear); required: tool support; context need ~2581 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2)), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "agent-04",
+   "category": "agent",
+   "inferred_task": "agent",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.5259,
+    "qwen3.6:latest": 0.4364
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.37,
+   "outcome": true,
+   "scorer_detail": "called read_file with id, valid JSON object args ['path'], {'path': 'pyproject'}",
+   "latency_ms": 366.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=agent (clear); required: tool support; context need ~2576 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2)), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "agent-05",
+   "category": "agent",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.4606,
+    "qwen3.6:latest": 0.3059
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.26,
+   "outcome": true,
+   "scorer_detail": "called bash with id, valid JSON object args ['command'], {'command': 'git'}",
+   "latency_ms": 387.8,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=coding (clear); required: tool support; context need ~2572 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2)), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "ambig-01",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.2182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.25,
+   "outcome": true,
+   "scorer_detail": "contains 'javascript'",
+   "latency_ms": 4618.0,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=coding (ambiguous); required: no special capabilities; context need ~2473 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "ambig-02",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.2,
+   "outcome": true,
+   "scorer_detail": "nonempty",
+   "latency_ms": 1132.9,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=conversation (ambiguous); required: no special capabilities; context need ~2460 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "ambig-03",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.321
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.26,
+   "outcome": true,
+   "scorer_detail": "nonempty",
+   "latency_ms": 1093.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2460 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "code-03",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.2182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.31,
+   "outcome": true,
+   "scorer_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+   "latency_ms": 1418.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": false,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=coding (clear); required: no special capabilities; context need ~2521 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "code-04",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.2182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.23,
+   "outcome": true,
+   "scorer_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+   "latency_ms": 666.9,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=coding (clear); required: no special capabilities; context need ~2510 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "code-05",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.2182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.25,
+   "outcome": true,
+   "scorer_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+   "latency_ms": 1243.3,
+   "fixed_strong_outcome": false,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": false,
+    "qwen3.8:latest": false,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "auto selected another model and improved the result",
+   "reasons": [
+    "task=coding (clear); required: no special capabilities; context need ~2502 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "code-06",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.2182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.21,
+   "outcome": true,
+   "scorer_detail": "contains '3 digits'",
+   "latency_ms": 523.8,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=coding (ambiguous); required: no special capabilities; context need ~2481 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "cont-01",
+   "category": "agent",
+   "inferred_task": "agent",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.5793,
+    "qwen3.6:latest": 0.4044
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.33,
+   "outcome": true,
+   "scorer_detail": "contains '4'",
+   "latency_ms": 430.1,
+   "fixed_strong_outcome": false,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": false,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "auto selected another model and improved the result",
+   "reasons": [
+    "task=agent (clear); required: tool support; context need ~2648 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "conv-03",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.22,
+   "outcome": true,
+   "scorer_detail": "nonempty",
+   "latency_ms": 349.6,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2476 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "conv-04",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.25,
+   "outcome": true,
+   "scorer_detail": "contains 'same'",
+   "latency_ms": 197.6,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2485 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "conv-05",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.24,
+   "outcome": true,
+   "scorer_detail": "contains 'pineapple'",
+   "latency_ms": 109.0,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2471 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "dec-02",
+   "category": "decision",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.25,
+   "outcome": true,
+   "scorer_detail": "contains 'account'",
+   "latency_ms": 100.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2489 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "dec-03",
+   "category": "decision",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.26,
+   "outcome": true,
+   "scorer_detail": "contains 'sports'",
+   "latency_ms": 96.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2495 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "extract-03",
+   "category": "extraction",
+   "inferred_task": "extraction",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_json_schema": true
+   },
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.24,
+   "outcome": true,
+   "scorer_detail": "schema-conformant with correct fields",
+   "latency_ms": 396.6,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=extraction (clear); required: strict JSON schema; context need ~2579 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "extract-04",
+   "category": "extraction",
+   "inferred_task": "extraction",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_json_schema": true
+   },
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.25,
+   "outcome": true,
+   "scorer_detail": "schema-conformant with correct fields",
+   "latency_ms": 429.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=extraction (clear); required: strict JSON schema; context need ~2579 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "long-01",
+   "category": "summarization",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 3.18,
+   "outcome": false,
+   "scorer_detail": "missing 'LINE 0: THE QUICK BROWN'",
+   "latency_ms": 306.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "auto selected another model and worsened the result",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~3593 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "math-03",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.321
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.23,
+   "outcome": true,
+   "scorer_detail": "last number 6 == 6 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 108.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2476 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "math-04",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.321
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.23,
+   "outcome": true,
+   "scorer_detail": "last number 55 == 55 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 110.0,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2484 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "math-05",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.321
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.26,
+   "outcome": false,
+   "scorer_detail": "last number 100 != 50 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 118.1,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": false
+   },
+   "routing_result_category": "auto selected another model and worsened the result",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2487 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "math-06",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2 (blend: math=measured:2, decision=measured:1)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.5433
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.29,
+   "outcome": true,
+   "scorer_detail": "contains 'yes'",
+   "latency_ms": 99.1,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=math (ambiguous); required: no special capabilities; context need ~2471 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: math=measured:2, decision=measured:1)), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "multi-01",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": -0.179,
+    "gemma4:31b": -0.2818
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.47,
+   "outcome": true,
+   "scorer_detail": "contains 'luz'",
+   "latency_ms": 1829.1,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2476 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "multi-02",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.321
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.31,
+   "outcome": true,
+   "scorer_detail": "last number 144 == 144 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 117.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2471 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "rag-02",
+   "category": "rag",
+   "inferred_task": "rag",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": 0.821,
+    "gemma4:31b": 0.7182
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.33,
+   "outcome": true,
+   "scorer_detail": "contains '410'",
+   "latency_ms": 598.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=rag (clear); required: no special capabilities; context need ~2523 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "rag-03",
+   "category": "rag",
+   "inferred_task": "rag",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": 0.821,
+    "gemma4:31b": 0.7182
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.32,
+   "outcome": true,
+   "scorer_detail": "contains 'harbour blue'",
+   "latency_ms": 288.6,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=rag (clear); required: no special capabilities; context need ~2527 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "sum-02",
+   "category": "summarization",
+   "inferred_task": "summarization",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:1 (blend: math=measured:2, summarization=measured:1)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.0483
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.47,
+   "outcome": true,
+   "scorer_detail": "contains 'trial'",
+   "latency_ms": 298.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=summarization (ambiguous); required: no special capabilities; context need ~2600 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:1 (blend: math=measured:2, summarization=measured:1)), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "sum-03",
+   "category": "summarization",
+   "inferred_task": "summarization",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:1 (blend: math=measured:2, summarization=measured:1)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": 0.0483
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.47,
+   "outcome": true,
+   "scorer_detail": "contains 'parking'",
+   "latency_ms": 988.9,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=summarization (ambiguous); required: no special capabilities; context need ~2603 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:1 (blend: math=measured:2, summarization=measured:1)), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "trans-02",
+   "category": "translation",
+   "inferred_task": "translation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.22,
+   "outcome": true,
+   "scorer_detail": "contains 'estaci\u00f3n'",
+   "latency_ms": 268.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=translation (clear); required: no special capabilities; context need ~2479 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "trans-03",
+   "category": "translation",
+   "inferred_task": "translation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3-coder:latest",
+    "qwen3.8:latest",
+    "gemma4:31b",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3-coder:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.023,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3-coder:latest": 0.9555,
+    "qwen3.8:latest": 0.938,
+    "gemma4:31b": 0.7182,
+    "qwen3.6:latest": -0.179
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.21,
+   "outcome": true,
+   "scorer_detail": "contains 'twenty minutes'",
+   "latency_ms": 159.0,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": true
+   },
+   "routing_result_category": "routing choice was irrelevant to the outcome (same result on either model)",
+   "reasons": [
+    "task=translation (clear); required: no special capabilities; context need ~2480 tokens",
+    "ollama/qwen3-coder:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.02, resident"
+   ]
+  },
+  {
+   "task": "vis-02",
+   "category": "document_vision",
+   "inferred_task": "document_vision",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_vision": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {
+    "qwen3-coder:latest": [
+     "image input required; capability vision is unsupported (source_claim)"
+    ]
+   },
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.152,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.938,
+    "qwen3.6:latest": 0.821,
+    "gemma4:31b": 0.7182
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.23,
+   "outcome": true,
+   "scorer_detail": "contains 'red'",
+   "latency_ms": 2519.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "gemma4:31b": true,
+    "qwen3.8:latest": true,
+    "qwen3-coder:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=document_vision (clear); required: image input; context need ~3737 tokens",
+    "1 deployment(s) excluded by hard filters; 3 eligible",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+   ]
+  }
+ ],
+ "note": "descriptive only; no routing change follows from this analysis (Stage B rule). Prompts are the synthetic frozen tasks; no application data."
+}

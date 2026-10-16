@@ -1,0 +1,218 @@
+# GX10 journal extract supplied by the owner (2026-10-15, 06:14:30-06:18:00 UTC window; GX10 clock Asia/Singapore +08).
+# Redacted for publication: the interactive shell header (ssh alias, GX10 home path) removed; shell prompt user/host neutralised.
+# Commands run on the GX10 (read-only journalctl):
+<gx10-user>@<gx10-host>:~$ timedatectl | grep 'Time zone'
+# Ollama (system unit; add sudo if journal access is denied)
+journalctl -u ollama --since '2026-10-15 06:14:30 UTC' --until '2026-10-15 06:18:00 UTC' -o short-iso --no-pager
+# ModelSaar production gateway (user unit)
+journalctl --user -u modelsaar.service --since '2026-10-15 06:14:30 UTC' --until '2026-10-15 06:18:00 UTC' -o short-iso --no-pager
+# GX10's view of the Mac peer during the wake window
+journalctl -u tailscaled --since '2026-10-15 06:17:30 UTC' --until '2026-10-15 06:18:00 UTC' -o short-iso --no-pager
+# retention sanity check (should print lines from earlier that morning)
+journalctl -u ollama --since '2026-10-15 05:50 UTC' --until '2026-10-15 05:55 UTC' -o short-iso --no-pager | head -3
+                Time zone: Asia/Singapore (+08, +0800)
+2026-10-15T14:14:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:30 | 200 |      73.216µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:14:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:30 | 200 |     103.873µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:14:32+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5222 | n_gen =    302, tg =  11.02 t/s, tg_3s =  10.92 t/s
+2026-10-15T14:14:32+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:32 | 200 |      69.569µs |  100.106.107.13 | GET      "/api/version"
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:33 | 200 |     114.433µs |  100.106.107.13 | GET      "/api/ps"
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5222 | prompt eval time =    2767.27 ms /    18 tokens (  153.74 ms per token,     6.50 tokens per second)
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5222 |        eval time =   28505.93 ms /   315 tokens (   90.78 ms per token,    11.02 tokens per second)
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5222 |       total time =   31273.20 ms /   333 tokens
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5222 |    graphs reused =       5430
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: slot      release: id  0 | task 5222 | stop processing: n_tokens = 332, truncated = 0
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: srv  update_slots: all slots are idle
+2026-10-15T14:14:33+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:33 | 200 | 31.348394738s |  100.106.107.13 | POST     "/v1/chat/completions"
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv  server_strea: conv_id= (empty=1)
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot get_availabl: id  0 | task -1 |  - checking sim = 0.611 (11/18) > 0.100
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.611 (> 0.100 thold), f_keep = 0.033
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv  get_availabl: updating prompt cache
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv   prompt_save:  - saving prompt with length 332, total state size = 285.322 MiB (draft: 0.000 MiB)
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:  - looking for better prompt, base f_keep = 0.033, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     285, lcp =      11, f_keep = 0.039, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     119, lcp =      11, f_keep = 0.092, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length      67, lcp =      11, f_keep = 0.164, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     452, lcp =      11, f_keep = 0.024, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     343, lcp =      11, f_keep = 0.032, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     456, lcp =      11, f_keep = 0.024, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     193, lcp =      11, f_keep = 0.057, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     145, lcp =       6, f_keep = 0.041, f_sim = 0.333
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     115, lcp =       6, f_keep = 0.052, f_sim = 0.333
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     161, lcp =      11, f_keep = 0.068, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     197, lcp =      11, f_keep = 0.056, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     229, lcp =      11, f_keep = 0.048, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     359, lcp =      11, f_keep = 0.031, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     298, lcp =      11, f_keep = 0.037, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     284, lcp =      11, f_keep = 0.039, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     382, lcp =      11, f_keep = 0.029, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     407, lcp =      11, f_keep = 0.027, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     269, lcp =      11, f_keep = 0.041, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     363, lcp =      11, f_keep = 0.030, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     428, lcp =      11, f_keep = 0.026, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     129, lcp =      11, f_keep = 0.085, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     423, lcp =      11, f_keep = 0.026, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv          load:    - prompt with length     332, lcp =      11, f_keep = 0.033, f_sim = 0.611
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:  - cache state: 23 prompts, 6254.592 MiB (limits: 8192.000 MiB, 131072 tokens, 131072 est)
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d76eea0:     285 tokens, checkpoints:  1,   262.119 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x32395540:     119 tokens, checkpoints:  1,   124.928 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d74fbf0:      67 tokens, checkpoints:  1,    72.426 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2e151020:     452 tokens, checkpoints:  1,   426.732 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2e227760:     343 tokens, checkpoints:  1,   339.308 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2ea9a5a0:     456 tokens, checkpoints:  1,   433.295 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2e36cd10:     193 tokens, checkpoints:  1,   192.429 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d74f350:     145 tokens, checkpoints:  1,   179.304 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2e3544a0:     115 tokens, checkpoints:  1,   148.834 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d74f400:     161 tokens, checkpoints:  1,   164.147 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d74f4e0:     197 tokens, checkpoints:  1,   193.523 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d74f590:     229 tokens, checkpoints:  1,   224.149 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d7433a0:     359 tokens, checkpoints:  1,   328.058 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2e370300:     298 tokens, checkpoints:  1,   283.447 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2ea58f80:     284 tokens, checkpoints:  1,   270.634 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2f01be10:     382 tokens, checkpoints:  1,   404.856 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x325a4370:     407 tokens, checkpoints:  1,   425.560 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d82e1e0:     269 tokens, checkpoints:  1,   249.931 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2d82e320:     363 tokens, checkpoints:  1,   336.964 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2e0fb370:     428 tokens, checkpoints:  1,   387.356 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2ea096d0:     129 tokens, checkpoints:  1,   131.178 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x2e0b0ab0:     423 tokens, checkpoints:  1,   379.153 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv        update:    - prompt 0x4789b530:     332 tokens, checkpoints:  1,   296.260 MiB
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: srv  get_availabl: prompt cache update took 54.49 ms
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot launch_slot_: id  0 | task -1 | sampler chain: logits -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> ?top-p -> ?min-p -> ?xtc -> temp-ext -> dist
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot launch_slot_: id  0 | task -1 | sampler params:
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]:         repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]:         dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]:         top_k = 64, top_p = 1.000, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]:         mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot launch_slot_: id  0 | task 5539 | processing task, is_child = 0
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot   operator(): id  0 | task 5539 | new prompt, n_ctx_slot = 131072, n_keep = 4, task.n_tokens = 18
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot   operator(): id  0 | task 5539 | checking checkpoint with [0, 13] against 0...
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot   operator(): id  0 | task 5539 | forcing full prompt re-processing due to lack of cache data (likely due to SWA or hybrid/recurrent memory, see https://github.com/ggml-org/llama.cpp/pull/13194#issuecomment-2868343055)
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot   operator(): id  0 | task 5539 | erased invalidated context checkpoint (pos_min = 0, pos_max = 13, n_tokens = 14, n_swa = 1024, pos_next = 0, size = 10.939 MiB)
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot   operator(): id  0 | task 5539 | cached n_tokens = 0, memory_seq_rm [0, end)
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot   operator(): id  0 | task 5539 | cached n_tokens = 14, memory_seq_rm [14, end)
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot init_sampler: id  0 | task 5539 | init sampler, took 0.01 ms, tokens: text = 18, total = 18
+2026-10-15T14:14:34+08:00 gx10-082d ollama[48972]: slot create_check: id  0 | task 5539 | created context checkpoint 1 of 32 (pos_min = 0, pos_max = 13, n_tokens = 14, size = 10.939 MiB)
+2026-10-15T14:14:43+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    100, tg =  11.04 t/s, tg_3s =  11.15 t/s
+2026-10-15T14:14:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:45 | 200 |       88.88µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:14:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:45 | 200 |     112.049µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:14:46+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:46 | 200 |      51.536µs |    192.168.0.10 | GET      "/"
+2026-10-15T14:14:46+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    134, tg =  11.05 t/s, tg_3s =  11.06 t/s
+2026-10-15T14:14:48+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:48 | 200 |      80.609µs |  100.106.107.13 | GET      "/api/version"
+2026-10-15T14:14:48+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:14:48 | 200 |      79.697µs |  100.106.107.13 | GET      "/api/ps"
+2026-10-15T14:14:49+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    168, tg =  11.05 t/s, tg_3s =  11.06 t/s
+2026-10-15T14:14:52+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    202, tg =  11.04 t/s, tg_3s =  11.03 t/s
+2026-10-15T14:14:55+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    236, tg =  11.05 t/s, tg_3s =  11.06 t/s
+2026-10-15T14:14:58+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    269, tg =  11.03 t/s, tg_3s =  10.92 t/s
+2026-10-15T14:15:00+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:00 | 200 |      93.457µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:15:00+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:00 | 200 |      60.513µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:15:01+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    302, tg =  11.02 t/s, tg_3s =  10.92 t/s
+2026-10-15T14:15:04+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    335, tg =  11.01 t/s, tg_3s =  10.93 t/s
+2026-10-15T14:15:07+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | n_gen =    368, tg =  11.00 t/s, tg_3s =  10.92 t/s
+2026-10-15T14:15:10+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 | prompt eval time =     208.27 ms /    18 tokens (   11.57 ms per token,    86.43 tokens per second)
+2026-10-15T14:15:10+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 |        eval time =   36287.89 ms /   400 tokens (   90.95 ms per token,    11.00 tokens per second)
+2026-10-15T14:15:10+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 |       total time =   36496.15 ms /   418 tokens
+2026-10-15T14:15:10+08:00 gx10-082d ollama[48972]: slot print_timing: id  0 | task 5539 |    graphs reused =       5827
+2026-10-15T14:15:10+08:00 gx10-082d ollama[48972]: slot      release: id  0 | task 5539 | stop processing: n_tokens = 417, truncated = 0
+2026-10-15T14:15:10+08:00 gx10-082d ollama[48972]: srv  update_slots: all slots are idle
+2026-10-15T14:15:10+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:10 | 200 | 36.555252386s |  100.106.107.13 | POST     "/v1/chat/completions"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |    3.152154ms |       127.0.0.1 | GET      "/api/tags"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |       7.312µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |      18.689µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |     318.657µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |    1.109347ms |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |     646.978µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |     396.577µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |     605.522µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |     320.897µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |      592.93µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:15 | 200 |     557.138µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:15:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:30 | 200 |      24.288µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:15:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:30 | 200 |      22.384µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:15:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:45 | 200 |      23.456µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:15:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:45 | 200 |      22.864µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:15:46+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:15:46 | 200 |      17.456µs |    192.168.0.10 | GET      "/"
+2026-10-15T14:16:00+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:00 | 200 |      21.072µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:16:00+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:00 | 200 |      19.456µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:16:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:15 | 200 |      25.808µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:16:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:15 | 200 |      19.856µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:16:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:30 | 200 |      19.777µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:16:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:30 | 200 |      17.952µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:16:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:45 | 200 |      20.256µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:16:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:45 | 200 |      17.456µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:16:46+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:16:46 | 200 |      15.216µs |    192.168.0.10 | GET      "/"
+2026-10-15T14:17:00+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:00 | 200 |      20.608µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:17:00+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:00 | 200 |      20.336µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |    2.380023ms |       127.0.0.1 | GET      "/api/tags"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |      10.816µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |      26.656µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |      612.61µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |     376.113µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |     676.802µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |     540.065µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |    1.338227ms |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |     473.985µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |     447.585µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:15+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:15 | 200 |     703.474µs |       127.0.0.1 | POST     "/api/show"
+2026-10-15T14:17:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:30 | 200 |      26.016µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:17:30+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:30 | 200 |      22.848µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:17:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:45 | 200 |      22.592µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T14:17:45+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:45 | 200 |      23.809µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T14:17:46+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:46 | 200 |      30.672µs |    192.168.0.10 | GET      "/"
+2026-10-15T14:17:55+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 14:17:55 | 200 |      41.008µs |  100.106.107.13 | GET      "/api/ps"
+2026-10-15T14:14:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:14:30,111 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:14:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:14:30,112 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:14:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:14:45,116 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:14:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:14:45,118 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:15:00+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:00,123 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:15:00+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:00,124 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,131 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,132 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,133 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,135 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,137 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,139 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,140 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,142 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,143 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,145 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:15,147 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:15:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:30,151 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:15:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:30,152 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:15:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:45,155 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:15:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:15:45,156 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:16:00+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:00,160 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:16:00+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:00,160 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:16:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:15,164 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:16:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:15,165 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:16:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:30,169 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:16:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:30,170 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:16:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:45,173 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:16:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:16:45,174 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:17:00+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:00,177 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:17:00+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:00,178 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,183 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,184 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,185 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,187 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,188 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,190 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,191 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,194 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,195 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,197 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:15+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:15,198 INFO httpx: HTTP Request: POST http://127.0.0.1:11434/api/show "HTTP/1.1 200 OK"
+2026-10-15T14:17:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:30,201 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:17:30+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:30,202 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:17:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:45,205 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/version "HTTP/1.1 200 OK"
+2026-10-15T14:17:45+08:00 gx10-082d modelsaar[760015]: 2026-10-15 14:17:45,205 INFO httpx: HTTP Request: GET http://127.0.0.1:11434/api/ps "HTTP/1.1 200 OK"
+2026-10-15T14:17:34+08:00 gx10-082d tailscaled[2192]: magicsock: derp-6 does not know about peer [qYvoe], removing route
+2026-10-15T14:17:39+08:00 gx10-082d tailscaled[2192]: magicsock: derp-6 does not know about peer [qYvoe], removing route
+2026-10-15T14:17:42+08:00 gx10-082d tailscaled[2192]: magicsock: new contact: peer=[qYvoe] usec=168757419910 cached=false via=derp
+2026-10-15T14:17:43+08:00 gx10-082d tailscaled[2192]: magicsock: new contact: peer=[qYvoe] usec=168758121350 cached=false via=derp
+2026-10-15T14:17:48+08:00 gx10-082d tailscaled[2192]: magicsock: derp-6 does not know about peer [qYvoe], removing route
+2026-10-15T14:17:49+08:00 gx10-082d tailscaled[2192]: magicsock: new contact: peer=[qYvoe] usec=168763978371 cached=false via=derp
+2026-10-15T14:17:54+08:00 gx10-082d tailscaled[2192]: magicsock: new contact: peer=[qYvoe] usec=168769337721 cached=false via=derp
+2026-10-15T13:50:14+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 13:50:14 | 200 |      23.824µs |       127.0.0.1 | GET      "/api/version"
+2026-10-15T13:50:14+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 13:50:14 | 200 |       4.176µs |       127.0.0.1 | GET      "/api/ps"
+2026-10-15T13:50:29+08:00 gx10-082d ollama[48972]: [GIN] 2026/10/15 - 13:50:29 | 200 |      26.384µs |       127.0.0.1 | GET      "/api/version"
+<gx10-user>@<gx10-host>:~$ 

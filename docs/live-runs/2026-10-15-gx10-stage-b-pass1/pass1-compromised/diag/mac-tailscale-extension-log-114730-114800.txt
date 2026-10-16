@@ -1,0 +1,27 @@
+2026-10-15 11:47:38.060 Df IPNExtension magicsock: [0x2a22f86c4f20] derp.Recv(derp-3): derp.Recv: read tcp4 192.168.0.142:55570->172.237.66.30:443: read: connection reset by peer
+2026-10-15 11:47:38.067 Df IPNExtension derphttp.Client.Recv: connecting to derp-3 (sin)
+2026-10-15 11:47:38.115 Df IPNExtension control: NetInfo: NetInfo{varies=false ipv6=false ipv6os=true udp=true icmpv4=false derp=#6 portmap=active-UMC link="" firewallmode=""}
+2026-10-15 11:47:38.230 Df IPNExtension magicsock: derp-3 connected; connGen=2
+2026-10-15 11:47:38.302 Df IPNExtension magicsock: disco: failed to send ping tx=8308c31c54ab padding=0 to 192.168.0.10:34883 [9ApTx]: write udp4 0.0.0.0:41641->192.168.0.10:34883: sendto: host is down
+2026-10-15 11:47:38.330 Df IPNExtension control: lite map update error after 214ms: Post "https://controlplane.tailscale.com/machine/map": read tcp 192.168.0.142:55604->192.200.0.106:443: read: connection reset by peer
+2026-10-15 11:47:38.341 Df IPNExtension Received error: PollNetMap: read tcp 192.168.0.142:55604->192.200.0.106:443: read: connection reset by peer
+2026-10-15 11:47:38.656 Df IPNExtension control: controlhttp: forcing port 443 dial due to recent noise dial
+2026-10-15 11:47:39.452 Df IPNExtension control: netmap: got new dial plan from control
+2026-10-15 11:47:42.088 Df IPNExtension open-conn-track: timeout opening (TCP 100.106.107.13:56076 => 100.83.54.124:22) to node [8HO5x]; online=yes, lastRecv=13s
+2026-10-15 11:47:43.371 Df IPNExtension monitor: time jump detected (slept 2m52s), probably wake from sleep
+2026-10-15 11:47:44.305 Df IPNExtension magicsock: disco: failed to send ping tx=02244855a54c padding=0 to 192.168.0.10:34883 [9ApTx]: write udp4 0.0.0.0:41641->192.168.0.10:34883: sendto: host is down
+2026-10-15 11:47:44.778 Df IPNExtension [general] - swiftNetMon: Path evaluated - unchanged
+2026-10-15 11:47:45.629 Df IPNExtension open-conn-track: timeout opening (TCP 100.106.107.13:56097 => 100.83.54.124:11434) to node [8HO5x]; online=yes, lastRecv=16s
+2026-10-15 11:47:49.002 Df IPNExtension magicsock: disco: failed to send ping tx=2812b48fc729 padding=0 to 192.168.0.12:41641 [8HO5x]: write udp4 0.0.0.0:41641->192.168.0.12:41641: sendto: no route to host
+2026-10-15 11:47:49.781 Df IPNExtension [general] - swiftNetMon: Path evaluated - unchanged
+2026-10-15 11:47:50.076 Df IPNExtension open-conn-track: timeout opening (TCP 100.106.107.13:56076 => 100.83.54.124:22) to node [8HO5x]; online=yes, lastRecv=21s
+2026-10-15 11:47:50.240 Df IPNExtension magicsock: [0x2a22f86c4dc0] derp.Recv(derp-6): derp.Recv: read tcp4 192.168.0.142:55577->68.183.90.120:443: read: connection reset by peer
+2026-10-15 11:47:50.252 Df IPNExtension derphttp.Client.Recv: connecting to derp-6 (blr)
+2026-10-15 11:47:50.305 Df IPNExtension magicsock: disco: failed to send ping tx=b4ba2987a9ad padding=0 to 192.168.0.10:34883 [9ApTx]: write udp4 0.0.0.0:41641->192.168.0.10:34883: sendto: host is down
+2026-10-15 11:47:50.350 Df IPNExtension magicsock: derp-6 connected; connGen=3
+2026-10-15 11:47:52.461 Df IPNExtension control: controlclient direct: got TSMP disco key advertisement from 100.115.171.37 via eventbus
+2026-10-15 11:47:52.461 Df IPNExtension control: controlclient direct: updating discoKey for 100.115.171.37 via mapSession
+2026-10-15 11:47:54.348 Df IPNExtension magicsock: disco: failed to send ping tx=91d1da8ba480 padding=0 to 192.168.0.12:41641 [8HO5x]: write udp4 0.0.0.0:41641->192.168.0.12:41641: sendto: host is down
+2026-10-15 11:47:54.480 Df IPNExtension control: controlclient direct: got TSMP disco key advertisement from 100.83.54.124 via eventbus
+2026-10-15 11:47:54.480 Df IPNExtension control: controlclient direct: updating discoKey for 100.83.54.124 via mapSession
+2026-10-15 11:47:57.374 Df IPNExtension open-conn-track: timeout opening (TCP 100.106.107.13:56076 => 100.83.54.124:22) to node [8HO5x]; online=yes, lastRecv=3s

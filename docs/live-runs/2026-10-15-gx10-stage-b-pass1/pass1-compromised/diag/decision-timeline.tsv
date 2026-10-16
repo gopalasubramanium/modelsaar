@@ -1,0 +1,221 @@
+idx	policy	task	status	latency_ms	request_id	decision_created_ist	registry_version	outcome	chosen	exclusion_reasons
+0	calib:ollama/qwen3.6:latest	conv-01	200	12587.7	req_deeb3aa89e994cf5	11:26:12.775	3	ok	ollama/qwen3.6:latest	{}
+1	calib:ollama/qwen3.6:latest	conv-02	200	4675.4	req_6070917140a140fb	11:26:17.452	3	ok	ollama/qwen3.6:latest	{}
+2	calib:ollama/qwen3.6:latest	code-01	200	4326.4	req_94d247779c32424e	11:26:21.780	3	ok	ollama/qwen3.6:latest	{}
+3	calib:ollama/qwen3.6:latest	code-02	200	4144.1	req_60014d49e654498c	11:26:25.972	3	ok	ollama/qwen3.6:latest	{}
+4	calib:ollama/qwen3.6:latest	agent-01	200	2507.5	req_979534e2e69b4cd9	11:26:28.523	3	ok	ollama/qwen3.6:latest	{}
+5	calib:ollama/qwen3.6:latest	agent-02	200	1917.3	req_096e54476676474c	11:26:30.441	3	ok	ollama/qwen3.6:latest	{}
+6	calib:ollama/qwen3.6:latest	math-01	200	3031.1	req_e3684e10284f42ac	11:26:33.474	3	ok	ollama/qwen3.6:latest	{}
+7	calib:ollama/qwen3.6:latest	math-02	200	4077.3	req_43486a1687014109	11:26:37.551	3	ok	ollama/qwen3.6:latest	{}
+8	calib:ollama/qwen3.6:latest	extract-01	200	4347.4	req_16cf77385721492e	11:26:41.900	3	ok	ollama/qwen3.6:latest	{}
+9	calib:ollama/qwen3.6:latest	extract-02	200	4390.7	req_5424620908394a22	11:26:46.291	3	ok	ollama/qwen3.6:latest	{}
+10	calib:ollama/qwen3.6:latest	sum-01	200	4488.0	req_dd27483906a24a4c	11:26:50.780	3	ok	ollama/qwen3.6:latest	{}
+11	calib:ollama/qwen3.6:latest	trans-01	200	4522.5	req_ac05b3b0c0824ba0	11:26:55.302	3	ok	ollama/qwen3.6:latest	{}
+12	calib:ollama/qwen3.6:latest	rag-01	200	2798.2	req_8af00b4821a74100	11:26:58.101	3	ok	ollama/qwen3.6:latest	{}
+13	calib:ollama/qwen3.6:latest	dec-01	200	2310.4	req_3d9a6279bc0d4b85	11:27:00.413	3	ok	ollama/qwen3.6:latest	{}
+14	calib:ollama/qwen3.6:latest	vis-01	200	1057.9	req_9d36330deec64703	11:27:01.472	3	ok	ollama/qwen3.6:latest	{}
+15	calib:ollama/gemma4:31b	conv-01	200	44381.6	req_df2060d7db594b8a	11:27:45.854	3	ok	ollama/gemma4:31b	{}
+16	calib:ollama/gemma4:31b	conv-02	200	36601.2	req_1af03f39c16a4b9e	11:28:22.455	4	ok	ollama/gemma4:31b	{}
+17	calib:ollama/gemma4:31b	code-01	200	34957.9	req_4d90770376cd4aee	11:28:57.414	4	ok	ollama/gemma4:31b	{}
+18	calib:ollama/gemma4:31b	code-02	200	36673.4	req_aeb5b63648fc4702	11:29:34.175	4	ok	ollama/gemma4:31b	{}
+19	calib:ollama/gemma4:31b	agent-01	200	4388.0	req_62e3d60b4f4244c6	11:29:38.653	5	ok	ollama/gemma4:31b	{}
+20	calib:ollama/gemma4:31b	agent-02	200	6309.2	req_a6ba5488abac461b	11:29:44.963	5	ok	ollama/gemma4:31b	{}
+21	calib:ollama/gemma4:31b	math-01	200	7836.7	req_630056264b7349a1	11:29:52.799	5	ok	ollama/gemma4:31b	{}
+22	calib:ollama/gemma4:31b	math-02	200	15593.2	req_a69e52f33db748fc	11:30:08.393	5	ok	ollama/gemma4:31b	{}
+23	calib:ollama/gemma4:31b	extract-01	200	29151.6	req_0e28b996a310459d	11:30:37.545	5	ok	ollama/gemma4:31b	{}
+24	calib:ollama/gemma4:31b	extract-02	200	20899.2	req_ddea320d320442f8	11:30:58.445	5	ok	ollama/gemma4:31b	{}
+25	calib:ollama/gemma4:31b	sum-01	200	25959.7	req_3017374fd0184261	11:31:24.405	5	ok	ollama/gemma4:31b	{}
+26	calib:ollama/gemma4:31b	trans-01	200	28108.5	req_4cdf704b9ae04e3f	11:31:52.515	5	ok	ollama/gemma4:31b	{}
+27	calib:ollama/gemma4:31b	rag-01	200	16817.9	req_75df3793872f4188	11:32:09.334	6	ok	ollama/gemma4:31b	{}
+28	calib:ollama/gemma4:31b	dec-01	200	9568.7	req_cf0b3eb863cd409f	11:32:18.904	6	ok	ollama/gemma4:31b	{}
+29	calib:ollama/gemma4:31b	vis-01	200	7298.9	req_37d5824edf8c49f6	11:32:26.204	6	ok	ollama/gemma4:31b	{}
+30	calib:ollama/qwen3.8:latest	conv-01	200	16727.4	req_bd8c072c89864159	11:32:42.932	6	ok	ollama/qwen3.8:latest	{}
+31	calib:ollama/qwen3.8:latest	conv-02	200	15554.7	req_8540a699078d469a	11:32:58.487	6	ok	ollama/qwen3.8:latest	{}
+32	calib:ollama/qwen3.8:latest	code-01	200	4526.7	req_b7725eb3f2934772	11:33:03.015	6	ok	ollama/qwen3.8:latest	{}
+33	calib:ollama/qwen3.8:latest	code-02	200	5316.8	req_50ce7fb498e74a1a	11:33:08.375	6	ok	ollama/qwen3.8:latest	{}
+34	calib:ollama/qwen3.8:latest	agent-01	200	2042.5	req_923f50ef12574b78	11:33:10.465	6	ok	ollama/qwen3.8:latest	{}
+35	calib:ollama/qwen3.8:latest	agent-02	200	1928.1	req_4eba3cc198604710	11:33:12.395	6	ok	ollama/qwen3.8:latest	{}
+36	calib:ollama/qwen3.8:latest	math-01	200	1422.8	req_4b8967b635e24c85	11:33:13.818	6	ok	ollama/qwen3.8:latest	{}
+37	calib:ollama/qwen3.8:latest	math-02	200	1537.3	req_df98146f19094f3a	11:33:15.355	6	ok	ollama/qwen3.8:latest	{}
+38	calib:ollama/qwen3.8:latest	extract-01	200	3314.3	req_43b5b7702fa64785	11:33:18.671	6	ok	ollama/qwen3.8:latest	{}
+39	calib:ollama/qwen3.8:latest	extract-02	200	3203.5	req_c7b3a6f6b4bc49c5	11:33:21.875	6	ok	ollama/qwen3.8:latest	{}
+40	calib:ollama/qwen3.8:latest	sum-01	200	4659.6	req_c167daae32f74273	11:33:26.536	6	ok	ollama/qwen3.8:latest	{}
+41	calib:ollama/qwen3.8:latest	trans-01	200	8047.6	req_820ddd405acf4cbf	11:33:34.585	6	ok	ollama/qwen3.8:latest	{}
+42	calib:ollama/qwen3.8:latest	rag-01	200	2472.1	req_a5db353dc9c24cd3	11:33:37.057	7	ok	ollama/qwen3.8:latest	{}
+43	calib:ollama/qwen3.8:latest	dec-01	200	2457.6	req_96ccd652450c47da	11:33:39.516	7	ok	ollama/qwen3.8:latest	{}
+44	calib:ollama/qwen3.8:latest	vis-01	200	2518.1	req_50778823470e4566	11:33:42.035	7	ok	ollama/qwen3.8:latest	{}
+45	calib:ollama/qwen3-coder:latest	conv-01	200	8419.0	req_8ee4d21f13924827	11:33:50.454	7	ok	ollama/qwen3-coder:latest	{}
+46	calib:ollama/qwen3-coder:latest	conv-02	200	2392.2	req_5658aba90c8f4d9e	11:33:52.847	7	ok	ollama/qwen3-coder:latest	{}
+47	calib:ollama/qwen3-coder:latest	code-01	200	856.2	req_6c854c161c0d4055	11:33:53.705	7	ok	ollama/qwen3-coder:latest	{}
+48	calib:ollama/qwen3-coder:latest	code-02	200	1195.4	req_3632281bee7a4f18	11:33:54.945	7	ok	ollama/qwen3-coder:latest	{}
+49	calib:ollama/qwen3-coder:latest	agent-01	200	505.3	req_8bee9b5e89514b18	11:33:55.497	7	ok	ollama/qwen3-coder:latest	{}
+50	calib:ollama/qwen3-coder:latest	agent-02	200	497.4	req_e30ebdb841c44526	11:33:55.995	7	ok	ollama/qwen3-coder:latest	{}
+51	calib:ollama/qwen3-coder:latest	math-01	200	218.9	req_44c7aa0049694a90	11:33:56.214	7	ok	ollama/qwen3-coder:latest	{}
+52	calib:ollama/qwen3-coder:latest	math-02	200	179.3	req_0962fa90135e461d	11:33:56.395	7	ok	ollama/qwen3-coder:latest	{}
+53	calib:ollama/qwen3-coder:latest	extract-01	200	510.3	req_3911b06b64e144aa	11:33:56.905	7	ok	ollama/qwen3-coder:latest	{}
+54	calib:ollama/qwen3-coder:latest	extract-02	200	499.5	req_e6dd0b7329494029	11:33:57.406	7	ok	ollama/qwen3-coder:latest	{}
+55	calib:ollama/qwen3-coder:latest	sum-01	200	548.5	req_f7a665ea9392438a	11:33:57.955	7	ok	ollama/qwen3-coder:latest	{}
+56	calib:ollama/qwen3-coder:latest	trans-01	200	329.2	req_c9548deaf46546e8	11:33:58.285	7	ok	ollama/qwen3-coder:latest	{}
+57	calib:ollama/qwen3-coder:latest	rag-01	200	377.6	req_c3f352e91f5b487c	11:33:58.665	7	ok	ollama/qwen3-coder:latest	{}
+58	calib:ollama/qwen3-coder:latest	dec-01	200	160.0	req_fc143e2f94344690	11:33:58.825	7	ok	ollama/qwen3-coder:latest	{}
+59	calib:ollama/qwen3-coder:latest	vis-01	422	3.0	req_216689be356b452d	11:33:58.829	7	no_eligible		image input required; capability vision is unsupported (source_claim)
+60	test:ollama/qwen3.6:latest	conv-03	200	12177.7	req_9d7cf95c5518436e	11:34:12.035	8	ok	ollama/qwen3.6:latest	{}
+61	test:ollama/qwen3.6:latest	conv-04	200	2909.3	req_b862e4201727456a	11:34:14.945	8	ok	ollama/qwen3.6:latest	{}
+62	test:ollama/qwen3.6:latest	conv-05	200	1440.5	req_80b4d2edbd604c45	11:34:16.385	8	ok	ollama/qwen3.6:latest	{}
+63	test:ollama/qwen3.6:latest	code-03	200	4668.5	req_e6639387672042be	11:34:21.055	8	ok	ollama/qwen3.6:latest	{}
+64	test:ollama/qwen3.6:latest	code-04	200	4545.5	req_c8dcd0ac72794933	11:34:25.648	8	ok	ollama/qwen3.6:latest	{}
+65	test:ollama/qwen3.6:latest	code-05	200	4279.4	req_c4c67f61ead3444c	11:34:29.976	8	ok	ollama/qwen3.6:latest	{}
+66	test:ollama/qwen3.6:latest	code-06	200	4425.1	req_349ac1050f4641d6	11:34:34.446	8	ok	ollama/qwen3.6:latest	{}
+67	test:ollama/qwen3.6:latest	agent-03	200	1558.4	req_5bff062270df4f20	11:34:36.004	8	ok	ollama/qwen3.6:latest	{}
+68	test:ollama/qwen3.6:latest	agent-04	200	1699.5	req_1ed9286e127b456e	11:34:37.705	8	ok	ollama/qwen3.6:latest	{}
+69	test:ollama/qwen3.6:latest	agent-05	200	950.3	req_5e5f95286e504f15	11:34:38.655	8	ok	ollama/qwen3.6:latest	{}
+70	test:ollama/qwen3.6:latest	math-03	200	2098.4	req_a114f3b63d5348ce	11:34:40.754	8	ok	ollama/qwen3.6:latest	{}
+71	test:ollama/qwen3.6:latest	math-04	200	4080.6	req_9cdd705e5b014186	11:34:44.835	8	ok	ollama/qwen3.6:latest	{}
+72	test:ollama/qwen3.6:latest	math-05	200	2925.7	req_ac49f1ff67734080	11:34:47.762	8	ok	ollama/qwen3.6:latest	{}
+73	test:ollama/qwen3.6:latest	math-06	200	4213.6	req_a56e30116f65453a	11:34:51.976	8	ok	ollama/qwen3.6:latest	{}
+74	test:ollama/qwen3.6:latest	extract-03	200	4322.8	req_e8feed1482774d0e	11:34:56.300	8	ok	ollama/qwen3.6:latest	{}
+75	test:ollama/qwen3.6:latest	extract-04	200	4276.3	req_fc2637a8b14947a2	11:35:00.577	8	ok	ollama/qwen3.6:latest	{}
+76	test:ollama/qwen3.6:latest	sum-02	200	4199.2	req_820dc9fc52064420	11:35:04.777	8	ok	ollama/qwen3.6:latest	{}
+77	test:ollama/qwen3.6:latest	sum-03	200	4371.0	req_cd215815f04249a2	11:35:09.147	8	ok	ollama/qwen3.6:latest	{}
+78	test:ollama/qwen3.6:latest	trans-02	200	4400.4	req_7692fe23679b4371	11:35:13.548	8	ok	ollama/qwen3.6:latest	{}
+79	test:ollama/qwen3.6:latest	trans-03	200	4116.4	req_a6f9df71f1004e6d	11:35:17.666	8	ok	ollama/qwen3.6:latest	{}
+80	test:ollama/qwen3.6:latest	multi-01	200	4129.2	req_448bcfa7d1f74dd7	11:35:21.796	8	ok	ollama/qwen3.6:latest	{}
+81	test:ollama/qwen3.6:latest	multi-02	200	2930.1	req_1da0c0b82ece4ad9	11:35:24.728	8	ok	ollama/qwen3.6:latest	{}
+82	test:ollama/qwen3.6:latest	ambig-01	200	4467.5	req_dd6310d2dba9461d	11:35:29.196	8	ok	ollama/qwen3.6:latest	{}
+83	test:ollama/qwen3.6:latest	ambig-02	200	4302.7	req_3e233f3eef1f410d	11:35:33.498	8	ok	ollama/qwen3.6:latest	{}
+84	test:ollama/qwen3.6:latest	ambig-03	200	5726.2	req_2c282ff24c074c4d	11:35:39.227	8	ok	ollama/qwen3.6:latest	{}
+85	test:ollama/qwen3.6:latest	rag-02	200	2739.8	req_c4540a71ccb24442	11:35:41.967	9	ok	ollama/qwen3.6:latest	{}
+86	test:ollama/qwen3.6:latest	rag-03	200	2723.8	req_b9a1d6ba180b4d0b	11:35:44.692	9	ok	ollama/qwen3.6:latest	{}
+87	test:ollama/qwen3.6:latest	dec-02	200	2395.1	req_92cf3dffe38e4ceb	11:35:47.087	9	ok	ollama/qwen3.6:latest	{}
+88	test:ollama/qwen3.6:latest	dec-03	200	2229.2	req_fda4d79cc69d4078	11:35:49.318	9	ok	ollama/qwen3.6:latest	{}
+89	test:ollama/qwen3.6:latest	vis-02	200	1396.4	req_f017d48bded04688	11:35:50.715	9	ok	ollama/qwen3.6:latest	{}
+90	test:ollama/qwen3.6:latest	cont-01	200	1521.0	req_f7b0532baa924aac	11:35:52.236	9	ok	ollama/qwen3.6:latest	{}
+91	test:ollama/qwen3.6:latest	long-01	200	4660.8	req_b8f806c9175e446d	11:35:56.898	9	ok	ollama/qwen3.6:latest	{}
+92	test:ollama/gemma4:31b	conv-03	200	31938.9	req_ca24b8b636e64636	11:36:28.838	9	ok	ollama/gemma4:31b	{}
+93	test:ollama/gemma4:31b	conv-04	200	8117.6	req_77f8241920cd440b	11:36:36.957	9	ok	ollama/gemma4:31b	{}
+94	test:ollama/gemma4:31b	conv-05	200	4300.4	req_6e6c6e05b2c84f4e	11:36:41.258	9	ok	ollama/gemma4:31b	{}
+95	test:ollama/gemma4:31b	code-03	200	36560.6	req_0df8cd124cb4446d	11:37:17.819	9	ok	ollama/gemma4:31b	{}
+96	test:ollama/gemma4:31b	code-04	200	26021.7	req_195a473198014b74	11:37:43.889	9	ok	ollama/gemma4:31b	{}
+97	test:ollama/gemma4:31b	code-05	200	36724.5	req_e284989407b6409a	11:38:20.658	10	ok	ollama/gemma4:31b	{}
+98	test:ollama/gemma4:31b	code-06	200	14390.2	req_d9ce44ccec1b43ca	11:38:35.138	10	ok	ollama/gemma4:31b	{}
+99	test:ollama/gemma4:31b	agent-03	200	4788.5	req_025c2dd010cb4c22	11:38:39.928	10	ok	ollama/gemma4:31b	{}
+100	test:ollama/gemma4:31b	agent-04	200	6810.8	req_2ff2ed62d5504e46	11:38:46.739	10	ok	ollama/gemma4:31b	{}
+101	test:ollama/gemma4:31b	agent-05	200	4649.2	req_0a18efc696ce4a7d	11:38:51.389	10	ok	ollama/gemma4:31b	{}
+102	test:ollama/gemma4:31b	math-03	200	11597.3	req_84a26aeb82b34f12	11:39:02.987	10	ok	ollama/gemma4:31b	{}
+103	test:ollama/gemma4:31b	math-04	200	15029.8	req_facbbf8ad87d4233	11:39:18.018	10	ok	ollama/gemma4:31b	{}
+104	test:ollama/gemma4:31b	math-05	200	17589.1	req_9377556d25564db7	11:39:35.609	10	ok	ollama/gemma4:31b	{}
+105	test:ollama/gemma4:31b	math-06	200	30392.2	req_f5ca1543cb3144c9	11:40:06.000	10	ok	ollama/gemma4:31b	{}
+106	test:ollama/gemma4:31b	extract-03	200	23978.5	req_42082efb40b94d94	11:40:29.980	11	ok	ollama/gemma4:31b	{}
+107	test:ollama/gemma4:31b	extract-04	200	22738.5	req_e483c0df530942bf	11:40:52.720	11	ok	ollama/gemma4:31b	{}
+108	test:ollama/gemma4:31b	sum-02	200	25950.5	req_b335c484edc04ad0	11:41:18.672	11	ok	ollama/gemma4:31b	{}
+109	test:ollama/gemma4:31b	sum-03	200	28347.8	req_aab607cd5c524edf	11:41:47.020	11	ok	ollama/gemma4:31b	{}
+110	test:ollama/gemma4:31b	trans-02	200	22319.4	req_621d49a84cc74300	11:42:09.341	12	ok	ollama/gemma4:31b	{}
+111	test:ollama/gemma4:31b	trans-03	200	30129.2	req_6815a23fb42b4d6f	11:42:39.472	12	ok	ollama/gemma4:31b	{}
+112	test:ollama/gemma4:31b	multi-01	200	36711.6	req_53d6a3cb287d4eed	11:43:16.183	12	ok	ollama/gemma4:31b	{}
+113	test:ollama/gemma4:31b	multi-02	200	9357.6	req_d5cb506d2392422b	11:43:25.543	12	ok	ollama/gemma4:31b	{}
+114	test:ollama/gemma4:31b	ambig-01	200	36669.3	req_d6ec7b9c391b4124	11:44:02.211	12	ok	ollama/gemma4:31b	{}
+115	test:ollama/gemma4:31b	ambig-02	200	31838.6	req_cd34a3b1bf0a41d7	11:44:34.053	13	ok	ollama/gemma4:31b	{}
+116	test:ollama/gemma4:31b	ambig-03	200	43574.9	req_c30ad749e54b44b9	11:47:54.572	13	ok	ollama/gemma4:31b	{}
+117	test:ollama/gemma4:31b	rag-02	422	1.6	req_2d7dfaf367e547d0	11:47:54.575	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+118	test:ollama/gemma4:31b	rag-03	422	2.9	req_15d7c937d3c74e6b	11:47:54.578	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+119	test:ollama/gemma4:31b	dec-02	422	2.3	req_fcea0467c0e246b7	11:47:54.581	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+120	test:ollama/gemma4:31b	dec-03	422	1.9	req_96f69762dd06445a	11:47:54.583	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+121	test:ollama/gemma4:31b	vis-02	422	1.9	req_710b2a269ff34210	11:47:54.586	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+122	test:ollama/gemma4:31b	cont-01	422	2.0	req_eae5b5e472e24c8f	11:47:54.588	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+123	test:ollama/gemma4:31b	long-01	422	5.3	req_7505b399fa474072	11:47:54.594	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+124	test:ollama/qwen3.8:latest	conv-03	422	1.1	req_a1dbf06295664462	11:47:54.596	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+125	test:ollama/qwen3.8:latest	conv-04	422	1.2	req_703c9a49fe434b45	11:47:54.597	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+126	test:ollama/qwen3.8:latest	conv-05	422	1.2	req_9613694d30274e52	11:47:54.599	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+127	test:ollama/qwen3.8:latest	code-03	422	1.4	req_3eacbc8a90ac4d47	11:47:54.600	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+128	test:ollama/qwen3.8:latest	code-04	422	1.1	req_d86248f5333244b3	11:47:54.602	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+129	test:ollama/qwen3.8:latest	code-05	422	1.3	req_0d60be0c2de7448b	11:47:54.603	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+130	test:ollama/qwen3.8:latest	code-06	422	1.7	req_e2a547f852f84c65	11:47:54.605	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+131	test:ollama/qwen3.8:latest	agent-03	422	1.3	req_1211d0ceaff842d7	11:47:54.607	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+132	test:ollama/qwen3.8:latest	agent-04	422	1.4	req_841730e791a54d54	11:47:54.608	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+133	test:ollama/qwen3.8:latest	agent-05	422	1.0	req_0347e2bac7b746eb	11:47:54.610	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+134	test:ollama/qwen3.8:latest	math-03	422	1.1	req_ffd1ad5ec21b42ec	11:47:54.611	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+135	test:ollama/qwen3.8:latest	math-04	422	1.2	req_f89cacae063844f0	11:47:54.612	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+136	test:ollama/qwen3.8:latest	math-05	422	1.0	req_01900d03d29844a7	11:47:54.613	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+137	test:ollama/qwen3.8:latest	math-06	422	0.9	req_0e46744e47bf46eb	11:47:54.615	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+138	test:ollama/qwen3.8:latest	extract-03	422	0.9	req_eeec401e491f4fe2	11:47:54.616	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+139	test:ollama/qwen3.8:latest	extract-04	422	0.9	req_5eed57790ccb4a77	11:47:54.617	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+140	test:ollama/qwen3.8:latest	sum-02	422	1.0	req_911718327fdb4b36	11:47:54.618	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+141	test:ollama/qwen3.8:latest	sum-03	422	1.0	req_3cadf85e7c584dde	11:47:54.619	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+142	test:ollama/qwen3.8:latest	trans-02	422	0.8	req_9016919ec2834541	11:47:54.620	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+143	test:ollama/qwen3.8:latest	trans-03	422	0.8	req_3bee32d218904c68	11:47:54.621	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+144	test:ollama/qwen3.8:latest	multi-01	422	0.8	req_e58fcc395d2f4aae	11:47:54.622	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+145	test:ollama/qwen3.8:latest	multi-02	422	0.8	req_5bd2f5bc096c4ab1	11:47:54.623	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+146	test:ollama/qwen3.8:latest	ambig-01	422	0.7	req_88ffb5662bbd4a21	11:47:54.623	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+147	test:ollama/qwen3.8:latest	ambig-02	422	0.7	req_e54ee889a90240de	11:47:54.624	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+148	test:ollama/qwen3.8:latest	ambig-03	422	0.6	req_debe83e084ee4ea3	11:47:54.625	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+149	test:ollama/qwen3.8:latest	rag-02	422	0.8	req_65c207052548475d	11:47:54.626	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+150	test:ollama/qwen3.8:latest	rag-03	422	0.8	req_5d74bf098a434f81	11:47:54.627	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+151	test:ollama/qwen3.8:latest	dec-02	422	0.7	req_39d75bb0f42d49b3	11:47:54.628	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+152	test:ollama/qwen3.8:latest	dec-03	422	0.7	req_db00fe2faf0e4d5e	11:47:54.628	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+153	test:ollama/qwen3.8:latest	vis-02	422	0.8	req_0bbb8efeb0c44c6c	11:47:54.629	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+154	test:ollama/qwen3.8:latest	cont-01	422	0.7	req_6e40c8be059240eb	11:47:54.630	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+155	test:ollama/qwen3.8:latest	long-01	422	2.6	req_536167bb64fa419e	11:47:54.633	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+156	test:ollama/qwen3-coder:latest	conv-03	422	0.6	req_3d13947951fc450c	11:47:54.634	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+157	test:ollama/qwen3-coder:latest	conv-04	422	0.6	req_b1bd4eefd7ea486d	11:47:54.634	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+158	test:ollama/qwen3-coder:latest	conv-05	422	0.6	req_acbea474154a4ed3	11:47:54.635	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+159	test:ollama/qwen3-coder:latest	code-03	422	0.7	req_687806fc62b2439d	11:47:54.636	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+160	test:ollama/qwen3-coder:latest	code-04	422	0.6	req_382c9dbe0bef4cb2	11:47:54.636	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+161	test:ollama/qwen3-coder:latest	code-05	422	0.6	req_2a7f472de438480c	11:47:54.637	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+162	test:ollama/qwen3-coder:latest	code-06	422	0.6	req_d8d2dc07bdc94754	11:47:54.638	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+163	test:ollama/qwen3-coder:latest	agent-03	422	0.7	req_050268a6327e4857	11:47:54.638	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+164	test:ollama/qwen3-coder:latest	agent-04	422	0.6	req_0589547f4fd349bb	11:47:54.639	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+165	test:ollama/qwen3-coder:latest	agent-05	422	0.6	req_9383bd261b48485b	11:47:54.640	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+166	test:ollama/qwen3-coder:latest	math-03	422	0.6	req_57cfb053fc6248d2	11:47:54.641	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+167	test:ollama/qwen3-coder:latest	math-04	422	0.6	req_12b2845345f34c91	11:47:54.641	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+168	test:ollama/qwen3-coder:latest	math-05	422	0.5	req_acafd5133fb54015	11:47:54.642	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+169	test:ollama/qwen3-coder:latest	math-06	422	0.5	req_f69e5532d80e4c5a	11:47:54.642	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+170	test:ollama/qwen3-coder:latest	extract-03	422	0.6	req_a789b46b61274b51	11:47:54.643	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+171	test:ollama/qwen3-coder:latest	extract-04	422	0.7	req_11f33d7322304e3a	11:47:54.644	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+172	test:ollama/qwen3-coder:latest	sum-02	422	0.7	req_bdae252f12c74d4d	11:47:54.645	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+173	test:ollama/qwen3-coder:latest	sum-03	422	0.7	req_9eac9b1f8f404159	11:47:54.645	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+174	test:ollama/qwen3-coder:latest	trans-02	422	0.5	req_3743f0ffdcc14115	11:47:54.646	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+175	test:ollama/qwen3-coder:latest	trans-03	422	0.6	req_45eb917b897740a2	11:47:54.647	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+176	test:ollama/qwen3-coder:latest	multi-01	422	0.5	req_8a3249ab9fb9485d	11:47:54.647	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+177	test:ollama/qwen3-coder:latest	multi-02	422	0.5	req_4b7ed7fe6f99413b	11:47:54.648	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+178	test:ollama/qwen3-coder:latest	ambig-01	422	0.5	req_0602b3bbd8f6439f	11:47:54.649	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+179	test:ollama/qwen3-coder:latest	ambig-02	422	0.5	req_1574a06a3281487d	11:47:54.649	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+180	test:ollama/qwen3-coder:latest	ambig-03	422	0.5	req_deae339d51ad4b3b	11:47:54.650	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+181	test:ollama/qwen3-coder:latest	rag-02	422	0.6	req_5ae836fbb74d4a4e	11:47:54.650	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+182	test:ollama/qwen3-coder:latest	rag-03	422	0.6	req_666f28ca5aef41b7	11:47:54.651	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+183	test:ollama/qwen3-coder:latest	dec-02	422	0.5	req_22aab1c15dff4d65	11:47:54.652	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+184	test:ollama/qwen3-coder:latest	dec-03	422	0.5	req_79162824e6814bb7	11:47:54.652	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+185	test:ollama/qwen3-coder:latest	vis-02	422	0.5	req_883fe7ba639c426a	11:47:54.653	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: ;image input required; capability vision is unsupported (source_claim)
+186	test:ollama/qwen3-coder:latest	cont-01	422	0.5	req_737a7caf8f0f4856	11:47:54.653	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+187	test:ollama/qwen3-coder:latest	long-01	422	1.9	req_5ebf6debaf3c4294	11:47:54.655	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+188	auto	conv-03	422	0.5	req_f18b4282dfb74802	11:47:54.656	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+189	auto	conv-04	422	0.5	req_5971b3b175bf4df7	11:47:54.657	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+190	auto	conv-05	422	0.5	req_90b4121334b84665	11:47:54.658	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+191	auto	code-03	422	0.5	req_ac51c4d5707f4c33	11:47:54.659	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+192	auto	code-04	422	0.5	req_c8a696f21e694cbf	11:47:54.660	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+193	auto	code-05	422	0.5	req_6c4a9126a74045fb	11:47:54.661	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+194	auto	code-06	422	0.4	req_2412fe7ed7a64666	11:47:54.662	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+195	auto	agent-03	422	1.0	req_ba96557ce4614af8	11:47:54.663	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+196	auto	agent-04	422	0.5	req_dbe9f7642e76483d	11:47:54.664	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+197	auto	agent-05	422	0.4	req_a4f8af028bc54eb3	11:47:54.665	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+198	auto	math-03	422	0.5	req_6364eebc63f14ae8	11:47:54.666	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+199	auto	math-04	422	0.4	req_5e4358edac344d90	11:47:54.667	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+200	auto	math-05	422	0.5	req_ddb2f83da9424967	11:47:54.668	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+201	auto	math-06	422	0.4	req_8fbdff8223b54aa9	11:47:54.668	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+202	auto	extract-03	422	0.4	req_6cbfb49ba2f5447b	11:47:54.669	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+203	auto	extract-04	422	0.5	req_81c54225b00d44fe	11:47:54.670	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+204	auto	sum-02	422	0.6	req_9fe6c39c10d6460e	11:47:54.671	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+205	auto	sum-03	422	0.5	req_a43106058df6423b	11:47:54.672	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+206	auto	trans-02	422	0.4	req_e54b9afb044842ab	11:47:54.673	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+207	auto	trans-03	422	0.4	req_e45abf4f9b8b4f52	11:47:54.674	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+208	auto	multi-01	422	0.4	req_4b63a48a91c741a6	11:47:54.674	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+209	auto	multi-02	422	0.5	req_bc3c5a8ddd274518	11:47:54.675	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+210	auto	ambig-01	422	0.4	req_3c178a9c8d15428d	11:47:54.676	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+211	auto	ambig-02	422	0.4	req_32a8b8d76cf54da7	11:47:54.677	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+212	auto	ambig-03	422	0.4	req_2ae659fcd53a4b4f	11:47:54.677	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+213	auto	rag-02	422	0.4	req_a47c633e60a440ab	11:47:54.678	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+214	auto	rag-03	422	0.4	req_bbf50ccff14e4373	11:47:54.679	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+215	auto	dec-02	422	0.4	req_0af815f79bbb4806	11:47:54.680	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+216	auto	dec-03	422	0.4	req_ca6c6671ec5841ec	11:47:54.681	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+217	auto	vis-02	422	0.4	req_10a3289069ad4388	11:47:54.681	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: ;image input required; capability vision is unsupported (source_claim)
+218	auto	cont-01	422	0.5	req_111c49d49e7948ee	11:47:54.682	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 
+219	auto	long-01	422	1.6	req_b86bf8bf7979404b	11:47:54.684	13	no_eligible		backend unhealthy: ollama: ConnectTimeout: 

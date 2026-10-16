@@ -1,0 +1,27 @@
+=== PASS 1b 2026-10-15T22:01:54+0530 (TZ=IST)
+pass1 preserved (before): d72ddc6695a0a856 6d1ca65c10c46cca verified
+gate marker: gate3-PASSED = 810917d31a468323c0a9bdd81a099b4e5569599b
+evaluator checkout: cf56cdd3416d8c853b64111b9b40211e5b126031 clean=yes
+executable: modelsaar 0.1.0; python Python 3.12.15; MODELSAAR_HOME=~/.modelsaar-stage-a/.modelsaar
+sandbox backend: ('sandbox-exec', 'macOS sandbox-exec at /usr/bin/sandbox-exec (MODELSAAR_MACOS_SANDBOX=verify)')
+config hash: loaded ~/.modelsaar-stage-a/.modelsaar/config.yaml (version 1, hash c58ce04fa1ed9902)   (Pass 1: c58ce04fa1ed9902)
+classifier: enabled=false
+gateway listening on configured port? 000none (must be none/000)
+store measurements before run (Pass 1 started with none from eval; no pre-Pass-1 snapshot exists): 48 rows {'ollama/gemma4:31b': 11, 'ollama/muse-glimmer:latest': 1, 'ollama/qwen3-coder-next:latest': 1, 'ollama/qwen3-coder:latest': 11, 'ollama/qwen3.6-accurate:latest': 1, 'ollama/qwen3.6-fast:latest': 1, 'ollama/qwen3.6:latest': 11, 'ollama/qwen3.8:latest': 11}
+power: Now drawing from 'AC Power'   (caffeinate -i prevents idle sleep only; lid must stay open)
+ollama version: 0.40.3
+resident before: []
+ollama/gemma4:31b: digest 6316f0629137 (same); fingerprint c2a3b30b88068a13 (same); ctx 4096; healthy True; loaded False
+ollama/qwen3-coder:latest: digest 06c1097efce0 (same); fingerprint 4eacb9bbc87cccbf (same); ctx 4096; healthy True; loaded False
+ollama/qwen3.6:latest: digest 096fdbd02fe6 (same); fingerprint 7495ed65fbf1dbd5 (same); ctx 4096; healthy True; loaded False
+ollama/qwen3.8:latest: digest aaee06c39dcf (same); fingerprint 06621e3e0e6844f0 (same); ctx 4096; healthy True; loaded False
+identities match Stage A
+=== PASS 1b start 2026-10-15T22:01:57+0530
+=== PASS 1b end 2026-10-15T22:30:25+0530 exit=0 duration=1708s
+gateway timeline: 0 samples; unhealthy samples: 0
+resident after: [('qwen3-coder:latest', 131072, 32149832990), ('qwen3.8:latest', 131072, 18488198429)]
+store measurements after run: 48 rows {'ollama/gemma4:31b': 11, 'ollama/muse-glimmer:latest': 1, 'ollama/qwen3-coder-next:latest': 1, 'ollama/qwen3-coder:latest': 11, 'ollama/qwen3.6-accurate:latest': 1, 'ollama/qwen3.6-fast:latest': 1, 'ollama/qwen3.6:latest': 11, 'ollama/qwen3.8:latest': 11}
+pass1 preserved (after): verified
+0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c  ~/Projects/Model_Router/stage-a/pass1b/stage-b-pass1b.json
+482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd  ~/Projects/Model_Router/stage-a/pass1b/stage-b-pass1b.records.jsonl
+=== done 2026-10-15T22:30:26+0530

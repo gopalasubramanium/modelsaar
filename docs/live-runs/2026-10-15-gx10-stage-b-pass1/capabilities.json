@@ -1,0 +1,366 @@
+{
+ "generated_at": "2026-10-15T22:06:30",
+ "method": "harness --probe (capability probes through the in-process gateway, before the sweeps); 8 deployments probed as discovered",
+ "deployments": {
+  "ollama/muse-glimmer:latest": {
+   "fingerprint": "31f1aafa7391ca95",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=179 content_chunks=9 reasoning_chunks=167 done=True finish=stop usage=yes",
+     "latency_ms": 21680.647125001997,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "supported",
+     "note": "tool call with id and JSON args",
+     "latency_ms": 5609.994875034317,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 12889.762290986255,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 25909.66991696041,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "unsupported",
+     "note": "image accepted but answer did not identify the colour ('white')",
+     "latency_ms": 28039.477666956373,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  },
+  "ollama/qwen3.6:latest": {
+   "fingerprint": "7495ed65fbf1dbd5",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=194 content_chunks=5 reasoning_chunks=186 done=True finish=stop usage=yes",
+     "latency_ms": 10199.896458012518,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "supported",
+     "note": "tool call with id and JSON args",
+     "latency_ms": 1896.8609999865294,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 2912.38733404316,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 7602.205790986773,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "supported",
+     "note": "accepted a base64 image and identified its colour",
+     "latency_ms": 1230.8027080143802,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  },
+  "ollama/gemma4:31b": {
+   "fingerprint": "c2a3b30b88068a13",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=59 content_chunks=9 reasoning_chunks=47 done=True finish=stop usage=yes",
+     "latency_ms": 14656.05329099344,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "supported",
+     "note": "tool call with id and JSON args",
+     "latency_ms": 5810.775415971875,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 4989.30975003168,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 14171.925999980886,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "supported",
+     "note": "accepted a base64 image and identified its colour",
+     "latency_ms": 3866.987707966473,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  },
+  "ollama/qwen3.8:latest": {
+   "fingerprint": "06621e3e0e6844f0",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=32 content_chunks=5 reasoning_chunks=24 done=True finish=stop usage=yes",
+     "latency_ms": 8639.957958017476,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "supported",
+     "note": "tool call with id and JSON args",
+     "latency_ms": 2129.5308750122786,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 1414.4595410325564,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 5645.687209034804,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "supported",
+     "note": "accepted a base64 image and identified its colour",
+     "latency_ms": 3730.5167500162497,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  },
+  "ollama/qwen3-coder-next:latest": {
+   "fingerprint": "3403278e77d95723",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes",
+     "latency_ms": 13308.559334021993,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "supported",
+     "note": "tool call with id and JSON args",
+     "latency_ms": 919.7818749817088,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 470.60324996709824,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 509.4260829500854,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "unsupported",
+     "note": "skipped: backend metadata says vision unsupported",
+     "latency_ms": 0.0,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  },
+  "ollama/qwen3-coder:latest": {
+   "fingerprint": "4eacb9bbc87cccbf",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=8 content_chunks=5 reasoning_chunks=0 done=True finish=stop usage=yes",
+     "latency_ms": 6608.742042037193,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "supported",
+     "note": "tool call with id and JSON args",
+     "latency_ms": 499.55483397934586,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 270.13779198750854,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 349.9347500037402,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "unsupported",
+     "note": "skipped: backend metadata says vision unsupported",
+     "latency_ms": 0.0,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  },
+  "ollama/qwen3.6-accurate:latest": {
+   "fingerprint": "e972c9b803aecfc4",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=149 content_chunks=5 reasoning_chunks=141 done=True finish=stop usage=yes",
+     "latency_ms": 10449.540542031173,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "supported",
+     "note": "tool call with id and JSON args",
+     "latency_ms": 2269.2812909954228,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 2870.2971669845283,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 9339.016542013269,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "supported",
+     "note": "accepted a base64 image and identified its colour",
+     "latency_ms": 2259.7547079785727,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  },
+  "ollama/qwen3.6-fast:latest": {
+   "fingerprint": "9274883c38d48361",
+   "results": [
+    {
+     "capability": "streaming",
+     "value": "supported",
+     "note": "events=141 content_chunks=5 reasoning_chunks=133 done=True finish=stop usage=yes",
+     "latency_ms": 9819.483415980358,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "tools",
+     "value": "unsupported",
+     "note": "no tool_calls returned for an explicit tool request",
+     "latency_ms": 13840.42462502839,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_object",
+     "value": "supported",
+     "note": "",
+     "latency_ms": 3107.941791997291,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "json_schema",
+     "value": "supported",
+     "note": "schema-conformant object",
+     "latency_ms": 8691.034040995874,
+     "details": {},
+     "uncertain": false
+    },
+    {
+     "capability": "vision",
+     "value": "supported",
+     "note": "accepted a base64 image and identified its colour",
+     "latency_ms": 1548.3394169714302,
+     "details": {},
+     "uncertain": false
+    }
+   ]
+  }
+ }
+}

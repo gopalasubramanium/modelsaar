@@ -1,0 +1,77 @@
+{
+ "stage": "B \u2014 Pass 1 (replacement run 'Pass 1b'; Pass 1 of 11:21 IST preserved under pass1-compromised/)",
+ "run_window_local": "2026-10-15 22:01:57 \u2013 22:30:25 IST (UTC+05:30), 1708 s, exit 0",
+ "owner_approval": "Pass 1b approved by the owner 2026-10-15 21:53 IST as one separately labelled run; acceptance as the official Pass 1 result is an owner decision",
+ "placement": "A \u2014 harness in-process gateway on the Mac (Stage A home ~/.modelsaar-stage-a/.modelsaar), backend GX10 Ollama over Tailscale; production GX10 modelsaar.service untouched; no --allow-concurrent",
+ "repository": {
+  "url": "https://github.com/gopalasubramanium/modelsaar",
+  "main_at_run": "3733972649449d109c573b1be084d01351cd9eb1",
+  "evidence_branch": "evidence/stage-b-pass1"
+ },
+ "evaluator": {
+  "revision": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+  "checkout": "~/.modelsaar-live/stage-b-cf56cdd (git clean, asserted by the launcher)",
+  "version": "modelsaar 0.1.0",
+  "python": "3.12.15",
+  "note": "src/ of this checkout is byte-identical to main 3733972 (PR #9 changes tests only)"
+ },
+ "gateway_revision": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+ "scorer_version": "2026.10.12-3",
+ "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+ "n_tasks": {
+  "calibration": 15,
+  "test": 32
+ },
+ "budgets": {
+  "max_tokens": 400,
+  "temperature": 0,
+  "seed": 7
+ },
+ "routing_config_hash": "c58ce04fa1ed9902",
+ "classifier": "disabled (enabled=false; consulted 0)",
+ "sandbox": {
+  "backend": "sandbox-exec",
+  "reason": "macOS sandbox-exec at /usr/bin/sandbox-exec (MODELSAAR_MACOS_SANDBOX=verify)",
+  "code_exec_tasks": 5
+ },
+ "checkpoint_format": 2,
+ "resumed_records": 0,
+ "resume_rejected": {},
+ "ollama": {
+  "version": "0.40.3",
+  "endpoint": "http://100.83.54.124:11434 (Tailscale)",
+  "resident_before": [],
+  "resident_after": [
+   [
+    "qwen3-coder:latest",
+    131072,
+    32149832990
+   ],
+   [
+    "qwen3.8:latest",
+    131072,
+    18488198429
+   ]
+  ]
+ },
+ "mac_host": {
+  "os": "macOS 27.0.1",
+  "power": "AC (asserted by the launcher)",
+  "sleep_prevention": "caffeinate -i around the harness; lid open (owner)"
+ },
+ "gx10_host": "NOT EXPOSED over the Ollama API (as in Stage A)",
+ "stored_measurements_disclosure": "the Stage A home's state DB already held 48 measurement rows (Stage A probes/smoke and Pass 1's calibration) when Pass 1b started; no pre-Pass-1 snapshot exists; see raw/store-measurements-before.json and -after.json",
+ "monitoring_limits": "console-transcript.txt is empty (harness stderr did not reach the file under caffeinate); the health sidecar recorded 0 samples \u2014 NOT evidence of health; health is evidenced by the checkpoint (no health-refused records) and the report",
+ "hashes": {
+  "canonical_mac_report_sha256": "0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c",
+  "canonical_mac_checkpoint_sha256": "482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd",
+  "public_copy_report_sha256": "76285802cfeb4f9f454be2b3e98e741b8cb5c54b3d88e0f00a6f4dcf9f74d20e",
+  "public_copy_checkpoint_sha256": "482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd",
+  "pass1_compromised_canonical_report_sha256": "d72ddc6695a0a8561392f32be32d83853ef56adbb46e1e902f7eba17fd8bd726",
+  "pass1_compromised_canonical_checkpoint_sha256": "6d1ca65c10c46cca5ead006c3e976c0f3c8ec3d1f4e12353f40790fc46e8803e",
+  "pass1_compromised_public_copy_report_sha256": "dd611fa83e8e533c437cbdcbd2c14dca8107e2311a69f47cea12917f2071a189",
+  "launcher_sha256_reviewed_candidate": "6ff32340aa5ef552",
+  "launcher_note": "the executed launcher = reviewed candidate + APPROVED=yes + an AC-power abort line",
+  "redaction": "public copies of the two harness reports and raw/discover.json have the Mac absolute paths in conditions.tasks_file / checkpoint / per-deployment tasks_file replaced by <EVAL_CHECKOUT> and <RUN_ROOT>; no other byte changed (verified by object comparison after placeholder restoration); checkpoints are byte-identical to the Mac originals; scoring data unchanged (scripts/eval_aggregate.py still matches)"
+ }
+}
