@@ -1,0 +1,35 @@
+=== REBASELINE 2026-10-16T14:18:26+0530 (TZ=IST) macOS 27.0.1
+evaluator checkout: cf56cdd3416d8c853b64111b9b40211e5b126031 clean=yes; modelsaar 0.1.0; MODELSAAR_HOME=~/.modelsaar-stage-a/.modelsaar
+config hash: loaded ~/.modelsaar-stage-a/.modelsaar/config.yaml (version 1, hash c58ce04fa1ed9902)
+configured local port: 50824; listening now? 000none (must be none/000)
+ollama version: 0.40.5 (Stage A / Pass 1b: 0.40.3)
+models (api/tags): qwen3.6:latest, qwen3.8:latest, embeddinggemma-2:latest, nimble-v3:latest, d1:latest, muse-glimmer:latest, gemma4:31b, qwen3-coder-next:latest, qwen3-coder:latest, qwen3.6-accurate:latest, qwen3.6-fast:latest
+resident before: []
+api/show saved: 11 files
+discover: 11 deployments; error: 
+local gateway: {"status":"ok","service":"modelsaar","version":"0.1.0","api":"openai-compatible"} (pid 36905)
+probe (5 deployments): exit 0 in 201s; 5 probed
+  ollama/qwen3.6:latest: {'streaming': 'supported', 'tools': 'supported', 'parallel_tools': 'supported', 'json_object': 'supported', 'json_schema': 'supported', 'vision': 'supported'}; uncertain=False skipped=[]
+  ollama/qwen3.8:latest: {'streaming': 'supported', 'tools': 'supported', 'parallel_tools': 'supported', 'json_object': 'supported', 'json_schema': 'supported', 'vision': 'supported'}; uncertain=False skipped=[]
+  ollama/gemma4:31b: {'streaming': 'supported', 'tools': 'supported', 'parallel_tools': 'supported', 'json_object': 'supported', 'json_schema': 'supported', 'vision': 'supported'}; uncertain=False skipped=[]
+  ollama/qwen3-coder-next:latest: {'streaming': 'supported', 'tools': 'supported', 'parallel_tools': 'supported', 'json_object': 'supported', 'json_schema': 'supported', 'vision': 'unsupported'}; uncertain=False skipped=[]
+  ollama/qwen3-coder:latest: {'streaming': 'supported', 'tools': 'supported', 'parallel_tools': 'supported', 'json_object': 'supported', 'json_schema': 'supported', 'vision': 'unsupported'}; uncertain=False skipped=[]
+resident after probes: [('qwen3-coder:latest', 131072, 32149843475), ('qwen3.8:latest', 131072, 18798597897)]
+local gateway stopped; port 50824 listening? 000none (must be none/000)
+ollama/d1:latest: digest CHANGED/none; fingerprint None -> 1f1dfcfcb9cabdc3; inputs changed None; probe-vs-StageA capability differences None
+ollama/embeddinggemma-2:latest: digest CHANGED/none; fingerprint None -> 2d88ce5436eecbd6; inputs changed None; probe-vs-StageA capability differences None
+ollama/gemma4:31b: digest same; fingerprint c2a3b30b88068a13 -> d9c2d9116eefdbe8; inputs changed {'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences {}
+ollama/muse-glimmer:latest: digest same; fingerprint 31f1aafa7391ca95 -> 059c50cc508332ed; inputs changed {'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences None
+ollama/nimble-v3:latest: digest CHANGED/none; fingerprint None -> a6aa90be70b33f32; inputs changed None; probe-vs-StageA capability differences None
+ollama/qwen3-coder-next:latest: digest same; fingerprint 3403278e77d95723 -> 76cc87b6d1648f9f; inputs changed {'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences {}
+ollama/qwen3-coder:latest: digest same; fingerprint 4eacb9bbc87cccbf -> 3acc2cdc4e4a963c; inputs changed {'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences {}
+ollama/qwen3.6-accurate:latest: digest same; fingerprint e972c9b803aecfc4 -> ed29b920218cc3fe; inputs changed {'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences None
+ollama/qwen3.6-fast:latest: digest same; fingerprint 9274883c38d48361 -> 5c3532bc42618479; inputs changed {'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences None
+ollama/qwen3.6:latest: digest CHANGED/none; fingerprint 7495ed65fbf1dbd5 -> 1c2c6fd22bf8cb30; inputs changed {'digest': ['096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47', 'a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c'], 'identity': ['096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47', 'a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c'], 'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences {}
+ollama/qwen3.8:latest: digest same; fingerprint 06621e3e0e6844f0 -> 1f657c93815106c4; inputs changed {'runtime_version': ['0.40.3', '0.40.5']}; probe-vs-StageA capability differences {}
+!! BASELINE NOT OK — an identity differs from Stage A beyond runtime_version; Pass 2 must not start (report)
+17b3cfe31afabc2535f727e36e3a4bbd6137202d4db10cae383ef43ea0555bc9  <RUN_ROOT>/baseline-0.40.5/deployments-0.40.5.json
+58aa61adb39dd5ed37c57928ddf45610cd369936c994e3f641684895b76430e6  <RUN_ROOT>/baseline-0.40.5/discover.json
+38e2aa15d62cba03b34d25b6f1ab4fc0fb49b702e63f8ffd2866fb2564c87c7a  <RUN_ROOT>/baseline-0.40.5/probe.json
+82d0926e7c3218773bfb906914060027a670d3d7fec6aa649bb12b05d7d71570  <RUN_ROOT>/baseline-0.40.5/ollama-tags.json
+=== done 2026-10-16T14:21:57+0530

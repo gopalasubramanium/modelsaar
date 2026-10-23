@@ -1,0 +1,179 @@
+#!/bin/bash
+# ============================================================================================================
+#  STAGE B — PASS 2 under OLLAMA 0.40.5 (qwen3-coder-next added; one run, separately labelled)  prepared 2026-10-16 14:25 IST
+#  Owner authorisation: messages of 2026-10-16 13:47 IST (run Pass 2 once) and 14:14 IST (re-baseline once under the
+#  GX10's current Ollama 0.40.5, then run Pass 2 once using those new identities; label Pass 2 as Ollama 0.40.5;
+#  comparisons with Pass 1b (Ollama 0.40.3) are CROSS-RUNTIME and cannot isolate the effect of the added model).
+#  The 13:56/13:58 attempts of 53_stage_b_pass2.command stopped at the AC-power and Ollama-0.40.3 gates (kept aside).
+# ============================================================================================================
+# Roadmap: docs/live-runs/2026-10-14-gx10-stage-a/stage-b-plan.md §3 "pass 2 (only inside the remaining budget):
+# add qwen3-coder-next" — the same frozen contract as Pass 1/1b (evaluator checkout cf56cdd, live mode, --probe,
+# --save-measurements, seed 7, max_tokens 400 / temperature 0 as harness constants, classifier off, no
+# --allow-concurrent, MODELSAAR_HOME = Stage A home, MODELSAAR_MACOS_SANDBOX=verify, placement A: in-process
+# gateway on this Mac, backend GX10 Ollama over Tailscale; production GX10 untouched) with FIVE deployments:
+# the Pass 1 four + ollama/qwen3-coder-next:latest. Budget gate (§4): Pass 1b took 1708 s < 60 min → Pass 2 allowed.
+# RUNTIME DEVIATION (owner-decided): the GX10's Ollama is 0.40.5, not the frozen 0.40.3. Identities are therefore checked
+# against the re-baseline baseline-0.40.5/deployments-0.40.5.json (54_rebaseline_ollama0405.command, which requires every
+# digest to equal Stage A and only runtime_version to differ in the fingerprint inputs — marker BASELINE-OK). Every other
+# contract element is unchanged.
+#
+# Pass 1 (pass1/) and Pass 1b (pass1b/) are preserved: never read for --resume, never written; their hashes are
+# verified before and after. Pass 2 is its own report (stage-b-pass2.json); passes are never merged.
+#
+# Launcher-only differences from 51_stage_b_pass1b.command: (1) outputs under pass2/, refuses if pass2/ exists;
+# (2) the harness runs in the FOREGROUND piped through tee (the Pass 1 form, which captured the console transcript;
+# Pass 1b's background form produced an empty transcript) while `caffeinate -i -w <this shell>` holds the idle-sleep
+# assertion alongside — it does NOT prevent lid-close sleep: KEEP THE LID OPEN and the Mac on AC for the window;
+# (3) the read-only /admin/status sidecar matches the harness by its venv python path and writes a diagnostic line
+# every 60 s when it finds no harness/port (Pass 1b's sidecar stayed silent with 0 samples); it changes nothing.
+#
+# DISCLOSURE: the Stage A home's state DB already holds the measurements Pass 1/1b calibration saved; no snapshot
+# predates them. Pass 2 starts with that evidence present; its own calibration re-measures the same keys (and
+# measures qwen3-coder-next afresh) before `auto`. Snapshots are taken (read-only) before and after.
+# Output: pass2/ (snapshots, report, checkpoint, console transcript, gateway timeline), 55-pass2.txt
+# ============================================================================================================
+APPROVED=yes         # owner authorisation 2026-10-16 13:47 + 14:14 IST (one Pass 2 run under Ollama 0.40.5)
+set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
+[ "$APPROVED" = "yes" ] || { echo "55_stage_b_pass2: UNAPPROVED (APPROVED=$APPROVED); not running" | tee "$HERE/55-pass2.txt"; exit 3; }
+mkdir "$HERE/.lock-55" 2>/dev/null || exit 0
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+WORK="$HOME/.modelsaar-live/stage-b-cf56cdd"; EXE="$WORK/.venv/bin/modelsaar"; PY="$WORK/.venv/bin/python"
+export MODELSAAR_HOME="$HOME/.modelsaar-stage-a/.modelsaar"
+export MODELSAAR_MACOS_SANDBOX=verify
+GX=100.83.54.124; OLLAMA="http://$GX:11434"; P="$HERE/pass2"; P1="$HERE/pass1"; P1B="$HERE/pass1b"; BASE="$HERE/baseline-0.40.5"
+EXPECT_OLLAMA=0.40.5
+DEPS="ollama/qwen3.8:latest ollama/qwen3-coder:latest ollama/gemma4:31b ollama/qwen3.6:latest ollama/qwen3-coder-next:latest"
+EVAL=cf56cdd3416d8c853b64111b9b40211e5b126031
+P1_REPORT_SHA=d72ddc6695a0a8561392f32be32d83853ef56adbb46e1e902f7eba17fd8bd726
+P1_CKPT_SHA=6d1ca65c10c46cca5ead006c3e976c0f3c8ec3d1f4e12353f40790fc46e8803e
+P1B_REPORT_SHA=0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c
+P1B_CKPT_SHA=482e44e7e4250acdd8a17b47f9d3030d11823abe97c508c6f2632a4cad7c9cfd
+sha() { shasum -a 256 "$1" | cut -d' ' -f1; }
+prior_intact() {
+  [ "$(sha "$P1/stage-b-pass1.json")" = "$P1_REPORT_SHA" ] && [ "$(sha "$P1/stage-b-pass1.records.jsonl")" = "$P1_CKPT_SHA" ] &&
+  [ "$(sha "$P1B/stage-b-pass1b.json")" = "$P1B_REPORT_SHA" ] && [ "$(sha "$P1B/stage-b-pass1b.records.jsonl")" = "$P1B_CKPT_SHA" ]
+}
+snapshot_measurements() {  # read-only
+"$PY" - "$MODELSAAR_HOME/state/modelsaar.db" "$1" "$2" <<'PYEOF'
+import json, sqlite3, sys
+db, out, label = sys.argv[1:4]
+c = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+cols = ("deployment_id","fingerprint","task","quality","samples","p50_ms","p95_ms","source","measured_at")
+rows = [dict(zip(cols, r)) for r in c.execute("SELECT " + ",".join(cols) + " FROM measurements ORDER BY deployment_id, task")]
+json.dump(rows, open(out, "w"), indent=1)
+by = {}
+for r in rows: by[r["deployment_id"]] = by.get(r["deployment_id"], 0) + 1
+print(f"store measurements {label}: {len(rows)} rows {by}")
+PYEOF
+}
+{
+echo "=== PASS 2 (Ollama 0.40.5 re-baseline) $(date '+%Y-%m-%dT%H:%M:%S%z') (TZ=$(date +%Z))"
+# --- guards: never touch pass1/ or pass1b/, never overwrite pass2/ -------------------------------------------
+[ -d "$P" ] && { echo "!! $P already exists; refusing (no overwrite)"; exit 1; }
+prior_intact || { echo "!! pass1/ or pass1b/ evidence hashes differ from the recorded ones; refusing"; exit 1; }
+echo "pass1 preserved (before): ${P1_REPORT_SHA:0:16} ${P1_CKPT_SHA:0:16} verified; pass1b preserved (before): ${P1B_REPORT_SHA:0:16} ${P1B_CKPT_SHA:0:16} verified"
+[ -f "$HERE/gate3-PASSED" ] || { echo "!! no gate3-PASSED; refusing"; exit 1; }
+echo "gate marker: gate3-PASSED = $(cat "$HERE/gate3-PASSED")"
+[ -f "$BASE/BASELINE-OK" ] || { echo "!! no $BASE/BASELINE-OK (re-baseline not done or identities differ beyond runtime_version); refusing"; exit 1; }
+echo "re-baseline marker: $(cat "$BASE/BASELINE-OK")"
+echo "re-baseline file: deployments-0.40.5.json sha256 $(sha "$BASE/deployments-0.40.5.json")"
+echo "pass 1b duration: $(grep -o 'duration=[0-9]*s' "$HERE/51-pass1b.txt" | head -1)  (pass 2 budget gate: pass 1 under 60 min)"
+mkdir -p "$P"
+# --- frozen evaluator / home ---------------------------------------------------------------------------------
+[ "$(git -C "$WORK" rev-parse HEAD)" = "$EVAL" ] || { echo "!! evaluator checkout is not $EVAL"; exit 1; }
+echo "evaluator checkout: $EVAL clean=$([ -z "$(git -C "$WORK" status --porcelain --untracked-files=no)" ] && echo yes || echo no)"
+echo "executable: $("$EXE" --version 2>&1); python $("$PY" --version 2>&1); MODELSAAR_HOME=$MODELSAAR_HOME"
+echo "sandbox backend: $("$PY" -c 'from modelsaar.evaluation import sandbox; print(sandbox.available())')"
+echo "config hash: $("$EXE" doctor --json 2>/dev/null | "$PY" -c 'import json,sys;print([f["message"] for f in json.load(sys.stdin)["findings"] if f["area"]=="config"][0])')   (Pass 1/1b: c58ce04fa1ed9902)"
+echo "classifier: $("$EXE" config show | "$PY" -c 'import sys,re;t=sys.stdin.read();m=re.search(r"classifier:\n\s+enabled:\s*(\S+)",t);print("enabled="+m.group(1) if m else "UNKNOWN")')"
+echo "gateway listening on configured port? $(curl -s -m 2 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$("$EXE" config show | "$PY" -c 'import sys,re;print(re.search(r"port:\s*(\d+)",sys.stdin.read()).group(1))')/healthz" || echo none) (must be none/000)"
+snapshot_measurements "$P/store-measurements-before.json" "before run (holds Pass 1/1b calibration evidence; no earlier snapshot exists)"
+echo "power: $(pmset -g batt | head -1)   (caffeinate -i prevents idle sleep only; lid must stay open)"
+pmset -g batt | head -1 | grep -q "AC Power" || { echo "!! STOP: Mac is not on AC power"; exit 2; }
+# --- backend preconditions (stage-b-plan.md §2; identical checks to Pass 1/1b, five models) --------------------
+curl -fsS -m 15 "$OLLAMA/api/version" > "$P/ollama-version.json" || { echo "!! Ollama unreachable"; exit 1; }
+OV="$("$PY" -c 'import json;print(json.load(open("'"$P"'/ollama-version.json"))["version"])')"; echo "ollama version: $OV   (Pass 1/1b: 0.40.3 — this run is labelled Ollama $OV; cross-runtime vs Pass 1b)"
+[ "$OV" = "$EXPECT_OLLAMA" ] || { echo "!! STOP: Ollama version is $OV, not the re-baselined $EXPECT_OLLAMA"; exit 2; }
+curl -fsS -m 15 "$OLLAMA/api/ps" > "$P/ollama-ps-before.json"; echo "resident before: $("$PY" -c 'import json;print([m["name"] for m in json.load(open("'"$P"'/ollama-ps-before.json"))["models"]])')"
+curl -fsS -m 20 "$OLLAMA/api/tags" > "$P/ollama-tags.json"
+"$EXE" discover --json > "$P/discover.json" 2> "$P/discover.err" || { echo "!! discover failed"; exit 1; }
+"$PY" - "$P" "$BASE/deployments-0.40.5.json" <<'PYEOF' || exit 2
+import json, sys, pathlib
+P = pathlib.Path(sys.argv[1]); ref = json.load(open(sys.argv[2]))["deployments"]
+want = {"ollama/qwen3.8:latest", "ollama/qwen3-coder:latest", "ollama/gemma4:31b", "ollama/qwen3.6:latest", "ollama/qwen3-coder-next:latest"}
+refmap = {d["modelsaar_deployment_id"]: d for d in ref}
+disc = {d["id"]: d for d in json.load(open(P / "discover.json"))["deployments"]}
+tags = {m["name"]: m["digest"] for m in json.load(open(P / "ollama-tags.json"))["models"]}
+print(f"discovered deployments: {len(disc)} (Stage A: {len(ref)})")
+bad = 0
+for dep in sorted(want):
+    d = disc.get(dep); r = refmap[dep]
+    if not d: print(f"!! {dep} not discovered"); bad += 1; continue
+    dg = tags.get(dep.split("/", 1)[1]); same = (dg == r["ollama_digest"]) and (d["fingerprint"] == r["modelsaar_fingerprint"])
+    print(f"{dep}: digest {dg[:12]} ({'same' if dg == r['ollama_digest'] else 'CHANGED'} vs re-baseline); fingerprint {d['fingerprint']} ({'same' if d['fingerprint'] == r['modelsaar_fingerprint'] else 'CHANGED'} vs re-baseline 0.40.5); runtime {d['fingerprint_inputs'].get('runtime_version')}; ctx {d['context_length']}; healthy {d['state']['healthy']}; loaded {d['state']['loaded']}")
+    bad += 0 if same else 1
+json.dump({dep: {"digest": tags.get(dep.split("/",1)[1]), "fingerprint": disc[dep]["fingerprint"], "context_length": disc[dep]["context_length"]} for dep in sorted(want) if dep in disc}, open(P / "pass2-identities.json", "w"), indent=1)
+if bad: print("!! STOP: a selected model's identity differs from the 0.40.5 re-baseline"); sys.exit(2)
+print("identities match the Ollama 0.40.5 re-baseline (5 of 5); digests equal Stage A per BASELINE-OK")
+PYEOF
+# --- idle-sleep assertion for the life of this launcher; read-only health sidecar; the frozen run -------------
+caffeinate -i -w $$ & CPID=$!
+echo "caffeinate -i -w $$ pid $CPID"
+"$PY" - "$MODELSAAR_HOME" "$P/gateway-status-timeline.jsonl" "$WORK/.venv/bin/python" <<'PYEOF' > "$P/sidecar.log" 2>&1 &
+# Read-only: finds the harness's in-process gateway port (lsof on the harness python process, matched by the
+# venv python path) and polls /admin/status every 5 s. Records health flags, last_refresh_error, registry_version,
+# request counters. The admin key is read from the key file for the Authorization header and never written anywhere.
+import json, os, re, subprocess, sys, time, urllib.request
+home, out, pypath = sys.argv[1:4]
+key = open(os.path.join(home, "keys", "admin_key")).read().split()[0]
+me = str(os.getpid())
+def harness_pids():
+    o = subprocess.run(["pgrep", "-f", pypath], capture_output=True, text=True).stdout.split()
+    return [p for p in o if p != me]
+def ports(pids):
+    if not pids: return [], ""
+    o = subprocess.run(["lsof", "-nP", "-a", "-iTCP", "-sTCP:LISTEN", "-p", ",".join(pids)], capture_output=True, text=True).stdout
+    return sorted({int(m) for m in re.findall(r":(\d+) \(LISTEN\)", o)}), o
+seen_any = False; deadline = time.time() + 3 * 3600; last_diag = 0
+with open(out, "a") as f:
+    while time.time() < deadline:
+        pids = harness_pids()
+        if not pids and seen_any: break
+        ps, raw = ports(pids)
+        if time.time() - last_diag >= 60:
+            print(time.strftime("%H:%M:%S"), f"harness pids {pids} listen ports {ps}" + ("" if ps or not pids else f" lsof: {raw.strip()[:300]!r}"), flush=True); last_diag = time.time()
+        for p in ps:
+            try:
+                req = urllib.request.Request(f"http://127.0.0.1:{p}/admin/status", headers={"Authorization": f"Bearer {key}"})
+                s = json.load(urllib.request.urlopen(req, timeout=3)); seen_any = True
+                rec = {"t": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "port": p, "ready": s.get("ready"), "registry_version": s.get("registry_version"),
+                       "last_refresh_error": s.get("last_refresh_error"), "requests_total": s.get("requests_total"), "requests_failed": s.get("requests_failed"),
+                       "deployments": {d["id"]: {"healthy": d["state"]["healthy"], "loaded": d["state"]["loaded"]} for d in s.get("deployments", [])}}
+                f.write(json.dumps(rec) + "\n"); f.flush()
+                if rec["deployments"] and not all(v["healthy"] for v in rec["deployments"].values()):
+                    print(rec["t"], "UNHEALTHY", rec["last_refresh_error"], flush=True)
+            except Exception as e:
+                if time.time() - last_diag < 1: print("  poll error on port", p, repr(e)[:120], flush=True)
+        time.sleep(5)
+PYEOF
+SPID=$!
+echo "=== PASS 2 start $(date '+%Y-%m-%dT%H:%M:%S%z')"
+T0=$(date +%s); cd "$P"
+"$EXE" eval --mode live --probe --save-measurements --seed 7 \
+  --deployments $DEPS \
+  --out "$P/stage-b-pass2.json" --checkpoint "$P/stage-b-pass2.records.jsonl" 2>&1 | tee "$P/console-transcript.txt"
+RC=${PIPESTATUS[0]}
+sleep 6; kill "$SPID" 2>/dev/null; wait "$SPID" 2>/dev/null
+echo "=== PASS 2 end $(date '+%Y-%m-%dT%H:%M:%S%z') exit=$RC duration=$(( $(date +%s) - T0 ))s"
+echo "console transcript: $(wc -l < "$P/console-transcript.txt" | tr -d ' ') lines"
+echo "gateway timeline: $(wc -l < "$P/gateway-status-timeline.jsonl" | tr -d ' ') samples; unhealthy samples: $(grep -c '"healthy": false' "$P/gateway-status-timeline.jsonl" || true)"
+curl -fsS -m 15 "$OLLAMA/api/ps" > "$P/ollama-ps-after.json"; echo "resident after: $("$PY" -c 'import json;print([(m["name"], m.get("context_length"), m.get("size_vram")) for m in json.load(open("'"$P"'/ollama-ps-after.json"))["models"]])')"
+snapshot_measurements "$P/store-measurements-after.json" "after run"
+prior_intact && echo "pass1 + pass1b preserved (after): verified" || echo "!! pass1/ or pass1b/ hashes changed during the run — investigate"
+shasum -a 256 "$P/stage-b-pass2.json" "$P/stage-b-pass2.records.jsonl" 2>/dev/null
+grep -rl "msk_[A-Za-z0-9]" "$P" 2>/dev/null | sed 's/^/!! key-like string in: /'
+kill "$CPID" 2>/dev/null
+echo "=== done $(date '+%Y-%m-%dT%H:%M:%S%z')"
+} > "$HERE/55-pass2.txt" 2>&1
+rmdir "$HERE/.lock-55"; sleep 1

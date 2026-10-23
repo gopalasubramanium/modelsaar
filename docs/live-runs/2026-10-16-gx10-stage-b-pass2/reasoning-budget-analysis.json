@@ -1,0 +1,458 @@
+{
+ "contract": {
+  "max_tokens": 400,
+  "temperature": 0,
+  "rule": "primary scores unchanged; no rerun at a higher budget; budget-limited events reported as SUSPECTED because the frozen harness records neither finish_reason nor token usage"
+ },
+ "evidence_limit": "records carry scorer detail + latency only; 'empty' content is the strongest indicator of reasoning consuming the whole budget; it cannot be distinguished from a model that returned nothing for another reason",
+ "thinking_model_basis": {
+  "ollama/qwen3.6:latest": "produced empty content on 3 conversation tasks and empty code harness output (Stage A: thinking family)",
+  "ollama/gemma4:31b": "produced empty content on 2 calibration conversation tasks",
+  "ollama/qwen3.8:latest": "qwen3.5 family (reasoning tag); no empty-content failure observed in this run",
+  "ollama/qwen3-coder:latest": "non-thinking coder (Stage A); not treated as thinking",
+  "ollama/qwen3-coder-next:latest": "non-thinking coder (Stage A: capabilities completion, tools; no thinking); not treated as thinking"
+ },
+ "counts": {
+  "failures_total": 37,
+  "budget_limited_suspected": 17,
+  "proven_budget_limited": 0,
+  "by_classification": {
+   "length/budget termination with no usable answer \u2014 SUSPECTED (empty content; finish_reason not recorded)": 5,
+   "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer": 8,
+   "no usable answer in content \u2014 budget-limited SUSPECTED for thinking models, else wrong/malformed": 4,
+   "wrong answer (content present, scorer mismatch)": 15,
+   "capability failure (HTTP 422 vision unsupported)": 4,
+   "malformed answer (code did not parse)": 1
+  },
+  "suspected_by_deployment": {
+   "qwen3.6:latest": 12,
+   "gemma4:31b": 5
+  },
+  "suspected_by_task": {
+   "conv-01": 2,
+   "conv-02": 2,
+   "code-01": 1,
+   "code-02": 2,
+   "math-02": 1,
+   "extract-01": 1,
+   "extract-02": 1,
+   "conv-03": 1,
+   "code-03": 2,
+   "code-04": 1,
+   "code-05": 2,
+   "extract-04": 1
+  },
+  "suspected_in_auto": [],
+  "suspected_in_fixed_strong": []
+ },
+ "events": [
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "conv-01",
+   "category": "conversation",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "length/budget termination with no usable answer \u2014 SUSPECTED (empty content; finish_reason not recorded)",
+   "budget_limited_suspected": true,
+   "detail": "empty",
+   "latency_ms": 12574.2
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "conv-02",
+   "category": "conversation",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "length/budget termination with no usable answer \u2014 SUSPECTED (empty content; finish_reason not recorded)",
+   "budget_limited_suspected": true,
+   "detail": "empty",
+   "latency_ms": 4802.3
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "code-01",
+   "category": "coding",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'is_palindrome' is not defined; harness output '' != expected 'True False'",
+   "latency_ms": 4402.1
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "code-02",
+   "category": "coding",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'fizzbuzz' is not defined; harness output '' != expected 'FizzBuzz Fizz Buzz'",
+   "latency_ms": 4262.5
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "math-02",
+   "category": "math",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "no usable answer in content \u2014 budget-limited SUSPECTED for thinking models, else wrong/malformed",
+   "budget_limited_suspected": true,
+   "detail": "no numeric token in content",
+   "latency_ms": 4158.3
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "extract-01",
+   "category": "extraction",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "no usable answer in content \u2014 budget-limited SUSPECTED for thinking models, else wrong/malformed",
+   "budget_limited_suspected": true,
+   "detail": "content is not JSON",
+   "latency_ms": 4239.9
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "extract-02",
+   "category": "extraction",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "no usable answer in content \u2014 budget-limited SUSPECTED for thinking models, else wrong/malformed",
+   "budget_limited_suspected": true,
+   "detail": "content is not JSON",
+   "latency_ms": 4171.0
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "sum-01",
+   "category": "summarization",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['trial', 'approve', 'bicycle', 'bike']",
+   "latency_ms": 4307.6
+  },
+  {
+   "policy": "calib:ollama/qwen3.6:latest",
+   "task": "trans-01",
+   "category": "translation",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['biblioth\u00e8que', 'bibliotheque']",
+   "latency_ms": 4488.1
+  },
+  {
+   "policy": "calib:ollama/gemma4:31b",
+   "task": "conv-01",
+   "category": "conversation",
+   "deployment": "gemma4:31b",
+   "status": 200,
+   "classification": "length/budget termination with no usable answer \u2014 SUSPECTED (empty content; finish_reason not recorded)",
+   "budget_limited_suspected": true,
+   "detail": "empty",
+   "latency_ms": 45249.7
+  },
+  {
+   "policy": "calib:ollama/gemma4:31b",
+   "task": "conv-02",
+   "category": "conversation",
+   "deployment": "gemma4:31b",
+   "status": 200,
+   "classification": "length/budget termination with no usable answer \u2014 SUSPECTED (empty content; finish_reason not recorded)",
+   "budget_limited_suspected": true,
+   "detail": "empty",
+   "latency_ms": 37113.3
+  },
+  {
+   "policy": "calib:ollama/gemma4:31b",
+   "task": "code-02",
+   "category": "coding",
+   "deployment": "gemma4:31b",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'fizzbuzz' is not defined; harness output '' != expected 'FizzBuzz Fizz Buzz'",
+   "latency_ms": 36796.8
+  },
+  {
+   "policy": "calib:ollama/qwen3-coder-next:latest",
+   "task": "vis-01",
+   "category": "document_vision",
+   "deployment": "qwen3-coder-next:latest",
+   "status": 422,
+   "classification": "capability failure (HTTP 422 vision unsupported)",
+   "budget_limited_suspected": false,
+   "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+   "latency_ms": 1.2
+  },
+  {
+   "policy": "calib:ollama/qwen3-coder:latest",
+   "task": "vis-01",
+   "category": "document_vision",
+   "deployment": "qwen3-coder:latest",
+   "status": 422,
+   "classification": "capability failure (HTTP 422 vision unsupported)",
+   "budget_limited_suspected": false,
+   "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+   "latency_ms": 1.6
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "conv-03",
+   "category": "conversation",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "length/budget termination with no usable answer \u2014 SUSPECTED (empty content; finish_reason not recorded)",
+   "budget_limited_suspected": true,
+   "detail": "empty",
+   "latency_ms": 12378.7
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "code-03",
+   "category": "coding",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'word_freq' is not defined; harness output '' != expected 'True'",
+   "latency_ms": 4710.8
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "code-04",
+   "category": "coding",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'mean' is not defined; harness output '' != expected '4.0'",
+   "latency_ms": 4365.2
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "code-05",
+   "category": "coding",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'rle' is not defined; harness output '' != expected 'a3b1c2'",
+   "latency_ms": 4171.5
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "code-06",
+   "category": "coding",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['three digits', '3 digits', 'digits']",
+   "latency_ms": 4310.7
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "math-06",
+   "category": "math",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['yes']",
+   "latency_ms": 4174.0
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "extract-04",
+   "category": "extraction",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "no usable answer in content \u2014 budget-limited SUSPECTED for thinking models, else wrong/malformed",
+   "budget_limited_suspected": true,
+   "detail": "content is not JSON",
+   "latency_ms": 4305.7
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "sum-02",
+   "category": "summarization",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['trial', 'approved', 'bicycle', 'bike', 'lane']",
+   "latency_ms": 4240.8
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "sum-03",
+   "category": "summarization",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['parking', 'trial', '5-2', 'safety']",
+   "latency_ms": 4230.4
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "trans-02",
+   "category": "translation",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['estaci\u00f3n', 'estacion']",
+   "latency_ms": 4236.7
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "trans-03",
+   "category": "translation",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['twenty minutes', '20 minutes']",
+   "latency_ms": 4012.5
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "ambig-01",
+   "category": "coding",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['javascript', 'function', 'undefined', 'call']",
+   "latency_ms": 4627.3
+  },
+  {
+   "policy": "test:ollama/qwen3.6:latest",
+   "task": "long-01",
+   "category": "summarization",
+   "deployment": "qwen3.6:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "missing 'LINE 0: THE QUICK BROWN'",
+   "latency_ms": 4586.1
+  },
+  {
+   "policy": "test:ollama/qwen3.8:latest",
+   "task": "code-05",
+   "category": "coding",
+   "deployment": "qwen3.8:latest",
+   "status": 200,
+   "classification": "malformed answer (code did not parse)",
+   "budget_limited_suspected": false,
+   "detail": "[sandbox-exec] model code raised SyntaxError: invalid syntax (model.py, line 1); harness output '' != expected 'a3b1c2'",
+   "latency_ms": 10538.1
+  },
+  {
+   "policy": "test:ollama/qwen3.8:latest",
+   "task": "cont-01",
+   "category": "agent",
+   "deployment": "qwen3.8:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "none of ['4', 'four']",
+   "latency_ms": 2633.1
+  },
+  {
+   "policy": "test:ollama/gemma4:31b",
+   "task": "code-03",
+   "category": "coding",
+   "deployment": "gemma4:31b",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'word_freq' is not defined; harness output '' != expected 'True'",
+   "latency_ms": 37436.6
+  },
+  {
+   "policy": "test:ollama/gemma4:31b",
+   "task": "code-05",
+   "category": "coding",
+   "deployment": "gemma4:31b",
+   "status": 200,
+   "classification": "malformed/incomplete code (function not defined) \u2014 budget-limited SUSPECTED for thinking models, else wrong answer",
+   "budget_limited_suspected": true,
+   "detail": "[sandbox-exec] harness raised NameError: name 'rle' is not defined; harness output '' != expected 'a3b1c2'",
+   "latency_ms": 37288.6
+  },
+  {
+   "policy": "test:ollama/qwen3-coder-next:latest",
+   "task": "vis-02",
+   "category": "document_vision",
+   "deployment": "qwen3-coder-next:latest",
+   "status": 422,
+   "classification": "capability failure (HTTP 422 vision unsupported)",
+   "budget_limited_suspected": false,
+   "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+   "latency_ms": 1.7
+  },
+  {
+   "policy": "test:ollama/qwen3-coder-next:latest",
+   "task": "long-01",
+   "category": "summarization",
+   "deployment": "qwen3-coder-next:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "missing 'LINE 0: THE QUICK BROWN'",
+   "latency_ms": 776.9
+  },
+  {
+   "policy": "test:ollama/qwen3-coder:latest",
+   "task": "math-05",
+   "category": "math",
+   "deployment": "qwen3-coder:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "last number 100 != 50 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 179.6
+  },
+  {
+   "policy": "test:ollama/qwen3-coder:latest",
+   "task": "vis-02",
+   "category": "document_vision",
+   "deployment": "qwen3-coder:latest",
+   "status": 422,
+   "classification": "capability failure (HTTP 422 vision unsupported)",
+   "budget_limited_suspected": false,
+   "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+   "latency_ms": 1.8
+  },
+  {
+   "policy": "auto",
+   "task": "math-05",
+   "category": "math",
+   "deployment": "qwen3-coder:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "last number 100 != 50 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 132.9
+  },
+  {
+   "policy": "auto",
+   "task": "long-01",
+   "category": "summarization",
+   "deployment": "qwen3-coder:latest",
+   "status": 200,
+   "classification": "wrong answer (content present, scorer mismatch)",
+   "budget_limited_suspected": false,
+   "detail": "missing 'LINE 0: THE QUICK BROWN'",
+   "latency_ms": 296.5
+  }
+ ],
+ "conclusion": "17 SUSPECTED budget-limited events by deployment {'qwen3.6:latest': 12, 'gemma4:31b': 5}; 0 in the auto policy, 0 on the calibrated fixed-strong model. No event is proven (no finish_reason/usage recorded); primary scores unchanged; nothing rerun at a higher budget."
+}

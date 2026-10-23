@@ -1,0 +1,1469 @@
+{
+  "error": "",
+  "deployments": [
+    {
+      "id": "ollama/qwen3.6:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.6:latest",
+      "role": "generative",
+      "family": "qwen35moe",
+      "parameter_size": "35.5B",
+      "quantization": "Q4_K_M",
+      "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.6:latest",
+        "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+        "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5059042,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.64396,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.505899,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.505897,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5058932,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.505902,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5059059,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.643954,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.643956,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "general",
+        "reasoning",
+        "code",
+        "vision"
+      ],
+      "catalogue_id": "qwen3.6",
+      "memory_gb_estimate": 26.01,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "general": 0.72,
+        "coding": 0.7,
+        "agent": 0.68,
+        "math": 0.7,
+        "document_vision": 0.68
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 1291.8664579628967,
+          "p95_ms": 1346.71845799312,
+          "ttft_ms": 40057.07387498114,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1792140586.203915,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.5",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "1c2c6fd22bf8cb30",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3.8:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.8:latest",
+      "role": "generative",
+      "family": "qwen35",
+      "parameter_size": "27.3B",
+      "quantization": "Q4_K_M",
+      "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.8:latest",
+        "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+        "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 131072,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.506151,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.723555,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5061471,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.506146,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.506143,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.506149,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5061529,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.723548,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.7235498,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "general",
+        "reasoning",
+        "code",
+        "vision"
+      ],
+      "catalogue_id": "qwen3.8-27b",
+      "memory_gb_estimate": 20.4,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": true,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "general": 0.75,
+        "coding": 0.72,
+        "agent": 0.7,
+        "math": 0.75,
+        "extraction": 0.7,
+        "document_vision": 0.7,
+        "rag": 0.72
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 1059.8315419629216,
+          "p95_ms": 1158.6265829973854,
+          "ttft_ms": 6977.445208001882,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1792140613.853194,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.5",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "1f657c93815106c4",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/embeddinggemma-2:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "embeddinggemma-2:latest",
+      "role": "embedding",
+      "family": "gemma-embedding2",
+      "parameter_size": "271.00M",
+      "quantization": "Q8_0",
+      "identity": "f4981a15b99858ad1f2e0729416e526be7b4f428291b40082b9e4f7b27b5f62f",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "embeddinggemma-2:latest",
+        "digest": "f4981a15b99858ad1f2e0729416e526be7b4f428291b40082b9e4f7b27b5f62f",
+        "identity": "f4981a15b99858ad1f2e0729416e526be7b4f428291b40082b9e4f7b27b5f62f",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "4b852efc0b99",
+        "quant": "Q8_0",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.8039522,
+          "note": "ollama /api/show capabilities"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.803961,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_schema": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.8039622,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.803963,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.8039548,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.803957,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.803958,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": "embeddinggemma-2",
+      "memory_gb_estimate": 1.48,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {},
+      "fingerprint": "2d88ce5436eecbd6",
+      "intended_use_note": "Multimodal embedding/retrieval model (text, image, video, audio into one space); truncated vectors must be re-normalized. ModelSaar 0.1 exposes text embeddings only."
+    },
+    {
+      "id": "ollama/nimble-v3:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "nimble-v3:latest",
+      "role": "decision",
+      "family": "qwen35",
+      "parameter_size": "9.0B",
+      "quantization": "Q8_0",
+      "identity": "6f0e87f398007002ca6de5899f8e62c0826a4e8b723b4fc533526ef9c2b2c487",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "nimble-v3:latest",
+        "digest": "6f0e87f398007002ca6de5899f8e62c0826a4e8b723b4fc533526ef9c2b2c487",
+        "identity": "6f0e87f398007002ca6de5899f8e62c0826a4e8b723b4fc533526ef9c2b2c487",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "a4aee8afcf2e",
+        "quant": "Q8_0",
+        "pool": "local-machine"
+      },
+      "context_length": 32768,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.954155,
+          "note": "ollama /api/show capabilities"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.954166,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_schema": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.954168,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142355.954169,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "vision": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.954158,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.9541602,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142355.954161,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": "nimble",
+      "memory_gb_estimate": 10.96,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {},
+      "fingerprint": "a6aa90be70b33f32",
+      "intended_use_note": "LoRA adapter on Qwen3.5-9B (requires the base weights); 8,192-token hard limit; decision model via /v1/systemone, not chat."
+    },
+    {
+      "id": "ollama/d1:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "d1:latest",
+      "role": "generative",
+      "family": "lfm2",
+      "parameter_size": "2.7B",
+      "quantization": "Q8_0",
+      "identity": "8c2d9ddae4413c38b183644320b6f4bca4c5f629ae9e5104c3b13a150ed85e7e",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "d1:latest",
+        "digest": "8c2d9ddae4413c38b183644320b6f4bca4c5f629ae9e5104c3b13a150ed85e7e",
+        "identity": "8c2d9ddae4413c38b183644320b6f4bca4c5f629ae9e5104c3b13a150ed85e7e",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "86f4770449a4",
+        "quant": "Q8_0",
+        "pool": "local-machine"
+      },
+      "context_length": 16384,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.0327868,
+          "note": "ollama /api/show capabilities"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.032795,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_schema": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.032795,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.032796,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.03279,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.0327911,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.032792,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 4.29,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {},
+      "fingerprint": "1f1dfcfcb9cabdc3",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/muse-glimmer:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "muse-glimmer:latest",
+      "role": "generative",
+      "family": "muse-glimmer",
+      "parameter_size": "27.9B",
+      "quantization": "Q4_K_M",
+      "identity": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "muse-glimmer:latest",
+        "digest": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+        "identity": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.103646,
+          "note": "ollama /api/show capabilities"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.103658,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_schema": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.10366,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.103661,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.10365,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.103651,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.1036532,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "general",
+        "agent",
+        "vision"
+      ],
+      "catalogue_id": "muse-glimmer-30b",
+      "memory_gb_estimate": 20.88,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "general": 0.7,
+        "agent": 0.7,
+        "document_vision": 0.65
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {},
+      "fingerprint": "059c50cc508332ed",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/gemma4:31b",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "gemma4:31b",
+      "role": "generative",
+      "family": "gemma4",
+      "parameter_size": "31.3B",
+      "quantization": "Q4_K_M",
+      "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "gemma4:31b",
+        "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+        "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508886,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.1855092,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508884,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508883,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5088809,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508885,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508887,
+          "note": "stored probe for current fingerprint"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.185506,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.185507,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 22.85,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 4599.649958021473,
+          "p95_ms": 4658.557959017344,
+          "ttft_ms": 15203.914874990005,
+          "load_ms": 58.90800099587068,
+          "source": "probe",
+          "measured_at": 1792140683.442816,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": false,
+            "runtime": "ollama 0.40.5",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "d9c2d9116eefdbe8",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3-coder-next:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3-coder-next:latest",
+      "role": "generative",
+      "family": "qwen3next",
+      "parameter_size": "79.7B",
+      "quantization": "Q4_K_M",
+      "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3-coder-next:latest",
+        "digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+        "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 4096,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508995,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.263401,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508993,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508991,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.50899,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.508994,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.263388,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.263392,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.263395,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 59.5,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 151.93716704379767,
+          "p95_ms": 227.34475001925603,
+          "ttft_ms": 13058.088458958082,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1792140701.6445599,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.5",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "76cc87b6d1648f9f",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3-coder:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3-coder:latest",
+      "role": "generative",
+      "family": "qwen3moe",
+      "parameter_size": "30.5B",
+      "quantization": "Q4_K_M",
+      "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3-coder:latest",
+        "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+        "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 131072,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5090759,
+          "note": "stored probe for current fingerprint"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.34384,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5090728,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_schema": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.5090718,
+          "note": "stored probe for current fingerprint"
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.509071,
+          "note": "stored probe for current fingerprint"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "probe",
+          "checked_at": 1792142356.509075,
+          "note": "stored probe for current fingerprint"
+        },
+        "vision": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.343827,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.343831,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.3438342,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [
+        "code",
+        "agent"
+      ],
+      "catalogue_id": "qwen3-coder-30b-a3b",
+      "memory_gb_estimate": 21.34,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": true,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {
+        "coding": 0.78,
+        "agent": 0.75,
+        "general": 0.6
+      },
+      "quality_prior_provenance": "catalogue",
+      "measurements": {
+        "latency_probe": {
+          "task": "latency_probe",
+          "quality": null,
+          "samples": 2,
+          "p50_ms": 102.09866595687345,
+          "p95_ms": 149.68070801114663,
+          "ttft_ms": 9056.352124956902,
+          "load_ms": 0.0,
+          "source": "probe",
+          "measured_at": 1792140714.3262799,
+          "conditions": {
+            "effective_context": 4096,
+            "endpoint": "http://100.83.54.124:11434",
+            "resident_before": true,
+            "runtime": "ollama 0.40.5",
+            "workload": "single short prompt, max_tokens=256, temperature=0"
+          }
+        }
+      },
+      "fingerprint": "3acc2cdc4e4a963c",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3.6-accurate:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.6-accurate:latest",
+      "role": "generative",
+      "family": "qwen35moe",
+      "parameter_size": "36.0B",
+      "quantization": "Q4_K_M",
+      "identity": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.6-accurate:latest",
+        "digest": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+        "identity": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 131072,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.423459,
+          "note": "ollama /api/show capabilities"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.423466,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_schema": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.423467,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.423468,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.4234612,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.423462,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.4234629,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 27.53,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {},
+      "fingerprint": "ed29b920218cc3fe",
+      "intended_use_note": ""
+    },
+    {
+      "id": "ollama/qwen3.6-fast:latest",
+      "backend": "ollama",
+      "backend_type": "ollama",
+      "model": "qwen3.6-fast:latest",
+      "role": "generative",
+      "family": "qwen35moe",
+      "parameter_size": "36.0B",
+      "quantization": "Q4_K_M",
+      "identity": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+      "identity_source": "ollama digest",
+      "endpoint": "http://100.83.54.124:11434",
+      "fingerprint_inputs": {
+        "backend": "ollama",
+        "endpoint": "http://100.83.54.124:11434",
+        "model": "qwen3.6-fast:latest",
+        "digest": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+        "identity": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+        "runtime": "ollama",
+        "runtime_version": "0.40.5",
+        "template": "b507b9c2f6ca",
+        "quant": "Q4_K_M",
+        "pool": "local-machine"
+      },
+      "context_length": 65536,
+      "max_output_tokens": null,
+      "locality": "local",
+      "locality_evidence": "operator declared backend locality=local; /api/tags shows no remote_model (trust assumption: the gateway cannot inspect the runtime's internals)",
+      "resource_pool": "local-machine",
+      "capabilities": {
+        "tools": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.5040472,
+          "note": "ollama /api/show capabilities"
+        },
+        "tool_choice_required": {
+          "value": "unsupported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.504065,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "parallel_tools": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_schema": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        },
+        "json_object": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.5040672,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "streaming": {
+          "value": "supported",
+          "provenance": "adapter",
+          "checked_at": 1792142356.5040698,
+          "note": "ollama OpenAI-compatible layer"
+        },
+        "vision": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.5040529,
+          "note": "ollama /api/show capabilities"
+        },
+        "audio_in": {
+          "value": "unsupported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.504056,
+          "note": "ollama /api/show capabilities"
+        },
+        "thinking": {
+          "value": "supported",
+          "provenance": "source_claim",
+          "checked_at": 1792142356.5040588,
+          "note": "ollama /api/show capabilities"
+        },
+        "continuation": {
+          "value": "unknown",
+          "provenance": "none",
+          "checked_at": null,
+          "note": ""
+        }
+      },
+      "tags": [],
+      "catalogue_id": null,
+      "memory_gb_estimate": 27.53,
+      "memory_estimate_provenance": "weights file size x1.15 runtime overhead; KV cache for the served context is NOT included",
+      "enabled": true,
+      "state": {
+        "configured": false,
+        "discovered": true,
+        "available_on_disk": true,
+        "loaded": false,
+        "healthy": true,
+        "last_error": ""
+      },
+      "quality_prior": {},
+      "quality_prior_provenance": "uncalibrated",
+      "measurements": {},
+      "fingerprint": "5c3532bc42618479",
+      "intended_use_note": ""
+    }
+  ],
+  "aliases": {
+    "auto": {
+      "id": "auto",
+      "profile": "quality",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/qwen3.8:latest",
+        "ollama/d1:latest",
+        "ollama/muse-glimmer:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "partial",
+      "description": "Best expected quality within limits"
+    },
+    "auto-quality": {
+      "id": "auto-quality",
+      "profile": "quality",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/qwen3.8:latest",
+        "ollama/d1:latest",
+        "ollama/muse-glimmer:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "partial",
+      "description": ""
+    },
+    "auto-balanced": {
+      "id": "auto-balanced",
+      "profile": "balanced",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/qwen3.8:latest",
+        "ollama/d1:latest",
+        "ollama/muse-glimmer:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "partial",
+      "description": ""
+    },
+    "auto-fast": {
+      "id": "auto-fast",
+      "profile": "fast",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/qwen3.8:latest",
+        "ollama/d1:latest",
+        "ollama/muse-glimmer:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3-coder-next:latest",
+        "ollama/qwen3-coder:latest",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "partial",
+      "json_schema": "partial",
+      "description": ""
+    },
+    "auto-code": {
+      "id": "auto-code",
+      "profile": "quality",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/qwen3.8:latest",
+        "ollama/qwen3-coder:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "supported",
+      "vision": "partial",
+      "json_schema": "supported",
+      "description": ""
+    },
+    "auto-vision": {
+      "id": "auto-vision",
+      "profile": "quality",
+      "deployments": [
+        "ollama/qwen3.6:latest",
+        "ollama/qwen3.8:latest",
+        "ollama/d1:latest",
+        "ollama/muse-glimmer:latest",
+        "ollama/gemma4:31b",
+        "ollama/qwen3.6-accurate:latest",
+        "ollama/qwen3.6-fast:latest"
+      ],
+      "context_length_min": 4096,
+      "context_length_max": 131072,
+      "tools": "partial",
+      "vision": "supported",
+      "json_schema": "partial",
+      "description": ""
+    }
+  }
+}
