@@ -1,0 +1,109 @@
+{
+ "stage": "B \u2014 Pass 2 (qwen3-coder-next added; one run) under Ollama 0.40.5 \u2014 CROSS-RUNTIME relative to Pass 1b (Ollama 0.40.3)",
+ "run_window_local": "2026-10-16 14:49:16 \u2013 15:19:29 IST (UTC+05:30), 1813 s, exit 0; probes 14:49\u201314:53, sweeps from 14:53",
+ "owner_authorisation": "2026-10-16 13:47 IST (run Pass 2 once); 14:14 IST (re-baseline once under the GX10's current Ollama 0.40.5, then Pass 2 with the new identities); 14:30 IST (accept the re-created qwen3.6:latest tag and the grown inventory as identity deviations)",
+ "placement": "A \u2014 harness in-process gateway on the Mac (Stage A home), backend GX10 Ollama over Tailscale; production GX10 modelsaar.service untouched; no --allow-concurrent",
+ "repository": {
+  "url": "https://github.com/gopalasubramanium/modelsaar",
+  "main_at_run": "906bde0ede6e74166fd1bf81cf1289703fbf011a",
+  "evidence_branch": "evidence/stage-b-pass2"
+ },
+ "evaluator": {
+  "revision": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+  "checkout": "<EVAL_CHECKOUT> (git clean, asserted by the launcher)",
+  "version": "modelsaar 0.1.0",
+  "python": "3.12.15",
+  "note": "src/ of this checkout is byte-identical to main 906bde0e (PR #9/#10 changed tests and docs only)"
+ },
+ "scorer_version": "2026.10.12-3",
+ "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+ "n_tasks": {
+  "calibration": 15,
+  "test": 32
+ },
+ "budgets": {
+  "max_tokens": 400,
+  "temperature": 0,
+  "seed": 7
+ },
+ "routing_config_hash": "c58ce04fa1ed9902",
+ "classifier": "disabled (enabled=false; consulted 0)",
+ "sandbox": {
+  "backend": "sandbox-exec",
+  "reason": "macOS sandbox-exec at /usr/bin/sandbox-exec (MODELSAAR_MACOS_SANDBOX=verify)",
+  "code_exec_tasks": 5
+ },
+ "checkpoint_format": 2,
+ "resumed_records": 0,
+ "resume_rejected": {},
+ "ollama": {
+  "version": "0.40.5",
+  "pass1b_version": "0.40.3",
+  "endpoint": "http://100.83.54.124:11434 (Tailscale)",
+  "inventory": [
+   "d1:latest",
+   "embeddinggemma-2:latest",
+   "gemma4:31b",
+   "muse-glimmer:latest",
+   "nimble-v3:latest",
+   "qwen3-coder-next:latest",
+   "qwen3-coder:latest",
+   "qwen3.6-accurate:latest",
+   "qwen3.6-fast:latest",
+   "qwen3.6:latest",
+   "qwen3.8:latest"
+  ],
+  "inventory_note": "11 tags (Stage A/Pass 1b: 8); d1, nimble-v3, embeddinggemma-2 added on the GX10 2026-10-16 13:17\u201313:33 IST; qwen3.6:latest re-created 13:35 IST (new manifest digest, identical weight blobs)",
+  "resident_before": [
+   "qwen3-coder:latest",
+   "qwen3.8:latest"
+  ],
+  "resident_after": [
+   [
+    "qwen3-coder:latest",
+    131072,
+    32149843475
+   ],
+   [
+    "qwen3.8:latest",
+    131072,
+    18798597897
+   ]
+  ]
+ },
+ "deviations_from_frozen_contract": [
+  "runtime: Ollama 0.40.5 instead of 0.40.3 (upgrade on the GX10 before this task; not performed by this task); every deployment fingerprint therefore differs from Stage A (runtime_version is a fingerprint input); identities re-baselined 14:18\u201314:22 IST (baseline-ollama-0.40.5/)",
+  "identity: qwen3.6:latest manifest digest 096fdbd02fe6\u2026 \u2192 a7eb95c53bcf\u2026 (tag re-created on the GX10; same weight blobs, template, parameters, capabilities; details.runner=llamacpp added) \u2014 owner-accepted as Pass 2 identity",
+  "inventory: 11 deployments discovered (8 in Pass 1b); the harness --probe step probed 9 generative deployments (8 + d1:latest); eligibility for sweeps/auto was restricted to the five Pass 2 deployments by --deployments",
+  "launcher: harness in the foreground piped through tee (Pass 1 form) with caffeinate -i -w alongside; read-only /admin/status sidecar matched by venv python path (recorded 358 samples, Pass 1b recorded 0)"
+ ],
+ "health_sidecar": {
+  "samples": 358,
+  "first": "2026-10-16T14:49:21+0530",
+  "last": "2026-10-16T15:19:20+0530",
+  "unhealthy_samples": 0,
+  "last_refresh_errors": [
+   ""
+  ],
+  "requests_total_last": 265,
+  "requests_failed_last": 4,
+  "note": "requests_failed 4 = the four capability-422 refusals (vis-01/vis-02 on the two coder models)"
+ },
+ "mac_host": {
+  "os": "macOS 27.0.1",
+  "power": "AC (asserted by the launcher; the 13:56 attempt stopped on battery)",
+  "sleep_prevention": "caffeinate -i -w <launcher> ; lid open (owner)"
+ },
+ "gx10_host": "NOT EXPOSED over the Ollama API (as in Stage A)",
+ "stored_measurements_disclosure": "the Stage A home's state DB held 53 measurement rows before the run (Stage A probes, Pass 1/1b calibration under 0.40.3 fingerprints, 5 latency rows from the 14:18 re-baseline probes) and 103 after; measurements under the 0.40.5 fingerprints are new rows, so auto routed on values measured in this run's own calibration (raw/store-measurements-*.json)",
+ "monitoring_limits": "pass2/console-transcript.txt (tee's file copy) is empty on the Mac for a reason not established; the identical stream reached the launcher log (raw/55-pass2-launcher-console.txt: 267 [eval] lines + the harness report table); the checkpoint is the record of truth",
+ "hashes": {
+  "report_sha256_canonical_mac": "4358acf888a52774c98f4dc3c705f0789bb31a43c9cd1e36933a577ef85806eb",
+  "report_sha256_public_redacted_copy": "164333d7f9fec121462bf6eba0f7b2c701c1d492d31479e51dedbbf21eb5f081",
+  "checkpoint_sha256": "81fa792ed321b01fc2f06e7d331e9ad921d80651f682cc3980363e36e1479e87",
+  "baseline_deployments_sha256_canonical_mac": "17b3cfe31afabc2535f727e36e3a4bbd6137202d4db10cae383ef43ea0555bc9",
+  "baseline_deployments_sha256_public_copy": "17b3cfe31afabc2535f727e36e3a4bbd6137202d4db10cae383ef43ea0555bc9",
+  "launcher_sha256": "bf8933abbd229308f79b93fccd64061e0689f3b750f72a04c03954fd793f4098",
+  "rebaseline_script_sha256": "82423b565b652de49d177261e87d062a0bbb832f0a9a51d58808b458fc129623"
+ }
+}

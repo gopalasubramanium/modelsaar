@@ -1,0 +1,1484 @@
+{
+ "run": "stage-b-pass2",
+ "runtime_label": "Ollama 0.40.5 (Pass 1b: 0.40.3 \u2014 cross-runtime; the added model's effect cannot be isolated)",
+ "generated_from": {
+  "report": "stage-b-pass2.json",
+  "checkpoint": "stage-b-pass2.records.jsonl",
+  "decisions": "36 stored routing decisions"
+ },
+ "hashes": {
+  "report_sha256": "4358acf888a52774c98f4dc3c705f0789bb31a43c9cd1e36933a577ef85806eb",
+  "checkpoint_sha256": "81fa792ed321b01fc2f06e7d331e9ad921d80651f682cc3980363e36e1479e87"
+ },
+ "conditions": {
+  "max_tokens": 400,
+  "temperature": 0,
+  "seed": 7,
+  "scorer_version": "2026.10.12-3",
+  "checkpoint_format": 2,
+  "routing_config_hash": "c58ce04fa1ed9902",
+  "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+  "sandbox_backend": "sandbox-exec",
+  "deployment_fingerprints": {
+   "ollama/qwen3.6:latest": "1c2c6fd22bf8cb30",
+   "ollama/qwen3.8:latest": "1f657c93815106c4",
+   "ollama/gemma4:31b": "d9c2d9116eefdbe8",
+   "ollama/qwen3-coder-next:latest": "76cc87b6d1648f9f",
+   "ollama/qwen3-coder:latest": "3acc2cdc4e4a963c"
+  },
+  "tasks_file": "<EVAL_CHECKOUT>/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+  "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+  "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1"
+ },
+ "deployments": [
+  {
+   "id": "ollama/qwen3.6:latest",
+   "fingerprint": "1c2c6fd22bf8cb30",
+   "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "family": "qwen35moe",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "35.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3.8:latest",
+   "fingerprint": "1f657c93815106c4",
+   "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "family": "qwen35",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "27.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/gemma4:31b",
+   "fingerprint": "d9c2d9116eefdbe8",
+   "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "family": "gemma4",
+   "tags": [],
+   "parameter_size": "31.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3-coder-next:latest",
+   "fingerprint": "76cc87b6d1648f9f",
+   "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "family": "qwen3next",
+   "tags": [],
+   "parameter_size": "79.7B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3-coder:latest",
+   "fingerprint": "3acc2cdc4e4a963c",
+   "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "family": "qwen3moe",
+   "tags": [
+    "code",
+    "agent"
+   ],
+   "parameter_size": "30.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  }
+ ],
+ "n_records": 267,
+ "http_status_counts": {
+  "200": 263,
+  "422": 4
+ },
+ "http_422_records": [
+  [
+   "calib:ollama/qwen3-coder-next:latest",
+   "vis-01",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "calib:ollama/qwen3-coder:latest",
+   "vis-01",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "test:ollama/qwen3-coder-next:latest",
+   "vis-02",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "test:ollama/qwen3-coder:latest",
+   "vis-02",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ]
+ ],
+ "resumed_records": 0,
+ "resume_rejected": {},
+ "sandbox": {
+  "backend": "sandbox-exec",
+  "reason": "macOS sandbox-exec at /usr/bin/sandbox-exec (MODELSAAR_MACOS_SANDBOX=verify)",
+  "code_exec_tasks": 5
+ },
+ "code_exec": {
+  "tasks": [
+   "code-01",
+   "code-02",
+   "code-03",
+   "code-04",
+   "code-05"
+  ],
+  "n_tasks": 5,
+  "auto_results": {
+   "code-03": true,
+   "code-04": true,
+   "code-05": true
+  },
+  "executed_in_isolation": true,
+  "skipped_for_no_backend": 0
+ },
+ "calibration": {
+  "per_deployment": {
+   "qwen3.6:latest": {
+    "success": 0.4,
+    "ci95": [
+     0.198,
+     0.643
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 4171.0,
+    "p95_ms": 4802.3
+   },
+   "qwen3.8:latest": {
+    "success": 1.0,
+    "ci95": [
+     0.796,
+     1.0
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 3170.1,
+    "p95_ms": 15878.7
+   },
+   "gemma4:31b": {
+    "success": 0.8,
+    "ci95": [
+     0.548,
+     0.93
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 21329.8,
+    "p95_ms": 37113.3
+   },
+   "qwen3-coder-next:latest": {
+    "success": 0.933,
+    "ci95": [
+     0.702,
+     0.988
+    ],
+    "n_scored": 15,
+    "completion_rate": 0.933,
+    "capability_violations": 1,
+    "p50_ms": 754.6,
+    "p95_ms": 6613.2
+   },
+   "qwen3-coder:latest": {
+    "success": 0.933,
+    "ci95": [
+     0.702,
+     0.988
+    ],
+    "n_scored": 15,
+    "completion_rate": 0.933,
+    "capability_violations": 1,
+    "p50_ms": 504.1,
+    "p95_ms": 2408.7
+   }
+  },
+  "fixed_strong": "qwen3.8:latest",
+  "fixed_fast": "qwen3-coder:latest",
+  "rule": "fixed-strong = highest calibration success (tie: lower p50); fixed-fast = lowest calibration p50 \u2014 frozen harness rule, test split not consulted"
+ },
+ "policies": {
+  "auto": {
+   "label": "auto (live routing)",
+   "success_rate": 0.938,
+   "ci95_wilson": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 30,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 406.6,
+   "p95_ms": 1957.7,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 0.667,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.208,
+      0.939
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   },
+   "failures_by_category": {
+    "summarization": 1,
+    "math": 1
+   },
+   "failed_tasks": [
+    "long-01",
+    "math-05"
+   ],
+   "http_422": [],
+   "latency_ms": {
+    "n": 32,
+    "mean": 712.7,
+    "p50": 406.6,
+    "p95": 2093.6,
+    "max": 4888.7
+   },
+   "selection_distribution": {
+    "qwen3-coder:latest": 31,
+    "qwen3.8:latest": 1
+   },
+   "evidence_levels": {
+    "measured:2": 25,
+    "measured:1": 7
+   },
+   "routing_overhead_ms": {
+    "n": 32,
+    "mean": 0.4,
+    "p50": 0.3,
+    "p95": 0.6,
+    "max": 3.14
+   }
+  },
+  "fixed-strong": {
+   "label": "fixed-strong (calibrated)",
+   "success_rate": 0.938,
+   "ci95_wilson": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 30,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 2985.9,
+   "p95_ms": 10538.1,
+   "per_category": {
+    "agent": {
+     "success": 0.75,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.301,
+      0.954
+     ]
+    },
+    "coding": {
+     "success": 0.8,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.376,
+      0.964
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   },
+   "failures_by_category": {
+    "coding": 1,
+    "agent": 1
+   },
+   "failed_tasks": [
+    "code-05",
+    "cont-01"
+   ],
+   "http_422": [],
+   "latency_ms": {
+    "n": 32,
+    "mean": 5135.6,
+    "p50": 2985.9,
+    "p95": 13037.8,
+    "max": 16928.4
+   }
+  },
+  "fixed-fast": {
+   "label": "fixed-fast (calibrated)",
+   "success_rate": 0.938,
+   "ci95_wilson": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 30,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 488.8,
+   "p95_ms": 4811.8,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 0.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.0,
+      0.793
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   },
+   "failures_by_category": {
+    "math": 1,
+    "document_vision": 1
+   },
+   "failed_tasks": [
+    "math-05",
+    "vis-02"
+   ],
+   "http_422": [
+    "vis-02"
+   ],
+   "latency_ms": {
+    "n": 31,
+    "mean": 1074.8,
+    "p50": 488.8,
+    "p95": 5035.6,
+    "max": 7248.1
+   }
+  },
+  "rules": {
+   "label": "rules (gold label, specialist tags)",
+   "success_rate": 0.844,
+   "ci95_wilson": [
+    0.682,
+    0.931
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 27,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 1626.2,
+   "p95_ms": 6066.9,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.0,
+      0.434
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "random": {
+   "label": "random (diagnostic)",
+   "success_rate": 0.781,
+   "ci95_wilson": [
+    0.612,
+    0.89
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 25,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 2790.3,
+   "p95_ms": 6476.5,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.4,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.118,
+      0.769
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 0.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.0,
+      0.793
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 0.667,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.208,
+      0.939
+     ]
+    },
+    "translation": {
+     "success": 0.5,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.095,
+      0.905
+     ]
+    }
+   }
+  },
+  "oracle": {
+   "label": "oracle (offline upper bound, not available at runtime)",
+   "success_rate": 1.0,
+   "ci95_wilson": [
+    0.893,
+    1.0
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 422.7,
+   "p95_ms": 1938.0,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  }
+ },
+ "per_deployment_test": {
+  "qwen3.6:latest": {
+   "success": 0.594,
+   "ci95": [
+    0.423,
+    0.745
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 4092.0,
+   "p95_ms": 4627.3
+  },
+  "qwen3.8:latest": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 2985.9,
+   "p95_ms": 10538.1
+  },
+  "gemma4:31b": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 19755.7,
+   "p95_ms": 37258.2
+  },
+  "qwen3-coder-next:latest": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 700.2,
+   "p95_ms": 4814.9
+  },
+  "qwen3-coder:latest": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 488.8,
+   "p95_ms": 4811.8
+  }
+ },
+ "auto_vs_fixed_strong": {
+  "n_tasks": 32,
+  "auto_successes": 30,
+  "fixed_strong_successes": 30,
+  "success_rate_difference": 0.0,
+  "ci95_paired_wald": [
+   -0.122,
+   0.122
+  ],
+  "discordant_auto_only": 2,
+  "discordant_strong_only": 2,
+  "exact_discordant_note": "2 task(s) auto passed and fixed-strong failed; 2 task(s) fixed-strong passed and auto failed; the interval includes zero",
+  "completion_difference": 0.0,
+  "capability_violation_difference": 0,
+  "latency_p50_difference_ms": -2579.3,
+  "latency_p95_difference_ms": -8580.4,
+  "tasks_with_changed_model_or_outcome": [
+   {
+    "task": "agent-03",
+    "category": "agent",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 427.8,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2201.9,
+    "auto_detail": "called bash with id, valid JSON object args ['command'], {'command': 'pytest'}",
+    "fixed_strong_detail": "called bash with id, valid JSON object args ['command'], {'command': 'pytest'}"
+   },
+   {
+    "task": "agent-04",
+    "category": "agent",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 391.4,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 1777.4,
+    "auto_detail": "called read_file with id, valid JSON object args ['path'], {'path': 'pyproject'}",
+    "fixed_strong_detail": "called read_file with id, valid JSON object args ['path'], {'path': 'pyproject'}"
+   },
+   {
+    "task": "agent-05",
+    "category": "agent",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 415.0,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 1670.8,
+    "auto_detail": "called bash with id, valid JSON object args ['command'], {'command': 'git'}",
+    "fixed_strong_detail": "called bash with id, valid JSON object args ['command'], {'command': 'git'}"
+   },
+   {
+    "task": "ambig-01",
+    "category": "coding",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 4888.7,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 16928.4,
+    "auto_detail": "contains 'javascript'",
+    "fixed_strong_detail": "contains 'function'"
+   },
+   {
+    "task": "ambig-02",
+    "category": "conversation",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 1174.7,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 16093.0,
+    "auto_detail": "nonempty",
+    "fixed_strong_detail": "nonempty"
+   },
+   {
+    "task": "ambig-03",
+    "category": "math",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 1139.3,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 9203.7,
+    "auto_detail": "nonempty",
+    "fixed_strong_detail": "nonempty"
+   },
+   {
+    "task": "code-03",
+    "category": "coding",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 1457.7,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 7589.4,
+    "auto_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+    "fixed_strong_detail": "[sandbox-exec] harness completed with expected output, exit 0"
+   },
+   {
+    "task": "code-04",
+    "category": "coding",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 717.4,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 5518.9,
+    "auto_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+    "fixed_strong_detail": "[sandbox-exec] harness completed with expected output, exit 0"
+   },
+   {
+    "task": "code-05",
+    "category": "coding",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 1324.5,
+    "fixed_strong_ok": false,
+    "fixed_strong_latency_ms": 10538.1,
+    "auto_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+    "fixed_strong_detail": "[sandbox-exec] model code raised SyntaxError: invalid syntax (model.py, line 1); harness output '' != expected 'a3b1c2'"
+   },
+   {
+    "task": "code-06",
+    "category": "coding",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 544.9,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 4720.3,
+    "auto_detail": "contains '3 digits'",
+    "fixed_strong_detail": "contains 'three digits'"
+   },
+   {
+    "task": "cont-01",
+    "category": "agent",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 446.2,
+    "fixed_strong_ok": false,
+    "fixed_strong_latency_ms": 2633.1,
+    "auto_detail": "contains '4'",
+    "fixed_strong_detail": "none of ['4', 'four']"
+   },
+   {
+    "task": "conv-03",
+    "category": "conversation",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 398.2,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 7788.2,
+    "auto_detail": "nonempty",
+    "fixed_strong_detail": "nonempty"
+   },
+   {
+    "task": "conv-04",
+    "category": "conversation",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 235.4,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2102.0,
+    "auto_detail": "contains 'same'",
+    "fixed_strong_detail": "contains 'same'"
+   },
+   {
+    "task": "conv-05",
+    "category": "conversation",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 129.2,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 1518.3,
+    "auto_detail": "contains 'pineapple'",
+    "fixed_strong_detail": "contains 'pineapple'"
+   },
+   {
+    "task": "dec-02",
+    "category": "decision",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 108.6,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2910.3,
+    "auto_detail": "contains 'account'",
+    "fixed_strong_detail": "contains 'account'"
+   },
+   {
+    "task": "dec-03",
+    "category": "decision",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 108.4,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2785.1,
+    "auto_detail": "contains 'sports'",
+    "fixed_strong_detail": "contains 'sports'"
+   },
+   {
+    "task": "extract-03",
+    "category": "extraction",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 430.9,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2932.4,
+    "auto_detail": "schema-conformant with correct fields",
+    "fixed_strong_detail": "schema-conformant with correct fields"
+   },
+   {
+    "task": "extract-04",
+    "category": "extraction",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 458.8,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 3039.3,
+    "auto_detail": "schema-conformant with correct fields",
+    "fixed_strong_detail": "schema-conformant with correct fields"
+   },
+   {
+    "task": "long-01",
+    "category": "summarization",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": false,
+    "auto_latency_ms": 296.5,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 6476.5,
+    "auto_detail": "missing 'LINE 0: THE QUICK BROWN'",
+    "fixed_strong_detail": "contains 'LINE 0: THE QUICK BROWN'"
+   },
+   {
+    "task": "math-03",
+    "category": "math",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 127.3,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 1063.6,
+    "auto_detail": "last number 6 == 6 (tol 1e-06, 1 numeric token(s))",
+    "fixed_strong_detail": "last number 6 == 6 (tol 1e-06, 1 numeric token(s))"
+   },
+   {
+    "task": "math-04",
+    "category": "math",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 132.6,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 1753.5,
+    "auto_detail": "last number 55 == 55 (tol 1e-06, 1 numeric token(s))",
+    "fixed_strong_detail": "last number 55 == 55 (tol 1e-06, 1 numeric token(s))"
+   },
+   {
+    "task": "math-05",
+    "category": "math",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": false,
+    "auto_latency_ms": 132.9,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2220.2,
+    "auto_detail": "last number 100 != 50 (tol 1e-06, 1 numeric token(s))",
+    "fixed_strong_detail": "last number 50 == 50 (tol 1e-06, 1 numeric token(s))"
+   },
+   {
+    "task": "math-06",
+    "category": "math",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 106.6,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 6066.9,
+    "auto_detail": "contains 'yes'",
+    "fixed_strong_detail": "contains 'yes'"
+   },
+   {
+    "task": "multi-01",
+    "category": "conversation",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 1957.7,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 8366.0,
+    "auto_detail": "contains 'luz'",
+    "fixed_strong_detail": "contains 'luz'"
+   },
+   {
+    "task": "multi-02",
+    "category": "math",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 137.8,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 1420.5,
+    "auto_detail": "last number 144 == 144 (tol 1e-06, 1 numeric token(s))",
+    "fixed_strong_detail": "last number 144 == 144 (tol 1e-06, 1 numeric token(s))"
+   },
+   {
+    "task": "rag-02",
+    "category": "rag",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 610.9,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2362.2,
+    "auto_detail": "contains '410'",
+    "fixed_strong_detail": "contains '410'"
+   },
+   {
+    "task": "rag-03",
+    "category": "rag",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 396.1,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 2577.6,
+    "auto_detail": "contains 'harbour blue'",
+    "fixed_strong_detail": "contains 'harbour blue'"
+   },
+   {
+    "task": "sum-02",
+    "category": "summarization",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 327.3,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 8386.6,
+    "auto_detail": "contains 'trial'",
+    "fixed_strong_detail": "contains 'trial'"
+   },
+   {
+    "task": "sum-03",
+    "category": "summarization",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 1057.6,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 6259.4,
+    "auto_detail": "contains 'parking'",
+    "fixed_strong_detail": "contains 'parking'"
+   },
+   {
+    "task": "trans-02",
+    "category": "translation",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 287.7,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 7210.9,
+    "auto_detail": "contains 'estaci\u00f3n'",
+    "fixed_strong_detail": "contains 'estaci\u00f3n'"
+   },
+   {
+    "task": "trans-03",
+    "category": "translation",
+    "auto_model": "qwen3-coder:latest",
+    "auto_ok": true,
+    "auto_latency_ms": 177.3,
+    "fixed_strong_ok": true,
+    "fixed_strong_latency_ms": 5733.2,
+    "auto_detail": "contains 'twenty minutes'",
+    "fixed_strong_detail": "contains 'twenty minutes'"
+   }
+  ],
+  "auto_selected_fixed_strong_model_on": [
+   "vis-02"
+  ]
+ },
+ "ttft": "not recorded by the frozen harness (non-streaming requests; no time-to-first-token field in records or report)",
+ "residency": {
+  "ps_before": {
+   "models": [
+    {
+     "name": "qwen3-coder:latest",
+     "model": "qwen3-coder:latest",
+     "size": 32149843475,
+     "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+     "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3moe",
+      "families": [
+       "qwen3moe"
+      ],
+      "parameter_size": "30.5B",
+      "quantization_level": "Q4_K_M"
+     },
+     "expires_at": "2026-10-16T20:51:54.341688261+08:00",
+     "size_vram": 32149843475,
+     "context_length": 131072,
+     "runner": "llamacpp"
+    },
+    {
+     "name": "qwen3.8:latest",
+     "model": "qwen3.8:latest",
+     "size": 18798597897,
+     "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+     "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen35",
+      "families": [
+       "qwen35"
+      ],
+      "parameter_size": "27.3B",
+      "quantization_level": "Q4_K_M"
+     },
+     "expires_at": "2026-10-16T20:50:13.86413443+08:00",
+     "size_vram": 18798597897,
+     "context_length": 131072,
+     "runner": "llamacpp"
+    }
+   ]
+  },
+  "ps_after": [
+   [
+    "qwen3-coder:latest",
+    32149843475
+   ],
+   [
+    "qwen3.8:latest",
+    18798597897
+   ]
+  ],
+  "auto_decisions_chosen_not_resident": [],
+  "note": "per-decision residency from the stored decision's chosen-candidate residency_cost (0.0 = resident when selected)"
+ },
+ "probes": {
+  "ollama/qwen3.6:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/qwen3.8:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/d1:latest": {
+   "streaming": "unsupported",
+   "tools": "unsupported",
+   "json_object": "unsupported",
+   "json_schema": "unsupported",
+   "vision": "unsupported"
+  },
+  "ollama/muse-glimmer:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "unsupported"
+  },
+  "ollama/gemma4:31b": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/qwen3-coder-next:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "unsupported"
+  },
+  "ollama/qwen3-coder:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "unsupported"
+  },
+  "ollama/qwen3.6-accurate:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/qwen3.6-fast:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  }
+ }
+}

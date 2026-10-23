@@ -1,0 +1,153 @@
+{
+ "generated_at": "2026-10-16T14:53:29",
+ "ollama_version": "0.40.5",
+ "source": "stage-b-pass2.json deployments[] + raw/pass2-identities.json + baseline-ollama-0.40.5/deployments-0.40.5.json + Stage A deployments.json",
+ "deployments": [
+  {
+   "id": "ollama/qwen3.6:latest",
+   "fingerprint": "1c2c6fd22bf8cb30",
+   "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "family": "qwen35moe",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "35.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "rebaseline_0405_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "rebaseline_0405_fingerprint": "1c2c6fd22bf8cb30",
+   "same_as_rebaseline": true,
+   "stage_a_digest": "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+   "stage_a_fingerprint": "7495ed65fbf1dbd5",
+   "digest_same_as_stage_a": false,
+   "fingerprint_inputs_changed_vs_stage_a": {
+    "digest": [
+     "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+     "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c"
+    ],
+    "runtime_version": [
+     "0.40.3",
+     "0.40.5"
+    ],
+    "identity": [
+     "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+     "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c"
+    ]
+   }
+  },
+  {
+   "id": "ollama/qwen3.8:latest",
+   "fingerprint": "1f657c93815106c4",
+   "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "family": "qwen35",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "27.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "rebaseline_0405_digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "rebaseline_0405_fingerprint": "1f657c93815106c4",
+   "same_as_rebaseline": true,
+   "stage_a_digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "stage_a_fingerprint": "06621e3e0e6844f0",
+   "digest_same_as_stage_a": true,
+   "fingerprint_inputs_changed_vs_stage_a": {
+    "runtime_version": [
+     "0.40.3",
+     "0.40.5"
+    ]
+   }
+  },
+  {
+   "id": "ollama/gemma4:31b",
+   "fingerprint": "d9c2d9116eefdbe8",
+   "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "family": "gemma4",
+   "tags": [],
+   "parameter_size": "31.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "rebaseline_0405_digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "rebaseline_0405_fingerprint": "d9c2d9116eefdbe8",
+   "same_as_rebaseline": true,
+   "stage_a_digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "stage_a_fingerprint": "c2a3b30b88068a13",
+   "digest_same_as_stage_a": true,
+   "fingerprint_inputs_changed_vs_stage_a": {
+    "runtime_version": [
+     "0.40.3",
+     "0.40.5"
+    ]
+   }
+  },
+  {
+   "id": "ollama/qwen3-coder-next:latest",
+   "fingerprint": "76cc87b6d1648f9f",
+   "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "family": "qwen3next",
+   "tags": [],
+   "parameter_size": "79.7B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "rebaseline_0405_digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "rebaseline_0405_fingerprint": "76cc87b6d1648f9f",
+   "same_as_rebaseline": true,
+   "stage_a_digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "stage_a_fingerprint": "3403278e77d95723",
+   "digest_same_as_stage_a": true,
+   "fingerprint_inputs_changed_vs_stage_a": {
+    "runtime_version": [
+     "0.40.3",
+     "0.40.5"
+    ]
+   }
+  },
+  {
+   "id": "ollama/qwen3-coder:latest",
+   "fingerprint": "3acc2cdc4e4a963c",
+   "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "family": "qwen3moe",
+   "tags": [
+    "code",
+    "agent"
+   ],
+   "parameter_size": "30.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "rebaseline_0405_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "rebaseline_0405_fingerprint": "3acc2cdc4e4a963c",
+   "same_as_rebaseline": true,
+   "stage_a_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "stage_a_fingerprint": "4eacb9bbc87cccbf",
+   "digest_same_as_stage_a": true,
+   "fingerprint_inputs_changed_vs_stage_a": {
+    "runtime_version": [
+     "0.40.3",
+     "0.40.5"
+    ]
+   }
+  }
+ ]
+}

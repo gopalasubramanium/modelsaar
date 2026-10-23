@@ -1,0 +1,139 @@
+#!/bin/bash
+# ============================================================================================================
+#  RE-BASELINE under Ollama 0.40.5 — Stage A-style IDENTITY + PROBE run (one run)      prepared 2026-10-16 14:20 IST
+#  Owner authorisation: message of 2026-10-16 14:14 IST ("one Stage A-style identity and probe run using the
+#  GX10's current Ollama 0.40.5"). READ / MEASURE / RECORD only: no Ollama, GX10 service, model-tag, registry,
+#  evaluator, scorer or configuration change. Production GX10 modelsaar.service untouched.
+# ============================================================================================================
+# Method = Stage A's 10_stage_a_collect.command, parts A (Ollama read-only inventory/identity), discover, and C
+# (probes through a Mac-LOCAL gateway on the Stage A home, admission-coordinated), using the same frozen
+# evaluator checkout cf56cdd that Pass 1/1b/2 use. Probes cover the five Pass 2 deployments; identities
+# (digest + fingerprint) are recorded for all 8 models. Smoke set, doctor/explain and gateway-identity parts
+# of Stage A are NOT repeated (not needed for Pass 2's identity gate).
+# Output: baseline-0.40.5/ (raw JSON, deployments-0.40.5.json, comparison vs Stage A), 54-rebaseline.txt,
+# marker baseline-0.40.5/BASELINE-OK only if: every digest equals Stage A AND the only fingerprint-input change
+# is runtime_version 0.40.3 -> 0.40.5. Stage A (stage-a-deployments.json), pass1/, pass1b/ are never written.
+# ============================================================================================================
+APPROVED=yes
+set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
+[ "$APPROVED" = "yes" ] || { echo "54_rebaseline: UNAPPROVED; not running" | tee "$HERE/54-rebaseline.txt"; exit 3; }
+mkdir "$HERE/.lock-54" 2>/dev/null || exit 0
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+WORK="$HOME/.modelsaar-live/stage-b-cf56cdd"; EXE="$WORK/.venv/bin/modelsaar"; PY="$WORK/.venv/bin/python"
+export MODELSAAR_HOME="$HOME/.modelsaar-stage-a/.modelsaar"
+GX=100.83.54.124; OLLAMA="http://$GX:11434"; B="$HERE/baseline-0.40.5"
+EVAL=cf56cdd3416d8c853b64111b9b40211e5b126031
+PASS2="ollama/qwen3.8:latest ollama/qwen3-coder:latest ollama/gemma4:31b ollama/qwen3.6:latest ollama/qwen3-coder-next:latest"
+SPID=""
+cleanup() { [ -n "$SPID" ] && kill "$SPID" 2>/dev/null; rmdir "$HERE/.lock-54" 2>/dev/null; }
+trap cleanup EXIT
+{
+echo "=== REBASELINE $(date '+%Y-%m-%dT%H:%M:%S%z') (TZ=$(date +%Z)) macOS $(sw_vers -productVersion)"
+[ -d "$B" ] && { echo "!! $B already exists; refusing (no overwrite)"; exit 1; }
+mkdir -p "$B/ollama-show"
+[ "$(git -C "$WORK" rev-parse HEAD)" = "$EVAL" ] || { echo "!! evaluator checkout is not $EVAL"; exit 1; }
+echo "evaluator checkout: $EVAL clean=$([ -z "$(git -C "$WORK" status --porcelain --untracked-files=no)" ] && echo yes || echo no); $("$EXE" --version 2>&1); MODELSAAR_HOME=$MODELSAAR_HOME"
+echo "config hash: $("$EXE" doctor --json 2>/dev/null | "$PY" -c 'import json,sys;print([f["message"] for f in json.load(sys.stdin)["findings"] if f["area"]=="config"][0])')"
+PORT="$("$EXE" config show | "$PY" -c 'import sys,re;print(re.search(r"port:\s*(\d+)",sys.stdin.read()).group(1))')"
+echo "configured local port: $PORT; listening now? $(curl -s -m 2 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/healthz" || echo none) (must be none/000)"
+curl -s -m 2 -o /dev/null "http://127.0.0.1:$PORT/healthz" && { echo "!! something listens on the configured port; refusing"; exit 1; }
+# --- A. Ollama read-only inventory / identity ----------------------------------------------------------------
+curl -fsS -m 15 "$OLLAMA/api/version" > "$B/ollama-version.json" || { echo "!! Ollama unreachable"; exit 1; }
+OV="$("$PY" -c 'import json;print(json.load(open("'"$B"'/ollama-version.json"))["version"])')"; echo "ollama version: $OV (Stage A / Pass 1b: 0.40.3)"
+[ "$OV" = "0.40.5" ] || { echo "!! STOP: expected Ollama 0.40.5 (observed 13:58 IST), got $OV — report before continuing"; exit 2; }
+curl -fsS -m 20 "$OLLAMA/api/tags" > "$B/ollama-tags.json" || { echo "!! /api/tags failed"; exit 1; }
+curl -fsS -m 15 "$OLLAMA/api/ps" > "$B/ollama-ps-before.json"
+echo "models (api/tags): $("$PY" -c 'import json;print(", ".join(m["name"] for m in json.load(open("'"$B"'/ollama-tags.json"))["models"]))')"
+echo "resident before: $("$PY" -c 'import json;print([m["name"] for m in json.load(open("'"$B"'/ollama-ps-before.json"))["models"]])')"
+for m in $("$PY" -c 'import json;print(" ".join(m["name"] for m in json.load(open("'"$B"'/ollama-tags.json"))["models"]))'); do
+  curl -fsS -m 30 "$OLLAMA/api/show" -H 'Content-Type: application/json' -d "{\"model\":\"$m\"}" > "$B/ollama-show/${m//[:\/]/_}.json" || echo "!! /api/show $m failed"
+done
+echo "api/show saved: $(ls "$B/ollama-show" | wc -l | tr -d ' ') files"
+"$EXE" discover --json > "$B/discover.json" 2> "$B/discover.err" || { echo "!! discover failed"; exit 1; }
+echo "discover: $("$PY" -c 'import json;d=json.load(open("'"$B"'/discover.json"));print(len(d["deployments"]),"deployments; error:",d.get("error"))')"
+# --- C. probes of the five Pass 2 deployments through the LOCAL gateway (admission-coordinated) -----------------
+"$EXE" serve > "$B/serve.log" 2>&1 &
+SPID=$!
+for i in $(seq 1 40); do curl -fsS -m 2 "http://127.0.0.1:$PORT/healthz" >/dev/null 2>&1 && break; sleep 0.5; done
+echo "local gateway: $(curl -fsS -m 3 "http://127.0.0.1:$PORT/healthz" 2>&1 | head -c 200) (pid $SPID)"
+T0=$(date +%s)
+"$EXE" probe $PASS2 --json --timeout 180 > "$B/probe.raw.json" 2> "$B/probe.log"
+echo "probe (5 deployments): exit $? in $(( $(date +%s) - T0 ))s; $(grep -c "^probing" "$B/probe.raw.json") probed"
+"$PY" - "$B" <<'PYEOF'
+import json, sys, pathlib
+B = pathlib.Path(sys.argv[1]); t = (B / "probe.raw.json").read_text()
+# the JSON array is printed last, after the human-readable progress/report lines: parse from the last "[" line that parses
+reports = None
+for k in [i for i in range(len(t)) if t.startswith("[", i) and (i == 0 or t[i-1] == "\n")][::-1]:
+    try: reports = json.loads(t[k:]); break
+    except Exception: pass
+if reports is None: print("!! could not parse probe JSON output"); sys.exit(1)
+json.dump(reports, open(B / "probe.json", "w"), indent=1)
+for rep in json.load(open(B / "probe.json")):
+    res = {r["capability"]: r["value"] for r in rep.get("results", [])}
+    print(f"  {rep.get('deployment_id') or rep.get('deployment')}: {res}; uncertain={rep.get('uncertain')} skipped={rep.get('skipped')}")
+PYEOF
+curl -fsS -m 15 "$OLLAMA/api/ps" > "$B/ollama-ps-after-probes.json"
+echo "resident after probes: $("$PY" -c 'import json;print([(m["name"], m.get("context_length"), m.get("size_vram")) for m in json.load(open("'"$B"'/ollama-ps-after-probes.json"))["models"]])')"
+kill "$SPID" 2>/dev/null; wait "$SPID" 2>/dev/null; SPID=""
+sleep 1; echo "local gateway stopped; port $PORT listening? $(curl -s -m 2 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/healthz" || echo none) (must be none/000)"
+# --- D. deployments-0.40.5.json + comparison with Stage A ---------------------------------------------------------
+"$PY" - "$B" "$HERE/stage-a-deployments.json" "$OV" <<'PYEOF'
+import json, sys, pathlib, datetime
+B = pathlib.Path(sys.argv[1]); ref = {d["modelsaar_deployment_id"]: d for d in json.load(open(sys.argv[2]))["deployments"]}; OV = sys.argv[3]
+disc = json.load(open(B / "discover.json"))["deployments"]
+tags = {m["name"]: m for m in json.load(open(B / "ollama-tags.json"))["models"]}
+probes = {(r.get("deployment_id") or r.get("deployment")): r for r in json.load(open(B / "probe.json"))}
+ps = {m["name"]: m for m in json.load(open(B / "ollama-ps-after-probes.json")).get("models", [])}
+out = {"generated_at": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+       "purpose": "re-baseline of model identities under Ollama " + OV + " (Stage A baseline was 0.40.3); Stage A-style identity + probe run, owner-authorised 2026-10-16 14:14 IST",
+       "source": "ollama-tags.json, ollama-show/*.json, discover.json (modelsaar cf56cdd on the Mac against the GX10's Ollama over Tailscale), probe.json (5 Pass 2 deployments), ollama-ps-after-probes.json",
+       "ollama_version": OV, "stage_a_reference": "stage-a-deployments.json (2026-10-14, Ollama 0.40.3)", "deployments": [], "comparison_with_stage_a": []}
+ok = True
+for d in sorted(disc, key=lambda x: x["id"]):
+    m = d["model"]; tag = tags.get(m, {}); show = json.load(open(B / "ollama-show" / (m.replace(":", "_").replace("/", "_") + ".json")))
+    mi = show.get("model_info", {}); arch = mi.get("general.architecture")
+    ctx_trained = mi.get(f"{arch}.context_length") if arch else None
+    entry = {"modelsaar_deployment_id": d["id"], "ollama_model": m, "ollama_digest": tag.get("digest"), "ollama_modified_at": tag.get("modified_at"),
+             "weights_file_bytes": tag.get("size"), "parameter_size": d.get("parameter_size"), "quantization": d.get("quantization"), "family": d.get("family"),
+             "architecture": arch, "ollama_declared_capabilities": show.get("capabilities"),
+             "context": {"trained_context_length_model_info": ctx_trained, "modelsaar_context_length_at_discovery": d.get("context_length"),
+                         "ollama_served_context_length_api_ps": ps.get(m, {}).get("context_length")},
+             "role": d.get("role"), "backend": d.get("backend"), "locality": d.get("locality"), "locality_evidence": d.get("locality_evidence"),
+             "modelsaar_fingerprint": d["fingerprint"], "fingerprint_inputs": d.get("fingerprint_inputs"), "identity": d.get("identity"), "identity_source": d.get("identity_source"),
+             "capabilities_at_discovery": {k: {"value": v.get("value"), "provenance": v.get("provenance")} for k, v in (d.get("capabilities") or {}).items()},
+             "probe_results": ({r["capability"]: r["value"] for r in probes[d["id"]].get("results", [])} if d["id"] in probes else None),
+             "probe_uncertain": probes[d["id"]].get("uncertain") if d["id"] in probes else None}
+    out["deployments"].append(entry)
+    r = ref.get(d["id"]); cmp = {"deployment": d["id"]}
+    if not r:
+        cmp["status"] = "NOT IN STAGE A"; ok = False
+    else:
+        cmp["digest_same_as_stage_a"] = (tag.get("digest") == r["ollama_digest"])
+        cmp["fingerprint_stage_a"] = r["modelsaar_fingerprint"]; cmp["fingerprint_now"] = d["fingerprint"]
+        a, b = r.get("fingerprint_inputs") or {}, d.get("fingerprint_inputs") or {}
+        changed = sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k))
+        cmp["fingerprint_inputs_changed"] = {k: [a.get(k), b.get(k)] for k in changed}
+        cmp["only_runtime_version_changed"] = (changed == ["runtime_version"])
+        cmp["probe_vs_stage_a_capabilities"] = None
+        if entry["probe_results"] is not None:
+            sa = {k: v["value"] for k, v in (r.get("capabilities_at_discovery") or {}).items()}
+            cmp["probe_vs_stage_a_capabilities"] = {k: [sa.get(k), v] for k, v in entry["probe_results"].items() if sa.get(k) not in (None, "unknown", v)}
+        if not cmp["digest_same_as_stage_a"] or not cmp["only_runtime_version_changed"]: ok = False
+    out["comparison_with_stage_a"].append(cmp)
+    print(f"{d['id']}: digest {'same' if cmp.get('digest_same_as_stage_a') else 'CHANGED/none'}; fingerprint {cmp.get('fingerprint_stage_a')} -> {d['fingerprint']}; inputs changed {cmp.get('fingerprint_inputs_changed')}; probe-vs-StageA capability differences {cmp.get('probe_vs_stage_a_capabilities')}")
+missing = sorted(set(ref) - {d["id"] for d in disc})
+if missing: print("!! Stage A deployments not discovered now:", missing); ok = False
+out["baseline_ok"] = ok
+json.dump(out, open(B / "deployments-0.40.5.json", "w"), indent=1)
+if ok:
+    (B / "BASELINE-OK").write_text(f"ollama {OV}; all digests equal Stage A; only runtime_version changed in fingerprint inputs; {datetime.datetime.now().astimezone().isoformat(timespec='seconds')}\n")
+    print("BASELINE-OK written")
+else:
+    print("!! BASELINE NOT OK — an identity differs from Stage A beyond runtime_version; Pass 2 must not start (report)")
+PYEOF
+grep -rl "msk_[A-Za-z0-9]" "$B" 2>/dev/null | sed 's/^/!! key-like string in: /'
+shasum -a 256 "$B/deployments-0.40.5.json" "$B/discover.json" "$B/probe.json" "$B/ollama-tags.json"
+echo "=== done $(date '+%Y-%m-%dT%H:%M:%S%z')"
+} > "$HERE/54-rebaseline.txt" 2>&1
