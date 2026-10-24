@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=f18b2f19">
+<link rel="stylesheet" href="/assets/site.css?v=6fe85ca1">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Evaluation harness", "description": "How `modelsaar eval` compares automatic routing with fixed, rules, random and oracle policies.", "url": "https://modelsaar.com/docs/evaluation/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Evaluation harness", "item": "https://modelsaar.com/docs/evaluation/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Evaluation harness</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Evaluation harness</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/f18b2f195478d9a6591e7c637c321a46d9420e7e/docs/evaluation.md"><code>docs/evaluation.md</code></a> at commit <code>f18b2f195478</code>. The repository file is authoritative.</p></header><p><code>modelsaar eval</code> is an executable harness that compares <code>auto</code> against strong fixed policies on a
+<article class="doc"><header class="doc-head"><h1>Evaluation harness</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/6fe85ca1995de0b8972606f142dbe9114263ec05/docs/evaluation.md"><code>docs/evaluation.md</code></a> at commit <code>6fe85ca1995d</code>. The repository file is authoritative.</p></header><p><code>modelsaar eval</code> is an executable harness that compares <code>auto</code> against strong fixed policies on a
 compact, inspectable task set with executable or exact scoring. It reports per-category results with
 95 % Wilson intervals, completion rate, capability violations, latency and routing overhead.</p>
 <h2 id="task-set">Task set</h2>
@@ -146,7 +146,7 @@ client checks and this evaluation into one resumable command.</p>
 <h2 id="results-read-the-label-before-the-table">Results — read the label before the table</h2>
 <p>Every table below is tied to a scorer version and a source revision. The current scorer is
 <code>2026.10.12-3</code> (record-based <code>code_exec</code> completion evidence, tool-argument schema validation; see
-"Scorers" above). <strong>No live evaluation has been run under the current scorer yet</strong> (only the simulated smoke, which validates mechanics, not model quality). The numbers below were
+"Scorers" above). <strong>One live evaluation has been run under the current scorer — Stage B Pass 1, 2026-10-15 (<code>live-runs/2026-10-15-gx10-stage-b-pass1/</code>), accepted by the owner on 2026-10-16; a second run, Stage B Pass 2 (<code>live-runs/2026-10-16-gx10-stage-b-pass2/</code>, Ollama 0.40.5, five deployments), followed the same day and is labelled cross-runtime relative to Pass 1; Stage C (<code>live-runs/2026-10-24-gx10-stage-c/</code>, Ollama 0.40.5, all eight deployments) completed the roadmap's deployment stages on 2026-10-24. The owner-approved website update (2026-10-24) quotes the accepted Pass 1b result, the cross-runtime Pass 2 result and Stage C with their caveats; it is a separate site change.</strong> Before it, only the simulated smoke had run under this scorer (it validates mechanics, not model quality). The numbers below were
 produced by the scorer named next to them and are kept as recorded; they are not relabelled, and a
 rerun — when it happens — will be reported as a separate run with its own scorer version.</p>
 <p><strong>Current reference result:</strong> the GX10 run of 2026-10-11 at source <code>0f8af84</code> (scorer <code>2026.10.11-2</code>,
@@ -312,7 +312,7 @@ thinking model was selected. Context and the defects it exposed: <a href="/docs/
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/f18b2f195478d9a6591e7c637c321a46d9420e7e">f18b2f195478</a> on 2026-10-14. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6fe85ca1995de0b8972606f142dbe9114263ec05">6fe85ca1995d</a> on 2026-10-24. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -324,6 +324,6 @@ thinking model was selected. Context and the defects it exposed: <a href="/docs/
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=f18b2f19" defer></script>
+<script src="/assets/site.js?v=6fe85ca1" defer></script>
 </body>
 </html>
