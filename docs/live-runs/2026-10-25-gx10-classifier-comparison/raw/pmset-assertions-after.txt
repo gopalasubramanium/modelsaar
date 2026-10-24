@@ -1,0 +1,29 @@
+2026-10-25 04:08:40 +0530 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   0
+   PreventUserIdleDisplaySleep    0
+   SoftwareUpdateTask             0
+   PreventSystemSleep             1
+   PreventSystemSleepSecurityIndicator 0
+   ExternalMedia                  0
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 959(cloudd): [0x0006103b000c9c2d] 00:00:00 SystemIsActive named: "NSURLSessionTask 8005BAB5-F589-4830-94F9-376DBA2AE5A7"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+   pid 45660(Claude): [0x000604020001886e] 00:52:09 NoIdleSleepAssertion named: "Electron"  
+   pid 849(mds_stores): [0x0006103b000b9c2c] 00:00:00 BackgroundTask named: "com.apple.metadata.mds_stores.power"  
+   pid 92777(caffeinate): [0x000606e4000188ca] 00:39:51 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of Process ID 92725
+	Created for PID: 92725. 
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 92777(caffeinate): [0x000606e4000788cb] 00:39:51 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of Process ID 92725
+	Created for PID: 92725. 
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 949(nsurlsessiond): [0x0006103b000c9c2a] 00:00:00 SystemIsActive named: "NSURLSessionTask AD921CF8-5BD4-4DF8-8447-BF4AC54803C5"  
+	Timeout will fire in 10799 secs Action=TimeoutActionTurnOff
+Kernel Assertions: 0x100=MAGICWAKE
+   id=773  level=255 0x100=MAGICWAKE creat=  mod= description=en0 owner=IOSkywalkNetworkBSDClient

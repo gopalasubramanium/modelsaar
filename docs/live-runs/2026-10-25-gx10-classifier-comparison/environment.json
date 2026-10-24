@@ -1,0 +1,170 @@
+{
+ "stage": "Classifier OFF vs ON comparison (docs/plans/measured-routing-quality.md design item 5; stage-b-plan.md §6) — one OFF twin and one ON run under Ollama 0.40.5",
+ "run_window_local": "2026-10-25 03:28:46–04:08:41 IST (UTC+05:30). OFF twin 03:28:54–03:30:25 (91 s, exit 0, COMPROMISED by a backend health flap); ON 03:30:26–04:08:39 (2293 s, exit 0, complete); watchdog (70 min per run) not triggered",
+ "owner_authorisation": "2026-10-25 03:23 IST: work only on the classifier-on vs classifier-off comparison; one run; follow the existing experiment plan and acceptance criteria; no production GX10, Ollama, model-tag, evaluator, scorer or unrelated configuration change; no website publication, no merge; docs-only evidence branch and review PR with exact-head CI",
+ "placement": "A — harness in-process gateway on the Mac (Stage A home), backend GX10 Ollama over Tailscale; production modelsaar.service not stopped and not touched (not contacted by placement A)",
+ "repository": {
+  "url": "https://github.com/gopalasubramanium/modelsaar",
+  "main_at_run": "08d6d3ed465124d0e40f62aef87b7ea9148cf044",
+  "evidence_branch": "evidence/classifier-comparison"
+ },
+ "evaluator": {
+  "revision": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+  "checkout": "<EVAL_CHECKOUT> (git clean, asserted by the launcher)",
+  "version": "modelsaar 0.1.0",
+  "python": "3.12.15",
+  "note": "same evaluator, scorer and task file as Pass 1/1b/2 and Stage C"
+ },
+ "scorer_version": "2026.10.12-3",
+ "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+ "n_tasks": {
+  "calibration": 15,
+  "test": 32
+ },
+ "budgets": {
+  "max_tokens": 400,
+  "temperature": 0,
+  "seed": 7
+ },
+ "routing_config": {
+  "off_hash": "c58ce04fa1ed9902",
+  "on_hash": "58fe0f31907b03ae",
+  "on_diff_vs_off": "routing.classifier: enabled false→true; backend: ollama; model: qwen3.8:latest (three lines; all other keys identical; `raw/config-show-off.txt` vs `raw/config-show-on.txt`)",
+  "on_classifier": {
+   "enabled": true,
+   "backend": "ollama",
+   "model": "qwen3.8:latest",
+   "timeout_s": 2.0,
+   "only_when_ambiguous": true,
+   "max_input_chars": 1500,
+   "max_output_tokens": 64,
+   "allow_remote": false
+  },
+  "off_config_untouched": "config.yaml hash c58ce04fa1ed9902 verified before and after"
+ },
+ "sandbox": {
+  "backend": "sandbox-exec",
+  "reason": "macOS sandbox-exec at /usr/bin/sandbox-exec (MODELSAAR_MACOS_SANDBOX=verify)",
+  "code_exec_tasks": 5
+ },
+ "checkpoint_format": 2,
+ "resumed_records": {
+  "on": 0,
+  "off": 0
+ },
+ "resume_rejected": {
+  "on": {},
+  "off": {}
+ },
+ "flags": "eval --mode live --seed 7 --deployments <four> --out … --checkpoint …; NO --probe and NO --save-measurements (stored measurements 133 rows before and after, unchanged)",
+ "deployments_eligible": [
+  "ollama/qwen3.6:latest",
+  "ollama/qwen3.8:latest",
+  "ollama/gemma4:31b",
+  "ollama/qwen3-coder:latest"
+ ],
+ "ollama": {
+  "version_before": "0.40.5",
+  "version_after": "0.40.5 (resident set re-read after; version re-read only before)",
+  "inventory": [
+   "d1:latest",
+   "embeddinggemma-2:latest",
+   "gemma4:31b",
+   "muse-glimmer:latest",
+   "nimble-v3:latest",
+   "qwen3-coder-next:latest",
+   "qwen3-coder:latest",
+   "qwen3.6-accurate:latest",
+   "qwen3.6-fast:latest",
+   "qwen3.6:latest",
+   "qwen3.8:latest"
+  ],
+  "inventory_note": "11 tags, unchanged since 2026-10-16",
+  "resident_before_off": [
+   "qwen3.8:latest"
+  ],
+  "resident_after_off": [
+   [
+    "qwen3.6:latest",
+    131072,
+    23136556809
+   ],
+   [
+    "qwen3.8:latest",
+    131072,
+    18798597897
+   ]
+  ],
+  "resident_before_on": [
+   [
+    "qwen3.6:latest",
+    131072,
+    23136556809
+   ],
+   [
+    "qwen3.8:latest",
+    131072,
+    18798597897
+   ]
+  ],
+  "resident_after_on": [
+   [
+    "qwen3-coder:latest",
+    131072,
+    32149843475
+   ],
+   [
+    "qwen3.8:latest",
+    131072,
+    18798597897
+   ]
+  ],
+  "classifier_model_residency": "qwen3.8:latest (the classifier model) was resident with size_vram 18798597897 bytes (18.8 GB) in every /api/ps snapshot: before the OFF twin, between the runs and after the ON run"
+ },
+ "identities": {
+  "all_equal_0405_rebaseline": true,
+  "stored_measurements_per_deployment": {
+   "ollama/qwen3.8:latest": 11,
+   "ollama/qwen3-coder:latest": 11,
+   "ollama/gemma4:31b": 11,
+   "ollama/qwen3.6:latest": 11
+  },
+  "probed_capabilities_per_deployment": {
+   "ollama/qwen3.8:latest": 6,
+   "ollama/qwen3-coder:latest": 5,
+   "ollama/gemma4:31b": 6,
+   "ollama/qwen3.6:latest": 6
+  }
+ },
+ "mac": {
+  "os": "macOS 27.0.1",
+  "power": "AC",
+  "assertions": "launcher caffeinate -i -s -w <pid>: PreventSystemSleep + PreventUserIdleSystemSleep verified before and after (raw/pmset-assertions-*.txt); lid open"
+ },
+ "health": {
+  "off_twin": "sidecar 16 samples 03:28:59–03:30:15; from 03:29:49 every deployment reported unhealthy (gateway health refresh: ollama ConnectTimeout); 11 × HTTP 200 then 209 × HTTP 422 no_eligible_deployment",
+  "on": "sidecar 453 samples 03:30:31–04:08:32, 0 unhealthy; 220 × HTTP 200 except the declared vision exclusions (2 × 422 on qwen3-coder: vis-01 calibration, vis-02 sweep)"
+ },
+ "canonical_mac_hashes": {
+  "on_report": "1b51d8cf7346bb2dbee1c665742f7d9c9f61e0ec3eca1527b47ac445f1d7980e",
+  "on_records": "e67d7cb575bcae5081e3d09be50c0c6b24af01c13d73f1c1b8594f7f2a8d8f26",
+  "off_report": "7fdc1ba4c81df06f8196b3192d2fc8bc84201473efc22ca2e05bd784e4c9c959",
+  "off_records": "ddaa12c54872691329fdf42127c0da2c5a9e31a0dd3ffab4f587be3bceb85b08"
+ },
+ "public_copies": {
+  "on_report_sha256": "d17e54cd296b297ab4d718a9d12285d9dd61088b04c38db7c8395b0da595d193",
+  "off_report_sha256": "8b2c206c98bb78d78976ea5a1d164a7d6c3a02e93b0275ba761be3eb7cb81ba5",
+  "note": "reports path-redacted (<EVAL_CHECKOUT>, <RUN_ROOT>, ~) and equal to the canonical objects once the placeholders are restored (verified); checkpoints byte-identical; decisions have _store_saved_at removed"
+ },
+ "verification": {
+  "eval_aggregate_on": "all aggregates in the report match the records",
+  "eval_aggregate_off_twin": "all aggregates in the report match the records (the shipped script needs its display line to tolerate None p50/p95 when no auto request completed; the comparison logic is unchanged — see MANIFEST §E)"
+ },
+ "differences_from_earlier_runs": [
+  "no --probe, no --save-measurements (the §6 design reuses the stored Stage B evidence; stored measurements unchanged at 133 rows)",
+  "runtime Ollama 0.40.5 (as Pass 2 and Stage C); the §6 OFF reference Pass 1b ran on 0.40.3 — the ON-vs-reference comparison is cross-runtime",
+  "the same-session OFF twin is compromised (health flap) and is not the OFF reference",
+  "ON config hash 58fe0f31907b03ae differs from every earlier run (c58ce04fa1ed9902); not resumed from any checkpoint",
+  "the classifier was consulted on every ambiguous request of every policy (38 gateway-wide calls, all timed out at 2.0 s); the fixed-policy latencies of the six ambiguous tasks in the ON run therefore include the classifier path too"
+ ]
+}

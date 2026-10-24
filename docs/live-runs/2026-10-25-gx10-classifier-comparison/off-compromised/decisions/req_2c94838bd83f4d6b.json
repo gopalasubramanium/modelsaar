@@ -1,0 +1,81 @@
+{
+ "_checkpoint": {
+  "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+  "index": 81,
+  "ok": false,
+  "policy": "test:ollama/qwen3.6:latest",
+  "status": 422,
+  "task": "multi-02"
+ },
+ "affinity": {},
+ "alias": null,
+ "candidates": [],
+ "chosen": null,
+ "classifier": {},
+ "compat": {},
+ "config_hash": "c58ce04fa1ed9902",
+ "created_at": 1792879219.4752052,
+ "endpoint": "chat",
+ "evidence": "",
+ "exclusions": {
+  "ollama/qwen3.6:latest": [
+   "backend unhealthy: ollama: ConnectTimeout: "
+  ]
+ },
+ "explicit": true,
+ "failover": [],
+ "failover_allowed": true,
+ "failover_note": "",
+ "outcome": "no_eligible",
+ "outcome_detail": "",
+ "overhead_ms": 1.19,
+ "profile": "quality",
+ "reasons": [
+  "no deployment satisfies all hard requirements"
+ ],
+ "registry_version": 1,
+ "remedies": [
+  "check that the inference server is running (`modelsaar doctor`)"
+ ],
+ "request_id": "req_2c94838bd83f4d6b",
+ "requested_model": "ollama/qwen3.6:latest",
+ "requirements": {
+  "ambiguous": false,
+  "has_remote_image_url": false,
+  "is_tool_result_turn": false,
+  "languages": [
+   "zh/ja"
+  ],
+  "multilingual": true,
+  "needs_audio": false,
+  "needs_continuation": false,
+  "needs_json_object": false,
+  "needs_json_schema": false,
+  "needs_parallel_tools": false,
+  "needs_streaming": false,
+  "needs_tools": false,
+  "needs_vision": false,
+  "outstanding_tool_call_ids": [],
+  "primary_task": "math",
+  "role": "generative",
+  "signals": [
+   "math:math symbols/keywords",
+   "multilingual:zh/ja"
+  ],
+  "tasks": {
+   "math": 0.5
+  },
+  "tokens": {
+   "images": 0,
+   "input_estimate": 23,
+   "method": "estimate:chars/3+overheads",
+   "output_allowance": 400,
+   "reasoning_allowance": 2048,
+   "total": 2471
+  },
+  "tool_choice_mode": "none"
+ },
+ "requirements_note": "",
+ "stream": false,
+ "translation_notes": []
+}
