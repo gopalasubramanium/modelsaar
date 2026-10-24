@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=6fe85ca1">
+<link rel="stylesheet" href="/assets/site.css?v=08d6d3ed">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Roadmap and status", "description": "Current status of ModelSaar and clearly identified future work.", "url": "https://modelsaar.com/roadmap/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Roadmap and status", "item": "https://modelsaar.com/roadmap/"}]}</script>
 </head>
 <body>
@@ -57,7 +57,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <section aria-labelledby="now-title">
   <h2 id="now-title">Now: public alpha</h2>
   <ul>
-    <li><strong>Implemented and tested:</strong> OpenAI-compatible gateway (chat completions with streaming, models, embeddings, health), Ollama and generic OpenAI-compatible adapters, three-state capability evidence with probes and fingerprints, deterministic routing with profiles and aliases, session and tool-call continuity, admission control with memory budgets, decision records and a status page, the CLI, client configuration generators, an evaluation harness with sandboxed scoring, and a fault-injection test suite (218 tests at the pinned revision, including the independent reviewer's 29 contract checks kept verbatim; the 6 sandbox tests need an isolation backend and are skipped where none exists).</li>
+    <li><strong>Implemented and tested:</strong> OpenAI-compatible gateway (chat completions with streaming, models, embeddings, health), Ollama and generic OpenAI-compatible adapters, three-state capability evidence with probes and fingerprints, deterministic routing with profiles and aliases, session and tool-call continuity, admission control with memory budgets, decision records and a status page, the CLI, client configuration generators, an evaluation harness with sandboxed scoring, and a fault-injection test suite (218 tests at the built revision, including the independent reviewer's 29 contract checks kept verbatim; the 6 sandbox tests need an isolation backend and are skipped where none exists).</li>
     <li><strong>Exercised live:</strong> discovery, probes, routing, streaming, tool calls, tool-result continuity, session pinning and the measured-routing evaluation on an ASUS GX10: a three-model run against Ollama 0.32.13 (2026-10-11, historical) and, under one frozen contract at the current revision, runs with four models (Ollama 0.40.3, accepted), five and all eight installed generative models (Ollama 0.40.5) in October 2026 (<a href="/benchmarks/">Benchmarks</a>).</li>
     <li><strong>Review status (precise):</strong> an independent review of the first public revision (<code>1122e1f</code>) produced 18 grouped findings, addressed on the hardening branch with regression tests (<a href="/docs/review-2026-10-11/">F01–F18</a>). A second independent review of that branch (<code>80276bb</code>) reproduced 11 further contract failures and 6 launcher/installer observations (R1–R8; occupancy after stream/probe timeouts, resident-memory accounting, embedding identity anchoring, stream validation, the beginner path, evaluator isolation/scoring/resume, publication guards). Those were corrected on 2026-10-12 and the reviewer's own tests pass and are part of the suite; F04, F08, F10, F13, F14 and F17 were reopened and re-closed by that pass. A third independent review of the corrected revision (2026-10-12) reproduced five further edge conditions (failed residency query, refused-connection residency, stream terminal ordering, evaluator probe admission, checkpoint alternatives); they were closed in the alpha pass and the reviewer's tests are in the suite. Those three independent reviews covered <code>1122e1f</code>, <code>80276bb</code> and <code>5cb7443</code>; the hardening was accepted and merged on 2026-10-13 (PR #1). Later changes — the website (PR #2), the isolated installer (PR #3), Odysseus <code>session_id</code>/<code>cache_prompt</code> compatibility (PR #4), the atomic environment switch (PR #5) and one-command upgrades (PR #6, merged 2026-10-14) — were verified by the project's own test suite and CI (including the installer cases against a real systemd user service on x86_64 and arm64) and by live checks on the owner's hardware, <strong>not by an independent reviewer</strong>. The installer pins <code>cf56cdd</code>, which the owner's GX10 runs.</li>
     <li><strong>Owner-reported:</strong> Odysseus chat through ModelSaar on the GX10 is working, reported by the owner on 2026-10-14. That is use reported in conversation, not a workflow recorded by the project; it does not cover tool, vision, streaming or agent workflows through Odysseus.</li>
@@ -106,7 +106,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6fe85ca1995de0b8972606f142dbe9114263ec05">6fe85ca1995d</a> on 2026-10-24. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/08d6d3ed465124d0e40f62aef87b7ea9148cf044">08d6d3ed4651</a> on 2026-10-24. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -118,6 +118,6 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=6fe85ca1" defer></script>
+<script src="/assets/site.js?v=08d6d3ed" defer></script>
 </body>
 </html>
