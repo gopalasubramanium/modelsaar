@@ -156,8 +156,8 @@ def inline_md(s: str) -> str:
     return "".join(out)
 
 
-def benchmark_table(site) -> str:  # type: ignore[no-untyped-def]
-    ev = facts.live_eval()
+def benchmark_table(site, run: str = "pass1b") -> str:  # type: ignore[no-untyped-def]
+    ev = facts.live_eval(run)
     rows = []
     for r in ev["rows"]:
         name = r["policy"]
