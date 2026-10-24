@@ -1,0 +1,172 @@
+{
+ "stage": "C \u2014 all eight roadmap deployments, one run (classifier OFF; frozen contract) under Ollama 0.40.5",
+ "run_window_local": "2026-10-24 07:32:56 \u2013 08:28:33 IST (UTC+05:30), 3337 s, exit 0; probes 07:33\u201307:37, sweeps from 07:37; watchdog (115 min) not triggered",
+ "owner_authorisation": "2026-10-24 01:09 IST: one Stage C run inside one maintenance window of up to two hours; current GX10 runtime; the eight tags of docs/plans/measured-routing-quality.md; no change to tags, Ollama, production configuration, evaluator, scorer or routing policy",
+ "placement": "A \u2014 harness in-process gateway on the Mac (Stage A home), backend GX10 Ollama over Tailscale; the production modelsaar.service was NOT stopped and not touched (placement A does not require it); its /healthz on the Tailscale and LAN addresses answered HTTP 000 (unreachable from the Mac) before and after, as in Stage A \u2014 service state NOT OBSERVED from the Mac",
+ "repository": {
+  "url": "https://github.com/gopalasubramanium/modelsaar",
+  "main_at_run": "51465a927101b51ae28c8ccaa035a6895dceb4f3",
+  "evidence_branch": "evidence/stage-c"
+ },
+ "evaluator": {
+  "revision": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+  "checkout": "<EVAL_CHECKOUT> (git clean, asserted by the launcher)",
+  "version": "modelsaar 0.1.0",
+  "python": "3.12.15",
+  "note": "src/ identical to main 51465a92"
+ },
+ "scorer_version": "2026.10.12-3",
+ "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+ "n_tasks": {
+  "calibration": 15,
+  "test": 32
+ },
+ "budgets": {
+  "max_tokens": 400,
+  "temperature": 0,
+  "seed": 7
+ },
+ "routing_config_hash": "c58ce04fa1ed9902",
+ "classifier": "disabled (enabled=false; consulted 0)",
+ "sandbox": {
+  "backend": "sandbox-exec",
+  "reason": "macOS sandbox-exec at /usr/bin/sandbox-exec (MODELSAAR_MACOS_SANDBOX=verify)",
+  "code_exec_tasks": 5
+ },
+ "checkpoint_format": 2,
+ "resumed_records": 0,
+ "resume_rejected": {},
+ "deployments_eligible": [
+  "ollama/qwen3.8:latest",
+  "ollama/qwen3.6:latest",
+  "ollama/qwen3.6-fast:latest",
+  "ollama/qwen3.6-accurate:latest",
+  "ollama/qwen3-coder:latest",
+  "ollama/qwen3-coder-next:latest",
+  "ollama/gemma4:31b",
+  "ollama/muse-glimmer:latest"
+ ],
+ "ollama": {
+  "version_before": "0.40.5",
+  "version_after": "0.40.5",
+  "inventory": [
+   "d1:latest",
+   "embeddinggemma-2:latest",
+   "gemma4:31b",
+   "muse-glimmer:latest",
+   "nimble-v3:latest",
+   "qwen3-coder-next:latest",
+   "qwen3-coder:latest",
+   "qwen3.6-accurate:latest",
+   "qwen3.6-fast:latest",
+   "qwen3.6:latest",
+   "qwen3.8:latest"
+  ],
+  "inventory_note": "11 tags, unchanged since 2026-10-16 (the eight roadmap tags + d1, nimble-v3, embeddinggemma-2); all eight roadmap tags present and healthy",
+  "resident_before": [],
+  "resident_after": [
+   [
+    "qwen3.8:latest",
+    131072,
+    18798597897
+   ],
+   [
+    "qwen3.6-fast:latest",
+    65536,
+    24589285456
+   ]
+  ]
+ },
+ "identities": {
+  "all_equal_0405_rebaseline": true,
+  "vs_stage_a": {
+   "qwen3.8:latest": "digest same",
+   "qwen3.6:latest": "digest changed 096fdbd02fe6->a7eb95c53bcf",
+   "qwen3.6-fast:latest": "digest same",
+   "qwen3.6-accurate:latest": "digest same",
+   "qwen3-coder:latest": "digest same",
+   "qwen3-coder-next:latest": "digest same",
+   "gemma4:31b": "digest same",
+   "muse-glimmer:latest": "digest same"
+  },
+  "runtime_version_in_fingerprints": [
+   "0.40.5"
+  ]
+ },
+ "differences_from_earlier_runs": [
+  "runtime: Ollama 0.40.5 \u2014 the same as the re-baseline and Pass 2 (2026-10-16); Pass 1/1b ran on 0.40.3, so any comparison with Pass 1b is cross-runtime",
+  "identities: all eight equal the 0.40.5 re-baseline (baseline-ollama-0.40.5/ in the Pass 2 package); vs Stage A only qwen3.6:latest's manifest digest differs (tag re-created 2026-10-16; same weight blobs)",
+  "inventory: 11 tags (8 in Stage A/Pass 1b; 11 since Pass 2); the harness's --probe step probed 9 generative deployments (8 + d1); the eligible set was the eight",
+  "pool: eight deployments (Pass 1b: 4, Pass 2: 5); the sweep order ended with qwen3.6-fast, so at the auto phase qwen3.8 and qwen3.6-fast were resident (Pass 1b/2: qwen3-coder and qwen3.8)",
+  "capabilities: muse-glimmer's live vision probe returned unsupported although Ollama declares vision; its two vision tasks were refused with HTTP 422 (capability exclusion), like the two coder models",
+  "monitoring: console transcript captured this time (437 lines); health sidecar 660 samples, 0 unhealthy; owner's caffeinate -i -s plus the launcher's caffeinate -i -w; watchdog not triggered"
+ ],
+ "health_sidecar": {
+  "samples": 660,
+  "first": "2026-10-24T07:33:01+0530",
+  "last": "2026-10-24T08:28:26+0530",
+  "unhealthy_samples": 0,
+  "last_refresh_errors": [
+   ""
+  ],
+  "requests_total_last": 408,
+  "requests_failed_last": 6,
+  "loaded_sets_seen_top": [
+   [
+    [
+     "muse-glimmer:latest",
+     "qwen3.8:latest"
+    ],
+    203
+   ],
+   [
+    [
+     "gemma4:31b",
+     "qwen3.8:latest"
+    ],
+    195
+   ],
+   [
+    [
+     "qwen3.6:latest",
+     "qwen3.8:latest"
+    ],
+    83
+   ],
+   [
+    [
+     "qwen3.6-fast:latest",
+     "qwen3.8:latest"
+    ],
+    72
+   ],
+   [
+    [
+     "qwen3.6-accurate:latest",
+     "qwen3.8:latest"
+    ],
+    44
+   ],
+   [
+    [
+     "qwen3.8:latest"
+    ],
+    36
+   ]
+  ]
+ },
+ "mac_host": {
+  "os": "macOS 27.0.1",
+  "power": "AC (asserted)",
+  "sleep_assertions": "owner's caffeinate -i -s (PreventUserIdleSystemSleep + PreventSystemSleep verified before and after) and the launcher's caffeinate -i -w",
+  "lid": "open (owner)"
+ },
+ "gx10_host": "NOT EXPOSED over the Ollama API (as in Stage A); production gateway unreachable from the Mac (HTTP 000) before and after",
+ "stored_measurements_disclosure": "the Stage A home's state DB held 103 measurement rows before and 133 after; rows for the four new sweep models (qwen3.6-fast, qwen3.6-accurate, muse-glimmer, qwen3-coder-next under 0.40.5 fingerprints) were created by this run's own calibration; auto routed on this run's measurements",
+ "hashes": {
+  "report_sha256_canonical_mac": "f7cdd2e8d1d4edda613886351b5f9edc8f5cfbc3278f2286c7895d549ad45972",
+  "report_sha256_public_redacted_copy": "78efb3d0c2ed817a379aff6e82415f429c89285e92b73071d6f9e604086921b3",
+  "checkpoint_sha256": "1bf93d845d88d647d35e827282d7cfd5cea7e50b8ff1dc5028f6d8836cd67353",
+  "launcher_sha256": "87472310197d0ba0568d1e303179930106c9b009f5afff2db523e186fca06f86"
+ }
+}

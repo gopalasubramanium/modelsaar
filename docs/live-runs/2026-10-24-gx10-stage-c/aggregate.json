@@ -1,0 +1,1256 @@
+{
+ "run": "stage-c",
+ "runtime_label": "Ollama 0.40.5 (same runtime as Pass 2; Pass 1b ran on 0.40.3 \u2014 any comparison with Pass 1b is cross-runtime)",
+ "generated_from": {
+  "report": "stage-c.json",
+  "checkpoint": "stage-c.records.jsonl",
+  "decisions": "38 stored routing decisions"
+ },
+ "hashes": {
+  "report_sha256": "f7cdd2e8d1d4edda613886351b5f9edc8f5cfbc3278f2286c7895d549ad45972",
+  "checkpoint_sha256": "1bf93d845d88d647d35e827282d7cfd5cea7e50b8ff1dc5028f6d8836cd67353"
+ },
+ "conditions": {
+  "max_tokens": 400,
+  "temperature": 0,
+  "seed": 7,
+  "scorer_version": "2026.10.12-3",
+  "checkpoint_format": 2,
+  "routing_config_hash": "c58ce04fa1ed9902",
+  "git_commit": "cf56cdd3416d8c853b64111b9b40211e5b126031",
+  "sandbox_backend": "sandbox-exec",
+  "deployment_fingerprints": {
+   "ollama/qwen3.6:latest": "1c2c6fd22bf8cb30",
+   "ollama/qwen3.8:latest": "1f657c93815106c4",
+   "ollama/muse-glimmer:latest": "059c50cc508332ed",
+   "ollama/gemma4:31b": "d9c2d9116eefdbe8",
+   "ollama/qwen3-coder-next:latest": "76cc87b6d1648f9f",
+   "ollama/qwen3-coder:latest": "3acc2cdc4e4a963c",
+   "ollama/qwen3.6-accurate:latest": "ed29b920218cc3fe",
+   "ollama/qwen3.6-fast:latest": "5c3532bc42618479"
+  },
+  "tasks_file": "<EVAL_CHECKOUT>/src/modelsaar/evaluation/fixtures/tasks.jsonl",
+  "tasks_file_sha256": "84c34596cb64835be9d0407e6ae513e1f4dc8c7a29c5d4c141d0a9030b0a9b5c",
+  "tasks_run_sha256": "30027412804ea681f4fea7f54e3dbe3be43256768426687df522795c807a6aa1"
+ },
+ "deployments": [
+  {
+   "id": "ollama/qwen3.6:latest",
+   "fingerprint": "1c2c6fd22bf8cb30",
+   "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "family": "qwen35moe",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "35.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3.8:latest",
+   "fingerprint": "1f657c93815106c4",
+   "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "family": "qwen35",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "27.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/muse-glimmer:latest",
+   "fingerprint": "059c50cc508332ed",
+   "identity": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+   "family": "muse-glimmer",
+   "tags": [
+    "general",
+    "agent",
+    "vision"
+   ],
+   "parameter_size": "27.9B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/gemma4:31b",
+   "fingerprint": "d9c2d9116eefdbe8",
+   "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "family": "gemma4",
+   "tags": [],
+   "parameter_size": "31.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3-coder-next:latest",
+   "fingerprint": "76cc87b6d1648f9f",
+   "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "family": "qwen3next",
+   "tags": [],
+   "parameter_size": "79.7B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3-coder:latest",
+   "fingerprint": "3acc2cdc4e4a963c",
+   "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "family": "qwen3moe",
+   "tags": [
+    "code",
+    "agent"
+   ],
+   "parameter_size": "30.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3.6-accurate:latest",
+   "fingerprint": "ed29b920218cc3fe",
+   "identity": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+   "family": "qwen35moe",
+   "tags": [],
+   "parameter_size": "36.0B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": null
+  },
+  {
+   "id": "ollama/qwen3.6-fast:latest",
+   "fingerprint": "5c3532bc42618479",
+   "identity": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+   "family": "qwen35moe",
+   "tags": [],
+   "parameter_size": "36.0B",
+   "quantization": "Q4_K_M",
+   "context_length": 65536,
+   "runtime": "ollama",
+   "runtime_version": null
+  }
+ ],
+ "n_records": 408,
+ "http_status_counts": {
+  "200": 402,
+  "422": 6
+ },
+ "http_422_records": [
+  [
+   "calib:ollama/muse-glimmer:latest",
+   "vis-01",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "calib:ollama/qwen3-coder-next:latest",
+   "vis-01",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "calib:ollama/qwen3-coder:latest",
+   "vis-01",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "test:ollama/muse-glimmer:latest",
+   "vis-02",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "test:ollama/qwen3-coder-next:latest",
+   "vis-02",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ],
+  [
+   "test:ollama/qwen3-coder:latest",
+   "vis-02",
+   "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements"
+  ]
+ ],
+ "resumed_records": 0,
+ "resume_rejected": {},
+ "sandbox": {
+  "backend": "sandbox-exec",
+  "reason": "macOS sandbox-exec at /usr/bin/sandbox-exec (MODELSAAR_MACOS_SANDBOX=verify)",
+  "code_exec_tasks": 5
+ },
+ "code_exec": {
+  "tasks": [
+   "code-01",
+   "code-02",
+   "code-03",
+   "code-04",
+   "code-05"
+  ],
+  "n_tasks": 5,
+  "auto_results": {
+   "code-03": true,
+   "code-04": true,
+   "code-05": false
+  },
+  "executed_in_isolation": true,
+  "skipped_for_no_backend": 0
+ },
+ "calibration": {
+  "per_deployment": {
+   "qwen3.6:latest": {
+    "success": 0.4,
+    "ci95": [
+     0.198,
+     0.643
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 3980.1,
+    "p95_ms": 4550.6
+   },
+   "qwen3.8:latest": {
+    "success": 1.0,
+    "ci95": [
+     0.796,
+     1.0
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 3218.3,
+    "p95_ms": 15857.8
+   },
+   "muse-glimmer:latest": {
+    "success": 0.8,
+    "ci95": [
+     0.548,
+     0.93
+    ],
+    "n_scored": 15,
+    "completion_rate": 0.933,
+    "capability_violations": 1,
+    "p50_ms": 21803.5,
+    "p95_ms": 32087.2
+   },
+   "gemma4:31b": {
+    "success": 0.8,
+    "ci95": [
+     0.548,
+     0.93
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 21273.9,
+    "p95_ms": 37219.6
+   },
+   "qwen3-coder-next:latest": {
+    "success": 0.933,
+    "ci95": [
+     0.702,
+     0.988
+    ],
+    "n_scored": 15,
+    "completion_rate": 0.933,
+    "capability_violations": 1,
+    "p50_ms": 764.0,
+    "p95_ms": 6717.2
+   },
+   "qwen3-coder:latest": {
+    "success": 0.933,
+    "ci95": [
+     0.702,
+     0.988
+    ],
+    "n_scored": 15,
+    "completion_rate": 0.933,
+    "capability_violations": 1,
+    "p50_ms": 500.5,
+    "p95_ms": 2410.3
+   },
+   "qwen3.6-accurate:latest": {
+    "success": 0.533,
+    "ci95": [
+     0.301,
+     0.752
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 5465.1,
+    "p95_ms": 5690.0
+   },
+   "qwen3.6-fast:latest": {
+    "success": 0.6,
+    "ci95": [
+     0.357,
+     0.802
+    ],
+    "n_scored": 15,
+    "completion_rate": 1.0,
+    "capability_violations": 0,
+    "p50_ms": 4201.2,
+    "p95_ms": 5799.4
+   }
+  },
+  "fixed_strong": "qwen3.8:latest",
+  "fixed_fast": "qwen3-coder:latest",
+  "rule": "fixed-strong = highest calibration success (tie: lower p50); fixed-fast = lowest calibration p50 \u2014 frozen harness rule, test split not consulted"
+ },
+ "policies": {
+  "auto": {
+   "label": "auto (live routing)",
+   "success_rate": 0.938,
+   "ci95_wilson": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 30,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 3000.6,
+   "p95_ms": 10620.5,
+   "per_category": {
+    "agent": {
+     "success": 0.75,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.301,
+      0.954
+     ]
+    },
+    "coding": {
+     "success": 0.8,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.376,
+      0.964
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   },
+   "failures_by_category": {
+    "coding": 1,
+    "agent": 1
+   },
+   "failed_tasks": [
+    "code-05",
+    "cont-01"
+   ],
+   "http_422": [],
+   "latency_ms": {
+    "n": 32,
+    "mean": 5142.9,
+    "p50": 3000.6,
+    "p95": 13066.8,
+    "max": 16869.5
+   },
+   "selection_distribution": {
+    "qwen3.8:latest": 32
+   },
+   "evidence_levels": {
+    "measured:2": 25,
+    "measured:1": 7
+   },
+   "routing_overhead_ms": {
+    "n": 32,
+    "mean": 0.38,
+    "p50": 0.3,
+    "p95": 0.5,
+    "max": 2.91
+   }
+  },
+  "fixed-strong": {
+   "label": "fixed-strong (calibrated)",
+   "success_rate": 0.938,
+   "ci95_wilson": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 30,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 2986.8,
+   "p95_ms": 10701.6,
+   "per_category": {
+    "agent": {
+     "success": 0.75,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.301,
+      0.954
+     ]
+    },
+    "coding": {
+     "success": 0.8,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.376,
+      0.964
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   },
+   "failures_by_category": {
+    "coding": 1,
+    "agent": 1
+   },
+   "failed_tasks": [
+    "code-05",
+    "cont-01"
+   ],
+   "http_422": [],
+   "latency_ms": {
+    "n": 32,
+    "mean": 5155.7,
+    "p50": 2986.8,
+    "p95": 13103.9,
+    "max": 16811.1
+   }
+  },
+  "fixed-fast": {
+   "label": "fixed-fast (calibrated)",
+   "success_rate": 0.938,
+   "ci95_wilson": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 30,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 479.4,
+   "p95_ms": 4847.9,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 0.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.0,
+      0.793
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 0.833,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.436,
+      0.97
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   },
+   "failures_by_category": {
+    "math": 1,
+    "document_vision": 1
+   },
+   "failed_tasks": [
+    "math-05",
+    "vis-02"
+   ],
+   "http_422": [
+    "vis-02"
+   ],
+   "latency_ms": {
+    "n": 31,
+    "mean": 1084.9,
+    "p50": 479.4,
+    "p95": 5008.1,
+    "max": 7239.0
+   }
+  },
+  "rules": {
+   "label": "rules (gold label, specialist tags)",
+   "success_rate": 0.844,
+   "ci95_wilson": [
+    0.682,
+    0.931
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 27,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 1629.9,
+   "p95_ms": 6050.1,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.0,
+      0.434
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "random": {
+   "label": "random (diagnostic)",
+   "success_rate": 0.812,
+   "ci95_wilson": [
+    0.647,
+    0.911
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 26,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 4537.5,
+   "p95_ms": 29529.7,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 0.4,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.118,
+      0.769
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 0.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.0,
+      0.562
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  },
+  "oracle": {
+   "label": "oracle (offline upper bound, not available at runtime)",
+   "success_rate": 1.0,
+   "ci95_wilson": [
+    0.893,
+    1.0
+   ],
+   "n_scored": 32,
+   "skipped": 0,
+   "successes": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 438.5,
+   "p95_ms": 1959.7,
+   "per_category": {
+    "agent": {
+     "success": 1.0,
+     "n": 4,
+     "skipped": 0,
+     "ci95": [
+      0.51,
+      1.0
+     ]
+    },
+    "coding": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "conversation": {
+     "success": 1.0,
+     "n": 5,
+     "skipped": 0,
+     "ci95": [
+      0.566,
+      1.0
+     ]
+    },
+    "decision": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "document_vision": {
+     "success": 1.0,
+     "n": 1,
+     "skipped": 0,
+     "ci95": [
+      0.207,
+      1.0
+     ]
+    },
+    "extraction": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "math": {
+     "success": 1.0,
+     "n": 6,
+     "skipped": 0,
+     "ci95": [
+      0.61,
+      1.0
+     ]
+    },
+    "rag": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    },
+    "summarization": {
+     "success": 1.0,
+     "n": 3,
+     "skipped": 0,
+     "ci95": [
+      0.438,
+      1.0
+     ]
+    },
+    "translation": {
+     "success": 1.0,
+     "n": 2,
+     "skipped": 0,
+     "ci95": [
+      0.342,
+      1.0
+     ]
+    }
+   }
+  }
+ },
+ "per_deployment_test": {
+  "qwen3.6:latest": {
+   "success": 0.594,
+   "ci95": [
+    0.423,
+    0.745
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 4134.1,
+   "p95_ms": 4551.0
+  },
+  "qwen3.8:latest": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 2986.8,
+   "p95_ms": 10701.6
+  },
+  "muse-glimmer:latest": {
+   "success": 0.688,
+   "ci95": [
+    0.514,
+    0.82
+   ],
+   "n_scored": 32,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 22276.7,
+   "p95_ms": 32440.6
+  },
+  "gemma4:31b": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 19811.8,
+   "p95_ms": 37468.7
+  },
+  "qwen3-coder-next:latest": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 695.1,
+   "p95_ms": 4821.2
+  },
+  "qwen3-coder:latest": {
+   "success": 0.938,
+   "ci95": [
+    0.799,
+    0.983
+   ],
+   "n_scored": 32,
+   "completion_rate": 0.969,
+   "capability_violations": 1,
+   "p50_ms": 479.4,
+   "p95_ms": 4847.9
+  },
+  "qwen3.6-accurate:latest": {
+   "success": 0.562,
+   "ci95": [
+    0.393,
+    0.718
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 5553.4,
+   "p95_ms": 5830.3
+  },
+  "qwen3.6-fast:latest": {
+   "success": 0.594,
+   "ci95": [
+    0.423,
+    0.745
+   ],
+   "n_scored": 32,
+   "completion_rate": 1.0,
+   "capability_violations": 0,
+   "p50_ms": 4801.1,
+   "p95_ms": 5782.0
+  }
+ },
+ "auto_vs_fixed_strong": {
+  "n_tasks": 32,
+  "auto_successes": 30,
+  "fixed_strong_successes": 30,
+  "success_rate_difference": 0.0,
+  "ci95_paired_wald": [
+   0.0,
+   0.0
+  ],
+  "discordant_auto_only": 0,
+  "discordant_strong_only": 0,
+  "exact_discordant_note": "0 task(s) auto passed and fixed-strong failed; 0 task(s) fixed-strong passed and auto failed; the interval includes zero",
+  "completion_difference": 0.0,
+  "capability_violation_difference": 0,
+  "latency_p50_difference_ms": 13.8,
+  "latency_p95_difference_ms": -81.1,
+  "tasks_with_changed_model_or_outcome": [],
+  "auto_selected_fixed_strong_model_on": [
+   "agent-03",
+   "agent-04",
+   "agent-05",
+   "ambig-01",
+   "ambig-02",
+   "ambig-03",
+   "code-03",
+   "code-04",
+   "code-05",
+   "code-06",
+   "cont-01",
+   "conv-03",
+   "conv-04",
+   "conv-05",
+   "dec-02",
+   "dec-03",
+   "extract-03",
+   "extract-04",
+   "long-01",
+   "math-03",
+   "math-04",
+   "math-05",
+   "math-06",
+   "multi-01",
+   "multi-02",
+   "rag-02",
+   "rag-03",
+   "sum-02",
+   "sum-03",
+   "trans-02",
+   "trans-03",
+   "vis-02"
+  ]
+ },
+ "ttft": "not recorded by the frozen harness (non-streaming requests; no time-to-first-token field in records or report)",
+ "residency": {
+  "ps_before": {
+   "models": []
+  },
+  "ps_after": [
+   [
+    "qwen3.8:latest",
+    18798597897
+   ],
+   [
+    "qwen3.6-fast:latest",
+    24589285456
+   ]
+  ],
+  "auto_decisions_chosen_not_resident": [],
+  "note": "per-decision residency from the stored decision's chosen-candidate residency_cost (0.0 = resident when selected)"
+ },
+ "probes": {
+  "ollama/qwen3.6:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/qwen3.8:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/d1:latest": {
+   "streaming": "unsupported",
+   "tools": "unsupported",
+   "json_object": "unsupported",
+   "json_schema": "unsupported",
+   "vision": "unsupported"
+  },
+  "ollama/muse-glimmer:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "unsupported"
+  },
+  "ollama/gemma4:31b": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/qwen3-coder-next:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "unsupported"
+  },
+  "ollama/qwen3-coder:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "unsupported"
+  },
+  "ollama/qwen3.6-accurate:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  },
+  "ollama/qwen3.6-fast:latest": {
+   "streaming": "supported",
+   "tools": "supported",
+   "json_object": "supported",
+   "json_schema": "supported",
+   "vision": "supported"
+  }
+ }
+}

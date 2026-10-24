@@ -1,0 +1,318 @@
+{
+ "ollama/qwen3.8:latest": {
+  "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+  "fingerprint": "1f657c93815106c4",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3.8:latest",
+   "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "modified_at": "2026-10-16T16:05:18.527718381+08:00",
+  "size": 17741872154,
+  "details": {
+   "parent_model": "qwen3.8:27b-q4_K_M",
+   "format": "gguf",
+   "family": "qwen35",
+   "families": [
+    "qwen35"
+   ],
+   "parameter_size": "27.3B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 262144,
+   "embedding_length": 5120,
+   "runner": "llamacpp"
+  },
+  "capabilities_declared": [
+   "completion",
+   "vision",
+   "tools",
+   "thinking"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest same"
+ },
+ "ollama/qwen3.6:latest": {
+  "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+  "fingerprint": "1c2c6fd22bf8cb30",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3.6:latest",
+   "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "modified_at": "2026-10-16T16:05:28.668774491+08:00",
+  "size": 22621314381,
+  "details": {
+   "parent_model": "qwen3.6-source:35b-a3b-mtp-q4_K_M-20260824",
+   "format": "gguf",
+   "family": "qwen35moe",
+   "families": [
+    "qwen35moe"
+   ],
+   "parameter_size": "35.5B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 262144,
+   "embedding_length": 2048,
+   "runner": "llamacpp"
+  },
+  "capabilities_declared": [
+   "completion",
+   "vision",
+   "tools",
+   "thinking"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest changed 096fdbd02fe6->a7eb95c53bcf"
+ },
+ "ollama/qwen3.6-fast:latest": {
+  "digest": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+  "fingerprint": "5c3532bc42618479",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3.6-fast:latest",
+   "digest": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+   "identity": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 65536,
+  "modified_at": "2026-05-24T12:51:35.302966812+08:00",
+  "size": 23938333743,
+  "details": {
+   "parent_model": "qwen3.6:latest",
+   "format": "gguf",
+   "family": "qwen35moe",
+   "families": [
+    "qwen35moe"
+   ],
+   "parameter_size": "36.0B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 262144,
+   "embedding_length": 2048,
+   "runner": "ggml"
+  },
+  "capabilities_declared": [
+   "completion",
+   "vision",
+   "tools",
+   "thinking"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest same"
+ },
+ "ollama/qwen3.6-accurate:latest": {
+  "digest": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+  "fingerprint": "ed29b920218cc3fe",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3.6-accurate:latest",
+   "digest": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+   "identity": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 131072,
+  "modified_at": "2026-05-24T13:07:10.983099198+08:00",
+  "size": 23938333880,
+  "details": {
+   "parent_model": "qwen3.6:latest",
+   "format": "gguf",
+   "family": "qwen35moe",
+   "families": [
+    "qwen35moe"
+   ],
+   "parameter_size": "36.0B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 262144,
+   "embedding_length": 2048,
+   "runner": "ggml"
+  },
+  "capabilities_declared": [
+   "completion",
+   "vision",
+   "tools",
+   "thinking"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest same"
+ },
+ "ollama/qwen3-coder:latest": {
+  "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+  "fingerprint": "3acc2cdc4e4a963c",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3-coder:latest",
+   "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "modified_at": "2026-06-07T13:15:03.795165848+08:00",
+  "size": 18556700761,
+  "details": {
+   "parent_model": "",
+   "format": "gguf",
+   "family": "qwen3moe",
+   "families": [
+    "qwen3moe"
+   ],
+   "parameter_size": "30.5B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 262144,
+   "embedding_length": 2048,
+   "runner": "ggml"
+  },
+  "capabilities_declared": [
+   "completion",
+   "tools"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest same"
+ },
+ "ollama/qwen3-coder-next:latest": {
+  "digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+  "fingerprint": "76cc87b6d1648f9f",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3-coder-next:latest",
+   "digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "modified_at": "2026-07-15T08:21:05.064901181+08:00",
+  "size": 51741611823,
+  "details": {
+   "parent_model": "",
+   "format": "gguf",
+   "family": "qwen3next",
+   "families": [
+    "qwen3next"
+   ],
+   "parameter_size": "79.7B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 262144,
+   "embedding_length": 2048,
+   "runner": "ggml"
+  },
+  "capabilities_declared": [
+   "completion",
+   "tools"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest same"
+ },
+ "ollama/gemma4:31b": {
+  "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+  "fingerprint": "d9c2d9116eefdbe8",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "gemma4:31b",
+   "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "modified_at": "2026-09-27T22:58:36.791538432+08:00",
+  "size": 19868981791,
+  "details": {
+   "parent_model": "",
+   "format": "gguf",
+   "family": "gemma4",
+   "families": [
+    "gemma4"
+   ],
+   "parameter_size": "31.3B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 262144,
+   "embedding_length": 5376,
+   "runner": "ggml"
+  },
+  "capabilities_declared": [
+   "completion",
+   "vision",
+   "tools",
+   "thinking"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest same"
+ },
+ "ollama/muse-glimmer:latest": {
+  "digest": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+  "fingerprint": "059c50cc508332ed",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "muse-glimmer:latest",
+   "digest": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+   "identity": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "modified_at": "2026-10-11T14:00:30.611044574+08:00",
+  "size": 18157010252,
+  "details": {
+   "parent_model": "muse-glimmer:30b-q4_K_M",
+   "format": "gguf",
+   "family": "muse-glimmer",
+   "families": [
+    "muse-glimmer"
+   ],
+   "parameter_size": "27.9B",
+   "quantization_level": "Q4_K_M",
+   "context_length": 131072,
+   "embedding_length": 6656,
+   "runner": "ggml"
+  },
+  "capabilities_declared": [
+   "completion",
+   "vision",
+   "tools",
+   "thinking"
+  ],
+  "vs_rebaseline_0405": "same",
+  "vs_stage_a": "digest same"
+ }
+}

@@ -1,0 +1,134 @@
+{
+ "thinking": {
+  "values": [
+   false,
+   true
+  ],
+  "default": true
+ },
+ "parameters": "draft_num_predict              2\nmin_p                          0\npresence_penalty               1.5\nrepeat_penalty                 1\ntemperature                    1\ntop_k                          20\ntop_p                          0.95",
+ "template": "{{ .Prompt }}",
+ "details": {
+  "parent_model": "qwen3.6-source:35b-a3b-mtp-q4_K_M-20260824",
+  "format": "gguf",
+  "family": "qwen35moe",
+  "families": [
+   "qwen35moe"
+  ],
+  "parameter_size": "35.5B",
+  "quantization_level": "Q4_K_M",
+  "runner": "llamacpp"
+ },
+ "model_info": {
+  "general.architecture": "qwen35moe",
+  "general.file_type": 15,
+  "general.parameter_count": 35505251456,
+  "general.quantization_version": 2,
+  "qwen35moe.attention.head_count": 16,
+  "qwen35moe.attention.head_count_kv": 2,
+  "qwen35moe.attention.key_length": 256,
+  "qwen35moe.attention.layer_norm_rms_epsilon": 1e-06,
+  "qwen35moe.attention.value_length": 256,
+  "qwen35moe.block_count": 41,
+  "qwen35moe.context_length": 262144,
+  "qwen35moe.embedding_length": 2048,
+  "qwen35moe.expert_count": 256,
+  "qwen35moe.expert_feed_forward_length": 512,
+  "qwen35moe.expert_shared_feed_forward_length": 512,
+  "qwen35moe.expert_used_count": 8,
+  "qwen35moe.feed_forward_length": 0,
+  "qwen35moe.full_attention_interval": 4,
+  "qwen35moe.nextn_predict_layers": 1,
+  "qwen35moe.rope.dimension_count": 64,
+  "qwen35moe.rope.dimension_sections": [
+   11,
+   11,
+   10,
+   0
+  ],
+  "qwen35moe.rope.freq_base": 10000000,
+  "qwen35moe.ssm.conv_kernel": 4,
+  "qwen35moe.ssm.group_count": 16,
+  "qwen35moe.ssm.inner_size": 4096,
+  "qwen35moe.ssm.state_size": 128,
+  "qwen35moe.ssm.time_step_rank": 32,
+  "tokenizer.ggml.eos_token_id": 248046,
+  "tokenizer.ggml.eos_token_ids": [
+   248046,
+   248044
+  ],
+  "tokenizer.ggml.merges": [],
+  "tokenizer.ggml.model": "gpt2",
+  "tokenizer.ggml.padding_token_id": 248044,
+  "tokenizer.ggml.pre": "qwen35",
+  "tokenizer.ggml.scores": [],
+  "tokenizer.ggml.token_type": [],
+  "tokenizer.ggml.tokens": []
+ },
+ "projector_info": {
+  "clip.has_vision_encoder": true,
+  "clip.projector_type": "qwen3vl_merger",
+  "clip.use_gelu": true,
+  "clip.vision.attention.head_count": 16,
+  "clip.vision.attention.layer_norm_epsilon": 1e-06,
+  "clip.vision.block_count": 27,
+  "clip.vision.embedding_length": 1152,
+  "clip.vision.feed_forward_length": 4304,
+  "clip.vision.image_mean": [
+   0.5,
+   0.5,
+   0.5
+  ],
+  "clip.vision.image_size": 768,
+  "clip.vision.image_std": [
+   0.5,
+   0.5,
+   0.5
+  ],
+  "clip.vision.is_deepstack_layers": [
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false
+  ],
+  "clip.vision.patch_size": 16,
+  "clip.vision.projection_dim": 2048,
+  "clip.vision.spatial_merge_size": 2,
+  "general.architecture": "clip",
+  "general.file_type": 1,
+  "general.parameter_count": 446571248,
+  "general.quantization_version": 2,
+  "general.type": "mmproj"
+ },
+ "capabilities": [
+  "completion",
+  "vision",
+  "tools",
+  "thinking"
+ ],
+ "modified_at": "2026-10-16T16:05:28.668774491+08:00",
+ "requires": "0.30.0"
+}

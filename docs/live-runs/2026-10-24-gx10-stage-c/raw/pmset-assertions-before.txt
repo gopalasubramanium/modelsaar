@@ -1,0 +1,47 @@
+2026-10-24 07:32:46 +0530 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    0
+   SoftwareUpdateTask             0
+   PreventSystemSleep             1
+   PreventSystemSleepSecurityIndicator 0
+   ExternalMedia                  0
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 959(cloudd): [0x0004ee92000c96d5] 00:00:00 SystemIsActive named: "NSURLSessionTask 621FC6DE-831C-4873-9E48-AAC6AD4A8106"  
+	Timeout will fire in 10799 secs Action=TimeoutActionTurnOff
+   pid 959(cloudd): [0x0004ee93000c96dc] 00:00:00 SystemIsActive named: "NSURLSessionTask FC177E9F-0486-47F0-B817-F393D48929C7"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+   pid 959(cloudd): [0x0004ee93000c96dd] 00:00:00 SystemIsActive named: "NSURLSessionTask 154F6F01-BFB6-4063-8DBE-1995B138F0F1"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+   pid 549(powerd): [0x0004ee03000196b5] 00:02:24 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 45660(Claude): [0x0004ed4a000196ac] 00:05:29 NoIdleSleepAssertion named: "Electron"  
+   pid 48954(caffeinate): [0x000494b900019150] 06:23:22 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting forever
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 48954(caffeinate): [0x000494b900079151] 06:23:22 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting forever
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 605(WindowServer): [0x0004ee03000996b4] 00:00:03 UserIsActive named: "com.apple.iohideventsystem.queue.tickle.nxevent service:IOHIDSystem pid:45660 process:Claude"  
+	Timeout will fire in 597 secs Action=TimeoutActionRelease
+   pid 949(nsurlsessiond): [0x0004ee90000c96cf] 00:00:02 SystemIsActive named: "NSURLSessionTask 704F8B68-A833-4279-9699-335A993270A7"  
+	Timeout will fire in 10797 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0004ee92000c96d2] 00:00:01 SystemIsActive named: "NSURLSessionTask F4BBB17B-6239-42C6-BD31-E66DED722577"  
+	Timeout will fire in 10798 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0004ee92000c96d4] 00:00:01 SystemIsActive named: "NSURLSessionTask B06673F1-E7B9-488F-8307-7A487ACFC7BE"  
+	Timeout will fire in 10799 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0004ee92000c96d6] 00:00:00 SystemIsActive named: "NSURLSessionTask C087190D-F015-45CB-BD64-60E1AEC44E93"  
+	Timeout will fire in 10799 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0004ee92000c96d7] 00:00:00 SystemIsActive named: "NSURLSessionTask 130AC0A6-82F8-4DB8-A296-55DEAAE36DBB"  
+	Timeout will fire in 10799 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0004ee93000c96d9] 00:00:00 SystemIsActive named: "NSURLSessionTask 03E65081-C35A-4ED0-8522-C954612489F8"  
+	Timeout will fire in 10799 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0004ee93000c96da] 00:00:00 SystemIsActive named: "NSURLSessionTask 71A55105-76E0-49C9-B420-7FA6AC15610C"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0004ee93000c96e0] 00:00:00 SystemIsActive named: "NSURLSessionTask 5A8DD4F0-E482-4AD3-B37C-12A3D3F54524"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+Kernel Assertions: 0x100=MAGICWAKE
+   id=773  level=255 0x100=MAGICWAKE creat=  mod= description=en0 owner=IOSkywalkNetworkBSDClient

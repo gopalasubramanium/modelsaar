@@ -1,0 +1,205 @@
+{
+ "_checkpoint": {
+  "detail": "none of ['4', 'four']",
+  "index": 406,
+  "ok": false,
+  "policy": "auto",
+  "status": 200,
+  "task": "cont-01"
+ },
+ "affinity": {
+  "session_source": "none",
+  "status": "stateless"
+ },
+ "alias": "auto",
+ "candidates": [
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.8:latest",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 0.148,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.343,
+   "quality": 1.0,
+   "residency_cost": 0.0,
+   "score": 0.9607,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3-coder:latest",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 0.023,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.359,
+   "quality": 1.0,
+   "residency_cost": 0.359,
+   "score": 0.9428,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3-coder-next:latest",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 0.035,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 1.0,
+   "quality": 1.0,
+   "residency_cost": 1.0,
+   "score": 0.8447,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/gemma4:31b",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 0.976,
+   "notes": [
+    "latency:measured",
+    "load:measured"
+   ],
+   "overhead_cost": 0.384,
+   "quality": 0.861,
+   "residency_cost": 0.001,
+   "score": 0.6954,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6-fast:latest",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 0.193,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.463,
+   "quality": 0.722,
+   "residency_cost": 0.0,
+   "score": 0.6702,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/muse-glimmer:latest",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 1.0,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.351,
+   "quality": 0.861,
+   "residency_cost": 0.351,
+   "score": 0.6585,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6:latest",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 0.183,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.437,
+   "quality": 0.583,
+   "residency_cost": 0.437,
+   "score": 0.4904,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6-accurate:latest",
+   "evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "latency_cost": 0.251,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.463,
+   "quality": 0.583,
+   "residency_cost": 0.463,
+   "score": 0.4763,
+   "uncertainty": 0.5
+  }
+ ],
+ "chosen": "ollama/qwen3.8:latest",
+ "classifier": {},
+ "compat": {},
+ "config_hash": "c58ce04fa1ed9902",
+ "created_at": 1792810697.907549,
+ "endpoint": "chat",
+ "evidence": "measured:2",
+ "exclusions": {},
+ "explicit": false,
+ "failover": [],
+ "failover_allowed": true,
+ "failover_note": "",
+ "outcome": "ok",
+ "outcome_detail": "2629ms",
+ "overhead_ms": 0.33,
+ "profile": "quality",
+ "reasons": [
+  "task=agent (clear); required: tool support; context need ~2648 tokens",
+  "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)), latency cost 0.15, resident"
+ ],
+ "registry_version": 28,
+ "remedies": [],
+ "request_id": "req_0084e4035e4f407c",
+ "requested_model": "auto",
+ "requirements": {
+  "ambiguous": false,
+  "has_remote_image_url": false,
+  "is_tool_result_turn": true,
+  "languages": [
+   "en"
+  ],
+  "multilingual": false,
+  "needs_audio": false,
+  "needs_continuation": false,
+  "needs_json_object": false,
+  "needs_json_schema": false,
+  "needs_parallel_tools": false,
+  "needs_streaming": false,
+  "needs_tools": true,
+  "needs_vision": false,
+  "outstanding_tool_call_ids": [
+   "call_eval_1"
+  ],
+  "primary_task": "agent",
+  "role": "generative",
+  "signals": [
+   "agent:agent-style tools/system prompt",
+   "coding:agent tools imply code work",
+   "math:math symbols/keywords"
+  ],
+  "tasks": {
+   "agent": 0.8,
+   "coding": 0.5,
+   "math": 0.5
+  },
+  "tokens": {
+   "images": 0,
+   "input_estimate": 200,
+   "method": "estimate:chars/3+overheads",
+   "output_allowance": 400,
+   "reasoning_allowance": 2048,
+   "total": 2648
+  },
+  "tool_choice_mode": "auto"
+ },
+ "requirements_note": "",
+ "stream": false,
+ "translation_notes": []
+}
