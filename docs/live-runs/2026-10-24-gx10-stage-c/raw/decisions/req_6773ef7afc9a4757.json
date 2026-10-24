@@ -1,0 +1,199 @@
+{
+ "_checkpoint": {
+  "detail": "contains '410'",
+  "index": 401,
+  "ok": true,
+  "policy": "auto",
+  "status": 200,
+  "task": "rag-02"
+ },
+ "affinity": {
+  "session_source": "none",
+  "status": "stateless"
+ },
+ "alias": "auto",
+ "candidates": [
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.8:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.148,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.343,
+   "quality": 1.0,
+   "residency_cost": 0.0,
+   "score": 0.9607,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6-fast:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.193,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.463,
+   "quality": 1.0,
+   "residency_cost": 0.0,
+   "score": 0.948,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3-coder:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.023,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.359,
+   "quality": 1.0,
+   "residency_cost": 0.359,
+   "score": 0.9428,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.183,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.437,
+   "quality": 1.0,
+   "residency_cost": 0.437,
+   "score": 0.907,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6-accurate:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.251,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.463,
+   "quality": 1.0,
+   "residency_cost": 0.463,
+   "score": 0.893,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3-coder-next:latest",
+   "evidence": "measured:1",
+   "latency_cost": 0.035,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 1.0,
+   "quality": 1.0,
+   "residency_cost": 1.0,
+   "score": 0.8447,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/gemma4:31b",
+   "evidence": "measured:1",
+   "latency_cost": 0.976,
+   "notes": [
+    "latency:measured",
+    "load:measured"
+   ],
+   "overhead_cost": 0.384,
+   "quality": 1.0,
+   "residency_cost": 0.001,
+   "score": 0.8343,
+   "uncertainty": 0.5
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/muse-glimmer:latest",
+   "evidence": "measured:1",
+   "latency_cost": 1.0,
+   "notes": [
+    "latency:measured",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.351,
+   "quality": 1.0,
+   "residency_cost": 0.351,
+   "score": 0.7974,
+   "uncertainty": 0.5
+  }
+ ],
+ "chosen": "ollama/qwen3.8:latest",
+ "classifier": {},
+ "compat": {},
+ "config_hash": "c58ce04fa1ed9902",
+ "created_at": 1792810684.814086,
+ "endpoint": "chat",
+ "evidence": "measured:1",
+ "exclusions": {},
+ "explicit": false,
+ "failover": [],
+ "failover_allowed": true,
+ "failover_note": "",
+ "outcome": "ok",
+ "outcome_detail": "2336ms",
+ "overhead_ms": 0.38,
+ "profile": "quality",
+ "reasons": [
+  "task=rag (clear); required: no special capabilities; context need ~2523 tokens",
+  "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+ ],
+ "registry_version": 28,
+ "remedies": [],
+ "request_id": "req_6773ef7afc9a4757",
+ "requested_model": "auto",
+ "requirements": {
+  "ambiguous": false,
+  "has_remote_image_url": false,
+  "is_tool_result_turn": false,
+  "languages": [
+   "en"
+  ],
+  "multilingual": false,
+  "needs_audio": false,
+  "needs_continuation": false,
+  "needs_json_object": false,
+  "needs_json_schema": false,
+  "needs_parallel_tools": false,
+  "needs_streaming": false,
+  "needs_tools": false,
+  "needs_vision": false,
+  "outstanding_tool_call_ids": [],
+  "primary_task": "rag",
+  "role": "generative",
+  "signals": [
+   "rag:context/document framing"
+  ],
+  "tasks": {
+   "rag": 0.6
+  },
+  "tokens": {
+   "images": 0,
+   "input_estimate": 75,
+   "method": "estimate:chars/3+overheads",
+   "output_allowance": 400,
+   "reasoning_allowance": 2048,
+   "total": 2523
+  },
+  "tool_choice_mode": "none"
+ },
+ "requirements_note": "",
+ "stream": false,
+ "translation_notes": []
+}

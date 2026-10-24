@@ -1,0 +1,30 @@
+{
+ "targets_source": "docs/evaluation.md \u2014 'Acceptance targets for a reference configuration' (predeclared; Stage B brief Phase 7)",
+ "checks": [
+  {
+   "target": "auto capability violations = 0",
+   "observed": 0,
+   "result": "PASS"
+  },
+  {
+   "target": "auto completion >= fixed-strong",
+   "observed": "1.0 vs 1.0",
+   "result": "PASS"
+  },
+  {
+   "target": "auto success >= fixed-strong - 0.05",
+   "observed": "0.938 vs 0.938 (threshold 0.888); paired difference 0.0 CI [0.0, 0.0]",
+   "result": "PASS"
+  },
+  {
+   "target": "deterministic routing overhead p95 < 5 ms",
+   "observed": "p95 0.5 ms (report p95 0.52 ms, mean 0.38 ms)",
+   "result": "PASS"
+  },
+  {
+   "target": "classifier timeouts < 5 % of consulted requests",
+   "observed": "classifier disabled; consulted 0",
+   "result": "NOT APPLICABLE (classifier off by contract)"
+  }
+ ]
+}

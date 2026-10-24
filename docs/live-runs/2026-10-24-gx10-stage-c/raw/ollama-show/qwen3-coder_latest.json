@@ -1,0 +1,62 @@
+{
+ "thinking": {
+  "values": [
+   false
+  ],
+  "default": false
+ },
+ "parameters": "temperature                    0.7\ntop_k                          20\ntop_p                          0.8\nrepeat_penalty                 1.05\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"\nstop                           \"<|endoftext|>\"",
+ "template": "{{ .Prompt }}",
+ "details": {
+  "parent_model": "",
+  "format": "gguf",
+  "family": "qwen3moe",
+  "families": [
+   "qwen3moe"
+  ],
+  "parameter_size": "30.5B",
+  "quantization_level": "Q4_K_M"
+ },
+ "model_info": {
+  "general.architecture": "qwen3moe",
+  "general.basename": "Qwen3-Coder",
+  "general.file_type": 15,
+  "general.finetune": "Instruct",
+  "general.license": "apache-2.0",
+  "general.license.link": "https://huggingface.co/Qwen/Qwen3-Coder-30B-A3B-Instruct/blob/main/LICENSE",
+  "general.parameter_count": 30532122624,
+  "general.quantization_version": 2,
+  "general.size_label": "30B-A3B",
+  "general.tags": [
+   "text-generation"
+  ],
+  "general.type": "model",
+  "qwen3moe.attention.head_count": 32,
+  "qwen3moe.attention.head_count_kv": 4,
+  "qwen3moe.attention.key_length": 128,
+  "qwen3moe.attention.layer_norm_rms_epsilon": 1e-06,
+  "qwen3moe.attention.value_length": 128,
+  "qwen3moe.block_count": 48,
+  "qwen3moe.context_length": 262144,
+  "qwen3moe.embedding_length": 2048,
+  "qwen3moe.expert_count": 128,
+  "qwen3moe.expert_feed_forward_length": 768,
+  "qwen3moe.expert_shared_feed_forward_length": 0,
+  "qwen3moe.expert_used_count": 8,
+  "qwen3moe.feed_forward_length": 5472,
+  "qwen3moe.rope.freq_base": 10000000,
+  "tokenizer.ggml.add_bos_token": false,
+  "tokenizer.ggml.eos_token_id": 151645,
+  "tokenizer.ggml.merges": [],
+  "tokenizer.ggml.model": "gpt2",
+  "tokenizer.ggml.padding_token_id": 151643,
+  "tokenizer.ggml.pre": "qwen2",
+  "tokenizer.ggml.token_type": [],
+  "tokenizer.ggml.tokens": []
+ },
+ "capabilities": [
+  "completion",
+  "tools"
+ ],
+ "modified_at": "2026-06-07T13:15:03.795165848+08:00"
+}

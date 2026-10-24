@@ -1,0 +1,196 @@
+{
+ "generated_at": "2026-10-24T07:37:24",
+ "ollama_version": "0.40.5",
+ "source": "stage-c.json deployments[] + raw/stage-c-identities.json (digest, fingerprint inputs, vs 0.40.5 re-baseline, vs Stage A)",
+ "deployments": [
+  {
+   "id": "ollama/qwen3.6:latest",
+   "fingerprint": "1c2c6fd22bf8cb30",
+   "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "family": "qwen35moe",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "35.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "modified_at": "2026-10-16T16:05:28.668774491+08:00",
+   "declared_capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest changed 096fdbd02fe6->a7eb95c53bcf"
+  },
+  {
+   "id": "ollama/qwen3.8:latest",
+   "fingerprint": "1f657c93815106c4",
+   "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "family": "qwen35",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "27.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "modified_at": "2026-10-16T16:05:18.527718381+08:00",
+   "declared_capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest same"
+  },
+  {
+   "id": "ollama/muse-glimmer:latest",
+   "fingerprint": "059c50cc508332ed",
+   "identity": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+   "family": "muse-glimmer",
+   "tags": [
+    "general",
+    "agent",
+    "vision"
+   ],
+   "parameter_size": "27.9B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "de878ce33ad81d060001db1469a02eebe4d86f0ad58cfe52dc062fdcbe4464c1",
+   "modified_at": "2026-10-11T14:00:30.611044574+08:00",
+   "declared_capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest same"
+  },
+  {
+   "id": "ollama/gemma4:31b",
+   "fingerprint": "d9c2d9116eefdbe8",
+   "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "family": "gemma4",
+   "tags": [],
+   "parameter_size": "31.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "modified_at": "2026-09-27T22:58:36.791538432+08:00",
+   "declared_capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest same"
+  },
+  {
+   "id": "ollama/qwen3-coder-next:latest",
+   "fingerprint": "76cc87b6d1648f9f",
+   "identity": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "family": "qwen3next",
+   "tags": [],
+   "parameter_size": "79.7B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "ca06e9e4087c714d44355bf954099187890e63084b4a632b8e9956c4b9492074",
+   "modified_at": "2026-07-15T08:21:05.064901181+08:00",
+   "declared_capabilities": [
+    "completion",
+    "tools"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest same"
+  },
+  {
+   "id": "ollama/qwen3-coder:latest",
+   "fingerprint": "3acc2cdc4e4a963c",
+   "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "family": "qwen3moe",
+   "tags": [
+    "code",
+    "agent"
+   ],
+   "parameter_size": "30.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "modified_at": "2026-06-07T13:15:03.795165848+08:00",
+   "declared_capabilities": [
+    "completion",
+    "tools"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest same"
+  },
+  {
+   "id": "ollama/qwen3.6-accurate:latest",
+   "fingerprint": "ed29b920218cc3fe",
+   "identity": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+   "family": "qwen35moe",
+   "tags": [],
+   "parameter_size": "36.0B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "6561b007fb01198bef1bb71bcaaf0e9b0fde914c56f9b1282fb838e4abaf10c1",
+   "modified_at": "2026-05-24T13:07:10.983099198+08:00",
+   "declared_capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest same"
+  },
+  {
+   "id": "ollama/qwen3.6-fast:latest",
+   "fingerprint": "5c3532bc42618479",
+   "identity": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+   "family": "qwen35moe",
+   "tags": [],
+   "parameter_size": "36.0B",
+   "quantization": "Q4_K_M",
+   "context_length": 65536,
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "ollama_digest": "b6f8526faefe8b47eecf137eba84a68aacb7f246f5786e6553424c33be13ca09",
+   "modified_at": "2026-05-24T12:51:35.302966812+08:00",
+   "declared_capabilities": [
+    "completion",
+    "vision",
+    "tools",
+    "thinking"
+   ],
+   "vs_rebaseline_0405": "same",
+   "vs_stage_a": "digest same"
+  }
+ ]
+}

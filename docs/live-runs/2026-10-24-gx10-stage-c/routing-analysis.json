@@ -1,0 +1,1909 @@
+{
+ "policy": "auto (deterministic router, classifier off)",
+ "n_tasks": 32,
+ "categories": {
+  "auto selected the same model as fixed-strong and both passed": 30,
+  "auto selected the same model as fixed-strong and both failed": 2
+ },
+ "selection_distribution": {
+  "qwen3.8:latest": 32
+ },
+ "overhead_ms": {
+  "n": 32,
+  "mean": 0.38,
+  "p50": 0.3,
+  "p95": 0.5,
+  "max": 2.91
+ },
+ "task_label_accuracy": 0.844,
+ "routing_mistakes_per_report": [
+  "code-05",
+  "cont-01"
+ ],
+ "classifier": {
+  "used": 0,
+  "timeouts": 0
+ },
+ "evidence_levels": {
+  "measured:1": 7,
+  "measured:2": 25
+ },
+ "tasks": [
+  {
+   "task": "agent-03",
+   "category": "agent",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.5767,
+    "muse-glimmer:latest": 0.5398,
+    "qwen3.6-fast:latest": 0.4328,
+    "qwen3.6:latest": 0.3919,
+    "qwen3.6-accurate:latest": 0.3778
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.31,
+   "outcome": true,
+   "scorer_detail": "called bash with id, valid JSON object args ['command'], {'command': 'pytest'}",
+   "latency_ms": 2161.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=coding (clear); required: tool support; context need ~2581 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2)), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "agent-04",
+   "category": "agent",
+   "inferred_task": "agent",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.642,
+    "muse-glimmer:latest": 0.6051,
+    "qwen3.6-fast:latest": 0.5633,
+    "qwen3.6:latest": 0.5224,
+    "qwen3.6-accurate:latest": 0.5084
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.32,
+   "outcome": true,
+   "scorer_detail": "called read_file with id, valid JSON object args ['path'], {'path': 'pyproject'}",
+   "latency_ms": 1795.1,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=agent (clear); required: tool support; context need ~2576 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2)), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "agent-05",
+   "category": "agent",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.5767,
+    "muse-glimmer:latest": 0.5398,
+    "qwen3.6-fast:latest": 0.4328,
+    "qwen3.6:latest": 0.3919,
+    "qwen3.6-accurate:latest": 0.3778
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.3,
+   "outcome": true,
+   "scorer_detail": "called bash with id, valid JSON object args ['command'], {'command': 'git'}",
+   "latency_ms": 1711.0,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=coding (clear); required: tool support; context need ~2572 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2)), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "ambig-01",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.3343,
+    "muse-glimmer:latest": 0.2974,
+    "qwen3.6-fast:latest": -0.052,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.26,
+   "outcome": true,
+   "scorer_detail": "contains 'function'",
+   "latency_ms": 16869.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=coding (ambiguous); required: no special capabilities; context need ~2473 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "ambig-02",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.24,
+   "outcome": true,
+   "scorer_detail": "nonempty",
+   "latency_ms": 16056.8,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (ambiguous); required: no special capabilities; context need ~2460 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "ambig-03",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6:latest": 0.407,
+    "qwen3.6-accurate:latest": 0.393
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.22,
+   "outcome": true,
+   "scorer_detail": "nonempty",
+   "latency_ms": 9241.4,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2460 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "code-03",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.3343,
+    "muse-glimmer:latest": 0.2974,
+    "qwen3.6-fast:latest": -0.052,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.32,
+   "outcome": true,
+   "scorer_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+   "latency_ms": 7637.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": false,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=coding (clear); required: no special capabilities; context need ~2521 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "code-04",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.3343,
+    "muse-glimmer:latest": 0.2974,
+    "qwen3.6-fast:latest": -0.052,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.22,
+   "outcome": true,
+   "scorer_detail": "[sandbox-exec] harness completed with expected output, exit 0",
+   "latency_ms": 5567.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=coding (clear); required: no special capabilities; context need ~2510 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "code-05",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.3343,
+    "muse-glimmer:latest": 0.2974,
+    "qwen3.6-fast:latest": -0.052,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.21,
+   "outcome": false,
+   "scorer_detail": "[sandbox-exec] model code raised SyntaxError: invalid syntax (model.py, line 1); harness output '' != expected 'a3b1c2'",
+   "latency_ms": 10620.5,
+   "fixed_strong_outcome": false,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": false,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": false,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both failed",
+   "reasons": [
+    "task=coding (clear); required: no special capabilities; context need ~2502 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "code-06",
+   "category": "coding",
+   "inferred_task": "coding",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.3343,
+    "muse-glimmer:latest": 0.2974,
+    "qwen3.6-fast:latest": -0.052,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.36,
+   "outcome": true,
+   "scorer_detail": "contains 'three digits'",
+   "latency_ms": 4764.8,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=coding (ambiguous); required: no special capabilities; context need ~2481 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "cont-01",
+   "category": "agent",
+   "inferred_task": "agent",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_tools": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "qwen3.6-fast:latest",
+    "muse-glimmer:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.6954,
+    "qwen3.6-fast:latest": 0.6702,
+    "muse-glimmer:latest": 0.6585,
+    "qwen3.6:latest": 0.4904,
+    "qwen3.6-accurate:latest": 0.4763
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.33,
+   "outcome": false,
+   "scorer_detail": "none of ['4', 'four']",
+   "latency_ms": 2630.4,
+   "fixed_strong_outcome": false,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": false,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both failed",
+   "reasons": [
+    "task=agent (clear); required: tool support; context need ~2648 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: coding=measured:2, agent=measured:2, math=measured:2)), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "conv-03",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.28,
+   "outcome": true,
+   "scorer_detail": "nonempty",
+   "latency_ms": 7856.2,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2476 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "conv-04",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.29,
+   "outcome": true,
+   "scorer_detail": "contains 'same'",
+   "latency_ms": 2118.8,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2485 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "conv-05",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.26,
+   "outcome": true,
+   "scorer_detail": "contains 'pineapple'",
+   "latency_ms": 1532.6,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2471 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "dec-02",
+   "category": "decision",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.32,
+   "outcome": true,
+   "scorer_detail": "contains 'account'",
+   "latency_ms": 2883.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2489 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "dec-03",
+   "category": "decision",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.3,
+   "outcome": true,
+   "scorer_detail": "contains 'sports'",
+   "latency_ms": 2775.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2495 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "extract-03",
+   "category": "extraction",
+   "inferred_task": "extraction",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_json_schema": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3.6-accurate:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "qwen3.6-fast:latest",
+    "muse-glimmer:latest",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3.6-accurate:latest": 0.893,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "qwen3.6-fast:latest": 0.448,
+    "muse-glimmer:latest": 0.2974,
+    "qwen3.6:latest": -0.093
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.3,
+   "outcome": true,
+   "scorer_detail": "schema-conformant with correct fields",
+   "latency_ms": 2940.8,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=extraction (clear); required: strict JSON schema; context need ~2579 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "extract-04",
+   "category": "extraction",
+   "inferred_task": "extraction",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_json_schema": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3.6-accurate:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "qwen3.6-fast:latest",
+    "muse-glimmer:latest",
+    "qwen3.6:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3.6-accurate:latest": 0.893,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "qwen3.6-fast:latest": 0.448,
+    "muse-glimmer:latest": 0.2974,
+    "qwen3.6:latest": -0.093
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.32,
+   "outcome": true,
+   "scorer_detail": "schema-conformant with correct fields",
+   "latency_ms": 3060.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=extraction (clear); required: strict JSON schema; context need ~2579 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "long-01",
+   "category": "summarization",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 2.91,
+   "outcome": true,
+   "scorer_detail": "contains 'LINE 0: THE QUICK BROWN'",
+   "latency_ms": 6469.6,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": false,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~3593 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "math-03",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6:latest": 0.407,
+    "qwen3.6-accurate:latest": 0.393
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.27,
+   "outcome": true,
+   "scorer_detail": "last number 6 == 6 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 1080.0,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2476 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "math-04",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6:latest": 0.407,
+    "qwen3.6-accurate:latest": 0.393
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.27,
+   "outcome": true,
+   "scorer_detail": "last number 55 == 55 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 1772.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2484 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "math-05",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6:latest": 0.407,
+    "qwen3.6-accurate:latest": 0.393
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.29,
+   "outcome": true,
+   "scorer_detail": "last number 50 == 50 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 2223.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": false,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2487 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "math-06",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2 (blend: math=measured:2, decision=measured:1)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6:latest": 0.6293,
+    "qwen3.6-accurate:latest": 0.6152
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.27,
+   "outcome": true,
+   "scorer_detail": "contains 'yes'",
+   "latency_ms": 6055.9,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=math (ambiguous); required: no special capabilities; context need ~2471 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2 (blend: math=measured:2, decision=measured:1)), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "multi-01",
+   "category": "conversation",
+   "inferred_task": "conversation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.448,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107,
+    "gemma4:31b": -0.1657
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.27,
+   "outcome": true,
+   "scorer_detail": "contains 'luz'",
+   "latency_ms": 8369.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=conversation (clear); required: no special capabilities; context need ~2476 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "multi-02",
+   "category": "math",
+   "inferred_task": "math",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:2",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6:latest": 0.407,
+    "qwen3.6-accurate:latest": 0.393
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.25,
+   "outcome": true,
+   "scorer_detail": "last number 144 == 144 (tol 1e-06, 1 numeric token(s))",
+   "latency_ms": 1423.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=math (clear); required: no special capabilities; context need ~2471 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:2), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "rag-02",
+   "category": "rag",
+   "inferred_task": "rag",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3.6:latest": 0.907,
+    "qwen3.6-accurate:latest": 0.893,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.38,
+   "outcome": true,
+   "scorer_detail": "contains '410'",
+   "latency_ms": 2337.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=rag (clear); required: no special capabilities; context need ~2523 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "rag-03",
+   "category": "rag",
+   "inferred_task": "rag",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3-coder:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3.6-fast:latest": 0.948,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3.6:latest": 0.907,
+    "qwen3.6-accurate:latest": 0.893,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.38,
+   "outcome": true,
+   "scorer_detail": "contains 'harbour blue'",
+   "latency_ms": 2586.6,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=rag (clear); required: no special capabilities; context need ~2527 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "sum-02",
+   "category": "summarization",
+   "inferred_task": "summarization",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1 (blend: math=measured:2, summarization=measured:1)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.4025,
+    "qwen3.6:latest": 0.1343,
+    "qwen3.6-accurate:latest": 0.1203
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.52,
+   "outcome": true,
+   "scorer_detail": "contains 'trial'",
+   "latency_ms": 8424.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=summarization (ambiguous); required: no special capabilities; context need ~2600 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1 (blend: math=measured:2, summarization=measured:1)), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "sum-03",
+   "category": "summarization",
+   "inferred_task": "summarization",
+   "ambiguous": true,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1 (blend: math=measured:2, summarization=measured:1)",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": 0.4025,
+    "qwen3.6:latest": 0.1343,
+    "qwen3.6-accurate:latest": 0.1203
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.53,
+   "outcome": true,
+   "scorer_detail": "contains 'parking'",
+   "latency_ms": 6241.3,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=summarization (ambiguous); required: no special capabilities; context need ~2603 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1 (blend: math=measured:2, summarization=measured:1)), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "trans-02",
+   "category": "translation",
+   "inferred_task": "translation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": -0.052,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.27,
+   "outcome": true,
+   "scorer_detail": "contains 'estaci\u00f3n'",
+   "latency_ms": 7250.2,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=translation (clear); required: no special capabilities; context need ~2479 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "trans-03",
+   "category": "translation",
+   "inferred_task": "translation",
+   "ambiguous": false,
+   "required_capabilities": {},
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3-coder:latest",
+    "qwen3-coder-next:latest",
+    "gemma4:31b",
+    "muse-glimmer:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest"
+   ],
+   "excluded": {},
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.148,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9607,
+    "qwen3-coder:latest": 0.9428,
+    "qwen3-coder-next:latest": 0.8447,
+    "gemma4:31b": 0.8343,
+    "muse-glimmer:latest": 0.7974,
+    "qwen3.6-fast:latest": -0.052,
+    "qwen3.6:latest": -0.093,
+    "qwen3.6-accurate:latest": -0.107
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.27,
+   "outcome": true,
+   "scorer_detail": "contains 'twenty minutes'",
+   "latency_ms": 5616.7,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": false,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": true,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": true,
+    "qwen3-coder:latest": true,
+    "qwen3.6-accurate:latest": false,
+    "qwen3.6-fast:latest": false
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=translation (clear); required: no special capabilities; context need ~2480 tokens",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+   ]
+  },
+  {
+   "task": "vis-02",
+   "category": "document_vision",
+   "inferred_task": "document_vision",
+   "ambiguous": false,
+   "required_capabilities": {
+    "needs_vision": true
+   },
+   "eligible": [
+    "qwen3.8:latest",
+    "qwen3.6-fast:latest",
+    "qwen3.6:latest",
+    "qwen3.6-accurate:latest",
+    "gemma4:31b"
+   ],
+   "excluded": {
+    "muse-glimmer:latest": [
+     "image input required; capability vision is unsupported (probe)"
+    ],
+    "qwen3-coder-next:latest": [
+     "image input required; capability vision is unsupported (source_claim)"
+    ],
+    "qwen3-coder:latest": [
+     "image input required; capability vision is unsupported (source_claim)"
+    ]
+   },
+   "selected": "qwen3.8:latest",
+   "selected_evidence": "measured:1",
+   "selected_quality": 1.0,
+   "selected_latency_cost": 0.151,
+   "selected_residency_cost": 0.0,
+   "candidate_scores": {
+    "qwen3.8:latest": 0.9403,
+    "qwen3.6-fast:latest": 0.9204,
+    "qwen3.6:latest": 0.8302,
+    "qwen3.6-accurate:latest": 0.8115,
+    "gemma4:31b": 0.8082
+   },
+   "affinity": {
+    "session_source": "none",
+    "status": "stateless"
+   },
+   "affinity_affected": false,
+   "overhead_ms": 0.26,
+   "outcome": true,
+   "scorer_detail": "contains 'red'",
+   "latency_ms": 2497.5,
+   "fixed_strong_outcome": true,
+   "sweep_outcomes": {
+    "qwen3.6:latest": true,
+    "qwen3.8:latest": true,
+    "muse-glimmer:latest": false,
+    "gemma4:31b": true,
+    "qwen3-coder-next:latest": false,
+    "qwen3-coder:latest": false,
+    "qwen3.6-accurate:latest": true,
+    "qwen3.6-fast:latest": true
+   },
+   "routing_result_category": "auto selected the same model as fixed-strong and both passed",
+   "reasons": [
+    "task=document_vision (clear); required: image input; context need ~3737 tokens",
+    "3 deployment(s) excluded by hard filters; 5 eligible",
+    "ollama/qwen3.8:latest ranked first on profile quality: quality 1.00 (measured:1), latency cost 0.15, resident"
+   ]
+  }
+ ],
+ "note": "descriptive only; no routing change follows from this analysis (Stage B rule). Prompts are the synthetic frozen tasks; no application data."
+}
