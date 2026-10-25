@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=08d6d3ed">
+<link rel="stylesheet" href="/assets/site.css?v=d955e965">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Roadmap and status", "description": "Current status of ModelSaar and clearly identified future work.", "url": "https://modelsaar.com/roadmap/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Roadmap and status", "item": "https://modelsaar.com/roadmap/"}]}</script>
 </head>
 <body>
@@ -61,7 +61,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     <li><strong>Exercised live:</strong> discovery, probes, routing, streaming, tool calls, tool-result continuity, session pinning and the measured-routing evaluation on an ASUS GX10: a three-model run against Ollama 0.32.13 (2026-10-11, historical) and, under one frozen contract at the current revision, runs with four models (Ollama 0.40.3, accepted), five and all eight installed generative models (Ollama 0.40.5) in October 2026 (<a href="/benchmarks/">Benchmarks</a>).</li>
     <li><strong>Review status (precise):</strong> an independent review of the first public revision (<code>1122e1f</code>) produced 18 grouped findings, addressed on the hardening branch with regression tests (<a href="/docs/review-2026-10-11/">F01–F18</a>). A second independent review of that branch (<code>80276bb</code>) reproduced 11 further contract failures and 6 launcher/installer observations (R1–R8; occupancy after stream/probe timeouts, resident-memory accounting, embedding identity anchoring, stream validation, the beginner path, evaluator isolation/scoring/resume, publication guards). Those were corrected on 2026-10-12 and the reviewer's own tests pass and are part of the suite; F04, F08, F10, F13, F14 and F17 were reopened and re-closed by that pass. A third independent review of the corrected revision (2026-10-12) reproduced five further edge conditions (failed residency query, refused-connection residency, stream terminal ordering, evaluator probe admission, checkpoint alternatives); they were closed in the alpha pass and the reviewer's tests are in the suite. Those three independent reviews covered <code>1122e1f</code>, <code>80276bb</code> and <code>5cb7443</code>; the hardening was accepted and merged on 2026-10-13 (PR #1). Later changes — the website (PR #2), the isolated installer (PR #3), Odysseus <code>session_id</code>/<code>cache_prompt</code> compatibility (PR #4), the atomic environment switch (PR #5) and one-command upgrades (PR #6, merged 2026-10-14) — were verified by the project's own test suite and CI (including the installer cases against a real systemd user service on x86_64 and arm64) and by live checks on the owner's hardware, <strong>not by an independent reviewer</strong>. The installer pins <code>cf56cdd</code>, which the owner's GX10 runs.</li>
     <li><strong>Owner-reported:</strong> Odysseus chat through ModelSaar on the GX10 is working, reported by the owner on 2026-10-14. That is use reported in conversation, not a workflow recorded by the project; it does not cover tool, vision, streaming or agent workflows through Odysseus.</li>
-    <li><strong>Not yet:</strong> a tagged release, a PyPI package or a container image (separate owner decisions); recorded real-client workflows for Open WebUI, OpenClaw, OpenCode and Hermes; a real vLLM/llama.cpp run; real-model embeddings; the optional classifier off/on comparison and a reasoning-budget sensitivity run (both prepared in the plan, not run); the macOS code-evaluation sandbox remains opt-in (<code>MODELSAAR_MACOS_SANDBOX=verify</code>; it was verified on the owner's Mac and used by the October 2026 evaluation runs).</li>
+    <li><strong>Not yet:</strong> a tagged release, a PyPI package or a container image (separate owner decisions); recorded real-client workflows for Open WebUI, OpenClaw, OpenCode and Hermes; a real vLLM/llama.cpp run; real-model embeddings; a reasoning-budget sensitivity run (prepared in the plan, not run); the macOS code-evaluation sandbox remains opt-in (<code>MODELSAAR_MACOS_SANDBOX=verify</code>; it was verified on the owner's Mac and used by the October 2026 evaluation runs).</li>
   </ul>
 </section>
 
@@ -78,7 +78,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <section aria-labelledby="next-title">
   <h2 id="next-title">Next</h2>
   <ol>
-    <li><strong>Measured Routing Quality</strong> — <em>completed in October 2026</em>: Stage A (identity and capability baseline), Stage B (four-model accepted run, five-model cross-runtime run) and Stage C (all eight models) with separate calibration and held-out splits and fixed-model, rule, random and oracle baselines; evidence under <code>docs/live-runs/</code> and a summary on <a href="/benchmarks/">Benchmarks</a>. Still open from the plan: the classifier off/on comparison and a reasoning-budget sensitivity run (<a href="/docs/plans/measured-routing-quality/">docs/plans/measured-routing-quality</a>).</li>
+    <li><strong>Measured Routing Quality</strong> — <em>completed in October 2026</em>: Stage A (identity and capability baseline), Stage B (four-model accepted run, five-model cross-runtime run) and Stage C (all eight models) with separate calibration and held-out splits and fixed-model, rule, random and oracle baselines; evidence under <code>docs/live-runs/</code> and a summary on <a href="/benchmarks/">Benchmarks</a>. The plan's optional classifier comparison ran on 2026-10-25 with one configuration, which failed its predeclared timeout criteria and stays off — not a causal on-versus-off result (cross-runtime reference; same-session off twin compromised); see <a href="/benchmarks/">Benchmarks</a>. Still open from the plan: a reasoning-budget sensitivity run (<a href="/docs/plans/measured-routing-quality/">docs/plans/measured-routing-quality</a>).</li>
     <li>One real client workflow recorded end to end by the project with its decision records (Odysseus is owner-reported working; Open WebUI is the quickest to record), then the others.</li>
     <li>A first tagged release (0.1.x) with a PyPI package and container image: the readiness list is in <a href="/docs/release/">docs/release</a>; tags and registry publication remain separate owner decisions.</li>
     <li>A run against a generic OpenAI-compatible server (vLLM or llama.cpp server) and real-model embeddings.</li>
@@ -106,7 +106,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/08d6d3ed465124d0e40f62aef87b7ea9148cf044">08d6d3ed4651</a> on 2026-10-24. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/d955e965d278dba343e2d4e55cc2089466abdff7">d955e965d278</a> on 2026-10-25. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -118,6 +118,6 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=08d6d3ed" defer></script>
+<script src="/assets/site.js?v=d955e965" defer></script>
 </body>
 </html>
