@@ -190,8 +190,12 @@ async def run_doctor(cfg: Config | None, cfg_error: str | None, path: Path) -> D
             rep.add("fail", "classifier", f"configured classifier {cl.backend}/{cl.model} not discovered", "fix routing.classifier or disable it")
         elif cd.locality != "local" and cfg.security.locality_mode == "local_only":
             rep.add("fail", "classifier", "classifier deployment is remote under local_only", "choose a local classifier model")
+        elif cl.mode == "decision" and cd.role != "decision":
+            rep.add("fail", "classifier", f"classifier mode 'decision' but {cd.id} has role {cd.role}", "point routing.classifier.model at a decision model (e.g. Ollama nimble/clef/laya) or use mode: chat")
+        elif cl.mode == "chat" and cd.role != "generative":
+            rep.add("fail", "classifier", f"classifier mode 'chat' but {cd.id} has role {cd.role}", "set routing.classifier.mode: decision for a decision model or choose a generative model")
         else:
-            rep.add("ok", "classifier", f"classifier {cd.id} available")
+            rep.add("ok", "classifier", f"classifier {cd.id} available (mode {cl.mode})")
     else:
         rep.add("ok", "classifier", "optional classifier disabled (deterministic routing only)")
     for a, _ in cfg.aliases.items():

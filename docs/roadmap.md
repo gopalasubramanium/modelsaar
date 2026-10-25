@@ -33,8 +33,9 @@ classification does not demonstrate value.
 
 Each with its own tests before being described as supported:
 
-* Native decision-model adapters (Ollama `/v1/systemone`: clef, nimble, laya) as routing classifiers
-  and as a `/v1/decisions`-style endpoint.
+* Native decision-model adapters (Ollama `/v1/systemone`: clef, nimble, laya): **as routing
+  classifiers — implemented, opt-in (`routing.classifier.mode: decision`; see `docs/routing.md` §C),
+  not yet measured live**; as a `/v1/decisions`-style endpoint — not implemented.
 * Audio/video inputs; multimodal embeddings (EmbeddingGemma 2 image/video/audio); OCR pipeline
   (GLM-OCR with layout stage) and guardrail pipelines (Granite Guardian) as separate results.
 * Responses API and Anthropic Messages with fail-closed translation (currently explicit 501).

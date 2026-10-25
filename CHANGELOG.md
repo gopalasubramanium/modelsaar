@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased — routing: decision-model classifier (Ollama `/v1/systemone`), 2026-10-25
+
+* **`routing.classifier.mode: decision`** (opt-in; default `chat`, unchanged): the optional classifier can
+  now be a decision model — a deployment with `role: decision` such as Ollama's `nimble`, `clef` or `laya` —
+  asked through its native endpoint (`OllamaAdapter.decide` → `POST /v1/systemone`, Ollama ≥ 0.35.0) one
+  `choice` question whose criteria are the closed task-label set. The answer's arg-max label and that
+  label's probability become the task refinement; the answer is validated strictly (type `choice`, labels
+  from the closed set only, finite probabilities in [0, 1] with the choice as arg-max, confidence in
+  [0, 1]) and any timeout, error or out-of-contract answer falls back to the deterministic label exactly
+  as in chat mode. Nothing but `model`, `state` and `questions` is sent; no free text is generated.
+* **Discovery:** an Ollama model whose `/api/show` capabilities list `decision` without `completion` is
+  registered with `role: decision` (previously `generative` unless the catalogue matched it), so it is
+  never offered or chosen for chat and an explicit request for it is refused.
+* **Guards:** the router and `modelsaar doctor` refuse a role/mode mismatch (a generative model in
+  `decision` mode or a decision model in `chat` mode) before any call; backends without a decision
+  endpoint (`openai_compatible`) report `unavailable`. `/admin/status` → `classifier` now carries `mode`.
+* Tests: `tests/test_decision_classifier.py` (answer validation, discovery, end-to-end refinement,
+  ambiguity gating, acceptance bar, failure fallbacks, role guards, unsupported backend, defaults) against
+  the fake backend's documented `/v1/systemone`; site test count updated to the collected total.
+* Not done: a `/v1/decisions`-style endpoint; any live measurement (the classifier comparison of
+  2026-10-25 used `mode: chat`).
+
 ## Unreleased — website: layout repair, rendered-layout checks, roadmap refresh, 2026-10-14
 
 * **Command blocks:** the Copy button was positioned over the scrolling code and covered the end of the

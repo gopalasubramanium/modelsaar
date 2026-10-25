@@ -193,6 +193,12 @@ class ClassifierConfig(StrictModel):
     enabled: bool = False
     backend: str | None = None
     model: str | None = None
+    # How the classifier deployment is asked:
+    #   "chat"     — a small generative model answers a JSON object through chat completions (default);
+    #   "decision" — a decision model (role=decision, e.g. Ollama's nimble/clef/laya) answers one
+    #                `choice` question over the task labels through its native decision endpoint
+    #                (Ollama POST /v1/systemone) and returns per-label probabilities, no free text.
+    mode: Literal["chat", "decision"] = "chat"
     timeout_s: float = 2.0
     max_input_chars: int = 1500
     # Only consult the classifier when deterministic classification is unsure.

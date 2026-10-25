@@ -44,8 +44,14 @@ Deterministic signals handle clear cases at ~0.3–0.6 ms overhead. The optional
 is ambiguous. Contract:
 
 * input: structural facts + a truncated excerpt of the last user text (`max_input_chars`)
-* output: `{"task": <one of the closed label set>, "confidence": 0..1}` via `response_format`
-  (`json_schema` if the deployment supports it, else `json_object`), `temperature 0`, `max_tokens 64`
+* output, `mode: chat` (default): `{"task": <one of the closed label set>, "confidence": 0..1}` via
+  `response_format` (`json_schema` if the deployment supports it, else `json_object`), `temperature 0`,
+  `max_tokens 64`
+* output, `mode: decision`: the deployment must be a decision model (`role=decision`, e.g. Ollama's
+  `nimble`, `clef`, `laya`, discovered from the `decision` capability); the gateway asks its native
+  decision endpoint (Ollama `POST /v1/systemone`) one `choice` question whose criteria are the closed
+  label set and takes the answer's arg-max label with that label's probability as the confidence —
+  no free text is generated or parsed
 * `timeout_s`; any timeout, error, or out-of-contract answer → deterministic result stands
 * it calls its configured deployment directly (never `auto`), cannot invent endpoints, change
   requirements/capabilities or policy, and its memory/latency is visible in `/admin/status`

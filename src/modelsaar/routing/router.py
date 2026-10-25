@@ -626,6 +626,15 @@ class Router:
             return None, "configured classifier deployment not found"
         if not (d.healthy and d.enabled):
             return None, "configured classifier deployment is disabled or unhealthy"
+        if c.mode == "decision" and d.role != "decision":
+            return None, (
+                f"classifier mode 'decision' needs a decision-model deployment (role=decision); {d.id} has role {d.role}"
+            )
+        if c.mode == "chat" and d.role != "generative":
+            return None, (
+                f"classifier mode 'chat' needs a generative deployment; {d.id} has role {d.role}"
+                + (" (set routing.classifier.mode: decision for a decision model)" if d.role == "decision" else "")
+            )
         if d.locality != "local" and not (c.allow_remote and self.cfg.security.locality_mode == "allow_remote"):
             return None, (
                 f"classifier deployment {d.id} is not local ({d.locality_evidence[:60]}); message excerpts stay on the host"
