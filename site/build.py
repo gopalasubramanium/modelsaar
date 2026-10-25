@@ -286,7 +286,7 @@ DOC_PAGES = [
     ("docs/troubleshooting.md", "/docs/troubleshooting/", "Troubleshooting", "Common failures when installing or running ModelSaar and what to do about them."),
     ("docs/extending.md", "/docs/extending/", "Extending ModelSaar", "Adding backends, probes and clients."),
     ("docs/roadmap.md", "/docs/roadmap-detail/", "Roadmap (repository)", "Planned work as recorded in the repository."),
-    ("docs/plans/measured-routing-quality.md", "/docs/plans/measured-routing-quality/", "Plan: Measured Routing Quality", "The measured-routing milestone, completed in October 2026: the current revision's routing evaluated on the GX10 with separate calibration and held-out splits and fixed-model, rule, random and oracle baselines; the optional classifier comparison stays prepared, not run."),
+    ("docs/plans/measured-routing-quality.md", "/docs/plans/measured-routing-quality/", "Plan: Measured Routing Quality", "The measured-routing milestone, completed in October 2026: the current revision's routing evaluated on the GX10 with separate calibration and held-out splits and fixed-model, rule, random and oracle baselines; the optional classifier comparison was run once on 2026-10-25 — the tested configuration failed its timeout criteria and stays off (not a causal on-versus-off result)."),
     ("docs/release.md", "/docs/release/", "Release process and readiness", "How a versioned release is produced and what is ready for the first tagged alpha release."),
     ("docs/clients/open-webui.md", "/docs/clients/open-webui/", "Open WebUI", "Connecting Open WebUI to ModelSaar."),
     ("docs/clients/openclaw.md", "/docs/clients/openclaw/", "OpenClaw", "Connecting OpenClaw to ModelSaar."),

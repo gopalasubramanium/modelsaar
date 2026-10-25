@@ -199,6 +199,37 @@ def live_eval(run: str = "pass1b") -> dict:
     }
 
 
+CLASSIFIER_RUN_DIR = "docs/live-runs/2026-10-25-gx10-classifier-comparison"  # classifier OFF/ON comparison, 2026-10-25, Ollama 0.40.5
+
+
+def classifier_comparison() -> dict:
+    """Numbers of the classifier OFF/ON comparison, read from its derived files (comparison.json, acceptance.json)."""
+    rdir = ROOT / CLASSIFIER_RUN_DIR
+    cmp = json.loads((rdir / "comparison.json").read_text(encoding="utf-8"))
+    acc = json.loads((rdir / "acceptance.json").read_text(encoding="utf-8"))
+    on = cmp["on"]
+    counters = on["gateway_classifier_counters"]["last"]
+    twin = cmp["off_twin_compromised"]["record_status_counts"]
+    return {
+        "dir": CLASSIFIER_RUN_DIR,
+        "date": on["generated_at"][:10],
+        "model": cmp["classifier_config"]["model"],
+        "timeout_ms": int(cmp["classifier_config"]["timeout_s"] * 1000),
+        "calls": counters["calls"],
+        "timeouts": counters["timeouts"],
+        "auto_consulted": len(cmp["classifier_consulted_tasks_auto"]),
+        "auto_timeouts": on["report_classifier"]["timeouts"],
+        "overhead_p95_ms": on["report_overhead"]["p95"],
+        "overhead_median_ms": on["overhead_ms"]["median"],
+        "auto_successes": on["auto_successes"],
+        "reference_successes": cmp["off_reference_pass1b"]["auto_successes"],
+        "gain": cmp["decision_rule"]["success_gain_on_minus_off"],
+        "twin_422": twin.get("422", 0),
+        "twin_200": twin.get("200", 0),
+        "failed_targets": [c["target"] for c in acc["checks"] if c["result"].startswith("FAIL")],
+    }
+
+
 def seconds(ms: float) -> str:
     return f"{ms / 1000:.2f} s"
 
