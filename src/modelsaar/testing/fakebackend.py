@@ -52,6 +52,11 @@ class FakeModel:
     template: str = "{{ .Prompt }}"
     # Simulated thinking model: spends this many output tokens on reasoning before answering.
     thinking_tokens: int = 0
+    # Simulated decision model (capability "decision", served at /v1/systemone): the option it picks for a
+    # ``choice`` question when that option exists in the criteria (otherwise the first option), and the
+    # probability it assigns to it (the rest is spread evenly over the other options).
+    decides: str = ""
+    decision_probability: float = 0.9
 
 
 def _expected_json(text: str) -> dict[str, Any]:
@@ -139,6 +144,7 @@ class FakeBackend:
                 Route("/v1/embeddings", self.v1_embeddings, methods=["POST"]),
                 Route("/embeddings", self.v1_embeddings, methods=["POST"]),
                 Route("/tokenize", self.tokenize, methods=["POST"]),
+                Route("/v1/systemone", self.v1_systemone, methods=["POST"]),
             ]
         )
 
@@ -398,6 +404,56 @@ class FakeBackend:
         # Metadata only: which model and how much text reached this backend's tokenizer.
         self.tokenize_requests.append({"model": body.get("model"), "chars": len(str(body.get("prompt", "")))})
         return JSONResponse({"count": n, "max_model_len": 32768, "tokens": list(range(n))})
+
+    async def v1_systemone(self, request: Request) -> Response:
+        """Ollama's System One decision endpoint as documented (docs.ollama.com/api/systemone): one JSON
+        answer per named question; errors are ``{"error": str}`` with 400 (invalid request or a model that
+        is not a decision model), 404 (model not found) or 500."""
+        body = await request.json()
+        name = body.get("model")
+        m = self.models.get(name) if isinstance(name, str) else None
+        with self._lock:
+            self.requests.append({"model": name, "path": "/v1/systemone", "fields": sorted(body.keys()), "questions": sorted((body.get("questions") or {}).keys()) if isinstance(body.get("questions"), dict) else None})
+        if not m:
+            return JSONResponse({"error": f"model '{name}' not found"}, status_code=404)
+        if "decision" not in m.capabilities:
+            return JSONResponse({"error": f"model '{name}' does not support system one requests"}, status_code=400)
+        if m.behaviour == "error_500":
+            return JSONResponse({"error": "simulated scoring failure"}, status_code=500)
+        if m.behaviour == "hang":
+            await asyncio.sleep(3600)
+        state, questions = body.get("state"), body.get("questions")
+        if not isinstance(state, (str, dict, list)) or (isinstance(state, str) and not state.strip()):
+            return JSONResponse({"error": "state must be a non-empty string, object or array"}, status_code=400)
+        if not isinstance(questions, dict) or not 1 <= len(questions) <= 64:
+            return JSONResponse({"error": "questions must name 1 to 64 questions"}, status_code=400)
+        if m.behaviour == "bad_json":
+            return Response("<html>proxy error</html>", status_code=200, media_type="text/html")
+        answers: dict[str, Any] = {}
+        for qname, q in questions.items():
+            if not isinstance(q, dict) or q.get("type") not in ("choice", "noul", "score"):
+                return JSONResponse({"error": f"question '{qname}': unsupported type"}, status_code=400)
+            if q["type"] == "choice":
+                crit = q.get("criteria")
+                if not isinstance(crit, dict) or not 2 <= len(crit) <= 255:
+                    return JSONResponse({"error": f"question '{qname}': choice needs 2 to 255 criteria"}, status_code=400)
+                options = list(crit)
+                pick = m.decides if m.decides in crit else options[0]
+                p = min(max(m.decision_probability, 0.0), 1.0)
+                rest = (1.0 - p) / max(len(options) - 1, 1)
+                probs = {o: round(p if o == pick else rest, 4) for o in options}
+                if m.behaviour == "malformed_decision":
+                    probs = {o: 2.0 for o in options}  # probabilities out of range: the gateway must reject it
+                answers[qname] = {"type": "choice", "choice": pick, "probabilities": probs, "confidence": round(p, 4)}
+            elif q["type"] == "noul":
+                answers[qname] = {"type": "noul", "noul": 0.5}
+            else:
+                crit = q.get("criteria") or []
+                answers[qname] = {
+                    "type": "score", "score": 0.0, "legend": {str(i): c for i, c in enumerate(crit)},
+                    "probabilities": {str(i): (1.0 if i == 0 else 0.0) for i in range(len(crit))}, "confidence": 1.0,
+                }
+        return JSONResponse({"model": name, "answers": answers, "usage": {"input_tokens": 100, "output_tokens": 1}})
 
     async def v1_embeddings(self, request: Request) -> Response:
         body = await request.json()

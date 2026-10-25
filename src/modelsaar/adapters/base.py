@@ -186,6 +186,18 @@ class BaseAdapter:
     async def embeddings(self, dep: Deployment, body: dict[str, Any], timeout: float | None = None) -> UpstreamResponse:
         raise NotImplementedError
 
+    async def decide(
+        self, dep: Deployment, state: str, questions: dict[str, Any], timeout: float | None = None
+    ) -> UpstreamResponse:
+        """Ask a decision model (``role == "decision"``) one or more typed questions about ``state`` and
+        return its native answer (per-option probabilities, no generated text). Backends without a
+        decision endpoint raise ``AdapterError(kind="unsupported")`` so callers fail closed."""
+        raise AdapterError(
+            f"{self.cfg.id}: backend type {getattr(self.cfg, 'type', 'backend')!r} has no decision-model endpoint",
+            status=501,
+            kind="unsupported",
+        )
+
     async def tokenize(self, dep: Deployment, text: str) -> int | None:
         """Exact token count if the runtime supports it; None otherwise."""
         return None

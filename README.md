@@ -111,7 +111,9 @@ the same hard checks.
 2. **Hard filters** – role, health, locality policy, capability tri-state, effective context,
    backend field support, admission feasibility. A score can never override a failed filter.
 3. **Classification** – deterministic multi-label task signals; an *optional* local classifier is
-   consulted only for ambiguous cases, under a strict JSON contract with timeout and fallback.
+   consulted only for ambiguous cases, under a strict contract with timeout and fallback — either a
+   small chat model answering JSON or, with `routing.classifier.mode: decision`, a decision model
+   (Ollama `/v1/systemone`: nimble, clef, laya) answering one choice question with probabilities.
 4. **Ranking** – transparent score per profile: evidence-based quality (measured > prior >
    uncalibrated, with uncertainty) minus latency, residency/load and overhead costs, plus a
    switching penalty for session affinity.

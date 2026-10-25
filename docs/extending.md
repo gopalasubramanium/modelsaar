@@ -44,5 +44,25 @@ routing:
     only_when_ambiguous: true
 ```
 
-Its calls, timeouts and failures are visible in `/admin/status` → `classifier`. If it does not
-improve routing in `modelsaar eval`, leave it disabled: the deterministic path is the simple mode.
+To use a decision model instead of a chat model — a model whose Ollama `/api/show` capabilities
+list `decision` (nimble, clef, laya, …; discovered with `role: decision`, never offered for chat) —
+set `mode: decision`; the gateway then asks Ollama's `POST /v1/systemone` (Ollama ≥ 0.35.0) one
+`choice` question over the task labels and reads the per-label probabilities:
+
+```yaml
+routing:
+  classifier:
+    enabled: true
+    mode: decision
+    backend: ollama
+    model: "nimble"            # role=decision; a generative model here is refused ("unavailable")
+    timeout_s: 2.0
+    only_when_ambiguous: true
+```
+
+`modelsaar doctor` checks that the configured deployment matches the mode. Backends without a
+decision endpoint (`openai_compatible`) report the classifier as `unavailable` and routing continues.
+
+Its calls, timeouts and failures are visible in `/admin/status` → `classifier` (with the `mode`). If
+it does not improve routing in `modelsaar eval`, leave it disabled: the deterministic path is the
+simple mode.

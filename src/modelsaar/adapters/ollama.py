@@ -165,9 +165,13 @@ class OllamaAdapter(BaseAdapter):
         template = str(info.get("template", "") or "")
         dep.template_hash = hashlib.sha256(template.encode()).hexdigest()[:12] if template else ""
         dep.raw_metadata["license_excerpt"] = str(info.get("license", "") or "")[:200]
-        # Role from capabilities.
+        # Role from capabilities. A model that declares "decision" and not "completion" is a System One
+        # decision model (Ollama /v1/systemone: per-option probabilities, no generation) and is never
+        # offered as a chat model; the catalogue may still refine the role afterwards.
         if "embedding" in caps_list and "completion" not in caps_list:
             dep.role = "embedding"
+        elif "decision" in caps_list and "completion" not in caps_list:
+            dep.role = "decision"
         else:
             dep.role = "generative"
         claims: dict[str, str] = {}
@@ -233,3 +237,18 @@ class OllamaAdapter(BaseAdapter):
         fwd = {k: v for k, v in body.items() if k in ("input", "encoding_format", "dimensions")}
         fwd["model"] = dep.model
         return await self._post_json("/v1/embeddings", fwd, timeout=timeout)
+
+    async def decide(
+        self, dep: Deployment, state: str, questions: dict[str, Any], timeout: float | None = None
+    ) -> UpstreamResponse:
+        """Ollama's System One endpoint (``POST /v1/systemone``, Ollama >= 0.35.0): ``state`` is the
+        text to judge (never chat messages), ``questions`` maps 1..64 names to typed questions
+        (``choice`` with 2..255 criteria, ``noul``, ``score``); the answer carries per-option
+        probabilities and a concentration ``confidence``. No streaming, tools or generation controls
+        exist on this endpoint, so nothing else is forwarded."""
+        if not isinstance(state, str) or not state.strip():
+            raise AdapterError(f"{self.cfg.id}: decision state must be a non-empty string", status=400, kind="internal")
+        if not isinstance(questions, dict) or not 1 <= len(questions) <= 64:
+            raise AdapterError(f"{self.cfg.id}: decision requests take 1..64 questions", status=400, kind="internal")
+        body = {"model": dep.model, "state": state, "questions": questions}
+        return await self._post_json("/v1/systemone", body, timeout=timeout)
