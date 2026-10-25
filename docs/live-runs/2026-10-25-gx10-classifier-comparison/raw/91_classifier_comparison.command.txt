@@ -1,0 +1,195 @@
+#!/bin/bash
+# ============================================================================================================
+#  CLASSIFIER OFF vs ON comparison — the prepared Stage C design (stage-b-plan.md §6; plan item 5)   2026-10-25
+#  Owner authorisation: message of 2026-10-25 03:23 IST (overnight; run the documented comparison once; no merge,
+#  no website publish, no change to GX10 service / Ollama / tags / evaluator / scorer / unrelated configuration).
+# ============================================================================================================
+# Two `auto` runs, identical in everything except routing.classifier.enabled (plan item 5 "run auto twice"):
+#   OFF: the Stage A home's config.yaml as is (hash c58ce04fa1ed9902; classifier disabled).
+#   ON : a SEPARATE config file next to it, config-classifier.yaml = config.yaml + routing.classifier.enabled true,
+#        backend ollama, model qwen3.8:latest (the smallest of the eight by parameter size / by weights — both documents'
+#        primary choice; the "non-thinking option" qwen3-coder was NOT used), timeout_s 2.0 and only_when_ambiguous
+#        true unchanged (defaults). Different routing-config hash → separate report, never resumed (§6).
+# Pool = the Stage B Pass 1 four (§6): qwen3.8, qwen3-coder, gemma4:31b, qwen3.6. Frozen contract: evaluator checkout
+# cf56cdd, scorer/tasks/seed 7/max_tokens 400/temperature 0 as harness constants, sandbox-exec, placement A (in-process
+# gateway on this Mac, backend the GX10's Ollama over Tailscale; production modelsaar.service untouched). Flags follow the
+# plan's classifier command: --mode live --seed 7 --deployments … --out … --checkpoint … (NO --probe, NO
+# --save-measurements: capabilities and measurements come from the store's existing evidence for the current
+# fingerprints, identical for both runs; the store is not written). Decisions are dumped read-only after each run.
+# Gates (no launch): a prior evidence folder changed (pass1/pass1b/pass2/stage-c hashes); classifier/ exists; evaluator
+# not cf56cdd or dirty; a gateway on the configured port; not on AC; the launcher's own `caffeinate -i -s` assertion not verified; Ollama unreachable;
+# any of the four not discovered/healthy or not equal to the 0.40.5 re-baseline identities; stored probe/measurement
+# evidence missing for a pool fingerprint; ON config fails validation or its classifier deployment is not resolvable.
+# Watchdog: SIGTERM to a run after 70 min (partial evidence kept). Output: classifier/{off,on}/, 91-classifier.txt
+# ============================================================================================================
+APPROVED=yes
+set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"
+[ "$APPROVED" = "yes" ] || { echo "91_classifier: UNAPPROVED; not running" | tee "$HERE/91-classifier.txt"; exit 3; }
+mkdir "$HERE/.lock-91" 2>/dev/null || exit 0
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+WORK="$HOME/.modelsaar-live/stage-b-cf56cdd"; EXE="$WORK/.venv/bin/modelsaar"; PY="$WORK/.venv/bin/python"
+export MODELSAAR_HOME="$HOME/.modelsaar-stage-a/.modelsaar"
+export MODELSAAR_MACOS_SANDBOX=verify
+CFG_OFF="$MODELSAAR_HOME/config.yaml"; CFG_ON="$MODELSAAR_HOME/config-classifier.yaml"; DB="$MODELSAAR_HOME/state/modelsaar.db"
+GX=100.83.54.124; OLLAMA="http://$GX:11434"; C="$HERE/classifier"; BASE="$HERE/baseline-0.40.5"; WATCHDOG_S=4200
+DEPS="ollama/qwen3.8:latest ollama/qwen3-coder:latest ollama/gemma4:31b ollama/qwen3.6:latest"
+CLS_MODEL="qwen3.8:latest"
+EVAL=cf56cdd3416d8c853b64111b9b40211e5b126031; CFG_OFF_HASH=c58ce04fa1ed9902
+sha() { shasum -a 256 "$1" | cut -d' ' -f1; }
+prior_intact() {
+  [ "$(sha "$HERE/pass1/stage-b-pass1.json")" = "d72ddc6695a0a8561392f32be32d83853ef56adbb46e1e902f7eba17fd8bd726" ] &&
+  [ "$(sha "$HERE/pass1b/stage-b-pass1b.json")" = "0f50675d9de15dfa5cb5bf2d418ce35ab8244673e238e3cdf882a0b5197bf02c" ] &&
+  [ "$(sha "$HERE/pass2/stage-b-pass2.json")" = "4358acf888a52774c98f4dc3c705f0789bb31a43c9cd1e36933a577ef85806eb" ] &&
+  [ "$(sha "$HERE/stage-c/stage-c.json")" = "f7cdd2e8d1d4edda613886351b5f9edc8f5cfbc3278f2286c7895d549ad45972" ] &&
+  [ "$(sha "$HERE/stage-c/stage-c.records.jsonl")" = "1bf93d845d88d647d35e827282d7cfd5cea7e50b8ff1dc5028f6d8836cd67353" ]
+}
+snapshot_store() {  # read-only
+"$PY" - "$DB" "$1" <<'PYEOF'
+import json, sqlite3, sys
+db, out = sys.argv[1:3]
+c = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+cols = ("deployment_id","fingerprint","task","quality","samples","p50_ms","p95_ms","source","measured_at")
+rows = [dict(zip(cols, r)) for r in c.execute("SELECT " + ",".join(cols) + " FROM measurements ORDER BY deployment_id, task")]
+json.dump(rows, open(out, "w"), indent=1); print(f"store measurements: {len(rows)} rows")
+PYEOF
+}
+dump_decisions() {  # read-only: every record's decision (auto + 422s) from the store, by request_id
+"$PY" - "$1" "$DB" "$2" <<'PYEOF'
+import json, sqlite3, sys, os
+recs_path, db, out = sys.argv[1:4]; os.makedirs(out, exist_ok=True)
+recs = [json.loads(l) for l in open(recs_path, encoding="utf-8")]
+want = [(i, r) for i, r in enumerate(recs) if r.get("policy") == "auto" or r.get("status") == 422]
+conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True); found = missing = 0
+for i, r in want:
+    rid = r.get("request_id"); row = conn.execute("SELECT record, created_at FROM decisions WHERE request_id=?", (rid,)).fetchone() if rid else None
+    if not row: missing += 1; continue
+    d = json.loads(row[0]); d["_store_saved_at"] = row[1]; d["_checkpoint"] = {"index": i, "policy": r["policy"], "task": r["task"], "status": r["status"], "ok": r.get("ok"), "detail": r.get("detail")}
+    json.dump(d, open(os.path.join(out, f"{rid}.json"), "w", encoding="utf-8"), indent=1, sort_keys=True); found += 1
+print(f"decisions dumped: {found}, missing: {missing}")
+PYEOF
+}
+run_one() {  # $1 label, $2 config file, $3 out dir
+  local L="$1" CFG="$2" D="$3"; mkdir -p "$D"
+  curl -fsS -m 15 "$OLLAMA/api/ps" > "$D/ollama-ps-before.json"; echo "[$L] resident before: $("$PY" -c 'import json;print([m["name"] for m in json.load(open("'"$D"'/ollama-ps-before.json"))["models"]])')"
+  "$PY" - "$MODELSAAR_HOME" "$D/gateway-status-timeline.jsonl" "$WORK/.venv/bin/python" <<'PYEOF' > "$D/sidecar.log" 2>&1 &
+import json, os, re, subprocess, sys, time, urllib.request
+home, out, pypath = sys.argv[1:4]
+key = open(os.path.join(home, "keys", "admin_key")).read().split()[0]; me = str(os.getpid())
+def pids(): return [p for p in subprocess.run(["pgrep", "-f", pypath], capture_output=True, text=True).stdout.split() if p != me]
+def ports(ps):
+    if not ps: return []
+    o = subprocess.run(["lsof", "-nP", "-a", "-iTCP", "-sTCP:LISTEN", "-p", ",".join(ps)], capture_output=True, text=True).stdout
+    return sorted({int(m) for m in re.findall(r":(\d+) \(LISTEN\)", o)})
+seen = False; deadline = time.time() + 3 * 3600
+with open(out, "a") as f:
+    while time.time() < deadline:
+        ps = pids()
+        if not ps and seen: break
+        for p in ports(ps):
+            try:
+                req = urllib.request.Request(f"http://127.0.0.1:{p}/admin/status", headers={"Authorization": f"Bearer {key}"})
+                s = json.load(urllib.request.urlopen(req, timeout=3)); seen = True
+                rec = {"t": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "port": p, "ready": s.get("ready"), "last_refresh_error": s.get("last_refresh_error"),
+                       "requests_total": s.get("requests_total"), "requests_failed": s.get("requests_failed"),
+                       "classifier": s.get("classifier"),
+                       "deployments": {d["id"]: {"healthy": d["state"]["healthy"], "loaded": d["state"]["loaded"]} for d in s.get("deployments", [])}}
+                f.write(json.dumps(rec) + "\n"); f.flush()
+            except Exception:
+                pass
+        time.sleep(5)
+PYEOF
+  local SPID=$!
+  echo "=== [$L] start $(date '+%Y-%m-%dT%H:%M:%S%z')"; local T0=$(date +%s)
+  ( sleep "$WATCHDOG_S"; echo "$(date '+%Y-%m-%dT%H:%M:%S%z') WATCHDOG [$L]: ${WATCHDOG_S}s elapsed; SIGTERM" >> "$D/watchdog.log"; pkill -TERM -f "$WORK/.venv/bin/python.*modelsaar.*eval --mode live" ) & local WPID=$!
+  ( cd "$D" && "$EXE" --config "$CFG" eval --mode live --seed 7 --deployments $DEPS \
+      --out "$D/classifier-$L.json" --checkpoint "$D/classifier-$L.records.jsonl" 2>&1 | tee "$D/console-transcript.txt" )
+  local RC=${PIPESTATUS[0]}
+  kill "$WPID" 2>/dev/null; wait "$WPID" 2>/dev/null; sleep 6; kill "$SPID" 2>/dev/null; wait "$SPID" 2>/dev/null
+  echo "=== [$L] end $(date '+%Y-%m-%dT%H:%M:%S%z') exit=$RC duration=$(( $(date +%s) - T0 ))s; watchdog: $(cat "$D/watchdog.log" 2>/dev/null || echo 'not triggered')"
+  echo "[$L] records: $(wc -l < "$D/classifier-$L.records.jsonl" 2>/dev/null | tr -d ' '); timeline: $(wc -l < "$D/gateway-status-timeline.jsonl" | tr -d ' ') samples, unhealthy: $(grep -c '"healthy": false' "$D/gateway-status-timeline.jsonl" || true)"
+  curl -fsS -m 15 "$OLLAMA/api/ps" > "$D/ollama-ps-after.json"; echo "[$L] resident after: $("$PY" -c 'import json;print([(m["name"], m.get("context_length"), m.get("size_vram")) for m in json.load(open("'"$D"'/ollama-ps-after.json"))["models"]])')"
+  dump_decisions "$D/classifier-$L.records.jsonl" "$D/decisions"
+  shasum -a 256 "$D/classifier-$L.json" "$D/classifier-$L.records.jsonl" 2>/dev/null
+}
+{
+echo "=== CLASSIFIER COMPARISON $(date '+%Y-%m-%dT%H:%M:%S%z') (TZ=$(date +%Z)) macOS $(sw_vers -productVersion)"
+[ -d "$C" ] && { echo "!! $C already exists; refusing"; exit 1; }
+prior_intact || { echo "!! pass1/pass1b/pass2/stage-c evidence hashes differ; refusing"; exit 1; }
+echo "prior evidence (pass1, pass1b, pass2, stage-c) hashes verified"
+[ "$(git -C "$WORK" rev-parse HEAD)" = "$EVAL" ] || { echo "!! evaluator checkout is not $EVAL"; exit 1; }
+[ -z "$(git -C "$WORK" status --porcelain --untracked-files=no)" ] || { echo "!! evaluator checkout dirty"; exit 1; }
+echo "evaluator checkout: $EVAL clean=yes; $("$EXE" --version 2>&1); python $("$PY" --version 2>&1); MODELSAAR_HOME=$MODELSAAR_HOME"
+echo "sandbox backend: $("$PY" -c 'from modelsaar.evaluation import sandbox; print(sandbox.available())')"
+H_OFF="$("$EXE" doctor --json 2>/dev/null | "$PY" -c 'import json,sys,re;print(re.search(r"hash ([0-9a-f]+)", [f["message"] for f in json.load(sys.stdin)["findings"] if f["area"]=="config"][0]).group(1))')"
+echo "OFF config: $CFG_OFF hash $H_OFF (expected $CFG_OFF_HASH); classifier: $("$EXE" config show | "$PY" -c 'import sys,re;t=sys.stdin.read();m=re.search(r"classifier:\n\s+enabled:\s*(\S+)",t);print("enabled="+m.group(1) if m else "UNKNOWN")')"
+[ "$H_OFF" = "$CFG_OFF_HASH" ] || { echo "!! OFF config hash changed; refusing"; exit 1; }
+PORT="$("$EXE" config show | "$PY" -c 'import sys,re;print(re.search(r"port:\s*(\d+)",sys.stdin.read()).group(1))')"
+curl -s -m 2 -o /dev/null "http://127.0.0.1:$PORT/healthz" && { echo "!! a gateway listens on the configured port $PORT; refusing"; exit 1; }; echo "configured port $PORT: nothing listening"
+# --- power / sleep ---------------------------------------------------------------------------------------------
+echo "power: $(pmset -g batt | head -1)"; pmset -g batt | head -1 | grep -q "AC Power" || { echo "!! STOP: not on AC"; exit 2; }
+mkdir -p "$C"
+caffeinate -i -s -w $$ & CPID=$!   # this launcher's own idle- and system-sleep assertion (on AC), held for its lifetime
+sleep 2; pmset -g assertions > "$C/pmset-assertions-before.txt" 2>&1
+{ grep -i caffeinate "$C/pmset-assertions-before.txt" | grep -q PreventUserIdleSystemSleep && grep -i caffeinate "$C/pmset-assertions-before.txt" | grep -q 'PreventSystemSleep'; } || { echo "!! STOP: sleep assertion not verified (caffeinate -i -s pid $CPID)"; kill "$CPID" 2>/dev/null; exit 2; }
+echo "caffeinate assertions verified: $(grep -i caffeinate "$C/pmset-assertions-before.txt" | grep -o 'Prevent[A-Za-z]*' | sort -u | tr '\n' ' ')(launcher pid $CPID; lid must stay open — -s does not cover lid-close sleep)"
+# --- backend / identities (recorded; gated on availability and equality with the 0.40.5 re-baseline) ----------
+curl -fsS -m 15 "$OLLAMA/api/version" > "$C/ollama-version.json" || { echo "!! STOP: Ollama unreachable"; exit 1; }; echo "ollama version: $(cat "$C/ollama-version.json")"
+curl -fsS -m 20 "$OLLAMA/api/tags" > "$C/ollama-tags.json"
+"$EXE" discover --json > "$C/discover.json" 2> "$C/discover.err" || { echo "!! discover failed"; exit 1; }
+"$PY" - "$C" "$BASE/deployments-0.40.5.json" "$DB" <<'PYEOF' || exit 2
+import json, sys, pathlib, sqlite3
+C = pathlib.Path(sys.argv[1]); ref = {d["modelsaar_deployment_id"]: d for d in json.load(open(sys.argv[2]))["deployments"]}; db = sys.argv[3]
+want = ["ollama/qwen3.8:latest", "ollama/qwen3-coder:latest", "ollama/gemma4:31b", "ollama/qwen3.6:latest"]
+disc = {d["id"]: d for d in json.load(open(C / "discover.json"))["deployments"]}
+tags = {m["name"]: m for m in json.load(open(C / "ollama-tags.json"))["models"]}
+conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+print(f"discovered: {len(disc)}; tags: {len(tags)}")
+bad = 0; ident = {}
+for dep in want:
+    d = disc.get(dep); r = ref[dep]
+    if not d or not d["state"]["healthy"]: print(f"!! {dep}: not discovered/healthy"); bad += 1; continue
+    dg = tags[dep.split("/",1)[1]]["digest"]; same = dg == r["ollama_digest"] and d["fingerprint"] == r["modelsaar_fingerprint"]
+    n_meas = conn.execute("SELECT COUNT(*) FROM measurements WHERE deployment_id=? AND fingerprint=?", (dep, d["fingerprint"])).fetchone()[0]
+    n_caps = sum(1 for v in (d.get("capabilities") or {}).values() if v.get("provenance") == "probe")
+    print(f"{dep}: digest {dg[:12]} fp {d['fingerprint']} runtime {d['fingerprint_inputs'].get('runtime_version')} ctx {d['context_length']} {'same' if same else 'DIFFERS'} vs re-baseline; stored measurements {n_meas}; probed capabilities {n_caps}")
+    ident[dep] = {"digest": dg, "fingerprint": d["fingerprint"], "fingerprint_inputs": d.get("fingerprint_inputs"), "context_length": d["context_length"], "stored_measurements": n_meas, "probed_capabilities": n_caps, "same_as_rebaseline_0405": same}
+    if not same: bad += 1
+    if n_meas == 0 or n_caps == 0: print(f"!! {dep}: no stored measurement/probe evidence for the current fingerprint"); bad += 1
+json.dump(ident, open(C / "identities.json", "w"), indent=1)
+if bad: print("!! STOP: a precondition on the pool failed"); sys.exit(2)
+print("pool: all four discovered, healthy, identities equal the 0.40.5 re-baseline, stored evidence present")
+PYEOF
+snapshot_store "$C/store-measurements-before.json"
+# --- ON config: a separate file next to config.yaml (relative key/state paths resolve identically) ---------------
+[ -f "$CFG_ON" ] && { echo "!! $CFG_ON already exists; refusing to overwrite"; exit 1; }
+"$PY" - "$CFG_OFF" "$CFG_ON" "$CLS_MODEL" <<'PYEOF' || exit 1
+import sys, yaml
+src, dst, model = sys.argv[1:4]
+data = yaml.safe_load(open(src)) or {}
+data.setdefault("routing", {}).setdefault("classifier", {})
+data["routing"]["classifier"].update({"enabled": True, "backend": "ollama", "model": model})
+open(dst, "w").write(yaml.safe_dump(data, sort_keys=False))
+print("wrote", dst, "classifier:", data["routing"]["classifier"])
+PYEOF
+cp "$CFG_ON" "$C/config-classifier.yaml"
+echo "ON config validate: $("$EXE" --config "$CFG_ON" config validate 2>&1 | tail -1)"
+H_ON="$("$EXE" --config "$CFG_ON" doctor --json 2>/dev/null | "$PY" -c 'import json,sys,re;print(re.search(r"hash ([0-9a-f]+)", [f["message"] for f in json.load(sys.stdin)["findings"] if f["area"]=="config"][0]).group(1))')"
+echo "ON config hash: $H_ON (must differ from OFF $H_OFF)"; [ -n "$H_ON" ] && [ "$H_ON" != "$H_OFF" ] || { echo "!! ON config hash invalid"; exit 1; }
+"$EXE" --config "$CFG_ON" config show > "$C/config-show-on.txt" 2>&1; "$EXE" config show > "$C/config-show-off.txt" 2>&1
+diff "$C/config-show-off.txt" "$C/config-show-on.txt" | sed 's/^/  cfg diff: /'
+echo "ON classifier deployment: $("$PY" -c 'import json;d=[x for x in json.load(open("'"$C"'/discover.json"))["deployments"] if x["id"]=="ollama/'"$CLS_MODEL"'"];print("found healthy=%s locality=%s" % (d[0]["state"]["healthy"], d[0]["locality"]) if d else "NOT FOUND")')"
+# --- the two runs -----------------------------------------------------------------------------------------------
+run_one off "$CFG_OFF" "$C/off"
+run_one on "$CFG_ON" "$C/on"
+# --- after ------------------------------------------------------------------------------------------------------
+snapshot_store "$C/store-measurements-after.json"
+cmp -s "$C/store-measurements-before.json" "$C/store-measurements-after.json" && echo "store measurements unchanged by the runs (no --save-measurements)" || echo "!! store measurements changed"
+prior_intact && echo "prior evidence preserved (after): verified" || echo "!! prior evidence hashes changed — investigate"
+pmset -g assertions > "$C/pmset-assertions-after.txt" 2>&1; echo "caffeinate assertions (after): $(grep -i caffeinate "$C/pmset-assertions-after.txt" | grep -o 'Prevent[A-Za-z]*' | sort -u | tr '\n' ' ')"
+echo "OFF config hash after: $("$EXE" doctor --json 2>/dev/null | "$PY" -c 'import json,sys,re;print(re.search(r"hash ([0-9a-f]+)", [f["message"] for f in json.load(sys.stdin)["findings"] if f["area"]=="config"][0]).group(1))') (config.yaml untouched)"
+grep -rl "msk_[A-Za-z0-9]" "$C" 2>/dev/null | sed 's/^/!! key-like string in: /'
+kill "$CPID" 2>/dev/null
+echo "=== done $(date '+%Y-%m-%dT%H:%M:%S%z')"
+} > "$HERE/91-classifier.txt" 2>&1
+rmdir "$HERE/.lock-91"; sleep 1

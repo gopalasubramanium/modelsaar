@@ -1,0 +1,93 @@
+{
+ "generated_at": "2026-10-25T03:30:29",
+ "ollama_version": "0.40.5",
+ "source": "on/classifier-on.json deployments[] + raw/identities.json (digest, stored measurements, probed capabilities, vs the 0.40.5 re-baseline of 2026-10-16)",
+ "pool": "Stage B Pass 1 four (stage-b-plan.md \u00a76)",
+ "deployments": [
+  {
+   "id": "ollama/qwen3.6:latest",
+   "fingerprint": "1c2c6fd22bf8cb30",
+   "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "family": "qwen35moe",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "35.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": null,
+   "ollama_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "declared_capabilities": null,
+   "stored_measurements": 11,
+   "probed_capabilities": 6,
+   "vs_rebaseline_0405": "same",
+   "role_in_this_run": "eligible deployment"
+  },
+  {
+   "id": "ollama/qwen3.8:latest",
+   "fingerprint": "1f657c93815106c4",
+   "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "family": "qwen35",
+   "tags": [
+    "general",
+    "reasoning",
+    "code",
+    "vision"
+   ],
+   "parameter_size": "27.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 131072,
+   "runtime": "ollama",
+   "runtime_version": null,
+   "ollama_digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "declared_capabilities": null,
+   "stored_measurements": 11,
+   "probed_capabilities": 6,
+   "vs_rebaseline_0405": "same",
+   "role_in_this_run": "classifier model (ON run) and eligible deployment"
+  },
+  {
+   "id": "ollama/gemma4:31b",
+   "fingerprint": "d9c2d9116eefdbe8",
+   "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "family": "gemma4",
+   "tags": [],
+   "parameter_size": "31.3B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null,
+   "ollama_digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "declared_capabilities": null,
+   "stored_measurements": 11,
+   "probed_capabilities": 6,
+   "vs_rebaseline_0405": "same",
+   "role_in_this_run": "eligible deployment"
+  },
+  {
+   "id": "ollama/qwen3-coder:latest",
+   "fingerprint": "3acc2cdc4e4a963c",
+   "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "family": "qwen3moe",
+   "tags": [
+    "code",
+    "agent"
+   ],
+   "parameter_size": "30.5B",
+   "quantization": "Q4_K_M",
+   "context_length": 4096,
+   "runtime": "ollama",
+   "runtime_version": null,
+   "ollama_digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "declared_capabilities": null,
+   "stored_measurements": 11,
+   "probed_capabilities": 5,
+   "vs_rebaseline_0405": "same",
+   "role_in_this_run": "eligible deployment"
+  }
+ ]
+}

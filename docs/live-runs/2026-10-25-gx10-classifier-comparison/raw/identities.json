@@ -1,0 +1,82 @@
+{
+ "ollama/qwen3.8:latest": {
+  "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+  "fingerprint": "1f657c93815106c4",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3.8:latest",
+   "digest": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 131072,
+  "stored_measurements": 11,
+  "probed_capabilities": 6,
+  "same_as_rebaseline_0405": true
+ },
+ "ollama/qwen3-coder:latest": {
+  "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+  "fingerprint": "3acc2cdc4e4a963c",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3-coder:latest",
+   "digest": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "identity": "06c1097efce0431c2045fe7b2e5108366e43bee1b4603a7aded8f21689e90bca",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "stored_measurements": 11,
+  "probed_capabilities": 5,
+  "same_as_rebaseline_0405": true
+ },
+ "ollama/gemma4:31b": {
+  "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+  "fingerprint": "d9c2d9116eefdbe8",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "gemma4:31b",
+   "digest": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "identity": "6316f0629137b426c9d9b853ffc4c8209589f30ee39aebede6285096c0ff47e7",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "stored_measurements": 11,
+  "probed_capabilities": 6,
+  "same_as_rebaseline_0405": true
+ },
+ "ollama/qwen3.6:latest": {
+  "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+  "fingerprint": "1c2c6fd22bf8cb30",
+  "fingerprint_inputs": {
+   "backend": "ollama",
+   "endpoint": "http://100.83.54.124:11434",
+   "model": "qwen3.6:latest",
+   "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "identity": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+   "runtime": "ollama",
+   "runtime_version": "0.40.5",
+   "template": "b507b9c2f6ca",
+   "quant": "Q4_K_M",
+   "pool": "local-machine"
+  },
+  "context_length": 4096,
+  "stored_measurements": 11,
+  "probed_capabilities": 6,
+  "same_as_rebaseline_0405": true
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "targets_source": "docs/evaluation.md — 'Acceptance targets for a reference configuration' (predeclared) + the classifier decision rule of docs/plans/measured-routing-quality.md item 5 / stage-b-plan.md §6",
+ "evaluated_on": "ON run (classifier-on.json, 2026-10-25 03:30–04:08 IST); OFF reference = Stage B Pass 1b auto (§6); the same-session OFF twin is compromised and not used",
+ "checks": [
+  {
+   "target": "auto capability violations = 0",
+   "observed": 0,
+   "result": "PASS"
+  },
+  {
+   "target": "auto completion >= fixed-strong",
+   "observed": "1.0 vs 1.0",
+   "result": "PASS"
+  },
+  {
+   "target": "auto success >= fixed-strong - 0.05",
+   "observed": "0.938 vs 0.938 (threshold 0.888)",
+   "result": "PASS"
+  },
+  {
+   "target": "routing overhead with classifier < classifier.timeout_s (2000 ms) at p95",
+   "observed": "p95 2003.52 ms (report; the six consulted requests each recorded 2002.3–2004.5 ms: the 2.0 s wait plus bookkeeping); median 0.55 ms",
+   "result": "FAIL (marginal: the timeout path itself exceeds the bound by 2–4 ms)"
+  },
+  {
+   "target": "classifier timeouts < 5 % of consulted requests",
+   "observed": "6 of 6 consulted auto requests timed out (100 %); gateway-wide 38 of 38 calls timed out, 0 other failures",
+   "result": "FAIL"
+  },
+  {
+   "target": "decision rule: enable only if success gain > 0 with 95 % interval excluding zero AND median routing overhead < 250 ms",
+   "observed": "gain 0.0 (30/32 vs 30/32, no discordant task, interval [0.0, 0.0]); median overhead 0.55 ms",
+   "result": "KEEP OFF (the simpler router is retained)"
+  }
+ ]
+}

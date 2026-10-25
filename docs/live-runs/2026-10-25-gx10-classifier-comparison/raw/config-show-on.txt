@@ -1,0 +1,139 @@
+version: 1
+server:
+  host: 127.0.0.1
+  port: 50824
+  api_keys_file: keys/api_keys
+  admin_key_file: keys/admin_key
+  state_db: state/modelsaar.db
+  request_timeout_s: 600.0
+  max_request_bytes: 33554432
+  response_model_field: requested
+  residency_refresh_s: 15.0
+  discovery_refresh_s: 120.0
+security:
+  allow_lan: false
+  locality_mode: local_only
+  allowed_backend_hosts: []
+  fetch_remote_media: false
+  log_prompts: false
+  telemetry_opt_in: false
+resource_pools:
+- id: local-machine
+  kind: unified
+  max_concurrent: 1
+  max_queue: 16
+  queue_timeout_s: 30.0
+  memory_margin_gb: 0.0
+  unknown_memory_policy: allow
+backends:
+- id: ollama
+  type: ollama
+  base_url: http://100.83.54.124:11434
+  locality: local
+  resource_pool: local-machine
+  discover: true
+  models: []
+  timeout_s: 600.0
+  connect_timeout_s: 5.0
+  max_concurrent: 4
+  circuit_failure_threshold: 3
+  circuit_cooldown_s: 30.0
+deployments: []
+aliases:
+  auto:
+    profile: quality
+    require_tags: []
+    require_vision: false
+    deployments: []
+    description: Best expected quality within limits
+  auto-quality:
+    profile: quality
+    require_tags: []
+    require_vision: false
+    deployments: []
+    description: ''
+  auto-balanced:
+    profile: balanced
+    require_tags: []
+    require_vision: false
+    deployments: []
+    description: ''
+  auto-fast:
+    profile: fast
+    require_tags: []
+    require_vision: false
+    deployments: []
+    description: ''
+  auto-code:
+    profile: quality
+    require_tags:
+    - code
+    require_vision: false
+    deployments: []
+    description: ''
+  auto-vision:
+    profile: quality
+    require_tags: []
+    require_vision: true
+    deployments: []
+    description: ''
+routing:
+  default_profile: quality
+  profiles:
+    quality:
+      quality: 1.0
+      latency: 0.15
+      residency: 0.1
+      overhead: 0.05
+    balanced:
+      quality: 1.0
+      latency: 0.45
+      residency: 0.3
+      overhead: 0.1
+    fast:
+      quality: 0.6
+      latency: 1.0
+      residency: 0.6
+      overhead: 0.2
+  switching_penalty: 0.08
+  classifier:
+    enabled: true
+    backend: ollama
+    model: qwen3.8:latest
+    timeout_s: 2.0
+    max_input_chars: 1500
+    only_when_ambiguous: true
+    max_output_tokens: 64
+    allow_remote: false
+  token_estimate:
+    chars_per_token: 3.0
+    per_message_overhead: 8
+    image_tokens: 1200
+    tool_definition_overhead: 24
+    default_max_output: 1024
+    reasoning_budget: 2048
+    safety_margin: 0.05
+    exact_count_deadline_s: 1.5
+  pre_commit_failover: true
+  max_failover_attempts: 1
+  uncalibrated_prior: 0.5
+affinity:
+  mode: session
+  ttl_s: 3600.0
+  max_sessions: 10000
+  session_headers:
+  - X-ModelSaar-Session
+  - X-OpenWebUI-Chat-Id
+  body_fields:
+  - prompt_cache_key
+  tool_round_trip_affinity: true
+embeddings: []
+admission:
+  uncertain_hold_s: 20.0
+  max_queue: 32
+  queue_timeout_s: 30.0
+observability:
+  decision_log: true
+  retention_days: 7
+  log_level: INFO
+

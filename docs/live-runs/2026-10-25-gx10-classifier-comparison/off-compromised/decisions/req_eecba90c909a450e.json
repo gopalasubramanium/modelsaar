@@ -1,0 +1,80 @@
+{
+ "_checkpoint": {
+  "detail": "HTTP 422: no_eligible_deployment: no deployment satisfies all hard requirements",
+  "index": 153,
+  "ok": false,
+  "policy": "test:ollama/gemma4:31b",
+  "status": 422,
+  "task": "vis-02"
+ },
+ "affinity": {},
+ "alias": null,
+ "candidates": [],
+ "chosen": null,
+ "classifier": {},
+ "compat": {},
+ "config_hash": "c58ce04fa1ed9902",
+ "created_at": 1792879219.5178392,
+ "endpoint": "chat",
+ "evidence": "",
+ "exclusions": {
+  "ollama/gemma4:31b": [
+   "backend unhealthy: ollama: ConnectTimeout: "
+  ]
+ },
+ "explicit": true,
+ "failover": [],
+ "failover_allowed": true,
+ "failover_note": "",
+ "outcome": "no_eligible",
+ "outcome_detail": "",
+ "overhead_ms": 0.15,
+ "profile": "quality",
+ "reasons": [
+  "no deployment satisfies all hard requirements"
+ ],
+ "registry_version": 1,
+ "remedies": [
+  "check that the inference server is running (`modelsaar doctor`)"
+ ],
+ "request_id": "req_eecba90c909a450e",
+ "requested_model": "ollama/gemma4:31b",
+ "requirements": {
+  "ambiguous": false,
+  "has_remote_image_url": false,
+  "is_tool_result_turn": false,
+  "languages": [
+   "en"
+  ],
+  "multilingual": false,
+  "needs_audio": false,
+  "needs_continuation": false,
+  "needs_json_object": false,
+  "needs_json_schema": false,
+  "needs_parallel_tools": false,
+  "needs_streaming": false,
+  "needs_tools": false,
+  "needs_vision": true,
+  "outstanding_tool_call_ids": [],
+  "primary_task": "document_vision",
+  "role": "generative",
+  "signals": [
+   "document_vision:image input present"
+  ],
+  "tasks": {
+   "document_vision": 0.9
+  },
+  "tokens": {
+   "images": 1,
+   "input_estimate": 1289,
+   "method": "estimate:chars/3+overheads",
+   "output_allowance": 400,
+   "reasoning_allowance": 2048,
+   "total": 3737
+  },
+  "tool_choice_mode": "none"
+ },
+ "requirements_note": "",
+ "stream": false,
+ "translation_notes": []
+}
