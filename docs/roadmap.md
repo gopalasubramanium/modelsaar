@@ -35,8 +35,12 @@ Each with its own tests before being described as supported:
 
 * Native decision-model adapters (Ollama `/v1/systemone`: clef, nimble, laya): **as routing
   classifiers — implemented, opt-in (`routing.classifier.mode: decision`; see `docs/routing.md` §C)**;
-  **as `POST /v1/decisions` — implemented (contract in `docs/routing.md` "Decisions")**; neither has
-  been exercised against a live decision model yet (fixture-tested only).
+  **as `POST /v1/decisions` — implemented (contract in `docs/routing.md` "Decisions")**. Both are
+  fixture-tested; one bounded live smoke test (three requests, 2026-10-28, `nimble-v3` on the GX10;
+  `docs/live-runs/2026-10-28-decision-preview-smoke/`) exercised the wire contract and routing — not
+  answer quality, not the classifier decision rule. Offered as an opt-in preview from GitHub at commit
+  `6075cdcf…` (README "Preview: decision models"; modelsaar.com/preview/decision-models/); the default
+  installer pin is unchanged.
 * Audio/video inputs; multimodal embeddings (EmbeddingGemma 2 image/video/audio); OCR pipeline
   (GLM-OCR with layout stage) and guardrail pipelines (Granite Guardian) as separate results.
 * Responses API and Anthropic Messages with fail-closed translation (currently explicit 501).

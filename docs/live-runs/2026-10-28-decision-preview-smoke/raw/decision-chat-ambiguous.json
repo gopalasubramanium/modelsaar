@@ -1,0 +1,208 @@
+{
+ "affinity": {
+  "session_source": "none",
+  "status": "stateless"
+ },
+ "alias": "auto",
+ "candidates": [
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.8:latest",
+   "evidence": "prior-general:catalogue",
+   "latency_cost": 0.369,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.343,
+   "quality": 0.75,
+   "residency_cost": 0.343,
+   "score": 0.6432,
+   "uncertainty": 0.3
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/muse-glimmer:latest",
+   "evidence": "prior-general:catalogue",
+   "latency_cost": 0.376,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.351,
+   "quality": 0.7,
+   "residency_cost": 0.351,
+   "score": 0.5909,
+   "uncertainty": 0.3
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6:latest",
+   "evidence": "prior-general:catalogue",
+   "latency_cost": 0.468,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.437,
+   "quality": 0.72,
+   "residency_cost": 0.437,
+   "score": 0.5843,
+   "uncertainty": 0.3
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3-coder:latest",
+   "evidence": "prior-general:catalogue",
+   "latency_cost": 0.407,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.359,
+   "quality": 0.6,
+   "residency_cost": 0.359,
+   "score": 0.4851,
+   "uncertainty": 0.3
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/gemma4:31b",
+   "evidence": "uncalibrated:size-heuristic",
+   "latency_cost": 0.417,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.384,
+   "quality": 0.575,
+   "residency_cost": 0.384,
+   "score": 0.4553,
+   "uncertainty": 0.35
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6-accurate:latest",
+   "evidence": "uncalibrated:size-heuristic",
+   "latency_cost": 0.474,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.463,
+   "quality": 0.578,
+   "residency_cost": 0.463,
+   "score": 0.438,
+   "uncertainty": 0.35
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3.6-fast:latest",
+   "evidence": "uncalibrated:size-heuristic",
+   "latency_cost": 0.474,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 0.463,
+   "quality": 0.578,
+   "residency_cost": 0.463,
+   "score": 0.438,
+   "uncertainty": 0.35
+  },
+  {
+   "affinity_adjust": 0.0,
+   "deployment": "ollama/qwen3-coder-next:latest",
+   "evidence": "uncalibrated:size-heuristic",
+   "latency_cost": 1.0,
+   "notes": [
+    "latency:size-heuristic",
+    "load:memory-heuristic"
+   ],
+   "overhead_cost": 1.0,
+   "quality": 0.595,
+   "residency_cost": 1.0,
+   "score": 0.2953,
+   "uncertainty": 0.35
+  }
+ ],
+ "chosen": "ollama/qwen3.8:latest",
+ "classifier": {
+  "confidence": 0.997122012373384,
+  "latency_ms": 255.3,
+  "note": "decision model; concentration confidence 1.00",
+  "status": "ok",
+  "task": "conversation",
+  "used": true
+ },
+ "compat": {},
+ "config_hash": "82800f2fe1340aba",
+ "created_at": 1793121092.768628,
+ "endpoint": "chat",
+ "evidence": "prior-general:catalogue",
+ "exclusions": {
+  "ollama/d1:latest": [
+   "role mismatch: request needs generative, deployment role is decision"
+  ],
+  "ollama/embeddinggemma-2:latest": [
+   "role mismatch: request needs generative, deployment role is embedding"
+  ],
+  "ollama/nimble-v3:latest": [
+   "role mismatch: request needs generative, deployment role is decision"
+  ]
+ },
+ "explicit": false,
+ "failover": [],
+ "failover_allowed": true,
+ "failover_note": "",
+ "outcome": "ok",
+ "outcome_detail": "8194ms",
+ "overhead_ms": 255.71,
+ "profile": "quality",
+ "reasons": [
+  "task=conversation (ambiguous); required: no special capabilities; context need ~2076 tokens",
+  "3 deployment(s) excluded by hard filters; 8 eligible",
+  "ollama/qwen3.8:latest ranked first on profile quality: quality 0.75 (prior-general:catalogue), latency cost 0.37, not resident"
+ ],
+ "registry_version": 1,
+ "remedies": [],
+ "request_id": "req_7c4838956513490f",
+ "requested_model": "auto",
+ "requirements": {
+  "ambiguous": true,
+  "has_remote_image_url": false,
+  "is_tool_result_turn": false,
+  "languages": [],
+  "multilingual": false,
+  "needs_audio": false,
+  "needs_continuation": false,
+  "needs_json_object": false,
+  "needs_json_schema": false,
+  "needs_parallel_tools": false,
+  "needs_streaming": false,
+  "needs_tools": false,
+  "needs_vision": false,
+  "outstanding_tool_call_ids": [],
+  "primary_task": "conversation",
+  "role": "generative",
+  "signals": [
+   "conversation:default (no structural signals; very short/vague)",
+   "classifier:conversation@1.00"
+  ],
+  "tasks": {
+   "conversation": 1.0
+  },
+  "tokens": {
+   "images": 0,
+   "input_estimate": 12,
+   "method": "estimate:chars/3+overheads",
+   "output_allowance": 16,
+   "reasoning_allowance": 2048,
+   "total": 2076
+  },
+  "tool_choice_mode": "none"
+ },
+ "requirements_note": "",
+ "stream": false,
+ "translation_notes": []
+}

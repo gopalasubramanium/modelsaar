@@ -1,0 +1,15 @@
+{
+ "version": "0.1.0",
+ "uptime_s": 25.9,
+ "ready": true,
+ "requests_total": 3,
+ "requests_failed": 0,
+ "classifier": {
+  "enabled": true,
+  "mode": "decision",
+  "calls": 1,
+  "timeouts": 0,
+  "failures": 0
+ },
+ "note": "trimmed: deployment snapshot omitted (identical to raw/discover.json); config_path redacted"
+}

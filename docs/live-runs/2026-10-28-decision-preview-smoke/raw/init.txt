@@ -1,0 +1,21 @@
+wrote <PREVIEW_HOME>/config.yaml
+API key:   <PREVIEW_HOME>/keys/api_keys
+admin key: <PREVIEW_HOME>/keys/admin_key
+discovered 11 deployment(s):
+  ollama/qwen3.6:latest                    role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/qwen3.8:latest                    role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/embeddinggemma-2:latest           role=embedding  ctx=4096 tools=unsupported vision=supported locality=local
+  ollama/nimble-v3:latest                  role=decision   ctx=32768 tools=unsupported vision=unsupported locality=local
+  ollama/d1:latest                         role=decision   ctx=16384 tools=unsupported vision=supported locality=local
+  ollama/muse-glimmer:latest               role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/gemma4:31b                        role=generative ctx=4096 tools=supported vision=supported locality=local
+  ollama/qwen3-coder-next:latest           role=generative ctx=4096 tools=supported vision=unsupported locality=local
+  ollama/qwen3-coder:latest                role=generative ctx=4096 tools=supported vision=unsupported locality=local
+  ollama/qwen3.6-accurate:latest           role=generative ctx=131072 tools=supported vision=supported locality=local
+  ollama/qwen3.6-fast:latest               role=generative ctx=65536 tools=supported vision=supported locality=local
+
+next steps:
+  modelsaar doctor            # check reachability, context assumptions, unknown capabilities
+  modelsaar probe --all       # verify tools/json/vision/streaming on each model (uses local compute)
+  modelsaar serve             # start the gateway
+  modelsaar client-config open-webui|openclaw|opencode|opencode-v2|hermes

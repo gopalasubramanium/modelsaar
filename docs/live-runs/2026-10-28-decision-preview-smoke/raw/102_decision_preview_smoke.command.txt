@@ -1,0 +1,125 @@
+#!/bin/bash
+# Owner-authorised 2026-10-28 01:06 SGT (overnight decision-model preview validation): ONE bounded live smoke test of the merged
+# decision-model features (main 6075cdcf…) from an ISOLATED preview checkout + home on this Mac, backend = the GX10's Ollama over
+# Tailscale (placement A, as every earlier run). At most THREE requests: (1) POST /v1/decisions with the explicit model
+# ollama/nimble-v3:latest, (2) POST /v1/decisions with model auto, (3) one ambiguous chat request with
+# routing.classifier.mode: decision. Read-only towards the GX10 (no pull/retag/alter; nimble-v3 is only loaded by Ollama for the
+# requests and unloads by its own keep-alive). Never touches ~/.modelsaar, ~/.modelsaar-stage-a, the Pass 1 checkout, the publish
+# clone's working tree, or any GX10 service. Keeps the Mac awake: its own `caffeinate -i -s -w $$`, plus — if no other
+# sleep-prevention assertion is active — a temporary `caffeinate -i -s -t 21600` (6 h, no persistent setting) recorded by pid.
+# STOP (no retry) on: not on AC; assertion not verified; Ollama unreachable; nimble-v3 absent or without the decision capability;
+# checkout/install failure; gateway not ready; any request failure after the first failing request. Output: 102-smoke.txt + preview-smoke/
+HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"; mkdir "$HERE/.lock-102" 2>/dev/null || exit 0
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH" GIT_TERMINAL_PROMPT=0
+COMMIT=6075cdcf3b0952d4213a7899438f5fe546e95d19; SRC="$HOME/.modelsaar-live/publish"; WORK="$HOME/.modelsaar-live/preview-6075cdcf"
+EXE="$WORK/.venv/bin/modelsaar"; PY="$WORK/.venv/bin/python"
+export MODELSAAR_HOME="$HOME/.modelsaar-preview/.modelsaar"; PORT=50826; OLLAMA="http://100.83.54.124:11434"; DEC="ollama/nimble-v3:latest"
+OUT="$HERE/preview-smoke"; mkdir -p "$OUT"
+LOG="$HERE/102-smoke.txt"
+{
+echo "=== DECISION PREVIEW SMOKE $(date '+%Y-%m-%dT%H:%M:%S%z') (TZ=$(date +%Z)) $(sw_vers -productName) $(sw_vers -productVersion)"
+echo "power: $(pmset -g batt | head -1)"; pmset -g batt | head -1 | grep -q "AC Power" || { echo "!! STOP: not on AC"; exit 2; }
+caffeinate -i -s -w $$ & CPID=$!
+sleep 2; pmset -g assertions > "$OUT/pmset-assertions-before.txt" 2>&1
+grep -i caffeinate "$OUT/pmset-assertions-before.txt" | grep -q PreventUserIdleSystemSleep || { echo "!! STOP: own sleep assertion not verified"; kill "$CPID" 2>/dev/null; exit 2; }
+other="$(grep -i caffeinate "$OUT/pmset-assertions-before.txt" | grep -v "pid $CPID(" | grep -c PreventUserIdleSystemSleep)"
+if [ "$other" = "0" ]; then nohup caffeinate -i -s -t 21600 >/dev/null 2>&1 & echo "task-window assertion: started caffeinate -i -s -t 21600 (pid $!, expires in 6 h; no persistent setting changed)"; else echo "task-window assertion: another caffeinate sleep assertion is already active ($other); none started"; fi
+echo "lid must stay open (-s does not cover lid-close sleep)"
+# --- preview checkout at the exact merged commit (isolated; the publish clone's working tree is not touched) ---
+cd "$SRC" || { echo "!! no publish clone"; exit 1; }; git fetch -q origin || { echo "!! fetch failed"; exit 1; }
+echo "origin/main: $(git rev-parse origin/main) (expected $COMMIT)"; [ "$(git rev-parse origin/main)" = "$COMMIT" ] || echo "note: main moved past $COMMIT; the preview still uses $COMMIT"
+[ -d "$WORK/.git" ] || git clone -q "$SRC" "$WORK" || { echo "!! clone failed"; exit 1; }
+cd "$WORK" && git fetch -q "$SRC" "$COMMIT" && git checkout -q --detach "$COMMIT" || { echo "!! checkout failed"; exit 1; }
+[ -z "$(git status --porcelain --untracked-files=no)" ] || { echo "!! dirty checkout"; exit 1; }
+echo "preview checkout: $(git rev-parse HEAD) (clean)"
+[ -x .venv/bin/python ] || uv venv -q --python 3.12 .venv || { echo "!! uv venv failed"; exit 1; }
+UV_NO_CACHE=1 uv pip install -q -e . --python .venv/bin/python || { echo "!! install failed"; exit 1; }
+echo "installed: $("$EXE" --version) with $("$PY" --version 2>&1)"
+echo "Pass 1 checkout untouched: $(git -C "$HOME/.modelsaar-live/stage-b-cf56cdd" rev-parse HEAD) clean=$([ -z "$(git -C "$HOME/.modelsaar-live/stage-b-cf56cdd" status --porcelain --untracked-files=no)" ] && echo yes || echo no)"
+echo "stage-a home untouched: $(shasum -a 256 "$HOME/.modelsaar-stage-a/.modelsaar/config.yaml" | cut -c1-16)…; default home ~/.modelsaar: $([ -e "$HOME/.modelsaar/config.yaml" ] && echo 'present (not used)' || echo absent)"
+# --- backend: read-only checks ---
+curl -sS -m 15 "$OLLAMA/api/version" > "$OUT/ollama-version.json" || { echo "!! STOP: Ollama unreachable"; exit 3; }
+echo "ollama version: $(cat "$OUT/ollama-version.json")"
+curl -sS -m 15 "$OLLAMA/api/tags" > "$OUT/ollama-tags.json" || { echo "!! STOP: /api/tags failed"; exit 3; }
+"$PY" - "$OUT/ollama-tags.json" <<'EOF' || { echo "!! STOP: nimble-v3:latest not present"; exit 3; }
+import json,sys; d=json.load(open(sys.argv[1])); names=[m["name"] for m in d["models"]]; print("inventory:", len(names), "tags; nimble-v3:latest present:", "nimble-v3:latest" in names); sys.exit(0 if "nimble-v3:latest" in names else 1)
+EOF
+curl -sS -m 30 -X POST "$OLLAMA/api/show" -d '{"model":"nimble-v3:latest"}' > "$OUT/ollama-show-nimble-v3.json" || { echo "!! STOP: /api/show failed"; exit 3; }
+"$PY" - "$OUT/ollama-show-nimble-v3.json" <<'EOF' || { echo "!! STOP: nimble-v3 does not declare the decision capability"; exit 3; }
+import json,sys; d=json.load(open(sys.argv[1])); caps=d.get("capabilities"); print("nimble-v3 capabilities:", caps, "| family", d.get("details",{}).get("family"), "| size", d.get("details",{}).get("parameter_size")); d.pop("license",None); d.pop("modelfile",None); json.dump(d, open(sys.argv[1],"w"), indent=1); sys.exit(0 if caps and "decision" in caps else 1)
+EOF
+curl -sS -m 15 "$OLLAMA/api/ps" > "$OUT/ollama-ps-before.json"; echo "resident before: $("$PY" -c 'import json,sys; print([m["name"] for m in json.load(open(sys.argv[1])).get("models",[])])' "$OUT/ollama-ps-before.json")"
+echo "production modelsaar.service: not contacted, not changed (placement A: gateway runs on this Mac)"
+# --- isolated preview home + gateway ---
+(lsof -nP -iTCP:$PORT -sTCP:LISTEN 2>/dev/null | grep -q LISTEN) && { echo "!! STOP: port $PORT busy"; exit 1; }
+mkdir -p "$MODELSAAR_HOME"
+"$EXE" init --endpoint "$OLLAMA" --type ollama --port $PORT --force > "$OUT/init.txt" 2>&1 || { echo "!! init failed: $(tail -3 "$OUT/init.txt")"; exit 1; }
+echo "init: $(grep -c . "$OUT/init.txt") lines; config $MODELSAAR_HOME/config.yaml"
+"$PY" - "$MODELSAAR_HOME/config.yaml" <<'EOF' || { echo "!! config edit failed"; exit 1; }
+import sys, yaml
+p=sys.argv[1]; d=yaml.safe_load(open(p))
+d.setdefault("routing",{}).setdefault("classifier",{}).update({"enabled": True, "mode": "decision", "backend": "ollama", "model": "nimble-v3:latest", "only_when_ambiguous": True, "timeout_s": 2.0})
+yaml.safe_dump(d, open(p,"w"), sort_keys=False); print("classifier config:", d["routing"]["classifier"])
+EOF
+"$EXE" config validate > "$OUT/config-validate.txt" 2>&1 || { echo "!! config validate failed: $(cat "$OUT/config-validate.txt")"; exit 1; }
+"$EXE" config show > "$OUT/config-show.txt" 2>&1; echo "config validate: $(cat "$OUT/config-validate.txt")"
+"$EXE" discover --json > "$OUT/discover.json" 2> "$OUT/discover.err" || { echo "!! discover failed: $(tail -2 "$OUT/discover.err")"; exit 1; }
+"$PY" - "$OUT/discover.json" "$DEC" <<'EOF' || { echo "!! STOP: $DEC not discovered with role decision"; exit 3; }
+import json,sys; d=json.load(open(sys.argv[1])); deps=d if isinstance(d,list) else d.get("deployments",d)
+dec=[x for x in deps if x.get("id")==sys.argv[2]]; print("discovered:", len(deps), "deployments; decision-role:", [x["id"] for x in deps if x.get("role")=="decision"])
+x=dec[0] if dec else {}; st=x.get("state") or {}; print("nimble-v3:", {k:x.get(k) for k in ("role","locality","parameter_size","context_length","family")}, "| state:", {k:st.get(k) for k in ("healthy","loaded")}, "| caps:", {k:v.get("value") for k,v in (x.get("capabilities") or {}).items()}); sys.exit(0 if x.get("role")=="decision" and st.get("healthy") else 1)
+EOF
+"$EXE" doctor > "$OUT/doctor.txt" 2>&1; echo "doctor classifier line: $(grep -i classifier "$OUT/doctor.txt" | head -1)"
+"$EXE" serve > "$OUT/serve.log" 2>&1 & SPID=$!
+for i in $(seq 1 40); do curl -sS -m 3 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/readyz" 2>/dev/null | grep -q 200 && break; sleep 1; done
+curl -sS -m 3 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/readyz" 2>/dev/null | grep -q 200 || { echo "!! STOP: gateway not ready: $(tail -5 "$OUT/serve.log")"; kill $SPID 2>/dev/null; exit 1; }
+echo "gateway ready on 127.0.0.1:$PORT (pid $SPID)"
+KEY="$(sed -n '/^[^#]/p' "$MODELSAAR_HOME/keys/api_keys" | head -1 | tr -d '[:space:]')"; AKEY="$(sed -n '/^[^#]/p' "$MODELSAAR_HOME/keys/admin_key" | head -1 | tr -d '[:space:]')"
+req() { # label, path, json body -> status code; saves response + headers; never prints keys
+  local L="$1" P="$2" B="$3"; local t0=$(date +%s)
+  code=$(curl -sS -m 600 -o "$OUT/$L.json" -D "$OUT/$L.headers" -w '%{http_code}' -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' "http://127.0.0.1:$PORT$P" -d "$B")
+  echo "[$L] HTTP $code in $(( $(date +%s) - t0 )) s; request-id $(grep -i '^x-modelsaar-request-id' "$OUT/$L.headers" | tr -d '\r' | cut -d' ' -f2); deployment $(grep -i '^x-modelsaar-deployment' "$OUT/$L.headers" | tr -d '\r' | cut -d' ' -f2)"
+  echo "$code"
+}
+Q='{"label":{"type":"choice","instructions":"Which label fits this support ticket?","criteria":{"bug":"Software errors","billing":"Payments and refunds","account":"Login and account access"}},"urgent":{"type":"noul","instructions":"Is the ticket urgent?"}}'
+STATE='Our checkout has returned 500 errors since 9am.'
+echo "--- request 1: POST /v1/decisions model=$DEC"
+c1=$(req decisions-explicit /v1/decisions "{\"model\":\"$DEC\",\"state\":\"$STATE\",\"questions\":$Q}" | tee /dev/stderr | tail -1)
+"$PY" - "$OUT/decisions-explicit.json" "$DEC" <<'EOF' && ok1=yes || ok1=no
+import json,sys; d=json.load(open(sys.argv[1])); assert set(d)=={"model","answers","usage"}, d; a=d["answers"]["label"]; assert a["type"]=="choice" and a["choice"] in ("bug","billing","account") and set(a["probabilities"])=={"bug","billing","account"} and 0<=a["confidence"]<=1; u=d["answers"]["urgent"]; assert u["type"]=="noul" and 0<=u["noul"]<=1
+print("schema ok; model field:", d["model"], "| label:", a["choice"], {k:round(v,3) for k,v in a["probabilities"].items()}, "confidence", round(a["confidence"],3), "| urgent noul", round(u["noul"],3), "| usage", d["usage"])
+EOF
+[ "$c1" = "200" ] && [ "$ok1" = "yes" ] || { echo "!! request 1 failed (HTTP $c1, schema $ok1): $(head -c 300 "$OUT/decisions-explicit.json")"; echo "STOP: live requests stopped after the first failure"; kill $SPID 2>/dev/null; curl -sS -m 15 "$OLLAMA/api/ps" > "$OUT/ollama-ps-after.json"; exit 4; }
+echo "--- request 2: POST /v1/decisions model=auto"
+c2=$(req decisions-auto /v1/decisions "{\"model\":\"auto\",\"state\":\"$STATE\",\"questions\":$Q}" | tee /dev/stderr | tail -1)
+"$PY" - "$OUT/decisions-auto.json" <<'EOF' && ok2=yes || ok2=no
+import json,sys; d=json.load(open(sys.argv[1])); assert set(d)=={"model","answers","usage"} and d["model"]=="auto", d; a=d["answers"]["label"]; assert a["type"]=="choice" and set(a["probabilities"])=={"bug","billing","account"}
+print("schema ok; label:", a["choice"], "confidence", round(a["confidence"],3))
+EOF
+[ "$c2" = "200" ] && [ "$ok2" = "yes" ] || { echo "!! request 2 failed (HTTP $c2, schema $ok2): $(head -c 300 "$OUT/decisions-auto.json")"; echo "STOP: live requests stopped"; kill $SPID 2>/dev/null; curl -sS -m 15 "$OLLAMA/api/ps" > "$OUT/ollama-ps-after.json"; exit 4; }
+echo "--- request 3: POST /v1/chat/completions model=auto, ambiguous prompt, classifier mode decision"
+c3=$(req chat-ambiguous /v1/chat/completions '{"model":"auto","messages":[{"role":"user","content":"thoughts?"}],"max_tokens":16}' | tee /dev/stderr | tail -1)
+echo "chat HTTP $c3; choices: $("$PY" -c 'import json,sys; d=json.load(open(sys.argv[1])); print(len(d.get("choices",[])), "model field", d.get("model"))' "$OUT/chat-ambiguous.json" 2>/dev/null)"
+# --- decision records (no prompts), status, residency ---
+curl -sS -m 15 -H "Authorization: Bearer $AKEY" "http://127.0.0.1:$PORT/admin/status" > "$OUT/admin-status.json"
+echo "admin/status classifier: $("$PY" -c 'import json,sys; print(json.load(open(sys.argv[1])).get("classifier"))' "$OUT/admin-status.json")"
+for L in decisions-explicit decisions-auto chat-ambiguous; do rid=$(grep -i '^x-modelsaar-request-id' "$OUT/$L.headers" | tr -d '\r' | cut -d' ' -f2); [ -n "$rid" ] && curl -sS -m 15 -H "Authorization: Bearer $AKEY" "http://127.0.0.1:$PORT/admin/decisions/$rid" > "$OUT/decision-$L.json"; done
+"$PY" - "$OUT" <<'EOF'
+import json,sys,os
+O=sys.argv[1]
+for L in ("decisions-explicit","decisions-auto","chat-ambiguous"):
+    p=f"{O}/decision-{L}.json"
+    if not os.path.exists(p): print(L, "no record"); continue
+    d=json.load(open(p)); d.pop("_store_saved_at",None)
+    print(f"record {L}: endpoint={d.get('endpoint')} chosen={d.get('chosen')} outcome={d.get('outcome')} overhead_ms={d.get('overhead_ms')} explicit={d.get('explicit')} evidence={d.get('evidence')}")
+    if L=="chat-ambiguous": print("   classifier:", d.get("classifier"), "| inferred task:", (d.get("requirements") or {}).get("primary_task"), "| ambiguous:", (d.get("requirements") or {}).get("ambiguous"), "| signals:", [s for s in (d.get("requirements") or {}).get("signals",[]) if s.startswith("classifier")])
+    json.dump(d, open(p,"w"), indent=1, sort_keys=True)
+EOF
+kill $SPID 2>/dev/null; sleep 1; echo "gateway stopped"
+curl -sS -m 15 "$OLLAMA/api/ps" > "$OUT/ollama-ps-after.json"; echo "resident after: $("$PY" -c 'import json,sys; print([(m["name"], m.get("size_vram")) for m in json.load(open(sys.argv[1])).get("models",[])])' "$OUT/ollama-ps-after.json")"
+sed -i '' -E 's/(msk|msa)_[A-Za-z0-9]+/<key>/g' "$OUT"/*.txt "$OUT"/*.log 2>/dev/null
+pmset -g assertions > "$OUT/pmset-assertions-after.txt" 2>&1; echo "sleep assertions after: $(grep -i caffeinate "$OUT/pmset-assertions-after.txt" | grep -o 'Prevent[A-Za-z]*' | sort -u | tr '\n' ' ')"
+echo "production modelsaar.service / live config / model tags: untouched"
+echo "=== done $(date '+%Y-%m-%dT%H:%M:%S%z') — requests 1-3 HTTP $c1/$c2/$c3"
+} > "$LOG" 2>&1
+rmdir "$HERE/.lock-102"; sleep 1
