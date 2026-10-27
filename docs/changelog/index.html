@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=d955e965">
+<link rel="stylesheet" href="/assets/site.css?v=8da1acb4">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Changelog", "description": "What changed in each ModelSaar revision.", "url": "https://modelsaar.com/docs/changelog/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Changelog", "item": "https://modelsaar.com/docs/changelog/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,76 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Changelog</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/d955e965d278dba343e2d4e55cc2089466abdff7/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>d955e965d278</code>. The repository file is authoritative.</p></header><h2 id="unreleased-website-layout-repair-rendered-layout-checks-roadmap-refresh-2026-10-14">Unreleased — website: layout repair, rendered-layout checks, roadmap refresh, 2026-10-14</h2>
+<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/8da1acb49a0b2d74873f311dde9656a3a5fd5c34/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>8da1acb49a0b</code>. The repository file is authoritative.</p></header><h2 id="unreleased-decision-model-preview-smoke-test-record-github-preview-path-website-page-2026-10-28">Unreleased — decision-model preview: smoke-test record, GitHub preview path, website page, 2026-10-28</h2>
+<ul>
+<li><strong>Live smoke test (one, bounded):</strong> three requests against the merged decision-model features from an isolated
+  preview checkout at <code>6075cdcf…</code> and an isolated home on the owner's Mac, backend the GX10's Ollama 0.40.5:
+  <code>POST /v1/decisions</code> with <code>ollama/nimble-v3:latest</code> (200, schema-valid), with <code>auto</code> (200; selected
+  <code>ollama/d1:latest</code> by the documented tie-break), and one ambiguous chat request with
+  <code>routing.classifier.mode: decision</code> (classifier used, status ok, 255 ms). Record under
+  <code>docs/live-runs/2026-10-28-decision-preview-smoke/</code> (<code>SMOKE-RESULT.md</code>, <code>SMOKE.json</code>, <code>raw/</code>). It
+  establishes the wire contract and routing on one machine — not answer quality, latency distributions or
+  the classifier decision rule.</li>
+<li><strong>Preview path (README, site):</strong> the ordinary source install pinned to that exact commit with its own
+  <code>MODELSAAR_HOME</code>, side by side with a stable installation. The one-line installer's pin is unchanged and
+  must not be pointed at the preview commit (it would replace a stable installation).</li>
+<li><strong>Website:</strong> new page <code>/preview/decision-models/</code> (what the features do, prerequisites and limits, the
+  pinned install/test instructions, the smoke-test table read from <code>SMOKE.json</code> at build time, what the
+  preview is not); links from Roadmap and Get started. No change to the benchmark pages or their claims.</li>
+</ul>
+<h2 id="unreleased-post-v1decisions-decision-model-endpoint-ollama-v1systemone-2026-10-27">Unreleased — <code>POST /v1/decisions</code>: decision-model endpoint (Ollama <code>/v1/systemone</code>), 2026-10-27</h2>
+<ul>
+<li><strong>New endpoint <code>POST /v1/decisions</code></strong> (<code>protocol/decisions.py</code>, <code>Router.route_decisions</code>, <code>server.decisions</code>):
+  typed questions (<code>choice</code> 2–255 options, <code>noul</code>, <code>score</code> 2–10 levels; 1–64 per request; optional base64
+  <code>images</code>) about a <code>state</code> (string, object or array), answered by a decision-role deployment through
+  <code>OllamaAdapter.decide</code> → <code>POST /v1/systemone</code>. <code>model</code> is a decision deployment id or <code>auto</code> (every
+  decision-role deployment passing the hard filters — enabled, healthy, locality, memory feasibility,
+  vision when images are sent — resident first, then by id; no quality scoring, choice explained in the
+  record). Strict request validation names the offending field (<code>param</code>); <code>keep_alive</code>, <code>stream</code> and any
+  other field are refused; state + questions are capped at the documented 64 KiB. Answers are validated
+  against the questions (type, options/levels, finite probabilities and confidence in [0, 1], arg-max
+  choice) → <code>502 decision_contract_violation</code> on violation. Errors follow the gateway's conventions
+  (<code>401</code>, <code>404 model_not_found</code>, <code>422 no_eligible_deployment</code> with blockers, <code>503 admission_rejected</code>,
+  <code>501 unsupported_backend</code>, upstream status + <code>upstream_error</code>, <code>504 upstream_timeout</code> with the slot
+  held as uncertain). Decision records carry <code>endpoint: "decisions"</code>. Chat routing and defaults unchanged.</li>
+<li><code>BaseAdapter.decide</code>/<code>OllamaAdapter.decide</code> accept object/array <code>state</code> and <code>images</code> (base64) per the
+  documented contract; the fake backend refuses images on a non-vision decision model (400).</li>
+<li>Tests: <code>tests/test_decisions_endpoint.py</code> (33: success for all question types, <code>auto</code> residency
+  preference, image routing, authentication, 16 invalid-request shapes, size/JSON limits, helper
+  validation, role mismatch, unknown model/alias, images on a text-only model, no decision model
+  discovered, unsupported backend, upstream 500/timeout, two malformed-answer shapes, chat unchanged).
+  Site test count 248 → 281 (<code>site/check_site.py</code> consistency; site not published).</li>
+<li><strong>Request-size limits:</strong> <code>_read_json</code> (all JSON routes) now reads the body incrementally and refuses it
+  with <code>413</code> as soon as <code>server.max_request_bytes</code> is exceeded — a declared <code>Content-Length</code> above the
+  limit is refused before reading, a chunked body is cut off at the limit — instead of buffering the whole
+  body first; <code>/v1/decisions</code> additionally checks the re-serialised upstream request (JSON incl. base64
+  images) against Ollama's documented 32 MiB whole-request limit before dispatch (<code>413</code>). Tests cover the
+  declared, chunked, within-limit and upstream-limit cases on this route.</li>
+<li>Not done: any live call against a real decision model (fixture-tested only).</li>
+</ul>
+<h2 id="unreleased-routing-decision-model-classifier-ollama-v1systemone-2026-10-25">Unreleased — routing: decision-model classifier (Ollama <code>/v1/systemone</code>), 2026-10-25</h2>
+<ul>
+<li><strong><code>routing.classifier.mode: decision</code></strong> (opt-in; default <code>chat</code>, unchanged): the optional classifier can
+  now be a decision model — a deployment with <code>role: decision</code> such as Ollama's <code>nimble</code>, <code>clef</code> or <code>laya</code> —
+  asked through its native endpoint (<code>OllamaAdapter.decide</code> → <code>POST /v1/systemone</code>, Ollama ≥ 0.35.0) one
+  <code>choice</code> question whose criteria are the closed task-label set. The answer's arg-max label and that
+  label's probability become the task refinement; the answer is validated strictly (type <code>choice</code>, labels
+  from the closed set only, finite probabilities in [0, 1] with the choice as arg-max, confidence in
+  [0, 1]) and any timeout, error or out-of-contract answer falls back to the deterministic label exactly
+  as in chat mode. Nothing but <code>model</code>, <code>state</code> and <code>questions</code> is sent; no free text is generated.</li>
+<li><strong>Discovery:</strong> an Ollama model whose <code>/api/show</code> capabilities list <code>decision</code> without <code>completion</code> is
+  registered with <code>role: decision</code> (previously <code>generative</code> unless the catalogue matched it), so it is
+  never offered or chosen for chat and an explicit request for it is refused.</li>
+<li><strong>Guards:</strong> the router and <code>modelsaar doctor</code> refuse a role/mode mismatch (a generative model in
+  <code>decision</code> mode or a decision model in <code>chat</code> mode) before any call; backends without a decision
+  endpoint (<code>openai_compatible</code>) report <code>unavailable</code>. <code>/admin/status</code> → <code>classifier</code> now carries <code>mode</code>.</li>
+<li>Tests: <code>tests/test_decision_classifier.py</code> (answer validation, discovery, end-to-end refinement,
+  ambiguity gating, acceptance bar, failure fallbacks, role guards, unsupported backend, defaults) against
+  the fake backend's documented <code>/v1/systemone</code>; site test count updated to the collected total.</li>
+<li>Not done: a <code>/v1/decisions</code>-style endpoint; any live measurement (the classifier comparison of
+  2026-10-25 used <code>mode: chat</code>).</li>
+</ul>
+<h2 id="unreleased-website-layout-repair-rendered-layout-checks-roadmap-refresh-2026-10-14">Unreleased — website: layout repair, rendered-layout checks, roadmap refresh, 2026-10-14</h2>
 <ul>
 <li><strong>Command blocks:</strong> the Copy button was positioned over the scrolling code and covered the end of the
   installation command, the API-key command and the connection example (3 of 5 home and 5 of 12 Get-started
@@ -233,7 +302,7 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/d955e965d278dba343e2d4e55cc2089466abdff7">d955e965d278</a> on 2026-10-25. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/8da1acb49a0b2d74873f311dde9656a3a5fd5c34">8da1acb49a0b</a> on 2026-10-27. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -245,6 +314,6 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=d955e965" defer></script>
+<script src="/assets/site.js?v=8da1acb4" defer></script>
 </body>
 </html>

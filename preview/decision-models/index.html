@@ -1,0 +1,156 @@
+<!doctype html>
+<!--
+ModelSaar. Created by Gopala Subramanium: https://me.sgopala.com
+Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
+-->
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview: decision models · ModelSaar</title>
+<meta name="description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.">
+<meta name="author" content="Gopala Subramanium">
+<link rel="canonical" href="https://modelsaar.com/preview/decision-models/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ModelSaar">
+<meta property="og:title" content="Preview: decision models · ModelSaar">
+<meta property="og:description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.">
+<meta property="og:url" content="https://modelsaar.com/preview/decision-models/">
+<meta property="og:image" content="https://modelsaar.com/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ModelSaar — one address for your local AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Preview: decision models · ModelSaar">
+<meta name="twitter:description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.">
+<meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
+<meta name="theme-color" content="#0f5c50">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css?v=8da1acb4">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Preview: decision models", "description": "Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.", "url": "https://modelsaar.com/preview/decision-models/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "preview", "item": "https://modelsaar.com/preview/"}, {"@type": "ListItem", "position": 3, "name": "Preview: decision models", "item": "https://modelsaar.com/preview/decision-models/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <a class="wordmark" href="/" aria-label="ModelSaar home">
+    <svg class="mark" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" focusable="false"><path d="M3 6h7l4 8-4 8H3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M14 14h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 6h5M10 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".45"/></svg>
+    <span>ModelSaar</span>
+  </a>
+  <nav class="main-nav" aria-label="Main">
+    <ul id="nav-list"><li><a href="/get-started/">Get started</a></li><li><a href="/how-it-works/">How it works</a></li><li><a href="/integrations/">Integrations</a></li><li><a href="/docs/">Docs</a></li><li><a href="/benchmarks/">Benchmarks</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/roadmap/">Roadmap</a></li><li><a href="https://github.com/gopalasubramanium/modelsaar" rel="noopener">Source on GitHub</a></li></ul>
+  </nav>
+</header>
+<main id="main" class="">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Preview: decision models</li></ol></nav>
+<section aria-labelledby="pv-title">
+  <h1 id="pv-title">Preview: decision models</h1>
+  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. You can try them today from GitHub at one exact commit. <strong>This is a preview for testing, not a stable release: the default installer and the stable installation path are unchanged.</strong></p>
+  <div class="callout"><p><strong>Status:</strong> both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>succeeded</strong> on 2026-10-28 (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
+</section>
+
+<section aria-labelledby="what-title">
+  <h2 id="what-title">What the two features do</h2>
+  <h3><code>POST /v1/decisions</code></h3>
+  <p>Ask a decision model typed questions about a <em>state</em> (a string, or any JSON object/array) and get back per-option probabilities. The request and answer are Ollama's documented System One contract (<code>POST /v1/systemone</code>, Ollama ≥ 0.35.0), carried through the gateway's usual API-key authentication, model resolution, admission, locality policy and decision record:</p>
+  <ul>
+    <li><code>model</code>: a decision-capable deployment id (for example <code>ollama/nimble:latest</code>) or <code>auto</code> — every decision-role deployment that passes the hard filters, resident ones first, then by id. No quality scoring: decision models are not measured by the evaluation harness, so the choice is deterministic and fully explained in the record.</li>
+    <li><code>questions</code>: 1–64 named questions of type <code>choice</code> (2–255 options), <code>noul</code> (yes/no probability) or <code>score</code> (2–10 ordered levels), each with <code>instructions</code>; optional base64 <code>images</code> for vision-capable decision models.</li>
+    <li>Answers are validated against the questions before they are returned; a backend answer that breaks the contract is <code>502 decision_contract_violation</code>, never passed on.</li>
+  </ul>
+  <h3><code>routing.classifier.mode: decision</code></h3>
+  <p>The optional routing classifier — consulted only when the deterministic task signals are ambiguous — can now be a decision model instead of a small chat model. It is asked one <code>choice</code> question over the closed task-label set and the arg-max label (with its probability as confidence) refines the task label. Any timeout, error or out-of-contract answer falls back to the deterministic label, exactly as before. Default: <code>mode: chat</code>, classifier <code>enabled: false</code> — nothing changes unless you turn it on.</p>
+</section>
+
+<section aria-labelledby="prereq-title">
+  <h2 id="prereq-title">Prerequisites and limits</h2>
+  <ul>
+    <li><strong>A decision model on your backend.</strong> Ollama ≥ 0.35.0 with a model whose <code>/api/show</code> capabilities list <code>decision</code> — for example <code>ollama pull nimble</code>, <code>clef</code> or <code>laya</code>. ModelSaar registers such models with role <code>decision</code>; they are never offered or chosen for chat. Only the Ollama backend has a decision endpoint; a generic OpenAI-compatible backend answers <code>501 unsupported_backend</code>.</li>
+    <li><strong>Request limits</strong> (checked in this order): the gateway reads at most <code>server.max_request_bytes</code> (default 32 MiB) of the body — a larger declared <code>Content-Length</code> is refused with <code>413</code> before reading and a streamed body is cut off at the limit; state + questions must fit 64 KiB; the request as the backend receives it (JSON including base64 images) must fit Ollama's 32 MiB whole-request limit (<code>413</code>, checked before dispatch). Any field other than <code>model</code>, <code>state</code>, <code>questions</code>, <code>images</code> is refused with <code>400</code> naming the field (<code>keep_alive</code> and <code>stream</code> included).</li>
+    <li><strong>Classifier mode <code>decision</code></strong> needs the configured deployment to have role <code>decision</code>; a chat model in that mode (or a decision model in <code>chat</code> mode) is refused before any call, and <code>modelsaar doctor</code> says so. The classifier's 2 s timeout applies; a model that is not resident will usually time out on its first consultation and the deterministic label stands.</li>
+  </ul>
+  <p>Full contract: <a href="/docs/routing/">Routing → Decisions</a> (<code>docs/routing.md</code>) and <a href="/docs/extending/">Extending → Optional classifier</a>.</p>
+</section>
+
+<section aria-labelledby="install-title">
+  <h2 id="install-title">Try it from GitHub (pinned to one exact commit)</h2>
+  <p>The preview uses the ordinary development install at commit <code>6075cdcf3b09</code>, in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. The one-line installer still pins <code>cf56cdd3416d</code>, which does <em>not</em> contain these features; do not point it at the preview commit, because it would replace your stable installation.</p>
+  <div class="cmd cmd-scroll"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre tabindex="0"><code class="language-bash">git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview &amp;&amp; cd modelsaar-preview
+git checkout 6075cdcf3b0952d4213a7899438f5fe546e95d19
+python3 -m venv .venv &amp;&amp; . .venv/bin/activate &amp;&amp; pip install -e .     # or: uv venv &amp;&amp; . .venv/bin/activate &amp;&amp; uv pip install -e .
+export MODELSAAR_HOME=~/.modelsaar-preview                           # separate config, keys and state: your normal install is untouched
+modelsaar init --port 8485                                            # or: --endpoint http://host:11434 --type ollama
+modelsaar discover                                                    # a decision model shows role &quot;decision&quot;
+modelsaar serve</code></pre></div>
+  <p>First decision request (the same body the live smoke test used; the API key is the first line of the preview home's <code>keys/api_keys</code>):</p>
+  <div class="cmd cmd-scroll"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre tabindex="0"><code class="language-bash">curl -s http://127.0.0.1:8485/v1/decisions \
+  -H &quot;Authorization: Bearer $(head -1 ~/.modelsaar-preview/keys/api_keys)&quot; -H &#x27;Content-Type: application/json&#x27; \
+  -d &#x27;{&quot;model&quot;: &quot;auto&quot;, &quot;state&quot;: &quot;Our checkout has returned 500 errors since 9am.&quot;,
+       &quot;questions&quot;: {&quot;label&quot;: {&quot;type&quot;: &quot;choice&quot;, &quot;instructions&quot;: &quot;Which label fits this ticket?&quot;,
+                                &quot;criteria&quot;: {&quot;bug&quot;: &quot;Software errors&quot;, &quot;billing&quot;: &quot;Payments and refunds&quot;, &quot;account&quot;: &quot;Login and account access&quot;}},
+                      &quot;urgent&quot;: {&quot;type&quot;: &quot;noul&quot;, &quot;instructions&quot;: &quot;Is the ticket urgent?&quot;}}}&#x27;</code></pre></div>
+  <p>Expected shape: <code>{"model": "auto", "answers": {"label": {"type": "choice", "choice": …, "probabilities": {…}, "confidence": …}, "urgent": {"type": "noul", "noul": …}}, "usage": {…}}</code>, with headers <code>X-ModelSaar-Request-Id</code> and <code>X-ModelSaar-Deployment</code>; <code>modelsaar decisions</code> shows the record with <code>endpoint: decisions</code>.</p>
+  <p>To try the classifier in decision mode, add this to <code>~/.modelsaar-preview/config.yaml</code>, run <code>modelsaar doctor</code> (it checks the role/mode pairing) and restart <code>modelsaar serve</code>; then send an ambiguous chat request such as <code>thoughts?</code> to <code>auto</code> and look at <code>classifier</code> in its decision record:</p>
+  <div class="cmd cmd-scroll"><div class="cmd-bar"><span class="cmd-label">yaml</span></div><pre tabindex="0"><code class="language-yaml">routing:
+  classifier:
+    enabled: true
+    mode: decision
+    backend: ollama
+    model: nimble            # a deployment with role decision (modelsaar discover)
+    only_when_ambiguous: true
+    timeout_s: 2.0</code></pre></div>
+  <p>To remove the preview: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written.</p>
+</section>
+
+<section aria-labelledby="smoke-title">
+  <h2 id="smoke-title">Live smoke test — 2026-10-28, completed</h2>
+  <p>isolated preview checkout + home on the owner's MacBook Air (in-process gateway on 127.0.0.1:50826); backend the GX10's Ollama over Tailscale; production modelsaar.service, ~/.modelsaar, the Stage A home and the Pass 1 checkout untouched. Ollama 0.40.5; decision models discovered: ollama/nimble-v3:latest, ollama/d1:latest; the configured one, <code>nimble-v3</code> (9.0B, Q8_0, capabilities ['decision']). Exactly three requests were made; every number below is read from the recorded result at build time.</p>
+  <div class="table-wrap" tabindex="0"><table>
+    <thead><tr><th>#</th><th>request</th><th>HTTP</th><th>time</th><th>deployment</th><th>result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>POST /v1/decisions</code>, <code>model: ollama/nimble-v3:latest</code> — includes the model&#x27;s first load</td><td>200</td><td>13 s</td><td><code>ollama/nimble-v3:latest</code></td><td><code>label</code> → <strong>billing</strong> (bug 0.246, billing 0.753, account 0.001), confidence 0.63; <code>urgent</code> noul 0.933</td></tr><tr><td>2</td><td><code>POST /v1/decisions</code>, <code>model: auto</code></td><td>200</td><td>3 s</td><td><code>ollama/d1:latest</code></td><td><code>label</code> → <strong>bug</strong> (bug 0.715, billing 0.267, account 0.018), confidence 0.573; <code>urgent</code> noul 0.927</td></tr><tr><td>3</td><td><code>POST /v1/chat/completions</code>, <code>model: auto</code> — ambiguous prompt; routing.classifier.mode: decision with nimble-v3</td><td>200</td><td>9 s</td><td><code>ollama/qwen3.8:latest</code></td><td>classifier used, status <code>ok</code>: task <code>conversation</code>, probability 0.997, 255.3 ms; then routed to the chat model shown</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>What it establishes:</strong> the wire contract works end to end against a real decision model on this one machine — authentication, discovery of decision-role models, explicit and <code>auto</code> selection, schema-valid answers, and the classifier in decision mode consulting the model and refining an ambiguous label. <strong>What it does not establish:</strong> answer quality, latency distributions, the classifier decision rule (one consultation), behaviour under load; this is a wire-contract and routing smoke test with three requests.</p>
+  <ul>
+    <li>nimble-v3 answered &#x27;billing&#x27; (0.753) for a checkout-500 ticket where a human would likely say &#x27;bug&#x27;; d1 answered &#x27;bug&#x27; (0.715). The smoke test validates the wire contract and routing, not answer quality.</li><li>`auto` chose ollama/d1:latest (2.7B, decision+vision) although nimble-v3 had just been loaded by request 1: at decision time neither model was observed resident (residency is refreshed on an interval), so the documented tie-break &#x27;by id&#x27; applied (d1 &lt; nimble-v3). Documented behaviour; an explicit model id is the way to pick a specific decision model.</li><li>the classifier&#x27;s single consultation took 255 ms end to end (nimble-v3 resident), above the 250 ms median bound of the classifier decision rule; one request establishes nothing about that rule.</li>
+  </ul>
+  <p>Record: <a href="https://github.com/gopalasubramanium/modelsaar/tree/8da1acb49a0b2d74873f311dde9656a3a5fd5c34/docs/live-runs/2026-10-28-decision-preview-smoke"><code>docs/live-runs/2026-10-28-decision-preview-smoke/</code></a> (summary, responses, headers, decision records, discovery, launcher console; no prompts beyond the two synthetic inputs, no keys).</p>
+</section>
+
+<section aria-labelledby="not-title">
+  <h2 id="not-title">What this preview is not</h2>
+  <ul>
+    <li>Not a release: no tag, no package, no container image; the default installer pin is unchanged and still predates these features.</li>
+    <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="/benchmarks/">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above.</li>
+    <li>Not stable: the wire contract follows Ollama's documented System One API and may change with it; feedback via <a href="https://github.com/gopalasubramanium/modelsaar/issues">issues</a>.</li>
+  </ul>
+</section>
+
+</main>
+<footer class="foot">
+  <div class="foot-grid">
+    <div>
+      <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
+      <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/8da1acb49a0b2d74873f311dde9656a3a5fd5c34">8da1acb49a0b</a> on 2026-10-27. Development preview; no release has been tagged.</p>
+    </div>
+    <ul class="foot-links">
+      <li><a href="/get-started/">Get started</a></li>
+      <li><a href="/docs/">Documentation</a></li>
+      <li><a href="/benchmarks/">Benchmarks and evidence</a></li>
+      <li><a href="/privacy/">Privacy</a></li>
+      <li><a href="https://github.com/gopalasubramanium/modelsaar/issues">Report a problem</a></li>
+      <li><a href="/llms.txt">llms.txt</a></li>
+    </ul>
+  </div>
+</footer>
+<script src="/assets/site.js?v=8da1acb4" defer></script>
+</body>
+</html>

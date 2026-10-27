@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=d955e965">
+<link rel="stylesheet" href="/assets/site.css?v=8da1acb4">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Routing: requirements, eligibility, ranking", "description": "How ModelSaar analyses a request, which hard filters apply, how candidates are ranked and how embeddings, memory budgets and failover behave.", "url": "https://modelsaar.com/docs/routing/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Routing: requirements, eligibility, ranking", "item": "https://modelsaar.com/docs/routing/"}]}</script>
 </head>
 <body>
@@ -49,11 +49,11 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Routing: requirements, eligibility, ranking</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Routing: requirements, eligibility, ranking</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/d955e965d278dba343e2d4e55cc2089466abdff7/docs/routing.md"><code>docs/routing.md</code></a> at commit <code>d955e965d278</code>. The repository file is authoritative.</p></header><h2 id="a-requirements">A. Requirements</h2>
+<article class="doc"><header class="doc-head"><h1>Routing: requirements, eligibility, ranking</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/8da1acb49a0b2d74873f311dde9656a3a5fd5c34/docs/routing.md"><code>docs/routing.md</code></a> at commit <code>8da1acb49a0b</code>. The repository file is authoritative.</p></header><h2 id="a-requirements">A. Requirements</h2>
 <p><code>routing/requirements.py</code> reads the whole request structurally (never the model's output, never
 instructions inside prompts):</p>
 <ul>
-<li>role needed (<code>generative</code> for chat, <code>embedding</code> for <code>/v1/embeddings</code>)</li>
+<li>role needed (<code>generative</code> for chat, <code>embedding</code> for <code>/v1/embeddings</code>, <code>decision</code> for <code>/v1/decisions</code>)</li>
 <li><code>tools</code> present and <code>tool_choice</code> mode (<code>auto</code> / <code>none</code> / <code>required</code> / <code>named</code>), <code>parallel_tool_calls</code></li>
 <li><code>response_format</code> → strict <code>json_schema</code> or <code>json_object</code></li>
 <li><code>stream</code></li>
@@ -86,8 +86,14 @@ the remedy "run <code>modelsaar probe &lt;id&gt;</code> or declare it under <cod
 is ambiguous. Contract:</p>
 <ul>
 <li>input: structural facts + a truncated excerpt of the last user text (<code>max_input_chars</code>)</li>
-<li>output: <code>{"task": &lt;one of the closed label set&gt;, "confidence": 0..1}</code> via <code>response_format</code>
-  (<code>json_schema</code> if the deployment supports it, else <code>json_object</code>), <code>temperature 0</code>, <code>max_tokens 64</code></li>
+<li>output, <code>mode: chat</code> (default): <code>{"task": &lt;one of the closed label set&gt;, "confidence": 0..1}</code> via
+  <code>response_format</code> (<code>json_schema</code> if the deployment supports it, else <code>json_object</code>), <code>temperature 0</code>,
+  <code>max_tokens 64</code></li>
+<li>output, <code>mode: decision</code>: the deployment must be a decision model (<code>role=decision</code>, e.g. Ollama's
+  <code>nimble</code>, <code>clef</code>, <code>laya</code>, discovered from the <code>decision</code> capability); the gateway asks its native
+  decision endpoint (Ollama <code>POST /v1/systemone</code>) one <code>choice</code> question whose criteria are the closed
+  label set and takes the answer's arg-max label with that label's probability as the confidence —
+  no free text is generated or parsed</li>
 <li><code>timeout_s</code>; any timeout, error, or out-of-contract answer → deterministic result stands</li>
 <li>it calls its configured deployment directly (never <code>auto</code>), cannot invent endpoints, change
   requirements/capabilities or policy, and its memory/latency is visible in <code>/admin/status</code></li>
@@ -184,6 +190,58 @@ measurements, <code>auto</code> prefers the cheaper of effectively-tied models. 
 <code>X-ModelSaar-Request-Id</code>, <code>X-ModelSaar-Deployment</code>, <code>X-ModelSaar-Profile</code>; the <code>model</code> field keeps
 the requested alias by default (<code>server.response_model_field: deployment</code> to change). Routing
 commentary is never injected into assistant content.</p>
+<h2 id="decisions-post-v1decisions">Decisions (<code>POST /v1/decisions</code>)</h2>
+<p>Typed questions about a <em>state</em>, answered by a <strong>decision model</strong> (<code>role: decision</code> — an Ollama model
+whose capabilities list <code>decision</code>: nimble, clef, laya, …) through its native endpoint (Ollama
+<code>POST /v1/systemone</code>, Ollama ≥ 0.35.0). The gateway adds authentication, model resolution, admission,
+the locality policy and a decision record; the body and the answer are Ollama's documented System One
+contract:</p>
+<pre tabindex="0"><code class="language-json">{&quot;model&quot;: &quot;auto&quot;,
+ &quot;state&quot;: &quot;Our checkout has returned 500 errors since 9am.&quot;,
+ &quot;questions&quot;: {
+   &quot;label&quot;:   {&quot;type&quot;: &quot;choice&quot;, &quot;instructions&quot;: &quot;Which label fits this ticket?&quot;,
+               &quot;criteria&quot;: {&quot;bug&quot;: &quot;Software errors&quot;, &quot;billing&quot;: &quot;Payments and refunds&quot;, &quot;account&quot;: null}},
+   &quot;angry&quot;:   {&quot;type&quot;: &quot;noul&quot;,  &quot;instructions&quot;: &quot;Is the customer angry?&quot;},
+   &quot;urgency&quot;: {&quot;type&quot;: &quot;score&quot;, &quot;instructions&quot;: &quot;How urgent is it?&quot;, &quot;criteria&quot;: [&quot;not urgent&quot;, &quot;soon&quot;, &quot;today&quot;, &quot;now&quot;]}}}
+</code></pre>
+<ul>
+<li><code>model</code>: a discovered decision deployment id (<code>ollama/nimble-v3:latest</code>, or a bare model name when
+  unambiguous) or <code>auto</code> — every decision-role deployment that passes the hard filters (enabled,
+  healthy, <code>security.locality_mode</code>, memory feasibility, vision when <code>images</code> are sent), resident ones
+  first, then by id. Chat aliases are not accepted. No quality scoring applies: decision models are not
+  measured by the evaluation harness, so the choice is deterministic and fully explained in the record.</li>
+<li><code>state</code>: a non-empty string, or an object/array (serialised as JSON for the model); never chat messages.</li>
+<li><code>questions</code>: 1–64 named questions (<code>[A-Za-z0-9_.-]{1,100}</code>): <code>choice</code> with 2–255 option keys (descriptions
+  or <code>null</code>), <code>noul</code> (yes/no; optional <code>criteria: {"true": …, "false": …}</code>), <code>score</code> with 2–10 ordered
+  level descriptions. <code>instructions</code> is required and takes the same string/object/array forms as <code>state</code>.</li>
+<li><code>images</code> (optional): base64 strings shared by all questions — raw base64 only, no URLs or data URLs;
+  routes only to decision models with verified <code>vision</code>.</li>
+<li>Refused with <code>400 invalid_request_error</code> (the <code>param</code> names the field): any other field (including
+  <code>keep_alive</code> and <code>stream</code> — lifecycle is the gateway's, and the endpoint never streams), empty or
+  whitespace state, more than 64 KiB of state + questions, malformed questions or images.</li>
+<li>Size limits, in order: the gateway reads at most <code>server.max_request_bytes</code> (default 32 MiB) of the
+  client's body — a declared <code>Content-Length</code> above it is refused with <code>413</code> before any byte is read,
+  and a streamed/chunked body is cut off with <code>413</code> as soon as it passes the limit, so no request is
+  ever buffered beyond that bound; then state + questions must fit 64 KiB (<code>400</code>); then the request as
+  the backend will receive it (JSON including base64 images) must fit the documented 32 MiB
+  whole-request limit of Ollama's local System One endpoint (<code>413</code>, <code>param</code> <code>images</code>), checked before
+  dispatch so an oversized image set never reaches the backend.</li>
+<li>Only <code>model</code>, <code>state</code>, <code>questions</code> and <code>images</code> reach the backend.</li>
+</ul>
+<p>Response (<code>200</code>): <code>{"model": &lt;requested or deployment, per server.response_model_field&gt;, "answers":
+{&lt;name&gt;: &lt;answer&gt;}, "usage": {"input_tokens", "output_tokens"}}</code> with the documented answer shapes —
+<code>choice</code> → <code>{type, choice, probabilities, confidence}</code>, <code>noul</code> → <code>{type, noul}</code>, <code>score</code> → <code>{type, score,
+legend, probabilities, confidence}</code>. Every answer is validated against its question before it is returned
+(matching type, exactly the question's options/levels, finite probabilities and confidence in [0, 1], the
+choice as arg-max); a backend answer that violates this is <code>502 decision_contract_violation</code>, never passed
+on. Other outcomes follow the gateway's conventions: <code>401</code> missing key; <code>404 model_not_found</code>; <code>422
+no_eligible_deployment</code> with per-deployment blockers (role mismatch for a chat model, locality, vision,
+no decision model discovered); <code>503 admission_rejected</code>; <code>501 unsupported_backend</code> for a backend without a
+decision endpoint (<code>openai_compatible</code>); upstream errors keep the backend's status with
+<code>upstream_error</code> and its message; <code>504 upstream_timeout</code> (the slot is held as uncertain, as for chat).
+Headers: <code>X-ModelSaar-Request-Id</code>, <code>X-ModelSaar-Deployment</code>; the record is under <code>/admin/decisions</code>
+with <code>endpoint: "decisions"</code>. The endpoint changes nothing for chat routing: decision-role deployments
+are never chat candidates, and <code>/v1/decisions</code> never consults the router's scoring or the classifier.</p>
 <h2 id="embeddings">Embeddings</h2>
 <p><code>/v1/embeddings</code> routes an alias defined under <code>embeddings:</code> to the contract's deployments only.
 Members must be <strong>one verified identity</strong>: the Ollama digest, or <code>backends[].models[].identity</code> for
@@ -251,7 +309,7 @@ not a completion is <code>502 upstream_bad_response</code>.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/d955e965d278dba343e2d4e55cc2089466abdff7">d955e965d278</a> on 2026-10-25. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/8da1acb49a0b2d74873f311dde9656a3a5fd5c34">8da1acb49a0b</a> on 2026-10-27. Development preview; no release has been tagged.</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -263,6 +321,6 @@ not a completion is <code>502 upstream_bad_response</code>.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=d955e965" defer></script>
+<script src="/assets/site.js?v=8da1acb4" defer></script>
 </body>
 </html>
