@@ -81,7 +81,7 @@ class _Counts(dict):
     __getattr__ = dict.__getitem__
 
 
-TEST_COUNTS = _Counts(total=248, reviewer=29, sandbox=6)  # pytest --collect-only -m 'not live' at the built revision (decision-model classifier tests added 2026-10-25)
+TEST_COUNTS = _Counts(total=285, reviewer=29, sandbox=6)  # pytest --collect-only -m 'not live' at the built revision (/v1/decisions endpoint + request-size tests, 2026-10-28)
 
 
 # ---- support matrix: one row per claim, with the kind of evidence behind it ------------------------

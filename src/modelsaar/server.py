@@ -27,6 +27,7 @@ from starlette.routing import Route
 from . import __version__
 from .adapters.base import AdapterError, UpstreamResponse, UpstreamStream
 from .config import Config
+from .protocol.decisions import decision_answers_problem, parse_decisions_request
 from .protocol.openai import (
     ProtocolError,
     error_body,
@@ -83,12 +84,21 @@ def _no_eligible_response(dec: Decision) -> JSONResponse:
 
 
 async def _read_json(request: Request, limit: int) -> dict[str, Any]:
+    """Read a JSON object body of at most ``limit`` bytes (``server.max_request_bytes``). A declared
+    ``Content-Length`` above the limit is refused before any byte is read; a streamed/chunked body is
+    read incrementally and refused as soon as the limit is exceeded, so the gateway never buffers more
+    than ``limit`` bytes of one request."""
     cl = request.headers.get("content-length")
     if cl and cl.isdigit() and int(cl) > limit:
         raise ProtocolError("request body too large", status=413)
-    raw = await request.body()
-    if len(raw) > limit:
-        raise ProtocolError("request body too large", status=413)
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > limit:
+            raise ProtocolError("request body too large", status=413)
+        chunks.append(chunk)
+    raw = b"".join(chunks)
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as e:
@@ -527,6 +537,97 @@ async def embeddings(request: Request) -> Response:
     return _json(200, out, headers)
 
 
+# --------------------------------------------------------------------------- #
+# Decisions (decision models: Ollama System One)
+# --------------------------------------------------------------------------- #
+async def decisions(request: Request) -> Response:
+    """``POST /v1/decisions``: typed questions about a state, answered by a decision model with
+    per-option probabilities (no generated text). Contract: ``protocol/decisions.py``."""
+    state: GatewayState = request.app.state.gw
+    router = state.router
+    state.requests_total += 1
+    try:
+        caller = _require_caller(state, request)
+        body = await _read_json(request, state.cfg.server.max_request_bytes)
+        req = parse_decisions_request(body)
+    except ProtocolError as e:
+        state.requests_failed += 1
+        return _json(e.status, e.body())
+    try:
+        dec = await router.route_decisions(body, caller, needs_vision=bool(req.images))
+    except NoEligibleDeployment as e:
+        state.requests_failed += 1
+        return _no_eligible_response(e.decision)
+    dep = router.registry.get(dec.chosen)  # type: ignore[arg-type]
+    adapter = router.adapters[dep.backend_id]
+    headers = {"X-ModelSaar-Request-Id": dec.request_id, "X-ModelSaar-Deployment": dep.id}
+    try:
+        reservation = await router.admission.acquire(dep)
+    except AdmissionRejected as e:
+        dec.outcome = "admission_rejected"
+        router.record(dec)
+        return _json(e.status, error_body(e.message, code="admission_rejected"), headers)
+    try:
+        # Same deadline rule as chat and embeddings: the server request timeout or the backend timeout, whichever is tighter.
+        resp = await adapter.decide(dep, req.state, req.upstream_questions(), timeout=state.cfg.server.request_timeout_s, images=req.images)
+    except AdapterError as e:
+        if e.kind == "timeout":
+            await reservation.mark_uncertain()  # the backend may still be scoring: hold the slot as uncertain
+        else:
+            await reservation.release(submitted=e.kind not in ("connect", "unsupported"))
+        state.requests_failed += 1
+        code = "upstream_timeout" if e.kind == "timeout" else "unsupported_backend" if e.kind == "unsupported" else "upstream_error"
+        dec.outcome = code
+        dec.outcome_detail = redact(e.message)[:200]
+        router.record(dec)
+        return _json(e.status, error_body(redact(e.message), code=code, modelsaar={"request_id": dec.request_id, "deployment": dep.id}), headers)
+    except Exception as e:  # noqa: BLE001 - every failure path must account for the slot
+        await reservation.release()
+        state.requests_failed += 1
+        dec.outcome = "internal_error"
+        dec.outcome_detail = redact(f"{e.__class__.__name__}: {e}")[:200]
+        router.record(dec)
+        log.exception("unexpected error in decisions dispatch to %s", dep.id)
+        return _json(500, error_body("internal gateway error", code="internal_error", modelsaar={"request_id": dec.request_id}), headers)
+    await reservation.release()
+    if resp.status != 200:
+        state.requests_failed += 1
+        err = resp.body.get("error") if isinstance(resp.body, dict) else None
+        message = err if isinstance(err, str) else (err.get("message", "") if isinstance(err, dict) else "") or f"upstream HTTP {resp.status}"
+        dec.outcome = "upstream_error"
+        dec.outcome_detail = redact(str(message))[:200]
+        router.record(dec)
+        return _json(
+            resp.status if 400 <= resp.status < 600 else 502,
+            error_body(f"decision model backend: {redact(str(message))}", code="upstream_error", modelsaar={"request_id": dec.request_id, "deployment": dep.id}),
+            headers,
+        )
+    violation = decision_answers_problem(req, resp.body)
+    if violation:
+        state.requests_failed += 1
+        dec.outcome = "decision_contract_violation"
+        dec.outcome_detail = violation
+        router.record(dec)
+        return _json(
+            502,
+            error_body(
+                f"backend answer violates the decision contract: {violation}",
+                code="decision_contract_violation",
+                modelsaar={"request_id": dec.request_id, "deployment": dep.id},
+            ),
+            headers,
+        )
+    out = {
+        "model": dec.requested_model if state.cfg.server.response_model_field == "requested" else dep.id,
+        "answers": resp.body["answers"],
+        "usage": resp.body.get("usage") or {},
+    }
+    dec.outcome = "ok"
+    dec.outcome_detail = f"{int(resp.elapsed_ms)}ms"
+    router.record(dec)
+    return _json(200, out, headers)
+
+
 def _embedding_input_count(inp: Any) -> int:
     if isinstance(inp, str):
         return 1
@@ -770,6 +871,7 @@ def build_app(cfg: Config, router: Router, auth: Auth, store: Store | None) -> S
         routes=[
             Route("/v1/chat/completions", chat_completions, methods=["POST"]),
             Route("/v1/embeddings", embeddings, methods=["POST"]),
+            Route("/v1/decisions", decisions, methods=["POST"]),
             Route("/v1/models", list_models, methods=["GET"]),
             Route("/v1/responses", unsupported_protocol, methods=["POST"]),
             Route("/v1/messages", unsupported_protocol, methods=["POST"]),

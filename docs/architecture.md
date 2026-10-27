@@ -5,7 +5,7 @@ One process, one versioned YAML config, a CLI, optional SQLite state. No externa
 ```
                  ┌────────────────────────────────────────────────────────────────────┐
   clients        │ modelsaar.server (Starlette)                                       │
-  Open WebUI     │  /v1/models  /v1/chat/completions  /v1/embeddings  /healthz /readyz│
+  Open WebUI     │  /v1/models /v1/chat/completions /v1/embeddings /v1/decisions /healthz│
   OpenClaw  ───▶ │  /admin/{status,decisions,explain,refresh,ui}   (admin key)        │
   OpenCode       │        │ auth (security.py)   commitment rules   SSE relay (sse.py)│
   Hermes         └────────┼───────────────────────────────────────────────────────────┘
@@ -22,7 +22,7 @@ One process, one versioned YAML config, a CLI, optional SQLite state. No externa
                          ▼                               ▼
                  ┌─ adapters/ ───────────────────────────────────────────────┐
                  │ ollama.py: /api/tags /api/show /api/ps /api/version       │
-                 │            + /v1/chat/completions, /v1/embeddings         │
+                 │            + /v1/chat/completions, /v1/embeddings, /v1/systemone │
                  │ openai_compat.py: /models /chat/completions /embeddings   │
                  │                   /tokenize (vLLM)                        │
                  │ register_adapter() plugin hook                            │
