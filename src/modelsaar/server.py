@@ -84,12 +84,21 @@ def _no_eligible_response(dec: Decision) -> JSONResponse:
 
 
 async def _read_json(request: Request, limit: int) -> dict[str, Any]:
+    """Read a JSON object body of at most ``limit`` bytes (``server.max_request_bytes``). A declared
+    ``Content-Length`` above the limit is refused before any byte is read; a streamed/chunked body is
+    read incrementally and refused as soon as the limit is exceeded, so the gateway never buffers more
+    than ``limit`` bytes of one request."""
     cl = request.headers.get("content-length")
     if cl and cl.isdigit() and int(cl) > limit:
         raise ProtocolError("request body too large", status=413)
-    raw = await request.body()
-    if len(raw) > limit:
-        raise ProtocolError("request body too large", status=413)
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > limit:
+            raise ProtocolError("request body too large", status=413)
+        chunks.append(chunk)
+    raw = b"".join(chunks)
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as e:

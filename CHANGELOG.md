@@ -22,6 +22,12 @@
   validation, role mismatch, unknown model/alias, images on a text-only model, no decision model
   discovered, unsupported backend, upstream 500/timeout, two malformed-answer shapes, chat unchanged).
   Site test count 248 → 281 (`site/check_site.py` consistency; site not published).
+* **Request-size limits:** `_read_json` (all JSON routes) now reads the body incrementally and refuses it
+  with `413` as soon as `server.max_request_bytes` is exceeded — a declared `Content-Length` above the
+  limit is refused before reading, a chunked body is cut off at the limit — instead of buffering the whole
+  body first; `/v1/decisions` additionally checks the re-serialised upstream request (JSON incl. base64
+  images) against Ollama's documented 32 MiB whole-request limit before dispatch (`413`). Tests cover the
+  declared, chunked, within-limit and upstream-limit cases on this route.
 * Not done: any live call against a real decision model (fixture-tested only).
 
 ## Unreleased — routing: decision-model classifier (Ollama `/v1/systemone`), 2026-10-25

@@ -282,3 +282,93 @@ def test_chat_routing_is_unchanged_by_the_endpoint(fake, g):
     dec = g.decision(r.headers["x-modelsaar-request-id"])
     assert dec["endpoint"] == "chat" and not dec["chosen"].startswith(("ollama/decider", "ollama/seer"))
     assert not systemone_calls(fake)
+
+
+# --------------------------------------------------------------------------- #
+# Request-size limits: bounded body read (declared and chunked) + the backend's whole-request limit
+# --------------------------------------------------------------------------- #
+LIMIT = 64 * 1024  # a small server.max_request_bytes for these tests
+
+
+@pytest.fixture
+def small_limit_gateway(fake):
+    gw = build_gateway(f"http://127.0.0.1:{fake.port}", server=ServerConfig(request_timeout_s=1.5, max_request_bytes=LIMIT))
+    yield gw
+    gw.gw.stop()
+
+
+def _big_payload(total_bytes: int) -> bytes:
+    """A syntactically valid decisions body of about ``total_bytes`` (images are base64 of zero bytes)."""
+    import json as _json
+
+    skeleton = {"model": "ollama/decider:9b", "state": STATE, "questions": {"label": CHOICE}, "images": [""]}
+    overhead = len(_json.dumps(skeleton).encode())
+    n = max(total_bytes - overhead, 0) // 4 * 3  # base64 expands 3 -> 4
+    skeleton["images"] = [base64.b64encode(b"\x00" * n).decode()]
+    return _json.dumps(skeleton).encode()
+
+
+def test_declared_content_length_over_the_limit_is_refused_before_reading(fake, small_limit_gateway):
+    g = small_limit_gateway
+    body = _big_payload(LIMIT + 4096)
+    assert len(body) > LIMIT
+    r = g.client.post("/v1/decisions", content=body, headers={"content-type": "application/json"})
+    assert r.status_code == 413 and "too large" in r.json()["error"]["message"]
+    assert not systemone_calls(fake)
+    # the declared length alone is enough: the gateway answers 413 without waiting for the body (raw socket,
+    # because HTTP clients refuse to send a Content-Length they cannot honour)
+    import socket
+    from urllib.parse import urlsplit
+
+    u = urlsplit(g.url)
+    with socket.create_connection((u.hostname, u.port), timeout=5) as s:
+        s.sendall(
+            (
+                f"POST /v1/decisions HTTP/1.1\r\nHost: {u.hostname}\r\nAuthorization: Bearer {g.api_key}\r\n"
+                f"Content-Type: application/json\r\nContent-Length: {LIMIT + 1}\r\n\r\n{{"
+            ).encode()
+        )
+        head = s.recv(4096).decode(errors="replace")
+    assert head.startswith("HTTP/1.1 413"), head[:80]
+
+
+def test_chunked_body_over_the_limit_is_cut_off_at_the_limit(fake, small_limit_gateway):
+    g = small_limit_gateway
+    body = _big_payload(LIMIT * 4)
+    sent = {"bytes": 0}
+
+    def chunks():
+        for i in range(0, len(body), 8192):
+            sent["bytes"] += len(body[i : i + 8192])
+            yield body[i : i + 8192]
+
+    # a generator body is sent with Transfer-Encoding: chunked and no Content-Length
+    r = g.client.post("/v1/decisions", content=chunks(), headers={"content-type": "application/json"})
+    assert r.status_code == 413 and "too large" in r.json()["error"]["message"]
+    assert not systemone_calls(fake)
+    assert "content-length" not in {k.lower() for k in r.request.headers} and r.request.headers.get("transfer-encoding") == "chunked"
+
+
+def test_body_within_the_limit_is_served(fake, small_limit_gateway):
+    g = small_limit_gateway
+    # vision model so that the image is accepted; the image keeps the body just under the limit
+    body = _big_payload(LIMIT - 512).replace(b"ollama/decider:9b", b"ollama/seer:27b")
+    assert len(body) <= LIMIT
+    r = g.client.post("/v1/decisions", content=body, headers={"content-type": "application/json"})
+    assert r.status_code == 200, r.text
+    assert systemone_calls(fake)[-1]["model"] == "seer:27b"
+
+
+def test_upstream_whole_request_limit_is_checked_before_dispatch(fake, g, monkeypatch):
+    """The backend's documented whole-request limit (32 MiB locally) is checked on the re-serialised
+    upstream body before any call; lowered here so the test does not need a 32 MiB payload."""
+    import modelsaar.protocol.decisions as dmod
+
+    monkeypatch.setattr(dmod, "MAX_REQUEST_BYTES", 16 * 1024)
+    r = decide(g, model="ollama/seer:27b", images=[base64.b64encode(b"\x00" * 15 * 1024).decode()])
+    assert r.status_code == 413, r.text
+    err = r.json()["error"]
+    assert err["param"] == "images" and "exceed" in err["message"] and "MiB limit of the decision backend" in err["message"]
+    assert not systemone_calls(fake)
+    r = decide(g, model="ollama/seer:27b", images=[base64.b64encode(b"\x00" * 1024).decode()])
+    assert r.status_code == 200  # under the (lowered) limit: served

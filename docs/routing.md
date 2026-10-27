@@ -158,6 +158,13 @@ contract:
 * Refused with `400 invalid_request_error` (the `param` names the field): any other field (including
   `keep_alive` and `stream` — lifecycle is the gateway's, and the endpoint never streams), empty or
   whitespace state, more than 64 KiB of state + questions, malformed questions or images.
+* Size limits, in order: the gateway reads at most `server.max_request_bytes` (default 32 MiB) of the
+  client's body — a declared `Content-Length` above it is refused with `413` before any byte is read,
+  and a streamed/chunked body is cut off with `413` as soon as it passes the limit, so no request is
+  ever buffered beyond that bound; then state + questions must fit 64 KiB (`400`); then the request as
+  the backend will receive it (JSON including base64 images) must fit the documented 32 MiB
+  whole-request limit of Ollama's local System One endpoint (`413`, `param` `images`), checked before
+  dispatch so an oversized image set never reaches the backend.
 * Only `model`, `state`, `questions` and `images` reach the backend.
 
 Response (`200`): `{"model": <requested or deployment, per server.response_model_field>, "answers":

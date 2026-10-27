@@ -10,7 +10,11 @@ request  ``{"model": <deployment id | "auto">, "state": <non-empty string | obje
 response ``{"model": ..., "answers": {<name>: <answer>}, "usage": {"input_tokens": n, "output_tokens": n}}``
 
 Question limits are the documented ones (1..64 questions; ``choice`` 2..255 options; ``score`` 2..10
-levels; text and schema at most 64 KiB). ``keep_alive`` and any other field are refused: model lifecycle
+levels; text and schema at most 64 KiB; the whole request the backend receives — JSON including base64
+images — at most 32 MiB, checked before dispatch). Before any of that, the gateway reads at most
+``server.max_request_bytes`` (default 32 MiB) of the client's body — a larger declared ``Content-Length``
+is refused before reading and a streamed body is cut off at the limit — so no request is buffered beyond
+that bound. ``keep_alive`` and any other field are refused: model lifecycle
 is managed by the gateway, not per request. Answers are validated against the questions before they are
 returned (type match, options from the criteria, probabilities and confidence in [0, 1]); a backend answer
 that violates the contract is reported as ``decision_contract_violation`` instead of being passed on.
@@ -30,6 +34,7 @@ from .openai import ProtocolError
 
 MAX_QUESTIONS = 64
 MAX_TEXT_BYTES = 64 * 1024  # documented local limit for state + questions (excluding images)
+MAX_REQUEST_BYTES = 32 * 1024 * 1024  # documented local limit for the whole request Ollama receives (JSON incl. base64 images)
 _NAME_RE = re.compile(r"^[A-Za-z0-9_.-]{1,100}$")
 Instructions = str | dict[str, Any] | list[Any]
 
@@ -131,10 +136,21 @@ class DecisionsRequest(BaseModel):
     def upstream_questions(self) -> dict[str, Any]:
         return {k: q.model_dump(exclude_none=True) for k, q in self.questions.items()}
 
+    def upstream_bytes(self) -> int:
+        """Size of the JSON the backend will receive (model, state, questions, images), as the adapter
+        serialises it; checked against the documented 32 MiB whole-request limit before dispatch."""
+        body: dict[str, Any] = {"model": self.model, "state": self.state, "questions": self.upstream_questions()}
+        if self.images:
+            body["images"] = self.images
+        return len(json.dumps(body).encode("utf-8"))
+
 
 def parse_decisions_request(body: dict[str, Any]) -> DecisionsRequest:
+    """Validate the body. Field errors are ``400`` naming the field; a request whose upstream form would
+    exceed the documented whole-request limit is ``413`` (the gateway's own ``server.max_request_bytes``
+    bounds the bytes read from the client before this point)."""
     try:
-        return DecisionsRequest.model_validate(body)
+        req = DecisionsRequest.model_validate(body)
     except ValidationError as e:
         first = e.errors()[0]
         loc = ".".join(str(p) for p in first.get("loc", ()))
@@ -142,6 +158,15 @@ def parse_decisions_request(body: dict[str, Any]) -> DecisionsRequest:
         raise ProtocolError(
             f"invalid decisions request: {loc + ': ' if loc else ''}{msg}", param=loc.split(".")[0] if loc else None
         ) from e
+    size = req.upstream_bytes()
+    if size > MAX_REQUEST_BYTES:
+        raise ProtocolError(
+            f"decisions request too large: {size} bytes including base64 images and JSON overhead exceed the "
+            f"{MAX_REQUEST_BYTES // (1024 * 1024)} MiB limit of the decision backend",
+            status=413,
+            param="images" if req.images else "state",
+        )
+    return req
 
 
 # --------------------------------------------------------------------------- #
