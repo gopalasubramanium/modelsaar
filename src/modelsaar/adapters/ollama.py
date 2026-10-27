@@ -239,16 +239,27 @@ class OllamaAdapter(BaseAdapter):
         return await self._post_json("/v1/embeddings", fwd, timeout=timeout)
 
     async def decide(
-        self, dep: Deployment, state: str, questions: dict[str, Any], timeout: float | None = None
+        self,
+        dep: Deployment,
+        state: Any,
+        questions: dict[str, Any],
+        timeout: float | None = None,
+        images: list[str] | None = None,
     ) -> UpstreamResponse:
         """Ollama's System One endpoint (``POST /v1/systemone``, Ollama >= 0.35.0): ``state`` is the
-        text to judge (never chat messages), ``questions`` maps 1..64 names to typed questions
-        (``choice`` with 2..255 criteria, ``noul``, ``score``); the answer carries per-option
-        probabilities and a concentration ``confidence``. No streaming, tools or generation controls
-        exist on this endpoint, so nothing else is forwarded."""
-        if not isinstance(state, str) or not state.strip():
-            raise AdapterError(f"{self.cfg.id}: decision state must be a non-empty string", status=400, kind="internal")
+        text to judge (a non-empty string, or an object/array; never chat messages), ``questions`` maps
+        1..64 names to typed questions (``choice`` with 2..255 criteria, ``noul``, ``score``), ``images``
+        are base64 strings shared by all questions; the answer carries per-option probabilities and a
+        concentration ``confidence``. No streaming, tools or generation controls exist on this endpoint,
+        and model lifecycle (``keep_alive``) is not forwarded."""
+        if isinstance(state, str):
+            if not state.strip():
+                raise AdapterError(f"{self.cfg.id}: decision state must be a non-empty string", status=400, kind="internal")
+        elif not isinstance(state, (dict, list)):
+            raise AdapterError(f"{self.cfg.id}: decision state must be a string, object or array", status=400, kind="internal")
         if not isinstance(questions, dict) or not 1 <= len(questions) <= 64:
             raise AdapterError(f"{self.cfg.id}: decision requests take 1..64 questions", status=400, kind="internal")
-        body = {"model": dep.model, "state": state, "questions": questions}
+        body: dict[str, Any] = {"model": dep.model, "state": state, "questions": questions}
+        if images:
+            body["images"] = list(images)
         return await self._post_json("/v1/systemone", body, timeout=timeout)

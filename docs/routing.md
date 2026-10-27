@@ -5,7 +5,7 @@
 `routing/requirements.py` reads the whole request structurally (never the model's output, never
 instructions inside prompts):
 
-* role needed (`generative` for chat, `embedding` for `/v1/embeddings`)
+* role needed (`generative` for chat, `embedding` for `/v1/embeddings`, `decision` for `/v1/decisions`)
 * `tools` present and `tool_choice` mode (`auto` / `none` / `required` / `named`), `parallel_tool_calls`
 * `response_format` → strict `json_schema` or `json_object`
 * `stream`
@@ -125,6 +125,55 @@ Inspect with `modelsaar explain` (offline dry run), `modelsaar explain --live` (
 `X-ModelSaar-Request-Id`, `X-ModelSaar-Deployment`, `X-ModelSaar-Profile`; the `model` field keeps
 the requested alias by default (`server.response_model_field: deployment` to change). Routing
 commentary is never injected into assistant content.
+
+## Decisions (`POST /v1/decisions`)
+
+Typed questions about a *state*, answered by a **decision model** (`role: decision` — an Ollama model
+whose capabilities list `decision`: nimble, clef, laya, …) through its native endpoint (Ollama
+`POST /v1/systemone`, Ollama ≥ 0.35.0). The gateway adds authentication, model resolution, admission,
+the locality policy and a decision record; the body and the answer are Ollama's documented System One
+contract:
+
+```json
+{"model": "auto",
+ "state": "Our checkout has returned 500 errors since 9am.",
+ "questions": {
+   "label":   {"type": "choice", "instructions": "Which label fits this ticket?",
+               "criteria": {"bug": "Software errors", "billing": "Payments and refunds", "account": null}},
+   "angry":   {"type": "noul",  "instructions": "Is the customer angry?"},
+   "urgency": {"type": "score", "instructions": "How urgent is it?", "criteria": ["not urgent", "soon", "today", "now"]}}}
+```
+
+* `model`: a discovered decision deployment id (`ollama/nimble-v3:latest`, or a bare model name when
+  unambiguous) or `auto` — every decision-role deployment that passes the hard filters (enabled,
+  healthy, `security.locality_mode`, memory feasibility, vision when `images` are sent), resident ones
+  first, then by id. Chat aliases are not accepted. No quality scoring applies: decision models are not
+  measured by the evaluation harness, so the choice is deterministic and fully explained in the record.
+* `state`: a non-empty string, or an object/array (serialised as JSON for the model); never chat messages.
+* `questions`: 1–64 named questions (`[A-Za-z0-9_.-]{1,100}`): `choice` with 2–255 option keys (descriptions
+  or `null`), `noul` (yes/no; optional `criteria: {"true": …, "false": …}`), `score` with 2–10 ordered
+  level descriptions. `instructions` is required and takes the same string/object/array forms as `state`.
+* `images` (optional): base64 strings shared by all questions — raw base64 only, no URLs or data URLs;
+  routes only to decision models with verified `vision`.
+* Refused with `400 invalid_request_error` (the `param` names the field): any other field (including
+  `keep_alive` and `stream` — lifecycle is the gateway's, and the endpoint never streams), empty or
+  whitespace state, more than 64 KiB of state + questions, malformed questions or images.
+* Only `model`, `state`, `questions` and `images` reach the backend.
+
+Response (`200`): `{"model": <requested or deployment, per server.response_model_field>, "answers":
+{<name>: <answer>}, "usage": {"input_tokens", "output_tokens"}}` with the documented answer shapes —
+`choice` → `{type, choice, probabilities, confidence}`, `noul` → `{type, noul}`, `score` → `{type, score,
+legend, probabilities, confidence}`. Every answer is validated against its question before it is returned
+(matching type, exactly the question's options/levels, finite probabilities and confidence in [0, 1], the
+choice as arg-max); a backend answer that violates this is `502 decision_contract_violation`, never passed
+on. Other outcomes follow the gateway's conventions: `401` missing key; `404 model_not_found`; `422
+no_eligible_deployment` with per-deployment blockers (role mismatch for a chat model, locality, vision,
+no decision model discovered); `503 admission_rejected`; `501 unsupported_backend` for a backend without a
+decision endpoint (`openai_compatible`); upstream errors keep the backend's status with
+`upstream_error` and its message; `504 upstream_timeout` (the slot is held as uncertain, as for chat).
+Headers: `X-ModelSaar-Request-Id`, `X-ModelSaar-Deployment`; the record is under `/admin/decisions`
+with `endpoint: "decisions"`. The endpoint changes nothing for chat routing: decision-role deployments
+are never chat candidates, and `/v1/decisions` never consults the router's scoring or the classifier.
 
 ## Embeddings
 

@@ -132,6 +132,7 @@ against real models (owner's GX10 via Tailscale, 2026-10-11); **D** documented f
 | area | status |
 |---|---|
 | `GET /v1/models`, `POST /v1/chat/completions` (non-stream + SSE), `POST /v1/embeddings`, `/healthz`, `/readyz` | F |
+| `POST /v1/decisions` — typed questions answered by a decision model (Ollama `/v1/systemone`); contract in `docs/routing.md` | F (fixture), **NOT RUN** against a live decision model |
 | Ollama adapter: `/api/tags`, `/api/show`, `/api/ps`, `/api/version`, OpenAI-compat forwarding, cloud-alias detection | F + **L** (Ollama 0.32.13 on an ASUS GX10, 8 models, 2026-10-11) |
 | Generic OpenAI-compatible adapter (`/models`, `/chat/completions`, `/embeddings`, vLLM `/tokenize`) | F (fixture), **NOT RUN** against vLLM/llama.cpp |
 | Tool round trips, streaming tool deltas, strict schema routing, image routing | F |

@@ -1,5 +1,29 @@
 # Changelog
 
+## Unreleased — `POST /v1/decisions`: decision-model endpoint (Ollama `/v1/systemone`), 2026-10-27
+
+* **New endpoint `POST /v1/decisions`** (`protocol/decisions.py`, `Router.route_decisions`, `server.decisions`):
+  typed questions (`choice` 2–255 options, `noul`, `score` 2–10 levels; 1–64 per request; optional base64
+  `images`) about a `state` (string, object or array), answered by a decision-role deployment through
+  `OllamaAdapter.decide` → `POST /v1/systemone`. `model` is a decision deployment id or `auto` (every
+  decision-role deployment passing the hard filters — enabled, healthy, locality, memory feasibility,
+  vision when images are sent — resident first, then by id; no quality scoring, choice explained in the
+  record). Strict request validation names the offending field (`param`); `keep_alive`, `stream` and any
+  other field are refused; state + questions are capped at the documented 64 KiB. Answers are validated
+  against the questions (type, options/levels, finite probabilities and confidence in [0, 1], arg-max
+  choice) → `502 decision_contract_violation` on violation. Errors follow the gateway's conventions
+  (`401`, `404 model_not_found`, `422 no_eligible_deployment` with blockers, `503 admission_rejected`,
+  `501 unsupported_backend`, upstream status + `upstream_error`, `504 upstream_timeout` with the slot
+  held as uncertain). Decision records carry `endpoint: "decisions"`. Chat routing and defaults unchanged.
+* `BaseAdapter.decide`/`OllamaAdapter.decide` accept object/array `state` and `images` (base64) per the
+  documented contract; the fake backend refuses images on a non-vision decision model (400).
+* Tests: `tests/test_decisions_endpoint.py` (33: success for all question types, `auto` residency
+  preference, image routing, authentication, 16 invalid-request shapes, size/JSON limits, helper
+  validation, role mismatch, unknown model/alias, images on a text-only model, no decision model
+  discovered, unsupported backend, upstream 500/timeout, two malformed-answer shapes, chat unchanged).
+  Site test count 248 → 281 (`site/check_site.py` consistency; site not published).
+* Not done: any live call against a real decision model (fixture-tested only).
+
 ## Unreleased — routing: decision-model classifier (Ollama `/v1/systemone`), 2026-10-25
 
 * **`routing.classifier.mode: decision`** (opt-in; default `chat`, unchanged): the optional classifier can

@@ -427,6 +427,8 @@ class FakeBackend:
             return JSONResponse({"error": "state must be a non-empty string, object or array"}, status_code=400)
         if not isinstance(questions, dict) or not 1 <= len(questions) <= 64:
             return JSONResponse({"error": "questions must name 1 to 64 questions"}, status_code=400)
+        if body.get("images") and "vision" not in m.capabilities:
+            return JSONResponse({"error": f"model '{name}' does not support images"}, status_code=400)
         if m.behaviour == "bad_json":
             return Response("<html>proxy error</html>", status_code=200, media_type="text/html")
         answers: dict[str, Any] = {}

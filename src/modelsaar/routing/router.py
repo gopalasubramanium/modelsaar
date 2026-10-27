@@ -768,3 +768,71 @@ class Router:
         dec.overhead_ms = (time.monotonic() - t0) * 1000
         dec.outcome = "routed"
         return dec
+
+    # ------------------------------------------------------------------ #
+    async def route_decisions(self, body: dict[str, Any], caller_id: str, needs_vision: bool = False) -> Decision:
+        """Choose the decision model for ``POST /v1/decisions``: an explicit deployment id (or bare model
+        name) with ``role == "decision"``, or ``auto`` → every decision-role deployment that passes the
+        hard filters (enabled, healthy, locality policy, memory feasibility, vision when images are sent),
+        resident ones first, then by id. No quality scoring applies: decision models are not measured by
+        the evaluation harness, so the choice is deterministic and fully explained in the record."""
+        t0 = time.monotonic()
+        dec = Decision(config_hash=self.cfg.config_hash, registry_version=self.registry.version, endpoint="decisions")
+        dec.requested_model = str(body.get("model", ""))
+        req = Requirements(role="decision", needs_vision=needs_vision)
+        nq = len(body.get("questions") or {}) if isinstance(body.get("questions"), dict) else 0
+        req.signals.append(f"decisions:{nq} question(s){' + images' if needs_vision else ''}")
+        candidates: list[Deployment]
+        if dec.requested_model == "auto":
+            candidates = [d for d in self.registry.all() if d.role == "decision"]
+            if not candidates:
+                dec.outcome = "no_eligible"
+                dec.reasons.append("no decision-model deployment is discovered (a model whose capabilities list 'decision')")
+                dec.remedies.append("pull a decision model (e.g. Ollama nimble, clef or laya) and refresh discovery")
+                dec.requirements = req.as_dict()
+                dec.overhead_ms = (time.monotonic() - t0) * 1000
+                self._record(dec)
+                raise NoEligibleDeployment(dec)
+        else:
+            alias_name, explicit = self.resolve_model(dec.requested_model)
+            if explicit is None:
+                dec.outcome = "unknown_model"
+                dec.reasons.append(
+                    f"model {dec.requested_model!r} is not a known deployment"
+                    + (" (chat aliases are not valid here; use 'auto' or a decision deployment id)" if alias_name else "")
+                )
+                dec.remedies.append("use 'auto' or the id of a discovered decision-model deployment (role decision)")
+                dec.requirements = req.as_dict()
+                dec.overhead_ms = (time.monotonic() - t0) * 1000
+                raise NoEligibleDeployment(dec)
+            candidates = [explicit]
+            dec.explicit = True
+        res = filter_deployments(candidates, req, self.cfg.security, feasibility=self.admission.feasibility)
+        if needs_vision:
+            keep = []
+            for d in res.eligible:
+                if d.cap("vision") == "supported":
+                    keep.append(d)
+                else:
+                    dec.exclusions[d.id] = [f"request carries images; capability vision is {d.cap('vision')} for this decision model"]
+            res.eligible = keep
+        dec.exclusions.update(res.blockers_summary())
+        dec.remedies.extend(sorted({r for e in res.exclusions for r in e.remedies}))
+        dec.requirements = req.as_dict()
+        if not res.eligible:
+            dec.outcome = "no_eligible"
+            dec.reasons.append("no decision-model deployment satisfies all hard requirements")
+            dec.overhead_ms = (time.monotonic() - t0) * 1000
+            self._record(dec)
+            raise NoEligibleDeployment(dec)
+        res.eligible.sort(key=lambda d: (not d.loaded, d.id))
+        chosen = res.eligible[0]
+        dec.chosen = chosen.id
+        dec.evidence = "explicit" if dec.explicit else "deterministic"
+        dec.reasons.append(
+            f"decision model {'requested explicitly' if dec.explicit else 'selected among ' + str(len(res.eligible)) + ' eligible decision deployment(s)'}; "
+            f"{chosen.id} ({'resident' if chosen.loaded else 'not resident'})"
+        )
+        dec.overhead_ms = (time.monotonic() - t0) * 1000
+        dec.outcome = "routed"
+        return dec
