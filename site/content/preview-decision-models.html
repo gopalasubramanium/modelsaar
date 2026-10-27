@@ -1,0 +1,65 @@
+<section aria-labelledby="pv-title">
+  <h1 id="pv-title">Preview: decision models</h1>
+  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. You can try them today from GitHub at one exact commit. <strong>This is a preview for testing, not a stable release: the default installer and the stable installation path are unchanged.</strong></p>
+  <div class="callout"><p><strong>Status:</strong> both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>{{ 'succeeded' if facts.decision_preview()['status'] == 'completed' else 'was not completed' }}</strong> on {{ facts.decision_preview()['date'] }} (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
+</section>
+
+<section aria-labelledby="what-title">
+  <h2 id="what-title">What the two features do</h2>
+  <h3><code>POST /v1/decisions</code></h3>
+  <p>Ask a decision model typed questions about a <em>state</em> (a string, or any JSON object/array) and get back per-option probabilities. The request and answer are Ollama's documented System One contract (<code>POST /v1/systemone</code>, Ollama ≥ 0.35.0), carried through the gateway's usual API-key authentication, model resolution, admission, locality policy and decision record:</p>
+  <ul>
+    <li><code>model</code>: a decision-capable deployment id (for example <code>ollama/nimble:latest</code>) or <code>auto</code> — every decision-role deployment that passes the hard filters, resident ones first, then by id. No quality scoring: decision models are not measured by the evaluation harness, so the choice is deterministic and fully explained in the record.</li>
+    <li><code>questions</code>: 1–64 named questions of type <code>choice</code> (2–255 options), <code>noul</code> (yes/no probability) or <code>score</code> (2–10 ordered levels), each with <code>instructions</code>; optional base64 <code>images</code> for vision-capable decision models.</li>
+    <li>Answers are validated against the questions before they are returned; a backend answer that breaks the contract is <code>502 decision_contract_violation</code>, never passed on.</li>
+  </ul>
+  <h3><code>routing.classifier.mode: decision</code></h3>
+  <p>The optional routing classifier — consulted only when the deterministic task signals are ambiguous — can now be a decision model instead of a small chat model. It is asked one <code>choice</code> question over the closed task-label set and the arg-max label (with its probability as confidence) refines the task label. Any timeout, error or out-of-contract answer falls back to the deterministic label, exactly as before. Default: <code>mode: chat</code>, classifier <code>enabled: false</code> — nothing changes unless you turn it on.</p>
+</section>
+
+<section aria-labelledby="prereq-title">
+  <h2 id="prereq-title">Prerequisites and limits</h2>
+  <ul>
+    <li><strong>A decision model on your backend.</strong> Ollama ≥ 0.35.0 with a model whose <code>/api/show</code> capabilities list <code>decision</code> — for example <code>ollama pull nimble</code>, <code>clef</code> or <code>laya</code>. ModelSaar registers such models with role <code>decision</code>; they are never offered or chosen for chat. Only the Ollama backend has a decision endpoint; a generic OpenAI-compatible backend answers <code>501 unsupported_backend</code>.</li>
+    <li><strong>Request limits</strong> (checked in this order): the gateway reads at most <code>server.max_request_bytes</code> (default 32 MiB) of the body — a larger declared <code>Content-Length</code> is refused with <code>413</code> before reading and a streamed body is cut off at the limit; state + questions must fit 64 KiB; the request as the backend receives it (JSON including base64 images) must fit Ollama's 32 MiB whole-request limit (<code>413</code>, checked before dispatch). Any field other than <code>model</code>, <code>state</code>, <code>questions</code>, <code>images</code> is refused with <code>400</code> naming the field (<code>keep_alive</code> and <code>stream</code> included).</li>
+    <li><strong>Classifier mode <code>decision</code></strong> needs the configured deployment to have role <code>decision</code>; a chat model in that mode (or a decision model in <code>chat</code> mode) is refused before any call, and <code>modelsaar doctor</code> says so. The classifier's 2 s timeout applies; a model that is not resident will usually time out on its first consultation and the deterministic label stands.</li>
+  </ul>
+  <p>Full contract: <a href="{{ href('/docs/routing/') }}">Routing → Decisions</a> (<code>docs/routing.md</code>) and <a href="{{ href('/docs/extending/') }}">Extending → Optional classifier</a>.</p>
+</section>
+
+<section aria-labelledby="install-title">
+  <h2 id="install-title">Try it from GitHub (pinned to one exact commit)</h2>
+  <p>The preview uses the ordinary development install at commit <code>{{ facts.PREVIEW_COMMIT[:12] }}</code>, in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. The one-line installer still pins <code>{{ facts.INSTALL_SHA[:12] }}</code>, which does <em>not</em> contain these features; do not point it at the preview commit, because it would replace your stable installation.</p>
+  {{ cmd(facts.PREVIEW_INSTALL, scroll=True) }}
+  <p>First decision request (the same body the live smoke test used; the API key is the first line of the preview home's <code>keys/api_keys</code>):</p>
+  {{ cmd(facts.PREVIEW_DECISIONS_REQUEST, scroll=True) }}
+  <p>Expected shape: <code>{"model": "auto", "answers": {"label": {"type": "choice", "choice": …, "probabilities": {…}, "confidence": …}, "urgent": {"type": "noul", "noul": …}}, "usage": {…}}</code>, with headers <code>X-ModelSaar-Request-Id</code> and <code>X-ModelSaar-Deployment</code>; <code>modelsaar decisions</code> shows the record with <code>endpoint: decisions</code>.</p>
+  <p>To try the classifier in decision mode, add this to <code>~/.modelsaar-preview/config.yaml</code>, run <code>modelsaar doctor</code> (it checks the role/mode pairing) and restart <code>modelsaar serve</code>; then send an ambiguous chat request such as <code>thoughts?</code> to <code>auto</code> and look at <code>classifier</code> in its decision record:</p>
+  {{ cmd(facts.PREVIEW_CLASSIFIER_YAML, lang='yaml', scroll=True) }}
+  <p>To remove the preview: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written.</p>
+</section>
+
+<section aria-labelledby="smoke-title">
+  <h2 id="smoke-title">Live smoke test — {{ facts.decision_preview()['date'] }}, {{ 'completed' if facts.decision_preview()['status'] == 'completed' else 'not completed' }}</h2>
+  <p>{{ facts.decision_preview()['placement'] }}. Ollama {{ facts.decision_preview()['ollama_version'] }}; decision models discovered: {{ ', '.join(facts.decision_preview()['decision_models_discovered']) }}; the configured one, <code>nimble-v3</code> ({{ facts.decision_preview()['nimble_v3']['parameter_size'] }}, {{ facts.decision_preview()['nimble_v3']['quantization'] }}, capabilities {{ facts.decision_preview()['nimble_v3']['capabilities'] }}). Exactly three requests were made; every number below is read from the recorded result at build time.</p>
+  <div class="table-wrap" tabindex="0"><table>
+    <thead><tr><th>#</th><th>request</th><th>HTTP</th><th>time</th><th>deployment</th><th>result</th></tr></thead>
+    <tbody>
+      {{ facts.decision_preview_rows_html() }}
+    </tbody>
+  </table></div>
+  <p><strong>What it establishes:</strong> the wire contract works end to end against a real decision model on this one machine — authentication, discovery of decision-role models, explicit and <code>auto</code> selection, schema-valid answers, and the classifier in decision mode consulting the model and refining an ambiguous label. <strong>What it does not establish:</strong> {{ facts.decision_preview()['not_established'] }}.</p>
+  <ul>
+    {{ facts.decision_preview_observations_html() }}
+  </ul>
+  <p>Record: <a href="{{ facts.REPO_URL }}/tree/{{ site.commit }}/{{ facts.decision_preview()['dir'] }}"><code>{{ facts.decision_preview()['dir'] }}/</code></a> (summary, responses, headers, decision records, discovery, launcher console; no prompts beyond the two synthetic inputs, no keys).</p>
+</section>
+
+<section aria-labelledby="not-title">
+  <h2 id="not-title">What this preview is not</h2>
+  <ul>
+    <li>Not a release: no tag, no package, no container image; the default installer pin is unchanged and still predates these features.</li>
+    <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="{{ href('/benchmarks/') }}">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above.</li>
+    <li>Not stable: the wire contract follows Ollama's documented System One API and may change with it; feedback via <a href="{{ facts.REPO_URL }}/issues">issues</a>.</li>
+  </ul>
+</section>

@@ -1,0 +1,1 @@
+{"model":"ollama/nimble-v3:latest","answers":{"label":{"type":"choice","choice":"billing","probabilities":{"bug":0.24636896686903012,"billing":0.7531251385350377,"account":0.0005058945959322574},"confidence":0.6296877078025566},"urgent":{"type":"noul","noul":0.9328410819328287}},"usage":{"input_tokens":480,"output_tokens":0}}

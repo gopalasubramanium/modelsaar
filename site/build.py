@@ -329,6 +329,7 @@ def build(site: Site) -> None:
         ("/benchmarks/", "Benchmarks and evidence", "Methodology, actual results and limitations of the ModelSaar evaluation, with links to the raw per-request records.", "benchmarks.html"),
         ("/privacy/", "Privacy", "What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host's access logs).", "privacy.html"),
         ("/roadmap/", "Roadmap and status", "Current status of ModelSaar and clearly identified future work.", "roadmap.html"),
+        ("/preview/decision-models/", "Preview: decision models", "Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.", "preview-decision-models.html"),
         ("/docs/", "Documentation", "ModelSaar documentation: installation, configuration, routing, API, operations, evaluation, clients.", "docs-index.html"),
     ]
     for path, title, desc, frag in pages:

@@ -1,0 +1,61 @@
+=== DECISION PREVIEW SMOKE 2026-10-28T01:11:07+0800 (TZ=+08) macOS 27.0.1
+power: Now drawing from 'AC Power'
+task-window assertion: another caffeinate sleep assertion is already active (1); none started
+lid must stay open (-s does not cover lid-close sleep)
+origin/main: 6075cdcf3b0952d4213a7899438f5fe546e95d19 (expected 6075cdcf3b0952d4213a7899438f5fe546e95d19)
+Note: switching to 'f18b2f195478d9a6591e7c637c321a46d9420e7e'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+preview checkout: 6075cdcf3b0952d4213a7899438f5fe546e95d19 (clean)
+installed: modelsaar 0.1.0 with Python 3.12.15
+Pass 1 checkout untouched: cf56cdd3416d8c853b64111b9b40211e5b126031 clean=yes
+stage-a home untouched: c58ce04fa1ed9902…; default home ~/.modelsaar: absent
+ollama version: {"version":"0.40.5"}
+inventory: 11 tags; nimble-v3:latest present: True
+nimble-v3 capabilities: ['decision'] | family qwen35 | size 9.0B
+resident before: []
+production modelsaar.service: not contacted, not changed (placement A: gateway runs on this Mac)
+init: 20 lines; config <PREVIEW_HOME>/config.yaml
+classifier config: {'enabled': True, 'mode': 'decision', 'timeout_s': 2.0, 'max_input_chars': 1500, 'only_when_ambiguous': True, 'max_output_tokens': 64, 'allow_remote': False, 'backend': 'ollama', 'model': 'nimble-v3:latest'}
+config validate: ok: <PREVIEW_HOME>/config.yaml (version 1, 1 backend(s))
+discovered: 11 deployments; decision-role: ['ollama/nimble-v3:latest', 'ollama/d1:latest']
+nimble-v3: {'role': 'decision', 'locality': 'local', 'parameter_size': '9.0B', 'context_length': 32768, 'family': 'qwen35'} | state: {'healthy': True, 'loaded': False} | caps: {'tools': 'unsupported', 'tool_choice_required': 'unsupported', 'parallel_tools': 'unknown', 'json_schema': 'unknown', 'json_object': 'supported', 'streaming': 'supported', 'vision': 'unsupported', 'audio_in': 'unsupported', 'thinking': 'unsupported', 'continuation': 'unknown'}
+doctor classifier line: [OK  ] classifier: classifier ollama/nimble-v3:latest available (mode decision)
+gateway ready on 127.0.0.1:50826 (pid 17696)
+--- request 1: POST /v1/decisions model=ollama/nimble-v3:latest
+[decisions-explicit] HTTP 200 in 13 s; request-id req_c979066d3da54da1; deployment ollama/nimble-v3:latest
+200
+schema ok; model field: ollama/nimble-v3:latest | label: billing {'bug': 0.246, 'billing': 0.753, 'account': 0.001} confidence 0.63 | urgent noul 0.933 | usage {'input_tokens': 480, 'output_tokens': 0}
+--- request 2: POST /v1/decisions model=auto
+[decisions-auto] HTTP 200 in 3 s; request-id req_adcb896ef55a48b5; deployment ollama/d1:latest
+200
+schema ok; label: bug confidence 0.573
+--- request 3: POST /v1/chat/completions model=auto, ambiguous prompt, classifier mode decision
+[chat-ambiguous] HTTP 200 in 9 s; request-id req_7c4838956513490f; deployment ollama/qwen3.8:latest
+200
+chat HTTP 200; choices: 1 model field auto
+admin/status classifier: {'enabled': True, 'mode': 'decision', 'calls': 1, 'timeouts': 0, 'failures': 0}
+record decisions-explicit: endpoint=decisions chosen=ollama/nimble-v3:latest outcome=ok overhead_ms=0.08 explicit=True evidence=explicit
+record decisions-auto: endpoint=decisions chosen=ollama/d1:latest outcome=ok overhead_ms=0.04 explicit=False evidence=deterministic
+record chat-ambiguous: endpoint=chat chosen=ollama/qwen3.8:latest outcome=ok overhead_ms=255.71 explicit=False evidence=prior-general:catalogue
+   classifier: {'used': True, 'task': 'conversation', 'confidence': 0.997122012373384, 'latency_ms': 255.3, 'status': 'ok', 'note': 'decision model; concentration confidence 1.00'} | inferred task: conversation | ambiguous: True | signals: ['classifier:conversation@1.00']
+<RUN_ROOT>/102_decision_preview_smoke.command: line 124: 17696 Terminated: 15          "$EXE" serve > "$OUT/serve.log" 2>&1
+gateway stopped
+resident after: [('qwen3.8:latest', 18798597897), ('nimble-v3:latest', 10530397879)]
+sleep assertions after: PreventSystemSleep PreventUserIdleSystemSleep 
+production modelsaar.service / live config / model tags: untouched
+=== done 2026-10-28T01:11:42+0800 — requests 1-3 HTTP 200/200/200

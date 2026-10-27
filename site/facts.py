@@ -230,6 +230,69 @@ def classifier_comparison() -> dict:
     }
 
 
+# ---- decision-model preview (opt-in, experimental; not a release) ----
+PREVIEW_COMMIT = "6075cdcf3b0952d4213a7899438f5fe546e95d19"  # main with POST /v1/decisions (#18) and classifier mode: decision (#17)
+PREVIEW_SMOKE_DIR = "docs/live-runs/2026-10-28-decision-preview-smoke"
+PREVIEW_INSTALL = (
+    "git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview && cd modelsaar-preview\n"
+    f"git checkout {PREVIEW_COMMIT}\n"
+    "python3 -m venv .venv && . .venv/bin/activate && pip install -e .     # or: uv venv && . .venv/bin/activate && uv pip install -e .\n"
+    "export MODELSAAR_HOME=~/.modelsaar-preview                           # separate config, keys and state: your normal install is untouched\n"
+    "modelsaar init --port 8485                                            # or: --endpoint http://host:11434 --type ollama\n"
+    "modelsaar discover                                                    # a decision model shows role \"decision\"\n"
+    "modelsaar serve"
+)
+PREVIEW_DECISIONS_REQUEST = (
+    "curl -s http://127.0.0.1:8485/v1/decisions \\\n"
+    "  -H \"Authorization: Bearer $(head -1 ~/.modelsaar-preview/keys/api_keys)\" -H 'Content-Type: application/json' \\\n"
+    "  -d '{\"model\": \"auto\", \"state\": \"Our checkout has returned 500 errors since 9am.\",\n"
+    "       \"questions\": {\"label\": {\"type\": \"choice\", \"instructions\": \"Which label fits this ticket?\",\n"
+    "                                \"criteria\": {\"bug\": \"Software errors\", \"billing\": \"Payments and refunds\", \"account\": \"Login and account access\"}},\n"
+    "                      \"urgent\": {\"type\": \"noul\", \"instructions\": \"Is the ticket urgent?\"}}}'"
+)
+PREVIEW_CLASSIFIER_YAML = (
+    "routing:\n"
+    "  classifier:\n"
+    "    enabled: true\n"
+    "    mode: decision\n"
+    "    backend: ollama\n"
+    "    model: nimble            # a deployment with role decision (modelsaar discover)\n"
+    "    only_when_ambiguous: true\n"
+    "    timeout_s: 2.0"
+)
+
+
+def decision_preview() -> dict:
+    """The preview's live smoke-test record, read from docs/live-runs at build time (never hand-copied)."""
+    d = json.loads((ROOT / PREVIEW_SMOKE_DIR / "SMOKE.json").read_text(encoding="utf-8"))
+    d["dir"] = PREVIEW_SMOKE_DIR
+    return d
+
+
+def decision_preview_rows_html() -> str:
+    """Table rows for the preview page's smoke-test table, built from SMOKE.json (content fragments have no loops)."""
+    from html import escape as e
+
+    rows = []
+    for r in decision_preview()["requests"]:
+        req = f"<code>{e(r['endpoint'])}</code>, <code>model: {e(r['model'])}</code>" + (f" — {e(r['note'])}" if r.get("note") else "")
+        if "answers" in r:
+            lab = r["answers"]["label"]
+            probs = ", ".join(f"{e(k)} {v}" for k, v in lab["probabilities"].items())
+            res = f"<code>label</code> → <strong>{e(lab['choice'])}</strong> ({probs}), confidence {lab['confidence']}; <code>urgent</code> noul {r['answers']['urgent']['noul']}"
+        else:
+            c = r["classifier"]
+            res = f"classifier used, status <code>{e(str(c['status']))}</code>: task <code>{e(str(c['task']))}</code>, probability {c['confidence']}, {c['latency_ms']} ms; then routed to the chat model shown"
+        rows.append(f"<tr><td>{r['n']}</td><td>{req}</td><td>{r['http']}</td><td>{r['seconds']} s</td><td><code>{e(r['deployment'])}</code></td><td>{res}</td></tr>")
+    return "".join(rows)
+
+
+def decision_preview_observations_html() -> str:
+    from html import escape as e
+
+    return "".join(f"<li>{e(o)}</li>" for o in decision_preview()["observations"])
+
+
 def seconds(ms: float) -> str:
     return f"{ms / 1000:.2f} s"
 

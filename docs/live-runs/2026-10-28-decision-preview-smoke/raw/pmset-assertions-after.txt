@@ -1,0 +1,55 @@
+2026-10-28 01:11:42 +0800 
+Assertion status system-wide:
+   BackgroundTask                 0
+   ApplePushServiceTask           0
+   UserIsActive                   1
+   PreventUserIdleDisplaySleep    0
+   SoftwareUpdateTask             0
+   PreventSystemSleep             1
+   PreventSystemSleepSecurityIndicator 0
+   ExternalMedia                  0
+   PreventUserIdleSystemSleep     1
+   NetworkClientActive            0
+Listed by owning process:
+   pid 17485(caffeinate): [0x0006dfe100019eed] 00:05:50 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting forever
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 17485(caffeinate): [0x0006dfe100079eee] 00:05:50 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting forever
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 949(nsurlsessiond): [0x0006e13b000c9f95] 00:00:03 SystemIsActive named: "NSURLSessionTask 1C054C43-1EE2-42B5-8E5C-9B440BA5415A"  
+	Timeout will fire in 10797 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0006e13c000c9f98] 00:00:02 SystemIsActive named: "NSURLSessionTask 45FF0D30-50F0-43DB-BE18-577534BCC599"  
+	Timeout will fire in 10797 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0006e13d000c9f99] 00:00:01 SystemIsActive named: "NSURLSessionTask 03F1423A-B576-4B0B-8DC9-2E95D66717C2"  
+	Timeout will fire in 10798 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0006e13e000c9f9a] 00:00:00 SystemIsActive named: "NSURLSessionTask 54696869-FEDE-4193-A96C-C6EE91114626"  
+	Timeout will fire in 10799 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0006e13e000c9f9c] 00:00:00 SystemIsActive named: "NSURLSessionTask 6631E8F2-8DEA-4A13-9094-673A34D7093B"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+   pid 949(nsurlsessiond): [0x0006e13f000c9fa0] 00:00:00 SystemIsActive named: "NSURLSessionTask C1563D2E-A230-4BBE-ADF7-2D3CDF155E06"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+   pid 705(backupd): [0x0006de9c00019ed5] 00:11:14 PreventUserIdleSystemSleep named: "Backup Job"  
+   pid 45660(Claude): [0x0006dfef00019ef0] 00:05:35 NoIdleSleepAssertion named: "Electron"  
+   pid 959(cloudd): [0x0006e13c000c9f96] 00:00:03 SystemIsActive named: "NSURLSessionTask F62EB0BE-2E52-4060-BDCF-464CF71CE2A3"  
+	Timeout will fire in 10797 secs Action=TimeoutActionTurnOff
+   pid 959(cloudd): [0x0006e13f000c9f9f] 00:00:00 SystemIsActive named: "NSURLSessionTask 03F9B705-E1DE-475D-BDEB-127B8C937314"  
+	Timeout will fire in 10800 secs Action=TimeoutActionTurnOff
+   pid 605(WindowServer): [0x0006c9ad000999e2] 00:00:35 UserIsActive named: "com.apple.iohideventsystem.queue.tickle.nxevent service:IOHIDSystem pid:45660 process:Claude"  
+	Timeout will fire in 565 secs Action=TimeoutActionRelease
+   pid 549(powerd): [0x0006c9ad000199e3] 01:40:33 PreventUserIdleSystemSleep named: "Powerd - Prevent sleep while display is on"  
+   pid 610(runningboardd): [0x0006e13f00019f9e] 00:00:00 PreventUserIdleSystemSleep named: "osservice<com.apple.nsurlsessiond(501)>610-949-283746:com.apple.CFNetwork.StorageDB"  
+	Created for PID: 949. 
+   pid 610(runningboardd): [0x0006e0e800019f0f] 00:01:26 PreventUserIdleSystemSleep named: "app<application.net.whatsapp.WhatsApp.13817893.13828829(501)>610-14429-279810:Shared Background Assertion 0 for net.whatsapp.WhatsApp(FinishTask)"  
+	Created for PID: 14429. 
+   pid 17623(caffeinate): [0x0006e11c00019f18] 00:00:34 PreventUserIdleSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of Process ID 17607
+	Created for PID: 17607. 
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 17623(caffeinate): [0x0006e11c00079f19] 00:00:34 PreventSystemSleep named: "caffeinate command-line tool"  
+	Details: caffeinate asserting on behalf of Process ID 17607
+	Created for PID: 17607. 
+	Localized=THE CAFFEINATE TOOL IS PREVENTING SLEEP.
+   pid 14741(backupd-helper): [0x0006de7e00019ed2] 00:11:44 PreventUserIdleSystemSleep named: "Mutexed Backup Block"  
+Kernel Assertions: 0x100=MAGICWAKE
+   id=773  level=255 0x100=MAGICWAKE creat=  mod= description=en0 owner=IOSkywalkNetworkBSDClient

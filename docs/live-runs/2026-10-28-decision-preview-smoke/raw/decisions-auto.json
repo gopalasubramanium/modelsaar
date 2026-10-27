@@ -1,0 +1,1 @@
+{"model":"auto","answers":{"label":{"type":"choice","choice":"bug","probabilities":{"bug":0.7151243818918313,"billing":0.2670375060677367,"account":0.01783811204043208},"confidence":0.5726865728377468},"urgent":{"type":"noul","noul":0.9272673891247083}},"usage":{"input_tokens":90,"output_tokens":0}}

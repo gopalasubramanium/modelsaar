@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased — decision-model preview: smoke-test record, GitHub preview path, website page, 2026-10-28
+
+* **Live smoke test (one, bounded):** three requests against the merged decision-model features from an isolated
+  preview checkout at `6075cdcf…` and an isolated home on the owner's Mac, backend the GX10's Ollama 0.40.5:
+  `POST /v1/decisions` with `ollama/nimble-v3:latest` (200, schema-valid), with `auto` (200; selected
+  `ollama/d1:latest` by the documented tie-break), and one ambiguous chat request with
+  `routing.classifier.mode: decision` (classifier used, status ok, 255 ms). Record under
+  `docs/live-runs/2026-10-28-decision-preview-smoke/` (`SMOKE-RESULT.md`, `SMOKE.json`, `raw/`). It
+  establishes the wire contract and routing on one machine — not answer quality, latency distributions or
+  the classifier decision rule.
+* **Preview path (README, site):** the ordinary source install pinned to that exact commit with its own
+  `MODELSAAR_HOME`, side by side with a stable installation. The one-line installer's pin is unchanged and
+  must not be pointed at the preview commit (it would replace a stable installation).
+* **Website:** new page `/preview/decision-models/` (what the features do, prerequisites and limits, the
+  pinned install/test instructions, the smoke-test table read from `SMOKE.json` at build time, what the
+  preview is not); links from Roadmap and Get started. No change to the benchmark pages or their claims.
+
 ## Unreleased — `POST /v1/decisions`: decision-model endpoint (Ollama `/v1/systemone`), 2026-10-27
 
 * **New endpoint `POST /v1/decisions`** (`protocol/decisions.py`, `Router.route_decisions`, `server.decisions`):

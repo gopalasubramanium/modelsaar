@@ -13,6 +13,7 @@ ModelSaar is Apache-2.0-licensed open source (https://github.com/gopalasubramani
 - [Benchmarks and evidence](https://modelsaar.com/benchmarks/): Methodology, actual results and limitations of the ModelSaar evaluation, with links to the raw per-request records.
 - [Privacy](https://modelsaar.com/privacy/): What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host's access logs).
 - [Roadmap and status](https://modelsaar.com/roadmap/): Current status of ModelSaar and clearly identified future work.
+- [Preview: decision models](https://modelsaar.com/preview/decision-models/): Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.
 - [Documentation](https://modelsaar.com/docs/): ModelSaar documentation: installation, configuration, routing, API, operations, evaluation, clients.
 - [Say thanks](https://modelsaar.com/thanks/): Meet ModelSaar's creator, share useful feedback, or offer optional appreciation via PayPal.
 - [Installation, upgrade, rollback, uninstall](https://modelsaar.com/docs/installation/): Install ModelSaar from source, configure it, run it under Docker Compose, upgrade, roll back and uninstall.

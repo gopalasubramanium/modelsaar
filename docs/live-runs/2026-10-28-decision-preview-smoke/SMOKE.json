@@ -1,0 +1,130 @@
+{
+ "date": "2026-10-28",
+ "timezone": "SGT (UTC+08:00)",
+ "window_local": "01:11:07\u201301:11:42",
+ "status": "completed",
+ "result": "all three requests succeeded (HTTP 200) with schema-valid answers; classifier mode decision consulted the decision model once, status ok",
+ "commit": "6075cdcf3b0952d4213a7899438f5fe546e95d19",
+ "gateway_version": "modelsaar 0.1.0",
+ "python": "3.12.15",
+ "placement": "isolated preview checkout + home on the owner's MacBook Air (in-process gateway on 127.0.0.1:50826); backend the GX10's Ollama over Tailscale; production modelsaar.service, ~/.modelsaar, the Stage A home and the Pass 1 checkout untouched",
+ "ollama_version": "0.40.5",
+ "decision_models_discovered": [
+  "ollama/nimble-v3:latest",
+  "ollama/d1:latest"
+ ],
+ "nimble_v3": {
+  "capabilities": [
+   "decision"
+  ],
+  "family": "qwen35",
+  "parameter_size": "9.0B",
+  "quantization": "Q8_0",
+  "context_length_served": 32768,
+  "size_vram_bytes": 10530397879
+ },
+ "requests": [
+  {
+   "n": 1,
+   "endpoint": "POST /v1/decisions",
+   "model": "ollama/nimble-v3:latest",
+   "http": 200,
+   "seconds": 13,
+   "note": "includes the model's first load",
+   "deployment": "ollama/nimble-v3:latest",
+   "outcome": "ok",
+   "overhead_ms": 0.08,
+   "answers": {
+    "label": {
+     "choice": "billing",
+     "probabilities": {
+      "bug": 0.246,
+      "billing": 0.753,
+      "account": 0.001
+     },
+     "confidence": 0.63
+    },
+    "urgent": {
+     "noul": 0.933
+    }
+   },
+   "usage": {
+    "input_tokens": 480,
+    "output_tokens": 0
+   }
+  },
+  {
+   "n": 2,
+   "endpoint": "POST /v1/decisions",
+   "model": "auto",
+   "http": 200,
+   "seconds": 3,
+   "deployment": "ollama/d1:latest",
+   "outcome": "ok",
+   "overhead_ms": 0.04,
+   "reason": "decision model selected among 2 eligible decision deployment(s); ollama/d1:latest (not resident)",
+   "answers": {
+    "label": {
+     "choice": "bug",
+     "probabilities": {
+      "bug": 0.715,
+      "billing": 0.267,
+      "account": 0.018
+     },
+     "confidence": 0.573
+    },
+    "urgent": {
+     "noul": 0.927
+    }
+   },
+   "usage": {
+    "input_tokens": 90,
+    "output_tokens": 0
+   }
+  },
+  {
+   "n": 3,
+   "endpoint": "POST /v1/chat/completions",
+   "model": "auto",
+   "http": 200,
+   "seconds": 9,
+   "note": "ambiguous prompt; routing.classifier.mode: decision with nimble-v3",
+   "deployment": "ollama/qwen3.8:latest",
+   "outcome": "ok",
+   "overhead_ms": 255.71,
+   "classifier": {
+    "confidence": 0.997,
+    "latency_ms": 255.3,
+    "note": "decision model; concentration confidence 1.00",
+    "status": "ok",
+    "task": "conversation",
+    "used": true
+   },
+   "inferred_task": "conversation",
+   "ambiguous": true
+  }
+ ],
+ "state_text": "Our checkout has returned 500 errors since 9am.",
+ "questions": {
+  "label": "choice over bug / billing / account",
+  "urgent": "noul"
+ },
+ "chat_prompt": "thoughts?",
+ "classifier_counters_after": {
+  "calls": 1,
+  "timeouts": 0,
+  "failures": 0
+ },
+ "observations": [
+  "nimble-v3 answered 'billing' (0.753) for a checkout-500 ticket where a human would likely say 'bug'; d1 answered 'bug' (0.715). The smoke test validates the wire contract and routing, not answer quality.",
+  "`auto` chose ollama/d1:latest (2.7B, decision+vision) although nimble-v3 had just been loaded by request 1: at decision time neither model was observed resident (residency is refreshed on an interval), so the documented tie-break 'by id' applied (d1 < nimble-v3). Documented behaviour; an explicit model id is the way to pick a specific decision model.",
+  "the classifier's single consultation took 255 ms end to end (nimble-v3 resident), above the 250 ms median bound of the classifier decision rule; one request establishes nothing about that rule."
+ ],
+ "not_established": "answer quality, latency distributions, the classifier decision rule (one consultation), behaviour under load; this is a wire-contract and routing smoke test with three requests",
+ "limits_documented": {
+  "max_request_bytes": "server.max_request_bytes (default 32 MiB) bounds the body read",
+  "text_limit": "64 KiB state + questions",
+  "upstream_limit": "32 MiB re-serialised request (Ollama local System One limit)",
+  "questions": "1\u201364; choice 2\u2013255 options; score 2\u201310 levels"
+ }
+}
