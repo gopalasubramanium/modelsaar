@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.1.0-rc.1 — GitHub-only release candidate (pre-release; not a stable release), 2026-10-28
+
+* **Tag `v0.1.0-rc.1`**, a GitHub *pre-release* on the `main` commit that contains every "Unreleased" entry
+  below — in particular `POST /v1/decisions` and the routing classifier's `mode: decision` (both **opt-in and
+  experimental**; nothing changes unless configured). Created for testers who install from GitHub at a
+  pinned tag; **no PyPI package, no container image, no stable tag**, and the one-line installer's pin is
+  unchanged (it still predates the decision-model features).
+* `release.yml` now runs only for stable tags (`v[0-9]+.[0-9]+.[0-9]+`, with a job-level guard against any
+  `-` suffix), so a candidate tag never triggers publication; `docs/release.md` gains the "GitHub-only
+  pre-releases" convention. The package version stays `0.1.0` (candidates are not version bumps).
+* Evidence behind the candidate: the fixture tests in CI (285 non-live tests at this commit) and the one
+  bounded live smoke test of 2026-10-28 (three requests). It establishes the wire contract and routing on
+  one machine, not answer quality, latency distributions or any routing benefit of the classifier.
+
 ## Unreleased — decision-model preview: smoke-test record, GitHub preview path, website page, 2026-10-28
 
 * **Live smoke test (one, bounded):** three requests against the merged decision-model features from an isolated

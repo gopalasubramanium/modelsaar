@@ -1,6 +1,6 @@
 # ModelSaar
 
-**Status: public alpha** — pinned candidate commits, no tagged release, no PyPI package or container image; see `docs/verification-report.md` for what has and has not been executed and `docs/roadmap.md` for scope.
+**Status: public alpha** — pinned candidate commits; no stable release, no PyPI package or container image. The first GitHub-only **release candidate**, `v0.1.0-rc.1` (a pre-release for testing the opt-in decision-model features), is described below; see `docs/verification-report.md` for what has and has not been executed and `docs/roadmap.md` for scope.
 
 [![ci](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml/badge.svg)](https://github.com/gopalasubramanium/modelsaar/actions/workflows/ci.yml)
 
@@ -41,20 +41,23 @@ tested against controlled backends, and exercised live against a real Ollama ser
 * **Small.** Five runtime dependencies (Starlette, uvicorn, httpx, pydantic, PyYAML). No Docker,
   Envoy, Redis, Postgres, GPU toolkit or mandatory classifier model.
 
-## Preview: decision models (opt-in, experimental — not a release)
+## Release candidate: decision models (`v0.1.0-rc.1`; opt-in, experimental — not a stable release)
 
 `POST /v1/decisions` (typed questions answered by a decision model such as Ollama's `nimble`, `clef` or
-`laya` through its native `/v1/systemone` API) and the routing classifier's `mode: decision` are merged on
-`main` as of commit `6075cdcf3b0952d4213a7899438f5fe546e95d19`. They are fixture-tested in CI and were
-exercised once live with three requests (`docs/live-runs/2026-10-28-decision-preview-smoke/`); nothing about
-answer quality or routing benefit is claimed. The one-line installer still pins an earlier commit and is
-unchanged — do not point it at the preview commit, that would replace a stable installation. To try the
-preview side by side with a stable install, use the ordinary source install at that exact commit with its
-own home:
+`laya` through its native `/v1/systemone` API) and the routing classifier's `mode: decision` were merged on
+`main` at commit `6075cdcf3b0952d4213a7899438f5fe546e95d19` and are tagged as the GitHub pre-release
+**`v0.1.0-rc.1`** (https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1; the tag's
+code is identical to that commit). They are fixture-tested in CI and were exercised once live with three
+requests (`docs/live-runs/2026-10-28-decision-preview-smoke/`); nothing about answer quality or routing
+benefit is claimed. A candidate is GitHub-only: no PyPI package, no container image, and the package
+version stays `0.1.0` (`docs/release.md`, "GitHub-only pre-releases"). The one-line installer still pins
+an earlier commit and is unchanged — do not point it at the candidate, that would replace a stable
+installation. To try the candidate side by side with a stable install, use the ordinary source install
+at the tag with its own home:
 
 ```bash
 git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview && cd modelsaar-preview
-git checkout 6075cdcf3b0952d4213a7899438f5fe546e95d19
+git checkout v0.1.0-rc.1
 python3 -m venv .venv && . .venv/bin/activate && pip install -e .
 export MODELSAAR_HOME=~/.modelsaar-preview        # separate config, keys and state
 modelsaar init --port 8485                         # or --endpoint http://host:11434 --type ollama
@@ -63,7 +66,7 @@ modelsaar serve
 ```
 
 Contract and limits: `docs/routing.md` ("Decisions"); classifier configuration: `docs/extending.md`;
-the web page with the smoke-test record: https://modelsaar.com/preview/decision-models/.
+the web page with the tester instructions and the smoke-test record: https://modelsaar.com/preview/decision-models/.
 
 ## Quickest working setup
 

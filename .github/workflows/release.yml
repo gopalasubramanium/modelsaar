@@ -1,20 +1,24 @@
 name: release
 
-# Runs only when a version tag is pushed (e.g. v0.1.0). Publishes:
+# Runs only when a STABLE version tag is pushed (exactly vX.Y.Z, e.g. v0.1.0). Publishes:
 #   * sdist + wheel to PyPI through Trusted Publishing (configure the publisher on pypi.org first:
 #     owner gopalasubramanium, repository modelsaar, workflow release.yml, environment pypi);
 #   * a container image to GitHub Container Registry (ghcr.io/<owner>/modelsaar:<tag> and :latest).
 # Nothing here runs on ordinary pushes; CI (ci.yml) must be green on the tagged commit.
+# Pre-release tags (vX.Y.Z-rc.N and any other tag with a "-" suffix) are GitHub-only release candidates
+# (docs/release.md, "GitHub-only pre-releases"): they never publish to PyPI or GHCR. They are excluded twice —
+# by the tag pattern below and by the job-level guard — and the version check in `build` would refuse them anyway.
 
 on:
   push:
-    tags: ["v*.*.*"]
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
 
 permissions:
   contents: read
 
 jobs:
   build:
+    if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -42,6 +46,7 @@ jobs:
 
   pypi:
     needs: build
+    if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -57,6 +62,7 @@ jobs:
 
   image:
     needs: build
+    if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

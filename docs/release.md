@@ -21,6 +21,30 @@
 Publishing to PyPI/GHCR and creating the public repository are owner decisions; the repository was
 made public on 2026-10-11 with the owner's authorization.
 
+## GitHub-only pre-releases (`vX.Y.Z-rc.N`)
+
+A release candidate is a **GitHub prerelease** and nothing else: a tag of the form `vX.Y.Z-rc.N` on a
+commit of `main` whose CI is green, plus a GitHub release marked *pre-release* whose notes say what is
+being tested and what the evidence does and does not show. It is for testers who install from GitHub.
+
+* **It does not publish anything.** `release.yml` runs only for tags that match `v[0-9]+.[0-9]+.[0-9]+`
+  exactly, and every job in it is additionally guarded with `!contains(github.ref_name, '-')`; a tag
+  with a `-rc.N` (or any other `-`) suffix therefore never builds, never reaches PyPI and never pushes
+  an image. The package version in `pyproject.toml` / `src/modelsaar/__init__.py` is **not** bumped for
+  a candidate (`modelsaar --version` keeps printing the base version, `0.1.0` for `v0.1.0-rc.1`); the
+  tag is the only marker. Steps 2–7 above are for the stable tag that may follow.
+* **The installer pin does not move.** `site/static/install.sh` keeps pinning the stable candidate
+  commit; a release candidate is tried from a source install at the tag, in its own directory and with
+  its own `MODELSAAR_HOME`, side by side with a stable installation (README, "Release candidate").
+* **How it is created** (owner or owner-authorised): on the exact `main` commit, after its push CI is
+  green — `git tag -a vX.Y.Z-rc.N <commit>`, push that one tag (never force), confirm that no
+  `release` workflow run was triggered, `gh release create vX.Y.Z-rc.N --verify-tag --prerelease
+  --notes-file …`. Tags are never moved or deleted; a superseded candidate is followed by `-rc.N+1`.
+* **Candidates so far:** `v0.1.0-rc.1` (2026-10-28) — decision-model support (`POST /v1/decisions`,
+  classifier `mode: decision`), opt-in and experimental; evidence: fixture tests in CI and one bounded
+  live smoke test of three requests (`docs/live-runs/2026-10-28-decision-preview-smoke/`); no quality
+  or routing-benefit claim.
+
 ## Readiness for the first versioned alpha release (checked 2026-10-14)
 
 A list against the steps above. Tagging, PyPI and GHCR publication remain separate owner decisions;
