@@ -84,7 +84,7 @@ modelsaar init
 
 # 3. check and verify
 modelsaar doctor            # reachability, context assumptions, unknown capabilities, cloud aliases
-modelsaar probe --all       # live checks: streaming, tools, JSON schema, vision, latency (uses local compute)
+modelsaar probe --all       # live checks: streaming, tools, JSON schema, vision, continuation, latency (uses local compute)
 
 # 4. run
 modelsaar serve             # http://127.0.0.1:8484/v1 ; keys in ~/.modelsaar/keys/

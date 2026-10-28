@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased — continuation probe; corrected `422` remedy, 2026-10-29
+
+* **New probe `continuation`** (`probes.py`, in `modelsaar probe --all` and `--which continuation`, also via
+  `POST /admin/probe`): sends a follow-up turn whose assistant history carries `reasoning_content` — the exact
+  shape agentic clients such as Odysseus replay — through the adapter unchanged, and records `supported` only
+  when that request is answered with a well-formed assistant message; `unsupported` on an explicit 4xx rejection
+  or an answer without content/tool_calls; `unknown` (capability left untouched) on 5xx, transport errors, a
+  timeout (uncertain hold, remaining probes skipped) or an exhausted output budget. Documented as **protocol
+  acceptance**, not semantic continuity. Background: the real-client Odysseus test against `v0.1.0-rc.1` returned
+  `422` in production (`req_496b78a6d49a4377`) because no runtime reports `continuation` and the only way to
+  make a deployment eligible was an operator override; the RC test passed only with that override.
+* **Corrected `422` remedy** (`routing/eligibility.py`): the "capability … is unknown" remedy now names a probe
+  that exists (`modelsaar probe <id> --which <capability>`) or, for capabilities no probe covers, only the
+  `deployments[]` override; for `continuation` it adds that a context-length exclusion on the same deployment
+  is separate and that raising `context_length`/`num_ctx` does not establish continuation. Previously it pointed
+  at a bare `modelsaar probe <id>` as if it verified continuation, which no probe did.
+* Default behaviour for unprobed deployments is unchanged (`unknown` still excludes). Docs: `docs/routing.md`
+  ("Continuation"), `docs/troubleshooting.md`, README. Tests: `tests/test_continuation_probe.py` (9: probe
+  request shape, supported/stored, explicit rejection → unsupported, 500 → unknown, timeout → uncertain,
+  Odysseus-shaped history 422 → probe → 200 with failover refused, override path, CLI choice, probe-name
+  consistency); fake backend gains `reject_reasoning_history`. Site test count 285 → 294.
+* Open WebUI (documented context only): its real-client test against the RC passed — the built-in
+  `search_knowledge_files` tool was returned as a structured `tool_calls` delta, executed by Open WebUI and
+  answered; the earlier production markup-as-text case was a backend parse miss on one generation. No code
+  change is justified by current evidence.
+
 ## Unreleased — website: release-candidate page and status wording, 2026-10-28
 
 * `/preview/decision-models/` is now the tester guide for the GitHub pre-release `v0.1.0-rc.1`: links the release,

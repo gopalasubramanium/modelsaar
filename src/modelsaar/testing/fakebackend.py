@@ -57,6 +57,9 @@ class FakeModel:
     # probability it assigns to it (the rest is spread evenly over the other options).
     decides: str = ""
     decision_probability: float = 0.9
+    # Simulated backend that refuses ``reasoning_content`` on assistant messages in the history (HTTP 400),
+    # the way a strict OpenAI-compatible layer would; used by the continuation-probe tests.
+    reject_reasoning_history: bool = False
 
 
 def _expected_json(text: str) -> dict[str, Any]:
@@ -283,6 +286,12 @@ class FakeBackend:
             return JSONResponse({"error": {"message": "simulated internal error", "type": "server_error"}}, status_code=500)
         if m.behaviour == "hang":
             await asyncio.sleep(3600)
+        if m.reject_reasoning_history and any(
+            isinstance(x, dict) and x.get("role") == "assistant" and x.get("reasoning_content") is not None for x in body.get("messages") or []
+        ):
+            return JSONResponse(
+                {"error": {"message": "unknown field 'reasoning_content' in messages[].", "type": "invalid_request_error"}}, status_code=400
+            )
         with self._lock:
             self.active += 1
             self.max_active = max(self.max_active, self.active)
