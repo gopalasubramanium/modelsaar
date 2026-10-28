@@ -16,7 +16,7 @@ CREATOR_NAME = "Gopala Subramanium"
 CREATOR_URL = "https://me.sgopala.com"
 PAYPAL_EMAIL = "gopalasubramanium@gmail.com"
 LICENSE = "Apache-2.0"
-STATUS = "public alpha"  # clearly labelled alpha; no git tag, no PyPI package, no container image published
+STATUS = "public alpha"  # clearly labelled alpha; no stable tag, no PyPI package, no container image published (one GitHub-only pre-release tag, RC_TAG)
 VERSION_STRING = "0.1.0 (unreleased public alpha)"
 
 # The revision the public installer pins. Must be a commit that is PUBLIC on GitHub and whose CI checks
@@ -230,12 +230,15 @@ def classifier_comparison() -> dict:
     }
 
 
-# ---- decision-model preview (opt-in, experimental; not a release) ----
+# ---- decision-model release candidate (GitHub-only pre-release; opt-in, experimental; not a stable release) ----
 PREVIEW_COMMIT = "6075cdcf3b0952d4213a7899438f5fe546e95d19"  # main with POST /v1/decisions (#18) and classifier mode: decision (#17)
+RC_TAG = "v0.1.0-rc.1"  # GitHub pre-release tag; its src/ + pyproject.toml are byte-identical to PREVIEW_COMMIT (site/check_site.py does not verify tags; the publish gate did)
+RC_COMMIT = "5b947f2859a7cce6af69ecc28436222233cbeebd"  # the main commit the tag points to (squash-merge of PR #20: release.yml stable-tags-only guard, release docs)
+RC_RELEASE_URL = f"{REPO_URL}/releases/tag/{RC_TAG}"
 PREVIEW_SMOKE_DIR = "docs/live-runs/2026-10-28-decision-preview-smoke"
 PREVIEW_INSTALL = (
     "git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview && cd modelsaar-preview\n"
-    f"git checkout {PREVIEW_COMMIT}\n"
+    f"git checkout {RC_TAG}                                               # the pre-release tag = commit {RC_COMMIT[:12]}\n"
     "python3 -m venv .venv && . .venv/bin/activate && pip install -e .     # or: uv venv && . .venv/bin/activate && uv pip install -e .\n"
     "export MODELSAAR_HOME=~/.modelsaar-preview                           # separate config, keys and state: your normal install is untouched\n"
     "modelsaar init --port 8485                                            # or: --endpoint http://host:11434 --type ollama\n"
@@ -342,7 +345,7 @@ def llms_txt(site_url: str, pages: list[tuple[str, str, str]]) -> str:
         "",
         f"> {TAGLINE_LONG}",
         "",
-        f"ModelSaar is {LICENSE}-licensed open source ({REPO_URL}). Status: {STATUS}; no release has been tagged and no package is published. "
+        f"ModelSaar is {LICENSE}-licensed open source ({REPO_URL}). Status: {STATUS}; no stable release has been tagged and no package is published (one GitHub-only pre-release tag, v0.1.0-rc.1, for testing the opt-in decision-model features). "
         "It is an OpenAI-compatible HTTP gateway (Chat Completions incl. streaming, /v1/models, /v1/embeddings) that routes each request to one of the "
         "model deployments you run (Ollama first; any OpenAI-compatible server with declared models) using the request's requirements, verified "
         "capability evidence, locality/privacy policy, health and capacity, and records a decision you can inspect. It never downloads models and "
