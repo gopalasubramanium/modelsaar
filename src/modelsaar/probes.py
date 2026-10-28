@@ -20,7 +20,7 @@ from .store import Store
 # A 1x1 red PNG (generated with Pillow once; embedded to avoid a dependency).
 # Thinking models spend output tokens on reasoning before the answer; keep probe budgets generous.
 PROBE_MAX_TOKENS = 1024
-PROBE_NAMES = frozenset({"streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"})
+PROBE_NAMES = frozenset({"streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "continuation", "latency"})
 STREAM_PROBE_MAX_TOKENS = 400
 
 _RED_PNG_B64 = (
@@ -262,6 +262,62 @@ async def probe_vision(adapter: BaseAdapter, dep: Deployment, timeout: float) ->
     return ProbeResult("vision", "unsupported", f"image accepted but answer did not identify the colour ({txt[:40]!r})", ms)
 
 
+# The exact shape agentic clients (e.g. Odysseus) send on a follow-up turn: the previous assistant message
+# is replayed with both its ``content`` and its ``reasoning_content``. Routing marks such requests
+# ``needs_continuation``; this probe sends that shape through the adapter unchanged (adapters forward
+# ``messages`` as received), so the backend's acceptance of ``reasoning_content`` in history is what is tested.
+_CONTINUATION_HISTORY: list[dict[str, Any]] = [
+    {"role": "user", "content": "What is 2 + 2? Reply with the number only."},
+    {"role": "assistant", "content": "4", "reasoning_content": "The user asks for a simple sum. 2 + 2 = 4."},
+    {"role": "user", "content": "Add 3 to your previous answer. Reply with the number only."},
+]
+_CONTINUATION_NOTE = (
+    "accepted an assistant history carrying reasoning_content and answered (protocol acceptance; whether the "
+    "model semantically uses the replayed reasoning is not verifiable through the OpenAI-compatible API)"
+)
+
+
+async def probe_continuation(adapter: BaseAdapter, dep: Deployment, timeout: float) -> ProbeResult:
+    """Can this deployment take a follow-up turn whose assistant history carries ``reasoning_content``?
+
+    ``supported``: HTTP 200 with a well-formed assistant answer to *this* request (the one carrying the
+    reasoning history) — not inferred from any other request. ``unsupported``: the backend explicitly
+    rejected the request (4xx) or answered without an assistant message. ``unknown``: 5xx, transport
+    error, timeout (uncertain hold), malformed body, or output budget exhausted before an answer.
+    """
+    t0 = time.monotonic()
+    body = {"messages": [dict(m) for m in _CONTINUATION_HISTORY]}
+    try:
+        r = await _chat(adapter, dep, body, timeout)
+    except AdapterError as e:
+        return _error_result("continuation", e)
+    ms = (time.monotonic() - t0) * 1000
+    if r.status >= 500:
+        return ProbeResult("continuation", "unknown", f"backend returned {r.status} (transient?) for a history with reasoning_content", ms)
+    if r.status != 200:
+        msg = ""
+        try:
+            err = r.body.get("error") if isinstance(r.body, dict) else None
+            msg = (err.get("message") if isinstance(err, dict) else err) or ""
+        except Exception:  # noqa: BLE001
+            msg = ""
+        return ProbeResult(
+            "continuation", "unsupported",
+            f"backend rejected an assistant history carrying reasoning_content (HTTP {r.status}{': ' + str(msg)[:80] if msg else ''})", ms,
+        )
+    if not isinstance(r.body, dict) or not isinstance(r.body.get("choices"), list) or not r.body["choices"]:
+        return ProbeResult("continuation", "unknown", "HTTP 200 without a choices array (malformed response)", ms)
+    if _budget_exhausted(r):
+        return ProbeResult("continuation", "unknown", _EXHAUSTED_NOTE, ms)
+    msg_obj = (r.body["choices"][0] or {}).get("message")
+    if not isinstance(msg_obj, dict) or msg_obj.get("role") not in (None, "assistant"):
+        return ProbeResult("continuation", "unsupported", "HTTP 200 but no assistant message in the first choice", ms)
+    answered = bool(_content(r).strip()) or bool(_tool_calls(r))
+    if not answered:
+        return ProbeResult("continuation", "unsupported", "HTTP 200 but the assistant message carried neither content nor tool_calls", ms)
+    return ProbeResult("continuation", "supported", _CONTINUATION_NOTE, ms, details={"answer_mentions_7": "7" in _content(r)})
+
+
 async def probe_streaming(adapter: BaseAdapter, dep: Deployment, timeout: float) -> tuple[ProbeResult, float | None]:
     t0 = time.monotonic()
     body = {"messages": [{"role": "user", "content": "Count from 1 to 5, separated by spaces."}], "max_tokens": STREAM_PROBE_MAX_TOKENS, "temperature": 0}
@@ -345,7 +401,7 @@ async def run_probes(
     which: list[str] | None = None,
     timeout: float = 120.0,
 ) -> ProbeReport:
-    which = which or ["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"]
+    which = which or ["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "continuation", "latency"]
     rep = ProbeReport(dep.id, dep.fingerprint)
     if dep.role != "generative":
         rep.errors.append(f"deployment role is {dep.role}; chat probes apply only to generative deployments")
@@ -368,7 +424,7 @@ async def run_probes(
             "not run and the slot is held as uncertain (re-run `modelsaar probe` later)"
         )
 
-    order = ["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"]
+    order = ["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "continuation", "latency"]
     ttft: float | None = None
     for name in order:
         if name not in which:
@@ -396,6 +452,8 @@ async def run_probes(
                 rep.results.append(ProbeResult("vision", "unsupported", "skipped: backend metadata says vision unsupported"))
             else:
                 await _save(await probe_vision(adapter, dep, timeout))
+        elif name == "continuation":
+            await _save(await probe_continuation(adapter, dep, timeout))
         elif name == "latency":
             m, timed_out = await measure_latency(adapter, dep, timeout)
             if timed_out:

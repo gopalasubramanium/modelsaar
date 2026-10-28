@@ -26,6 +26,12 @@ class EligibilityResult:
         return {e.deployment_id: e.reasons for e in self.exclusions}
 
 
+# Capabilities a live probe can establish (``modelsaar probe <deployment> --which <capability>``). Kept in
+# step with ``probes.PROBE_NAMES`` minus the latency measurement (checked by a unit test); the remedy text
+# must never point at a probe that does not exist.
+_PROBEABLE = frozenset({"streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "continuation"})
+
+
 def _cap_check(dep: Deployment, key: str, label: str, ex: Exclusion) -> None:
     v = dep.cap(key)
     if v == "unsupported":
@@ -33,9 +39,16 @@ def _cap_check(dep: Deployment, key: str, label: str, ex: Exclusion) -> None:
         ex.remedies.append(f"use a deployment whose {key} capability is supported")
     elif v == "unknown":
         ex.reasons.append(f"{label} required; capability {key} is unknown (treated conservatively as not eligible)")
-        ex.remedies.append(
-            f"run `modelsaar probe {dep.id}` to verify {key}, or declare it in config under deployments[] overrides"
-        )
+        override = f"declare `capabilities: {{{key}: supported}}` for {dep.model} under deployments[] (operator provenance)"
+        if key in _PROBEABLE:
+            ex.remedies.append(f"run `modelsaar probe {dep.id} --which {key}` to verify {key}, or {override}")
+        else:
+            ex.remedies.append(f"no live probe exists for {key}; {override}")
+        if key == "continuation":
+            ex.remedies.append(
+                "a context-length exclusion on the same deployment is separate: raising context_length/num_ctx does not "
+                "establish continuation support, and probing continuation does not change the context limit"
+            )
 
 
 def filter_deployments(

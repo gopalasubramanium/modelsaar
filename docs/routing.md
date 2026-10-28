@@ -32,8 +32,28 @@ explicit `deployments`), capabilities (`tools`, `tool_choice_required`, `paralle
 effective context (`input + output [+ reasoning] <= context_length`), `max_output_tokens`, request
 fields the backend path cannot honour, and admission feasibility (non-reserving).
 
-Capability values: `supported` passes; `unsupported` fails; **`unknown` fails** (conservative) with
-the remedy "run `modelsaar probe <id>` or declare it under `deployments[]`".
+Capability values: `supported` passes; `unsupported` fails; **`unknown` fails** (conservative). The
+remedy names the probe that can establish the capability — `modelsaar probe <id> --which <capability>`
+for `streaming`, `tools`, `parallel_tools`, `json_object`, `json_schema`, `vision` and `continuation` —
+or, for capabilities no probe covers (`tool_choice_required`, `audio_in`, `thinking`), only the operator
+override `deployments[] … capabilities: {<capability>: supported}`. The remedy never points at a probe
+that does not exist.
+
+**Continuation.** A follow-up turn whose assistant history carries `reasoning_content` (agentic clients
+such as Odysseus replay the previous assistant message with its reasoning) sets `needs_continuation`;
+every deployment whose `continuation` capability is `unknown` is then excluded, so an unprobed
+installation answers such requests with `422 no_eligible_deployment`. Discovery never claims this
+capability (no runtime reports it). `modelsaar probe <id> --which continuation` sends exactly that
+shape — user, assistant (`content` + `reasoning_content`), user — through the adapter unchanged and
+records `supported` only when **that** request is answered with a well-formed assistant message
+(`unsupported` on an explicit 4xx rejection or an answer without content/tool_calls; `unknown` on
+5xx, transport errors, a timeout — held as uncertain — or an exhausted output budget). This is
+**protocol acceptance**: it proves the backend accepts and answers a history carrying
+`reasoning_content`, not that the model semantically uses the replayed reasoning (the
+OpenAI-compatible API offers no way to verify that). Once a request needs continuation the gateway
+also refuses cross-model failover for it (`failover_note`). A context-length exclusion on the same
+deployment is independent: raising `context_length`/`num_ctx` does not establish continuation, and
+probing continuation does not change the context limit.
 
 Explicit deployment selection goes through the same checks.
 

@@ -708,7 +708,7 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("probe", help="verify capabilities with live probes (uses local compute)")
     s.add_argument("deployment", nargs="*", help="deployment id(s)")
     s.add_argument("--all", action="store_true")
-    s.add_argument("--which", nargs="*", choices=["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "latency"])
+    s.add_argument("--which", nargs="*", choices=["streaming", "tools", "parallel_tools", "json_object", "json_schema", "vision", "continuation", "latency"])
     s.add_argument("--timeout", type=float, default=120.0)
     s.add_argument("--json", action="store_true")
     s.add_argument("--offline", action="store_true", help="probe directly instead of through a running gateway (refused while a gateway listens unless --allow-concurrent)")
