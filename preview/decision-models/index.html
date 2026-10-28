@@ -7,23 +7,23 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Preview: decision models · ModelSaar</title>
-<meta name="description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.">
+<title>Release candidate: decision models · ModelSaar</title>
+<meta name="description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from the GitHub pre-release v0.1.0-rc.1 — experimental, not a stable release.">
 <meta name="author" content="Gopala Subramanium">
 <link rel="canonical" href="https://modelsaar.com/preview/decision-models/">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ModelSaar">
-<meta property="og:title" content="Preview: decision models · ModelSaar">
-<meta property="og:description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.">
+<meta property="og:title" content="Release candidate: decision models · ModelSaar">
+<meta property="og:description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from the GitHub pre-release v0.1.0-rc.1 — experimental, not a stable release.">
 <meta property="og:url" content="https://modelsaar.com/preview/decision-models/">
 <meta property="og:image" content="https://modelsaar.com/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="ModelSaar — one address for your local AI">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Preview: decision models · ModelSaar">
-<meta name="twitter:description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.">
+<meta name="twitter:title" content="Release candidate: decision models · ModelSaar">
+<meta name="twitter:description" content="Try ModelSaar&#x27;s opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from the GitHub pre-release v0.1.0-rc.1 — experimental, not a stable release.">
 <meta name="twitter:image" content="https://modelsaar.com/assets/og.png">
 <meta name="theme-color" content="#0f5c50">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -32,8 +32,8 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=8da1acb4">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Preview: decision models", "description": "Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.", "url": "https://modelsaar.com/preview/decision-models/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "preview", "item": "https://modelsaar.com/preview/"}, {"@type": "ListItem", "position": 3, "name": "Preview: decision models", "item": "https://modelsaar.com/preview/decision-models/"}]}</script>
+<link rel="stylesheet" href="/assets/site.css?v=329ff110">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Release candidate: decision models", "description": "Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from the GitHub pre-release v0.1.0-rc.1 — experimental, not a stable release.", "url": "https://modelsaar.com/preview/decision-models/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "preview", "item": "https://modelsaar.com/preview/"}, {"@type": "ListItem", "position": 3, "name": "Release candidate: decision models", "item": "https://modelsaar.com/preview/decision-models/"}]}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -48,11 +48,11 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
   </nav>
 </header>
 <main id="main" class="">
-<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Preview: decision models</li></ol></nav>
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Release candidate: decision models</li></ol></nav>
 <section aria-labelledby="pv-title">
-  <h1 id="pv-title">Preview: decision models</h1>
-  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. You can try them today from GitHub at one exact commit. <strong>This is a preview for testing, not a stable release: the default installer and the stable installation path are unchanged.</strong></p>
-  <div class="callout"><p><strong>Status:</strong> both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>succeeded</strong> on 2026-10-28 (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
+  <h1 id="pv-title">Release candidate: decision models</h1>
+  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. They are available for testing as the GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1"><strong>v0.1.0-rc.1</strong></a> (tag on commit <code>5b947f2859a7</code>; code identical to <code>6075cdcf3b09</code>). <strong>This is a release candidate for testing, not a stable release: no package, no container image, and the default installer and the stable installation path are unchanged.</strong></p>
+  <div class="callout"><p><strong>Status:</strong> GitHub-only release candidate (<a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">release notes</a>). Both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>succeeded</strong> on 2026-10-28 (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
 </section>
 
 <section aria-labelledby="what-title">
@@ -79,10 +79,10 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </section>
 
 <section aria-labelledby="install-title">
-  <h2 id="install-title">Try it from GitHub (pinned to one exact commit)</h2>
-  <p>The preview uses the ordinary development install at commit <code>6075cdcf3b09</code>, in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. The one-line installer still pins <code>cf56cdd3416d</code>, which does <em>not</em> contain these features; do not point it at the preview commit, because it would replace your stable installation.</p>
+  <h2 id="install-title">Try it from GitHub (pinned to the pre-release tag)</h2>
+  <p>The candidate uses the ordinary development install at the tag <code>v0.1.0-rc.1</code> (commit <code>5b947f2859a7</code>; <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">GitHub pre-release</a>), in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. <code>modelsaar --version</code> still prints <code>0.1.0</code>: a candidate does not bump the package version. The one-line installer still pins <code>cf56cdd3416d</code>, which does <em>not</em> contain these features; do not point it at the candidate, because it would replace your stable installation.</p>
   <div class="cmd cmd-scroll"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre tabindex="0"><code class="language-bash">git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview &amp;&amp; cd modelsaar-preview
-git checkout 6075cdcf3b0952d4213a7899438f5fe546e95d19
+git checkout v0.1.0-rc.1                                               # the pre-release tag = commit 5b947f2859a7
 python3 -m venv .venv &amp;&amp; . .venv/bin/activate &amp;&amp; pip install -e .     # or: uv venv &amp;&amp; . .venv/bin/activate &amp;&amp; uv pip install -e .
 export MODELSAAR_HOME=~/.modelsaar-preview                           # separate config, keys and state: your normal install is untouched
 modelsaar init --port 8485                                            # or: --endpoint http://host:11434 --type ollama
@@ -105,7 +105,7 @@ modelsaar serve</code></pre></div>
     model: nimble            # a deployment with role decision (modelsaar discover)
     only_when_ambiguous: true
     timeout_s: 2.0</code></pre></div>
-  <p>To remove the preview: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written.</p>
+  <p>To remove the candidate: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written. Problems or feedback: <a href="https://github.com/gopalasubramanium/modelsaar/issues">GitHub issues</a>.</p>
 </section>
 
 <section aria-labelledby="smoke-title">
@@ -121,15 +121,15 @@ modelsaar serve</code></pre></div>
   <ul>
     <li>nimble-v3 answered &#x27;billing&#x27; (0.753) for a checkout-500 ticket where a human would likely say &#x27;bug&#x27;; d1 answered &#x27;bug&#x27; (0.715). The smoke test validates the wire contract and routing, not answer quality.</li><li>`auto` chose ollama/d1:latest (2.7B, decision+vision) although nimble-v3 had just been loaded by request 1: at decision time neither model was observed resident (residency is refreshed on an interval), so the documented tie-break &#x27;by id&#x27; applied (d1 &lt; nimble-v3). Documented behaviour; an explicit model id is the way to pick a specific decision model.</li><li>the classifier&#x27;s single consultation took 255 ms end to end (nimble-v3 resident), above the 250 ms median bound of the classifier decision rule; one request establishes nothing about that rule.</li>
   </ul>
-  <p>Record: <a href="https://github.com/gopalasubramanium/modelsaar/tree/8da1acb49a0b2d74873f311dde9656a3a5fd5c34/docs/live-runs/2026-10-28-decision-preview-smoke"><code>docs/live-runs/2026-10-28-decision-preview-smoke/</code></a> (summary, responses, headers, decision records, discovery, launcher console; no prompts beyond the two synthetic inputs, no keys).</p>
+  <p>Record: <a href="https://github.com/gopalasubramanium/modelsaar/tree/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/docs/live-runs/2026-10-28-decision-preview-smoke"><code>docs/live-runs/2026-10-28-decision-preview-smoke/</code></a> (summary, responses, headers, decision records, discovery, launcher console; no prompts beyond the two synthetic inputs, no keys).</p>
 </section>
 
 <section aria-labelledby="not-title">
-  <h2 id="not-title">What this preview is not</h2>
+  <h2 id="not-title">What this release candidate is not</h2>
   <ul>
-    <li>Not a release: no tag, no package, no container image; the default installer pin is unchanged and still predates these features.</li>
+    <li>Not a stable release: <code>v0.1.0-rc.1</code> is a GitHub pre-release tag only — no package on PyPI, no container image, no version bump; the default installer pin is unchanged and still predates these features. A stable <code>v0.1.x</code> remains a separate owner decision (<a href="/docs/release/">release process</a>).</li>
     <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="/benchmarks/">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above.</li>
-    <li>Not stable: the wire contract follows Ollama's documented System One API and may change with it; feedback via <a href="https://github.com/gopalasubramanium/modelsaar/issues">issues</a>.</li>
+    <li>Not frozen: the wire contract follows Ollama's documented System One API and may change with it; a later candidate would be <code>-rc.2</code>, never a moved tag.</li>
   </ul>
 </section>
 
@@ -139,7 +139,7 @@ modelsaar serve</code></pre></div>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/8da1acb49a0b2d74873f311dde9656a3a5fd5c34">8da1acb49a0b</a> on 2026-10-27. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -151,6 +151,6 @@ modelsaar serve</code></pre></div>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=8da1acb4" defer></script>
+<script src="/assets/site.js?v=329ff110" defer></script>
 </body>
 </html>

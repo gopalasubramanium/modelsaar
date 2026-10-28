@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=8da1acb4">
+<link rel="stylesheet" href="/assets/site.css?v=329ff110">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Changelog", "description": "What changed in each ModelSaar revision.", "url": "https://modelsaar.com/docs/changelog/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Changelog", "item": "https://modelsaar.com/docs/changelog/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,28 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Changelog</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/8da1acb49a0b2d74873f311dde9656a3a5fd5c34/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>8da1acb49a0b</code>. The repository file is authoritative.</p></header><h2 id="unreleased-decision-model-preview-smoke-test-record-github-preview-path-website-page-2026-10-28">Unreleased — decision-model preview: smoke-test record, GitHub preview path, website page, 2026-10-28</h2>
+<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>329ff11047d0</code>. The repository file is authoritative.</p></header><h2 id="unreleased-website-release-candidate-page-and-status-wording-2026-10-28">Unreleased — website: release-candidate page and status wording, 2026-10-28</h2>
+<ul>
+<li><code>/preview/decision-models/</code> is now the tester guide for the GitHub pre-release <code>v0.1.0-rc.1</code>: links the release,
+  installs from the pinned tag (commit shown; package version stays 0.1.0), keeps every caveat and the smoke-test
+  table; home, Get started, Roadmap, the footer and <code>llms.txt</code> say "no <em>stable</em> release" and name the candidate.
+  Installer pin and test count unchanged.</li>
+</ul>
+<h2 id="v010-rc1-github-only-release-candidate-pre-release-not-a-stable-release-2026-10-28">v0.1.0-rc.1 — GitHub-only release candidate (pre-release; not a stable release), 2026-10-28</h2>
+<ul>
+<li><strong>Tag <code>v0.1.0-rc.1</code></strong>, a GitHub <em>pre-release</em> on the <code>main</code> commit that contains every "Unreleased" entry
+  below — in particular <code>POST /v1/decisions</code> and the routing classifier's <code>mode: decision</code> (both <strong>opt-in and
+  experimental</strong>; nothing changes unless configured). Created for testers who install from GitHub at a
+  pinned tag; <strong>no PyPI package, no container image, no stable tag</strong>, and the one-line installer's pin is
+  unchanged (it still predates the decision-model features).</li>
+<li><code>release.yml</code> now runs only for stable tags (<code>v[0-9]+.[0-9]+.[0-9]+</code>, with a job-level guard against any
+  <code>-</code> suffix), so a candidate tag never triggers publication; <code>docs/release.md</code> gains the "GitHub-only
+  pre-releases" convention. The package version stays <code>0.1.0</code> (candidates are not version bumps).</li>
+<li>Evidence behind the candidate: the fixture tests in CI (285 non-live tests at this commit) and the one
+  bounded live smoke test of 2026-10-28 (three requests). It establishes the wire contract and routing on
+  one machine, not answer quality, latency distributions or any routing benefit of the classifier.</li>
+</ul>
+<h2 id="unreleased-decision-model-preview-smoke-test-record-github-preview-path-website-page-2026-10-28">Unreleased — decision-model preview: smoke-test record, GitHub preview path, website page, 2026-10-28</h2>
 <ul>
 <li><strong>Live smoke test (one, bounded):</strong> three requests against the merged decision-model features from an isolated
   preview checkout at <code>6075cdcf…</code> and an isolated home on the owner's Mac, backend the GX10's Ollama 0.40.5:
@@ -302,7 +323,7 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/8da1acb49a0b2d74873f311dde9656a3a5fd5c34">8da1acb49a0b</a> on 2026-10-27. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -314,6 +335,6 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=8da1acb4" defer></script>
+<script src="/assets/site.js?v=329ff110" defer></script>
 </body>
 </html>

@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=8da1acb4">
+<link rel="stylesheet" href="/assets/site.css?v=329ff110">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect."}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "ModelSaar", "description": "ModelSaar is an open-source gateway that connects the AI apps you already use to the models you already run. Each request goes to a suitable available model, chosen from the task, verified model capabilities and the limits you set — with a decision you can inspect.", "codeRepository": "https://github.com/gopalasubramanium/modelsaar", "author": {"@type": "Person", "name": "Gopala Subramanium", "url": "https://me.sgopala.com"}, "programmingLanguage": "Python", "runtimePlatform": "Python 3.10+", "license": "https://www.apache.org/licenses/LICENSE-2.0", "url": "https://modelsaar.com", "version": "0.1.0 (unreleased public alpha)"}</script>
 </head>
 <body>
@@ -51,7 +51,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 
 <section class="hero" aria-labelledby="hero-title">
   <div>
-    <p class="status">Development preview — open source, no release tagged yet</p>
+    <p class="status">Development preview — open source, no stable release yet</p>
     <h1 id="hero-title">One address for your local AI.</h1>
     <p class="lede">Connect the AI apps you already use. ModelSaar sends each request to a suitable available model, chosen from the task, verified model capabilities and the limits you set.</p>
     <p>Spend less time switching models and configuring apps. Keep control of where your requests run.</p>
@@ -178,7 +178,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
 <section aria-labelledby="evidence-title">
   <h2 id="evidence-title">Measured, not promised</h2>
   <p>In the accepted run of 2026-10-15 (four models on one machine, 32 held-out tasks, 400-token budget), automatic routing scored 30 of 32 and the strongest single model 29 of 32 — a difference the data cannot distinguish from zero — with a median end-to-end latency of 0.38 s against 3.44 s and zero capability violations, because the router sent almost every task to a resident fast model and the one image task to a vision-capable one. Two later runs on an upgraded runtime, with five and then all eight of the machine's models, matched the strongest single model exactly; in the eight-model run the router picked that model itself on every task because it was the one resident at the time. Routing overhead — the decision itself, separate from the response — stayed under 1 ms at p95 in all three runs.</p>
-  <p>Those are three runs on one machine with a small task set; the confidence intervals overlap, the later runs are not comparable to the first (different Ollama version), and no run isolates the effect of adding one model. Read the <a href="/benchmarks/">methodology, numbers and limitations</a>, or regenerate every aggregate from the <a href="https://github.com/gopalasubramanium/modelsaar/tree/8da1acb49a0b2d74873f311dde9656a3a5fd5c34/docs/live-runs/2026-10-15-gx10-stage-b-pass1">raw per-request records</a>.</p>
+  <p>Those are three runs on one machine with a small task set; the confidence intervals overlap, the later runs are not comparable to the first (different Ollama version), and no run isolates the effect of adding one model. Read the <a href="/benchmarks/">methodology, numbers and limitations</a>, or regenerate every aggregate from the <a href="https://github.com/gopalasubramanium/modelsaar/tree/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/docs/live-runs/2026-10-15-gx10-stage-b-pass1">raw per-request records</a>.</p>
 </section>
 
 <section class="faq" aria-labelledby="faq-title">
@@ -211,7 +211,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/8da1acb49a0b2d74873f311dde9656a3a5fd5c34">8da1acb49a0b</a> on 2026-10-27. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -223,6 +223,6 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=8da1acb4" defer></script>
+<script src="/assets/site.js?v=329ff110" defer></script>
 </body>
 </html>

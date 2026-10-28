@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=8da1acb4">
+<link rel="stylesheet" href="/assets/site.css?v=329ff110">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Get started", "description": "Prerequisites, installation, first request and client connection for ModelSaar on macOS, Linux and WSL.", "url": "https://modelsaar.com/get-started/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "Get started", "item": "https://modelsaar.com/get-started/"}]}</script>
 </head>
 <body>
@@ -52,7 +52,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <section aria-labelledby="gs-title">
   <h1 id="gs-title">Get started</h1>
   <p class="lede">From nothing to a first request routed through <code>auto</code>. Two paths: the beginner path installs, configures and verifies in a few commands; the expert path is the same thing without the wrapper.</p>
-  <div class="callout"><p><strong>Status:</strong> ModelSaar is a <strong>public alpha</strong>. No release has been tagged and no package is published, so every install path below pins commit <code>cf56cdd3416d</code> of the <code>main</code> branch — the candidate described on the <a href="/roadmap/">roadmap</a> (two independent reviews reproduced and re-checked its defects; independent verification of this exact candidate is pending). Re-running the installer later moves you to the next pinned commit. Looking for the decision-model features (<code>/v1/decisions</code>, classifier <code>mode: decision</code>)? They are newer than the pinned commit and available only as an opt-in <a href="/preview/decision-models/">preview from GitHub</a>.</p></div>
+  <div class="callout"><p><strong>Status:</strong> ModelSaar is a <strong>public alpha</strong>. No stable release has been tagged and no package is published, so every install path below pins commit <code>cf56cdd3416d</code> of the <code>main</code> branch — the candidate described on the <a href="/roadmap/">roadmap</a> (two independent reviews reproduced and re-checked its defects; independent verification of this exact candidate is pending). Re-running the installer later moves you to the next pinned commit. Looking for the decision-model features (<code>/v1/decisions</code>, classifier <code>mode: decision</code>)? They are newer than the pinned commit and available only as the opt-in GitHub-only release candidate <a href="/preview/decision-models/">v0.1.0-rc.1</a> (a pre-release for testing, installed separately; see that page).</p></div>
 </section>
 
 <section aria-labelledby="prereq-title">
@@ -118,7 +118,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div><p
 <section aria-labelledby="ops-title">
   <h2 id="ops-title">Running it day to day</h2>
   <dl>
-    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/8da1acb49a0b2d74873f311dde9656a3a5fd5c34/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
+    <dt>Keep it running</dt><dd>Run <code>modelsaar serve</code> under your service manager; a <code>launchd</code> plist and a <code>systemd</code> unit are in <a href="https://github.com/gopalasubramanium/modelsaar/tree/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/examples"><code>examples/</code></a>. Docker Compose is documented in <a href="/docs/installation/">Installation</a> (gateway only; models stay with your runtime).</dd>
     <dt>Stop / restart</dt><dd>Ctrl-C in the terminal, or your service manager's stop/restart. Configuration changes need a restart; in-flight requests finish on the old config.</dd>
     <dt>Update</dt><dd>Re-run the same installer command. With an existing configuration it upgrades in place: nothing is re-initialised, the new revision is validated against your configuration before it becomes current, the previous environment is kept for rollback, and on Linux a <code>modelsaar.service</code> user unit that belongs to the installation is restarted and checked at the address it actually listens on (details in <a href="/docs/installation/">Installation</a>). With uv/pipx re-run the install command with the new commit. Then <code>modelsaar config validate</code> and <code>modelsaar doctor</code>. Keys and state are untouched; evidence from an older evidence scheme is kept but not used until you re-probe.</dd>
     <dt>Troubleshoot</dt><dd><code>modelsaar doctor</code> first; then <code>modelsaar decisions --limit 10</code> for the last routing records and <code>modelsaar explain -m "…" [--tools --image --json-schema]</code> to dry-run a request. More in <a href="/docs/troubleshooting/">Troubleshooting</a>.</dd>
@@ -137,7 +137,7 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div><p
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/8da1acb49a0b2d74873f311dde9656a3a5fd5c34">8da1acb49a0b</a> on 2026-10-27. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -149,6 +149,6 @@ API key:   msk_…  (the line printed by the command above)</code></pre></div><p
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=8da1acb4" defer></script>
+<script src="/assets/site.js?v=329ff110" defer></script>
 </body>
 </html>
