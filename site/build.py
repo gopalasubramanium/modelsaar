@@ -180,7 +180,7 @@ Source: {esc(facts.REPO_URL)}. Licence: {esc(facts.LICENSE)}.
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="{esc(facts.CREATOR_URL)}">{esc(facts.CREATOR_NAME)}</a> · <a href="{self.href('/thanks/')}">Say thanks</a></p>
-      <p class="small">Site built from <a href="{facts.REPO_URL}/commit/{self.commit}">{self.commit[:12]}</a> on {self.built}. Development preview; no release has been tagged.</p>
+      <p class="small">Site built from <a href="{facts.REPO_URL}/commit/{self.commit}">{self.commit[:12]}</a> on {self.built}. Development preview; no stable release has been tagged (GitHub pre-release <a href="{facts.RC_RELEASE_URL}">{facts.RC_TAG}</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="{self.href('/get-started/')}">Get started</a></li>
@@ -329,7 +329,7 @@ def build(site: Site) -> None:
         ("/benchmarks/", "Benchmarks and evidence", "Methodology, actual results and limitations of the ModelSaar evaluation, with links to the raw per-request records.", "benchmarks.html"),
         ("/privacy/", "Privacy", "What the ModelSaar gateway does with your requests, and what this website collects (nothing beyond the host's access logs).", "privacy.html"),
         ("/roadmap/", "Roadmap and status", "Current status of ModelSaar and clearly identified future work.", "roadmap.html"),
-        ("/preview/decision-models/", "Preview: decision models", "Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from GitHub at one pinned commit — experimental, not a release.", "preview-decision-models.html"),
+        ("/preview/decision-models/", "Release candidate: decision models", "Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from the GitHub pre-release v0.1.0-rc.1 — experimental, not a stable release.", "preview-decision-models.html"),
         ("/docs/", "Documentation", "ModelSaar documentation: installation, configuration, routing, API, operations, evaluation, clients.", "docs-index.html"),
     ]
     for path, title, desc, frag in pages:

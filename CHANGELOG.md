@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — website: release-candidate page and status wording, 2026-10-28
+
+* `/preview/decision-models/` is now the tester guide for the GitHub pre-release `v0.1.0-rc.1`: links the release,
+  installs from the pinned tag (commit shown; package version stays 0.1.0), keeps every caveat and the smoke-test
+  table; home, Get started, Roadmap, the footer and `llms.txt` say "no *stable* release" and name the candidate.
+  Installer pin and test count unchanged.
+
 ## v0.1.0-rc.1 — GitHub-only release candidate (pre-release; not a stable release), 2026-10-28
 
 * **Tag `v0.1.0-rc.1`**, a GitHub *pre-release* on the `main` commit that contains every "Unreleased" entry

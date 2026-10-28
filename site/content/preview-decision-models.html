@@ -1,7 +1,7 @@
 <section aria-labelledby="pv-title">
-  <h1 id="pv-title">Preview: decision models</h1>
-  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. You can try them today from GitHub at one exact commit. <strong>This is a preview for testing, not a stable release: the default installer and the stable installation path are unchanged.</strong></p>
-  <div class="callout"><p><strong>Status:</strong> both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>{{ 'succeeded' if facts.decision_preview()['status'] == 'completed' else 'was not completed' }}</strong> on {{ facts.decision_preview()['date'] }} (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
+  <h1 id="pv-title">Release candidate: decision models</h1>
+  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. They are available for testing as the GitHub pre-release <a href="{{ facts.RC_RELEASE_URL }}"><strong>{{ facts.RC_TAG }}</strong></a> (tag on commit <code>{{ facts.RC_COMMIT[:12] }}</code>; code identical to <code>{{ facts.PREVIEW_COMMIT[:12] }}</code>). <strong>This is a release candidate for testing, not a stable release: no package, no container image, and the default installer and the stable installation path are unchanged.</strong></p>
+  <div class="callout"><p><strong>Status:</strong> GitHub-only release candidate (<a href="{{ facts.RC_RELEASE_URL }}">release notes</a>). Both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>{{ 'succeeded' if facts.decision_preview()['status'] == 'completed' else 'was not completed' }}</strong> on {{ facts.decision_preview()['date'] }} (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
 </section>
 
 <section aria-labelledby="what-title">
@@ -28,15 +28,15 @@
 </section>
 
 <section aria-labelledby="install-title">
-  <h2 id="install-title">Try it from GitHub (pinned to one exact commit)</h2>
-  <p>The preview uses the ordinary development install at commit <code>{{ facts.PREVIEW_COMMIT[:12] }}</code>, in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. The one-line installer still pins <code>{{ facts.INSTALL_SHA[:12] }}</code>, which does <em>not</em> contain these features; do not point it at the preview commit, because it would replace your stable installation.</p>
+  <h2 id="install-title">Try it from GitHub (pinned to the pre-release tag)</h2>
+  <p>The candidate uses the ordinary development install at the tag <code>{{ facts.RC_TAG }}</code> (commit <code>{{ facts.RC_COMMIT[:12] }}</code>; <a href="{{ facts.RC_RELEASE_URL }}">GitHub pre-release</a>), in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. <code>modelsaar --version</code> still prints <code>0.1.0</code>: a candidate does not bump the package version. The one-line installer still pins <code>{{ facts.INSTALL_SHA[:12] }}</code>, which does <em>not</em> contain these features; do not point it at the candidate, because it would replace your stable installation.</p>
   {{ cmd(facts.PREVIEW_INSTALL, scroll=True) }}
   <p>First decision request (the same body the live smoke test used; the API key is the first line of the preview home's <code>keys/api_keys</code>):</p>
   {{ cmd(facts.PREVIEW_DECISIONS_REQUEST, scroll=True) }}
   <p>Expected shape: <code>{"model": "auto", "answers": {"label": {"type": "choice", "choice": …, "probabilities": {…}, "confidence": …}, "urgent": {"type": "noul", "noul": …}}, "usage": {…}}</code>, with headers <code>X-ModelSaar-Request-Id</code> and <code>X-ModelSaar-Deployment</code>; <code>modelsaar decisions</code> shows the record with <code>endpoint: decisions</code>.</p>
   <p>To try the classifier in decision mode, add this to <code>~/.modelsaar-preview/config.yaml</code>, run <code>modelsaar doctor</code> (it checks the role/mode pairing) and restart <code>modelsaar serve</code>; then send an ambiguous chat request such as <code>thoughts?</code> to <code>auto</code> and look at <code>classifier</code> in its decision record:</p>
   {{ cmd(facts.PREVIEW_CLASSIFIER_YAML, lang='yaml', scroll=True) }}
-  <p>To remove the preview: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written.</p>
+  <p>To remove the candidate: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written. Problems or feedback: <a href="{{ facts.REPO_URL }}/issues">GitHub issues</a>.</p>
 </section>
 
 <section aria-labelledby="smoke-title">
@@ -56,10 +56,10 @@
 </section>
 
 <section aria-labelledby="not-title">
-  <h2 id="not-title">What this preview is not</h2>
+  <h2 id="not-title">What this release candidate is not</h2>
   <ul>
-    <li>Not a release: no tag, no package, no container image; the default installer pin is unchanged and still predates these features.</li>
+    <li>Not a stable release: <code>{{ facts.RC_TAG }}</code> is a GitHub pre-release tag only — no package on PyPI, no container image, no version bump; the default installer pin is unchanged and still predates these features. A stable <code>v0.1.x</code> remains a separate owner decision (<a href="{{ href('/docs/release/') }}">release process</a>).</li>
     <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="{{ href('/benchmarks/') }}">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above.</li>
-    <li>Not stable: the wire contract follows Ollama's documented System One API and may change with it; feedback via <a href="{{ facts.REPO_URL }}/issues">issues</a>.</li>
+    <li>Not frozen: the wire contract follows Ollama's documented System One API and may change with it; a later candidate would be <code>-rc.2</code>, never a moved tag.</li>
   </ul>
 </section>
