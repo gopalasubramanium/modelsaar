@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — website and docs for the GitHub pre-release v0.1.0-rc.2, 2026-10-29
+
+* `/preview/decision-models/` installs from `v0.1.0-rc.2`, gains the section "Agentic clients that replay
+  reasoning" (probe command, what it establishes — protocol acceptance — and the operator override), and keeps
+  rc.1 linked and unchanged; roadmap, README, `docs/roadmap.md`, `docs/release.md` ("Candidates so far") updated.
+  Installer pin unchanged.
+
 ## Unreleased — continuation probe; corrected `422` remedy, 2026-10-29
 
 * **New probe `continuation`** (`probes.py`, in `modelsaar probe --all` and `--which continuation`, also via

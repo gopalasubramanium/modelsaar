@@ -38,8 +38,9 @@ Each with its own tests before being described as supported:
   **as `POST /v1/decisions` — implemented (contract in `docs/routing.md` "Decisions")**. Both are
   fixture-tested; one bounded live smoke test (three requests, 2026-10-28, `nimble-v3` on the GX10;
   `docs/live-runs/2026-10-28-decision-preview-smoke/`) exercised the wire contract and routing — not
-  answer quality, not the classifier decision rule. Offered as the opt-in GitHub-only release candidate
-  `v0.1.0-rc.1` (pre-release tag; code identical to `6075cdcf…`; README "Release candidate: decision
+  answer quality, not the classifier decision rule. Offered as the opt-in GitHub-only release candidates
+  `v0.1.0-rc.1` (pre-release tag; code identical to `6075cdcf…`) and `v0.1.0-rc.2` (adds the
+  `continuation` probe and the corrected `422` remedy; README "Release candidate: decision
   models"; modelsaar.com/preview/decision-models/); the default
   installer pin is unchanged.
 * Audio/video inputs; multimodal embeddings (EmbeddingGemma 2 image/video/audio); OCR pipeline

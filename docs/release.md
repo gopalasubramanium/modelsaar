@@ -43,7 +43,10 @@ being tested and what the evidence does and does not show. It is for testers who
 * **Candidates so far:** `v0.1.0-rc.1` (2026-10-28) — decision-model support (`POST /v1/decisions`,
   classifier `mode: decision`), opt-in and experimental; evidence: fixture tests in CI and one bounded
   live smoke test of three requests (`docs/live-runs/2026-10-28-decision-preview-smoke/`); no quality
-  or routing-benefit claim.
+  or routing-benefit claim. `v0.1.0-rc.2` (2026-10-29) — rc.1 plus the `continuation` capability probe
+  (`modelsaar probe <id> --which continuation`; protocol acceptance, not semantic continuity) and the
+  corrected `422` remedy; fixture-tested (294 tests); the probe has not yet been run against a live
+  backend from this tag. rc.1 remains available unchanged.
 
 ## Readiness for the first versioned alpha release (checked 2026-10-14)
 
