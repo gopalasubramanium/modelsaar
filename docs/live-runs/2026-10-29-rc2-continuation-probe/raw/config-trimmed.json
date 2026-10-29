@@ -1,0 +1,39 @@
+{
+ "server": {
+  "host": "<GX10_LAN_IP>",
+  "port": 8486,
+  "api_keys_file": "keys/api_keys",
+  "admin_key_file": "keys/admin_key",
+  "state_db": "state/modelsaar.db",
+  "request_timeout_s": 600.0,
+  "max_request_bytes": 33554432,
+  "response_model_field": "requested",
+  "residency_refresh_s": 15.0,
+  "discovery_refresh_s": 120.0
+ },
+ "security": {
+  "allow_lan": true,
+  "locality_mode": "local_only",
+  "allowed_backend_hosts": [],
+  "fetch_remote_media": false,
+  "log_prompts": false,
+  "telemetry_opt_in": false
+ },
+ "backends": [
+  {
+   "id": "ollama",
+   "type": "ollama",
+   "base_url": "http://127.0.0.1:11434",
+   "locality": "local",
+   "resource_pool": "local-machine",
+   "discover": true,
+   "models": [],
+   "timeout_s": 600.0,
+   "connect_timeout_s": 5.0,
+   "max_concurrent": 4,
+   "circuit_failure_threshold": 3,
+   "circuit_cooldown_s": 30.0
+  }
+ ],
+ "deployments": []
+}

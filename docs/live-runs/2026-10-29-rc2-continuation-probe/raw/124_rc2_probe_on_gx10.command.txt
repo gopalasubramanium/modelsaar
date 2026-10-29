@@ -1,0 +1,105 @@
+#!/bin/bash
+# Owner-requested 2026-10-29 09:15 SGT: ONE bounded live validation of the RC2 `continuation` probe on the GX10, from an
+# ISOLATED RC2 checkout (tag v0.1.0-rc.2 = 7e7579825a2d37c238b04fbbb2d3a225119600f0): checkout ~/modelsaar-rc2, MODELSAAR_HOME
+# ~/.modelsaar-rc2, port 8486 bound to <GX10_LAN_IP> only (allow_lan, API keys; never 0.0.0.0), backend Ollama 127.0.0.1:11434,
+# plain background process (setsid nohup) — NOT a systemd unit. NO `continuation: supported` override (the probe is the test).
+# Exactly one probe: `modelsaar probe ollama/qwen3.8:latest --which continuation` (with --json for the record; same single
+# request). NOT touched: modelsaar.service (8484), ~/.modelsaar, the RC1 process on 8485 (~/.modelsaar-rc), the installer/pin,
+# Ollama, model tags, firewall. Gates: tag -> commit verified from the Mac, dirs unused, port 8486 free, RC1 + production
+# still up. Keys never printed; evidence contains no prompts/answers (the probe fixture is in the source). Output: 124-rc2-probe.txt
+HERE="$(cd "$(dirname "$0")" && pwd)"; cd "$HERE"; mkdir "$HERE/.lock-124" 2>/dev/null || exit 0
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH" GIT_TERMINAL_PROMPT=0
+scrub() { sed -E 's/(msk_|msa_)[A-Za-z0-9]+/<key>/g; s/(Bearer )[A-Za-z0-9_.-]+/\1<key>/g'; }
+RC2=7e7579825a2d37c238b04fbbb2d3a225119600f0; TAG=v0.1.0-rc.2
+{
+echo "=== $(date '+%Y-%m-%dT%H:%M:%S%z')"
+echo "power: $(pmset -g batt | head -1 | sed 's/^Now drawing from //')"
+T="$(git ls-remote https://github.com/gopalasubramanium/modelsaar "refs/tags/$TAG^{}" | cut -f1)"
+echo "tag $TAG -> ${T:-none} (expected $RC2)"; [ "$T" = "$RC2" ] || { echo "!! tag mismatch; refusing"; exit 1; }
+ssh -o BatchMode=yes -o ConnectTimeout=20 <SSH_ALIAS> 'bash -s' <<'REMOTE' 2>&1 | scrub
+set -u
+RC2=7e7579825a2d37c238b04fbbb2d3a225119600f0; TAG=v0.1.0-rc.2; WORK="$HOME/modelsaar-rc2"; export MODELSAAR_HOME="$HOME/.modelsaar-rc2"
+HOSTIP=<GX10_LAN_IP>; PORT=8486; OLLAMA="http://127.0.0.1:11434"; DEP="ollama/qwen3.8:latest"
+echo "host: $(hostname) $(uname -m) $(date -u '+%H:%M:%SZ')"
+echo "--- preflight (read-only)"
+echo "production service: $(systemctl --user is-active modelsaar.service 2>/dev/null || systemctl is-active modelsaar.service 2>/dev/null) pid $(systemctl --user show -p MainPID --value modelsaar.service 2>/dev/null || systemctl show -p MainPID --value modelsaar.service 2>/dev/null) on $(ss -ltn 2>/dev/null | grep -E ':8484\b' | awk '{print $4}' | tr '\n' ' ') (untouched)"
+RC1PID="$(cat "$HOME/.modelsaar-rc/serve.pid" 2>/dev/null)"; echo "rc1 process: pid ${RC1PID:-?} $(ps -o stat= -p "${RC1PID:-0}" 2>/dev/null || echo 'not running') on $(ss -ltn 2>/dev/null | grep -E ':8485\b' | awk '{print $4}' | tr '\n' ' ') (untouched)"
+[ -e "$WORK" ] && { echo "!! $WORK exists; refusing to overwrite"; exit 1; }
+[ -e "$MODELSAAR_HOME" ] && { echo "!! $MODELSAAR_HOME exists; refusing to overwrite"; exit 1; }
+ss -ltn 2>/dev/null | grep -qE ":$PORT\b" && { echo "!! port $PORT already in use on the GX10; refusing"; exit 1; }
+echo "dirs unused; port $PORT free"
+echo "python3: $(python3 -c 'import sys;print("%d.%d.%d"%sys.version_info[:3])' 2>/dev/null || echo none); git: $(command -v git || echo none)"
+echo "ollama: $(curl -s -m 5 $OLLAMA/api/version); ps before: $(curl -s -m 5 $OLLAMA/api/ps | python3 -c 'import sys,json;print([m["name"] for m in json.load(sys.stdin).get("models",[])])')"
+curl -s -m 5 $OLLAMA/api/tags | python3 -c 'import sys,json;t=[m["name"] for m in json.load(sys.stdin)["models"]];print("qwen3.8:latest present:", "qwen3.8:latest" in t, "(", len(t), "tags )")'
+# --- source at the exact tag ---
+mkdir -p "$WORK"
+git clone -q https://github.com/gopalasubramanium/modelsaar.git "$WORK" || { echo "!! clone failed"; exit 1; }
+git -C "$WORK" checkout -q --detach "$TAG" || { echo "!! checkout failed"; exit 1; }
+echo "checkout: $(git -C "$WORK" rev-parse HEAD) (expected $RC2); describe $(git -C "$WORK" describe --tags --exact-match 2>/dev/null); clean: $([ -z "$(git -C "$WORK" status --porcelain)" ] && echo yes || echo no)"
+[ "$(git -C "$WORK" rev-parse HEAD)" = "$RC2" ] || { echo "!! wrong commit"; exit 1; }
+# --- venv + install ---
+cd "$WORK"
+python3 -m venv .venv || { echo "!! python3 -m venv failed; refusing"; exit 1; }; .venv/bin/pip install -q -e . || { echo "!! pip install failed"; exit 1; }
+PY="$WORK/.venv/bin/python"; MS="$WORK/.venv/bin/modelsaar"
+echo "installed: $($MS --version); module path: $($PY -c 'import modelsaar,os;print(os.path.dirname(modelsaar.__file__))'); continuation in PROBE_NAMES: $($PY -c 'from modelsaar.probes import PROBE_NAMES;print("continuation" in PROBE_NAMES)')"
+# --- isolated home, bind <GX10_LAN_IP>:8486; NO capability override ---
+mkdir -p "$MODELSAAR_HOME/evidence"; EV="$MODELSAAR_HOME/evidence"
+$MS init --endpoint "$OLLAMA" --type ollama --port $PORT > "$EV/init.txt" 2>&1 || { echo "!! init failed: $(tail -3 "$EV/init.txt")"; exit 1; }
+$PY - <<PY
+import yaml
+p="$MODELSAAR_HOME/config.yaml"; c=yaml.safe_load(open(p))
+c.setdefault("server",{})["host"]="$HOSTIP"; c["server"]["port"]=$PORT
+c.setdefault("security",{})["allow_lan"]=True
+assert not c.get("deployments"), "unexpected deployments override"
+open(p,"w").write(yaml.safe_dump(c, sort_keys=False))
+print("config: host=%s port=%s allow_lan=%s backends=%s deployments override=%s" % (c["server"]["host"], c["server"]["port"], c["security"]["allow_lan"], [b.get("base_url") for b in c["backends"]], c.get("deployments")))
+open("$EV/config-trimmed.json","w").write(__import__("json").dumps({"server":c["server"],"security":c["security"],"backends":c["backends"],"deployments":c.get("deployments")}, indent=1, default=str))
+PY
+echo "--- discover + doctor"
+$MS discover > "$EV/discover.txt" 2>&1; grep -E "qwen3.8|auto  " "$EV/discover.txt" | head -3
+$MS doctor > "$EV/doctor.txt" 2>&1; grep -E "FAIL|failure|alias:auto:" "$EV/doctor.txt" | head -4
+# --- serve as a plain background process ---
+cd "$MODELSAAR_HOME"; setsid nohup "$MS" serve > "$MODELSAAR_HOME/serve.log" 2>&1 < /dev/null & SPID=$!; echo $SPID > "$MODELSAAR_HOME/serve.pid"
+for i in $(seq 1 40); do curl -sf "http://$HOSTIP:$PORT/healthz" >/dev/null && break; sleep 0.5; done
+echo "serve pid $SPID; healthz: $(curl -s -m 5 "http://$HOSTIP:$PORT/healthz")"
+echo "listening: $(ss -ltnp 2>/dev/null | grep -E ":$PORT\b" | awk '{print $4}' | tr '\n' ' ') (must be $HOSTIP:$PORT only)"
+echo "process: $(ps -o pid=,cmd= -p $SPID)"
+AK="$(head -1 "$MODELSAAR_HOME/keys/admin_key")"
+capstate() { curl -s -m 10 -H "Authorization: Bearer $AK" "http://$HOSTIP:$PORT/admin/status" | python3 -c '
+import sys,json; d=json.load(sys.stdin); dep=[x for x in d["deployments"] if x["id"]=="'"$DEP"'"]
+out={"gateway_version":d["version"],"config_hash":d["config_hash"],"registry_version":d["registry_version"],"security":d["security"],"deployment":dep[0] if dep else None}
+json.dump(out, open("'"$EV"'/'"$1"'","w"), indent=1, default=str)
+c=(dep[0].get("capabilities") or {}).get("continuation") if dep else None
+print("continuation:", c)'; }
+echo "--- capability BEFORE the probe (must be unknown, no override):"; capstate admin-status-before.trimmed.json
+echo "--- the one probe: modelsaar probe $DEP --which continuation  ($(date -u '+%H:%M:%SZ'))"
+T0=$(date +%s)
+$MS probe "$DEP" --which continuation --json > "$EV/probe-stdout.txt" 2>&1; PRC=$?
+echo "probe exit $PRC after $(( $(date +%s) - T0 )) s; human report:"; grep -vE '^\s*[\[\]{}"]' "$EV/probe-stdout.txt" | head -8
+echo "--- capability AFTER the probe:"; capstate admin-status-after.trimmed.json
+echo "ps after: $(curl -s -m 5 $OLLAMA/api/ps | python3 -c 'import sys,json;print([(m["name"],m.get("size_vram")) for m in json.load(sys.stdin).get("models",[])])')"
+cp "$MODELSAAR_HOME/serve.log" "$EV/serve.log"; echo "serve.log lines: $(wc -l < "$EV/serve.log"); admin/probe lines: $(grep -c 'admin/probe' "$EV/serve.log")"
+$PY - <<PY > "$EV/probes-table.json"
+import sqlite3,json,glob
+db=glob.glob("$MODELSAAR_HOME/*.db")+glob.glob("$MODELSAAR_HOME/**/*.db",recursive=True)
+rows=[]
+for p in db:
+    try:
+        for r in sqlite3.connect(p).execute("select deployment_id,fingerprint,capability,value,note,checked_at,scheme from probes where capability='continuation'"): rows.append(dict(zip(["deployment_id","fingerprint","capability","value","note","checked_at","scheme"],r)))
+    except Exception as e: rows.append({"db":p,"error":str(e)})
+print(json.dumps(rows,indent=1))
+PY
+echo "probes table rows (continuation): $(python3 -c 'import json;print(len(json.load(open("'"$EV"'/probes-table.json"))))')"
+echo "production still: $(systemctl --user is-active modelsaar.service 2>/dev/null || systemctl is-active modelsaar.service 2>/dev/null) pid $(systemctl --user show -p MainPID --value modelsaar.service 2>/dev/null || systemctl show -p MainPID --value modelsaar.service 2>/dev/null); ~/.modelsaar/config.yaml mtime $(stat -c %y "$HOME/.modelsaar/config.yaml" | cut -c1-19); rc1 pid ${RC1PID:-?} $(ps -o stat= -p "${RC1PID:-0}" 2>/dev/null || echo 'not running'); 8485 healthz: $(curl -s -m 5 http://$HOSTIP:8485/healthz | cut -c1-40)"
+echo "RC2 on GX10 running: http://$HOSTIP:$PORT/v1  (key: first line of $MODELSAAR_HOME/keys/api_keys on the GX10 — not printed; stop: kill \$(cat $MODELSAAR_HOME/serve.pid))"
+echo "evidence dir: $EV ($(ls "$EV" | tr '\n' ' '))"
+REMOTE
+echo "ssh exit: ${PIPESTATUS[0]}"
+echo "--- reachability from this Mac: $(curl -s -m 8 http://<GX10_LAN_IP>:8486/healthz || echo 'NOT reachable')"
+mkdir -p "$HERE/rc2-probe-evidence" && scp -q -o BatchMode=yes -o ConnectTimeout=20 "<SSH_ALIAS>:~/.modelsaar-rc2/evidence/*" "$HERE/rc2-probe-evidence/" && echo "evidence copied: $(ls "$HERE/rc2-probe-evidence" | wc -l | tr -d ' ') files" || echo "!! evidence copy failed"
+for f in "$HERE"/rc2-probe-evidence/*; do scrub < "$f" > "$f.s" && mv "$f.s" "$f"; done
+echo "key scan of copied evidence: $(grep -lE 'msk_[A-Za-z0-9]{8}|msa_[A-Za-z0-9]{8}' "$HERE"/rc2-probe-evidence/* 2>/dev/null | wc -l | tr -d ' ') files (must be 0)"
+echo "=== done $(date '+%Y-%m-%dT%H:%M:%S%z')"
+} > "$HERE/124-rc2-probe.txt" 2>&1
+scrub < "$HERE/124-rc2-probe.txt" > "$HERE/124-rc2-probe.s.txt" && mv "$HERE/124-rc2-probe.s.txt" "$HERE/124-rc2-probe.txt"
+rmdir "$HERE/.lock-124"; sleep 1

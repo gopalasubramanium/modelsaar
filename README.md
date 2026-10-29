@@ -51,7 +51,9 @@ tested against controlled backends, and exercised live against a real Ollama ser
 and `v0.1.0-rc.1` (unchanged). They are fixture-tested in CI and were exercised once live with three
 requests (`docs/live-runs/2026-10-28-decision-preview-smoke/`); nothing about answer quality or routing
 benefit is claimed. The continuation probe establishes protocol acceptance of `reasoning_content` in the
-assistant history, not semantic continuity. A candidate is GitHub-only: no PyPI package, no container image, and the package
+assistant history, not semantic continuity; it was run live once from `v0.1.0-rc.2` against `ollama/qwen3.8:latest`
+(Ollama 0.40.5) and reported `supported` (`docs/live-runs/2026-10-29-rc2-continuation-probe/`; one deployment,
+no override, nothing about other models or a real client's follow-up turn). A candidate is GitHub-only: no PyPI package, no container image, and the package
 version stays `0.1.0` (`docs/release.md`, "GitHub-only pre-releases"). The one-line installer still pins
 an earlier commit and is unchanged — do not point it at the candidate, that would replace a stable
 installation. To try the candidate side by side with a stable install, use the ordinary source install

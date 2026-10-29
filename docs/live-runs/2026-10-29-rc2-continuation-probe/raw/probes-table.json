@@ -1,0 +1,11 @@
+[
+ {
+  "deployment_id": "ollama/qwen3.8:latest",
+  "fingerprint": "d004025f23bf51de",
+  "capability": "continuation",
+  "value": "supported",
+  "note": "accepted an assistant history carrying reasoning_content and answered (protocol acceptance; whether the model semantically uses the replayed reasoning is not verifiable through the OpenAI-compatible API)",
+  "checked_at": 1793277657.1352332,
+  "scheme": 2
+ }
+]
