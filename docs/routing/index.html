@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=329ff110">
+<link rel="stylesheet" href="/assets/site.css?v=6e3c2ea1">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Routing: requirements, eligibility, ranking", "description": "How ModelSaar analyses a request, which hard filters apply, how candidates are ranked and how embeddings, memory budgets and failover behave.", "url": "https://modelsaar.com/docs/routing/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Routing: requirements, eligibility, ranking", "item": "https://modelsaar.com/docs/routing/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Routing: requirements, eligibility, ranking</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Routing: requirements, eligibility, ranking</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/docs/routing.md"><code>docs/routing.md</code></a> at commit <code>329ff11047d0</code>. The repository file is authoritative.</p></header><h2 id="a-requirements">A. Requirements</h2>
+<article class="doc"><header class="doc-head"><h1>Routing: requirements, eligibility, ranking</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5/docs/routing.md"><code>docs/routing.md</code></a> at commit <code>6e3c2ea12b56</code>. The repository file is authoritative.</p></header><h2 id="a-requirements">A. Requirements</h2>
 <p><code>routing/requirements.py</code> reads the whole request structurally (never the model's output, never
 instructions inside prompts):</p>
 <ul>
@@ -77,8 +77,27 @@ explicit <code>deployments</code>), capabilities (<code>tools</code>, <code>tool
 <code>json_schema</code>, <code>json_object</code>, <code>streaming</code>, <code>vision</code>, <code>audio_in</code>, <code>continuation</code>), remote image URLs,
 effective context (<code>input + output [+ reasoning] &lt;= context_length</code>), <code>max_output_tokens</code>, request
 fields the backend path cannot honour, and admission feasibility (non-reserving).</p>
-<p>Capability values: <code>supported</code> passes; <code>unsupported</code> fails; <strong><code>unknown</code> fails</strong> (conservative) with
-the remedy "run <code>modelsaar probe &lt;id&gt;</code> or declare it under <code>deployments[]</code>".</p>
+<p>Capability values: <code>supported</code> passes; <code>unsupported</code> fails; <strong><code>unknown</code> fails</strong> (conservative). The
+remedy names the probe that can establish the capability — <code>modelsaar probe &lt;id&gt; --which &lt;capability&gt;</code>
+for <code>streaming</code>, <code>tools</code>, <code>parallel_tools</code>, <code>json_object</code>, <code>json_schema</code>, <code>vision</code> and <code>continuation</code> —
+or, for capabilities no probe covers (<code>tool_choice_required</code>, <code>audio_in</code>, <code>thinking</code>), only the operator
+override <code>deployments[] … capabilities: {&lt;capability&gt;: supported}</code>. The remedy never points at a probe
+that does not exist.</p>
+<p><strong>Continuation.</strong> A follow-up turn whose assistant history carries <code>reasoning_content</code> (agentic clients
+such as Odysseus replay the previous assistant message with its reasoning) sets <code>needs_continuation</code>;
+every deployment whose <code>continuation</code> capability is <code>unknown</code> is then excluded, so an unprobed
+installation answers such requests with <code>422 no_eligible_deployment</code>. Discovery never claims this
+capability (no runtime reports it). <code>modelsaar probe &lt;id&gt; --which continuation</code> sends exactly that
+shape — user, assistant (<code>content</code> + <code>reasoning_content</code>), user — through the adapter unchanged and
+records <code>supported</code> only when <strong>that</strong> request is answered with a well-formed assistant message
+(<code>unsupported</code> on an explicit 4xx rejection or an answer without content/tool_calls; <code>unknown</code> on
+5xx, transport errors, a timeout — held as uncertain — or an exhausted output budget). This is
+<strong>protocol acceptance</strong>: it proves the backend accepts and answers a history carrying
+<code>reasoning_content</code>, not that the model semantically uses the replayed reasoning (the
+OpenAI-compatible API offers no way to verify that). Once a request needs continuation the gateway
+also refuses cross-model failover for it (<code>failover_note</code>). A context-length exclusion on the same
+deployment is independent: raising <code>context_length</code>/<code>num_ctx</code> does not establish continuation, and
+probing continuation does not change the context limit.</p>
 <p>Explicit deployment selection goes through the same checks.</p>
 <h2 id="c-classification">C. Classification</h2>
 <p>Deterministic signals handle clear cases at ~0.3–0.6 ms overhead. The optional local classifier
@@ -309,7 +328,7 @@ not a completion is <code>502 upstream_bad_response</code>.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5">6e3c2ea12b56</a> on 2026-10-29. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">v0.1.0-rc.2</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -321,6 +340,6 @@ not a completion is <code>502 upstream_bad_response</code>.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=329ff110" defer></script>
+<script src="/assets/site.js?v=6e3c2ea1" defer></script>
 </body>
 </html>

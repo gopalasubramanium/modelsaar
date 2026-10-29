@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=329ff110">
+<link rel="stylesheet" href="/assets/site.css?v=6e3c2ea1">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Changelog", "description": "What changed in each ModelSaar revision.", "url": "https://modelsaar.com/docs/changelog/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Changelog", "item": "https://modelsaar.com/docs/changelog/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,40 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Changelog</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>329ff11047d0</code>. The repository file is authoritative.</p></header><h2 id="unreleased-website-release-candidate-page-and-status-wording-2026-10-28">Unreleased — website: release-candidate page and status wording, 2026-10-28</h2>
+<article class="doc"><header class="doc-head"><h1>Changelog</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5/CHANGELOG.md"><code>CHANGELOG.md</code></a> at commit <code>6e3c2ea12b56</code>. The repository file is authoritative.</p></header><h2 id="unreleased-website-and-docs-for-the-github-pre-release-v010-rc2-2026-10-29">Unreleased — website and docs for the GitHub pre-release v0.1.0-rc.2, 2026-10-29</h2>
+<ul>
+<li><code>/preview/decision-models/</code> installs from <code>v0.1.0-rc.2</code>, gains the section "Agentic clients that replay
+  reasoning" (probe command, what it establishes — protocol acceptance — and the operator override), and keeps
+  rc.1 linked and unchanged; roadmap, README, <code>docs/roadmap.md</code>, <code>docs/release.md</code> ("Candidates so far") updated.
+  Installer pin unchanged.</li>
+</ul>
+<h2 id="unreleased-continuation-probe-corrected-422-remedy-2026-10-29">Unreleased — continuation probe; corrected <code>422</code> remedy, 2026-10-29</h2>
+<ul>
+<li><strong>New probe <code>continuation</code></strong> (<code>probes.py</code>, in <code>modelsaar probe --all</code> and <code>--which continuation</code>, also via
+  <code>POST /admin/probe</code>): sends a follow-up turn whose assistant history carries <code>reasoning_content</code> — the exact
+  shape agentic clients such as Odysseus replay — through the adapter unchanged, and records <code>supported</code> only
+  when that request is answered with a well-formed assistant message; <code>unsupported</code> on an explicit 4xx rejection
+  or an answer without content/tool_calls; <code>unknown</code> (capability left untouched) on 5xx, transport errors, a
+  timeout (uncertain hold, remaining probes skipped) or an exhausted output budget. Documented as <strong>protocol
+  acceptance</strong>, not semantic continuity. Background: the real-client Odysseus test against <code>v0.1.0-rc.1</code> returned
+  <code>422</code> in production (<code>req_496b78a6d49a4377</code>) because no runtime reports <code>continuation</code> and the only way to
+  make a deployment eligible was an operator override; the RC test passed only with that override.</li>
+<li><strong>Corrected <code>422</code> remedy</strong> (<code>routing/eligibility.py</code>): the "capability … is unknown" remedy now names a probe
+  that exists (<code>modelsaar probe &lt;id&gt; --which &lt;capability&gt;</code>) or, for capabilities no probe covers, only the
+  <code>deployments[]</code> override; for <code>continuation</code> it adds that a context-length exclusion on the same deployment
+  is separate and that raising <code>context_length</code>/<code>num_ctx</code> does not establish continuation. Previously it pointed
+  at a bare <code>modelsaar probe &lt;id&gt;</code> as if it verified continuation, which no probe did.</li>
+<li>Default behaviour for unprobed deployments is unchanged (<code>unknown</code> still excludes). Docs: <code>docs/routing.md</code>
+  ("Continuation"), <code>docs/troubleshooting.md</code>, README. Tests: <code>tests/test_continuation_probe.py</code> (9: probe
+  request shape, supported/stored, explicit rejection → unsupported, 500 → unknown, timeout → uncertain,
+  Odysseus-shaped history 422 → probe → 200 with failover refused, override path, CLI choice, probe-name
+  consistency); fake backend gains <code>reject_reasoning_history</code>. Site test count 285 → 294.</li>
+<li>Open WebUI (documented context only): its real-client test against the RC passed — the built-in
+  <code>search_knowledge_files</code> tool was returned as a structured <code>tool_calls</code> delta, executed by Open WebUI and
+  answered; the earlier production markup-as-text case was a backend parse miss on one generation. No code
+  change is justified by current evidence.</li>
+</ul>
+<h2 id="unreleased-website-release-candidate-page-and-status-wording-2026-10-28">Unreleased — website: release-candidate page and status wording, 2026-10-28</h2>
 <ul>
 <li><code>/preview/decision-models/</code> is now the tester guide for the GitHub pre-release <code>v0.1.0-rc.1</code>: links the release,
   installs from the pinned tag (commit shown; package version stays 0.1.0), keeps every caveat and the smoke-test
@@ -323,7 +356,7 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5">6e3c2ea12b56</a> on 2026-10-29. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">v0.1.0-rc.2</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -335,6 +368,6 @@ served context, <code>eval --deployments</code> subset filter.</p></article>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=329ff110" defer></script>
+<script src="/assets/site.js?v=6e3c2ea1" defer></script>
 </body>
 </html>

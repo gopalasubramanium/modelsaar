@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=329ff110">
+<link rel="stylesheet" href="/assets/site.css?v=6e3c2ea1">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Release candidate: decision models", "description": "Try ModelSaar's opt-in decision-model features (POST /v1/decisions and the decision-model classifier) from the GitHub pre-release v0.1.0-rc.1 — experimental, not a stable release.", "url": "https://modelsaar.com/preview/decision-models/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "preview", "item": "https://modelsaar.com/preview/"}, {"@type": "ListItem", "position": 3, "name": "Release candidate: decision models", "item": "https://modelsaar.com/preview/decision-models/"}]}</script>
 </head>
 <body>
@@ -51,8 +51,8 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Release candidate: decision models</li></ol></nav>
 <section aria-labelledby="pv-title">
   <h1 id="pv-title">Release candidate: decision models</h1>
-  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. They are available for testing as the GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1"><strong>v0.1.0-rc.1</strong></a> (tag on commit <code>5b947f2859a7</code>; code identical to <code>6075cdcf3b09</code>). <strong>This is a release candidate for testing, not a stable release: no package, no container image, and the default installer and the stable installation path are unchanged.</strong></p>
-  <div class="callout"><p><strong>Status:</strong> GitHub-only release candidate (<a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">release notes</a>). Both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>succeeded</strong> on 2026-10-28 (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
+  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. They are available for testing as the GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2"><strong>v0.1.0-rc.2</strong></a> (tag on commit <code>7e7579825a2d</code>), which adds the <a href="#continuation-title">continuation probe</a> and a corrected <code>422</code> remedy on top of <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> (commit <code>5b947f2859a7</code>, still available unchanged). <strong>This is a release candidate for testing, not a stable release: no package, no container image, and the default installer and the stable installation path are unchanged.</strong></p>
+  <div class="callout"><p><strong>Status:</strong> GitHub-only release candidate (<a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">release notes</a>). Both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>succeeded</strong> on 2026-10-28 (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
 </section>
 
 <section aria-labelledby="what-title">
@@ -80,9 +80,9 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 
 <section aria-labelledby="install-title">
   <h2 id="install-title">Try it from GitHub (pinned to the pre-release tag)</h2>
-  <p>The candidate uses the ordinary development install at the tag <code>v0.1.0-rc.1</code> (commit <code>5b947f2859a7</code>; <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">GitHub pre-release</a>), in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. <code>modelsaar --version</code> still prints <code>0.1.0</code>: a candidate does not bump the package version. The one-line installer still pins <code>cf56cdd3416d</code>, which does <em>not</em> contain these features; do not point it at the candidate, because it would replace your stable installation.</p>
+  <p>The candidate uses the ordinary development install at the tag <code>v0.1.0-rc.2</code> (commit <code>7e7579825a2d</code>; <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">GitHub pre-release</a>), in its own directory and with its own <code>MODELSAAR_HOME</code>, so an existing stable installation (installer-managed environment, launcher, config, keys, service) is not touched. <code>modelsaar --version</code> still prints <code>0.1.0</code>: a candidate does not bump the package version. The one-line installer still pins <code>cf56cdd3416d</code>, which does <em>not</em> contain these features; do not point it at the candidate, because it would replace your stable installation.</p>
   <div class="cmd cmd-scroll"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre tabindex="0"><code class="language-bash">git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview &amp;&amp; cd modelsaar-preview
-git checkout v0.1.0-rc.1                                               # the pre-release tag = commit 5b947f2859a7
+git checkout v0.1.0-rc.2                                               # the pre-release tag = commit 7e7579825a2d
 python3 -m venv .venv &amp;&amp; . .venv/bin/activate &amp;&amp; pip install -e .     # or: uv venv &amp;&amp; . .venv/bin/activate &amp;&amp; uv pip install -e .
 export MODELSAAR_HOME=~/.modelsaar-preview                           # separate config, keys and state: your normal install is untouched
 modelsaar init --port 8485                                            # or: --endpoint http://host:11434 --type ollama
@@ -108,6 +108,25 @@ modelsaar serve</code></pre></div>
   <p>To remove the candidate: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written. Problems or feedback: <a href="https://github.com/gopalasubramanium/modelsaar/issues">GitHub issues</a>.</p>
 </section>
 
+<section aria-labelledby="continuation-title">
+  <h2 id="continuation-title">Agentic clients that replay reasoning (new in v0.1.0-rc.2)</h2>
+  <p>Clients such as Odysseus send every follow-up turn with the previous assistant message <em>and its</em> <code>reasoning_content</code>. The gateway marks such requests as needing <em>continuation</em>, and a deployment is eligible only when its <code>continuation</code> capability is <code>supported</code>. No runtime reports that capability, so on a fresh installation every follow-up turn of this kind answers <code>422 no_eligible_deployment</code> with <q>capability continuation is unknown</q> on each deployment — this is exactly what the real-client Odysseus test against the stable gateway produced, and what v0.1.0-rc.1 could only pass with a hand-written override. v0.1.0-rc.2 adds a probe for it and corrects the remedy text:</p>
+  <div class="cmd cmd-scroll"><div class="cmd-bar"><span class="cmd-label">Terminal</span></div><pre tabindex="0"><code class="language-bash"># in a second shell, same MODELSAAR_HOME, while `modelsaar serve` is running (the probe goes through the gateway admission control)
+export MODELSAAR_HOME=~/.modelsaar-preview
+modelsaar probe ollama/&lt;model&gt; --which continuation          # one bounded two-turn request; uses local compute
+# the report prints continuation: supported | unsupported | unknown with the reason; re-run on unknown</code></pre></div>
+  <ul>
+    <li><strong>What the probe does:</strong> one bounded two-turn request in exactly the client shape (user → assistant with <code>content</code> + <code>reasoning_content</code> → user), forwarded to the backend unchanged. <code>supported</code> only when <em>that</em> request is answered with a well-formed assistant message; <code>unsupported</code> when the backend explicitly rejects it (4xx); <code>unknown</code> (nothing recorded) on 5xx, transport errors, a timeout or an exhausted output budget — re-run it.</li>
+    <li><strong>What it establishes:</strong> <em>protocol acceptance</em> — the backend accepts and answers a history carrying <code>reasoning_content</code>. It does <em>not</em> verify that the model semantically uses the replayed reasoning; the OpenAI-compatible API offers no way to check that.</li>
+    <li><strong>Without probing</strong> you can still declare the capability yourself (recorded with operator provenance) in <code>~/.modelsaar-preview/config.yaml</code>:</li>
+  </ul>
+  <div class="cmd cmd-scroll"><div class="cmd-bar"><span class="cmd-label">yaml</span></div><pre tabindex="0"><code class="language-yaml">deployments:
+  - backend: ollama
+    model: &lt;model&gt;           # e.g. qwen3.8:latest
+    capabilities: { continuation: supported }   # operator provenance; no probe needed</code></pre></div>
+  <p>A context-length exclusion on the same deployment is separate: raising <code>context_length</code>/<code>num_ctx</code> does not establish continuation, and probing continuation does not change the context limit. The remedy printed by the gateway now says both. Unprobed, undeclared deployments behave exactly as before (excluded).</p>
+</section>
+
 <section aria-labelledby="smoke-title">
   <h2 id="smoke-title">Live smoke test — 2026-10-28, completed</h2>
   <p>isolated preview checkout + home on the owner's MacBook Air (in-process gateway on 127.0.0.1:50826); backend the GX10's Ollama over Tailscale; production modelsaar.service, ~/.modelsaar, the Stage A home and the Pass 1 checkout untouched. Ollama 0.40.5; decision models discovered: ollama/nimble-v3:latest, ollama/d1:latest; the configured one, <code>nimble-v3</code> (9.0B, Q8_0, capabilities ['decision']). Exactly three requests were made; every number below is read from the recorded result at build time.</p>
@@ -121,15 +140,15 @@ modelsaar serve</code></pre></div>
   <ul>
     <li>nimble-v3 answered &#x27;billing&#x27; (0.753) for a checkout-500 ticket where a human would likely say &#x27;bug&#x27;; d1 answered &#x27;bug&#x27; (0.715). The smoke test validates the wire contract and routing, not answer quality.</li><li>`auto` chose ollama/d1:latest (2.7B, decision+vision) although nimble-v3 had just been loaded by request 1: at decision time neither model was observed resident (residency is refreshed on an interval), so the documented tie-break &#x27;by id&#x27; applied (d1 &lt; nimble-v3). Documented behaviour; an explicit model id is the way to pick a specific decision model.</li><li>the classifier&#x27;s single consultation took 255 ms end to end (nimble-v3 resident), above the 250 ms median bound of the classifier decision rule; one request establishes nothing about that rule.</li>
   </ul>
-  <p>Record: <a href="https://github.com/gopalasubramanium/modelsaar/tree/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/docs/live-runs/2026-10-28-decision-preview-smoke"><code>docs/live-runs/2026-10-28-decision-preview-smoke/</code></a> (summary, responses, headers, decision records, discovery, launcher console; no prompts beyond the two synthetic inputs, no keys).</p>
+  <p>Record: <a href="https://github.com/gopalasubramanium/modelsaar/tree/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5/docs/live-runs/2026-10-28-decision-preview-smoke"><code>docs/live-runs/2026-10-28-decision-preview-smoke/</code></a> (summary, responses, headers, decision records, discovery, launcher console; no prompts beyond the two synthetic inputs, no keys).</p>
 </section>
 
 <section aria-labelledby="not-title">
   <h2 id="not-title">What this release candidate is not</h2>
   <ul>
-    <li>Not a stable release: <code>v0.1.0-rc.1</code> is a GitHub pre-release tag only — no package on PyPI, no container image, no version bump; the default installer pin is unchanged and still predates these features. A stable <code>v0.1.x</code> remains a separate owner decision (<a href="/docs/release/">release process</a>).</li>
-    <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="/benchmarks/">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above.</li>
-    <li>Not frozen: the wire contract follows Ollama's documented System One API and may change with it; a later candidate would be <code>-rc.2</code>, never a moved tag.</li>
+    <li>Not a stable release: <code>v0.1.0-rc.2</code> is a GitHub pre-release tag only — no package on PyPI, no container image, no version bump; the default installer pin is unchanged and still predates these features. A stable <code>v0.1.x</code> remains a separate owner decision (<a href="/docs/release/">release process</a>).</li>
+    <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="/benchmarks/">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above, and the continuation probe has not yet been run against a live backend from this candidate.</li>
+    <li>Not frozen: the wire contract follows Ollama's documented System One API and may change with it; a later candidate would be <code>-rc.3</code>, never a moved tag. v0.1.0-rc.1 stays available unchanged.</li>
   </ul>
 </section>
 
@@ -139,7 +158,7 @@ modelsaar serve</code></pre></div>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5">6e3c2ea12b56</a> on 2026-10-29. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">v0.1.0-rc.2</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -151,6 +170,6 @@ modelsaar serve</code></pre></div>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=329ff110" defer></script>
+<script src="/assets/site.js?v=6e3c2ea1" defer></script>
 </body>
 </html>

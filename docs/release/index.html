@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=329ff110">
+<link rel="stylesheet" href="/assets/site.css?v=6e3c2ea1">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Release process and readiness", "description": "How a versioned release is produced and what is ready for the first tagged alpha release.", "url": "https://modelsaar.com/docs/release/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Release process and readiness", "item": "https://modelsaar.com/docs/release/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Release process and readiness</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Release process and readiness</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/docs/release.md"><code>docs/release.md</code></a> at commit <code>329ff11047d0</code>. The repository file is authoritative.</p></header><ol>
+<article class="doc"><header class="doc-head"><h1>Release process and readiness</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5/docs/release.md"><code>docs/release.md</code></a> at commit <code>6e3c2ea12b56</code>. The repository file is authoritative.</p></header><ol>
 <li><code>python -m pytest</code> green locally; CI (<code>ci.yml</code>) green on <code>main</code> (lint, tests on 3.10/3.12/3.13,
    pip-audit of runtime dependencies, gitleaks secret scan, local Docker image build + smoke).</li>
 <li>Update <code>CHANGELOG.md</code>; bump <code>version</code> in <code>pyproject.toml</code> and <code>src/modelsaar/__init__.py</code>
@@ -91,7 +91,10 @@ being tested and what the evidence does and does not show. It is for testers who
 <li><strong>Candidates so far:</strong> <code>v0.1.0-rc.1</code> (2026-10-28) — decision-model support (<code>POST /v1/decisions</code>,
   classifier <code>mode: decision</code>), opt-in and experimental; evidence: fixture tests in CI and one bounded
   live smoke test of three requests (<code>docs/live-runs/2026-10-28-decision-preview-smoke/</code>); no quality
-  or routing-benefit claim.</li>
+  or routing-benefit claim. <code>v0.1.0-rc.2</code> (2026-10-29) — rc.1 plus the <code>continuation</code> capability probe
+  (<code>modelsaar probe &lt;id&gt; --which continuation</code>; protocol acceptance, not semantic continuity) and the
+  corrected <code>422</code> remedy; fixture-tested (294 tests); the probe has not yet been run against a live
+  backend from this tag. rc.1 remains available unchanged.</li>
 </ul>
 <h2 id="readiness-for-the-first-versioned-alpha-release-checked-2026-10-14">Readiness for the first versioned alpha release (checked 2026-10-14)</h2>
 <p>A list against the steps above. Tagging, PyPI and GHCR publication remain separate owner decisions;
@@ -151,7 +154,7 @@ pin the tagged commit. The GX10 and the owner's service are not part of the rele
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5">6e3c2ea12b56</a> on 2026-10-29. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">v0.1.0-rc.2</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -163,6 +166,6 @@ pin the tagged commit. The GX10 and the owner's service are not part of the rele
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=329ff110" defer></script>
+<script src="/assets/site.js?v=6e3c2ea1" defer></script>
 </body>
 </html>

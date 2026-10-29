@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=329ff110">
+<link rel="stylesheet" href="/assets/site.css?v=6e3c2ea1">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Roadmap (repository)", "description": "Planned work as recorded in the repository.", "url": "https://modelsaar.com/docs/roadmap-detail/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Roadmap (repository)", "item": "https://modelsaar.com/docs/roadmap-detail/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Roadmap (repository)</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Roadmap (repository)</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/docs/roadmap.md"><code>docs/roadmap.md</code></a> at commit <code>329ff11047d0</code>. The repository file is authoritative.</p></header><h2 id="status-2026-10-14">Status, 2026-10-14</h2>
+<article class="doc"><header class="doc-head"><h1>Roadmap (repository)</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5/docs/roadmap.md"><code>docs/roadmap.md</code></a> at commit <code>6e3c2ea12b56</code>. The repository file is authoritative.</p></header><h2 id="status-2026-10-14">Status, 2026-10-14</h2>
 <p>Done (evidence in <code>CHANGELOG.md</code>, <code>docs/verification-report.md</code> and the repository's CI runs):</p>
 <ul>
 <li>Hardening accepted and merged on 2026-10-13 (PR #1); the three independent reviews covered
@@ -82,8 +82,9 @@ classification does not demonstrate value.</p>
   <strong>as <code>POST /v1/decisions</code> — implemented (contract in <code>docs/routing.md</code> "Decisions")</strong>. Both are
   fixture-tested; one bounded live smoke test (three requests, 2026-10-28, <code>nimble-v3</code> on the GX10;
   <code>docs/live-runs/2026-10-28-decision-preview-smoke/</code>) exercised the wire contract and routing — not
-  answer quality, not the classifier decision rule. Offered as the opt-in GitHub-only release candidate
-  <code>v0.1.0-rc.1</code> (pre-release tag; code identical to <code>6075cdcf…</code>; README "Release candidate: decision
+  answer quality, not the classifier decision rule. Offered as the opt-in GitHub-only release candidates
+  <code>v0.1.0-rc.1</code> (pre-release tag; code identical to <code>6075cdcf…</code>) and <code>v0.1.0-rc.2</code> (adds the
+  <code>continuation</code> probe and the corrected <code>422</code> remedy; README "Release candidate: decision
   models"; modelsaar.com/preview/decision-models/); the default
   installer pin is unchanged.</li>
 <li>Audio/video inputs; multimodal embeddings (EmbeddingGemma 2 image/video/audio); OCR pipeline
@@ -103,7 +104,7 @@ classification does not demonstrate value.</p>
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5">6e3c2ea12b56</a> on 2026-10-29. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">v0.1.0-rc.2</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -115,6 +116,6 @@ classification does not demonstrate value.</p>
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=329ff110" defer></script>
+<script src="/assets/site.js?v=6e3c2ea1" defer></script>
 </body>
 </html>

@@ -32,7 +32,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/site.css?v=329ff110">
+<link rel="stylesheet" href="/assets/site.css?v=6e3c2ea1">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Troubleshooting", "description": "Common failures when installing or running ModelSaar and what to do about them.", "url": "https://modelsaar.com/docs/troubleshooting/", "isPartOf": {"@type": "WebSite", "name": "ModelSaar", "url": "https://modelsaar.com"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://modelsaar.com/"}, {"@type": "ListItem", "position": 2, "name": "docs", "item": "https://modelsaar.com/docs/"}, {"@type": "ListItem", "position": 3, "name": "Troubleshooting", "item": "https://modelsaar.com/docs/troubleshooting/"}]}</script>
 </head>
 <body>
@@ -49,7 +49,7 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 </header>
 <main id="main" class="docs">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/docs/">Docs</a></li><li aria-current="page">Troubleshooting</li></ol></nav>
-<article class="doc"><header class="doc-head"><h1>Troubleshooting</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b/docs/troubleshooting.md"><code>docs/troubleshooting.md</code></a> at commit <code>329ff11047d0</code>. The repository file is authoritative.</p></header><p>Start with <code>modelsaar doctor</code> — it checks most of the items below and prints a remedy per finding.</p>
+<article class="doc"><header class="doc-head"><h1>Troubleshooting</h1><p class="small">Rendered from <a href="https://github.com/gopalasubramanium/modelsaar/blob/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5/docs/troubleshooting.md"><code>docs/troubleshooting.md</code></a> at commit <code>6e3c2ea12b56</code>. The repository file is authoritative.</p></header><p>Start with <code>modelsaar doctor</code> — it checks most of the items below and prints a remedy per finding.</p>
 <table tabindex="0">
 <thead>
 <tr>
@@ -87,7 +87,12 @@ Source: https://github.com/gopalasubramanium/modelsaar. Licence: Apache-2.0.
 <tr>
 <td><code>422 no_eligible_deployment</code> with <code>capability tools is unknown</code></td>
 <td>the runtime did not report the capability and no probe/override exists</td>
-<td><code>modelsaar probe &lt;deployment&gt;</code>; or add <code>deployments[] … capabilities: {tools: supported}</code> (operator provenance)</td>
+<td><code>modelsaar probe &lt;deployment&gt; --which tools</code>; or add <code>deployments[] … capabilities: {tools: supported}</code> (operator provenance)</td>
+</tr>
+<tr>
+<td><code>422 … reasoning continuation state required; capability continuation is unknown</code> on every deployment (typical for Odysseus and other agents that replay the previous assistant turn with <code>reasoning_content</code>)</td>
+<td>no runtime reports <code>continuation</code>; it is <code>unknown</code> until probed or declared</td>
+<td><code>modelsaar probe &lt;deployment&gt; --which continuation</code> (sends a history carrying <code>reasoning_content</code>; <code>supported</code> = protocol acceptance only), or add <code>deployments[] … capabilities: {continuation: supported}</code>. Context-length exclusions listed on the same deployments are separate — raising <code>context_length</code>/<code>num_ctx</code> does not establish continuation</td>
 </tr>
 <tr>
 <td><code>422 … effective context 4096 &lt; required …</code></td>
@@ -179,7 +184,7 @@ prompt content unless <code>security.log_prompts: true</code>, which is for debu
     <div>
       <p><strong>ModelSaar</strong> — one address for your local AI. Apache-2.0 licensed gateway; model weights keep their own licences.</p>
       <p class="small">Created by <a href="https://me.sgopala.com">Gopala Subramanium</a> · <a href="/thanks/">Say thanks</a></p>
-      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/329ff11047d0d5d3819bd1b9f2fc094bfdcc5e1b">329ff11047d0</a> on 2026-10-28. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.1">v0.1.0-rc.1</a> only).</p>
+      <p class="small">Site built from <a href="https://github.com/gopalasubramanium/modelsaar/commit/6e3c2ea12b56fd40af1742dcf3ac237fa120eee5">6e3c2ea12b56</a> on 2026-10-29. Development preview; no stable release has been tagged (GitHub pre-release <a href="https://github.com/gopalasubramanium/modelsaar/releases/tag/v0.1.0-rc.2">v0.1.0-rc.2</a> only).</p>
     </div>
     <ul class="foot-links">
       <li><a href="/get-started/">Get started</a></li>
@@ -191,6 +196,6 @@ prompt content unless <code>security.log_prompts: true</code>, which is for debu
     </ul>
   </div>
 </footer>
-<script src="/assets/site.js?v=329ff110" defer></script>
+<script src="/assets/site.js?v=6e3c2ea1" defer></script>
 </body>
 </html>
