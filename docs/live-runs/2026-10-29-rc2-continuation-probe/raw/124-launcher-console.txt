@@ -1,0 +1,41 @@
+=== 2026-10-29T20:40:36+0800
+power: 'Battery Power'
+tag v0.1.0-rc.2 -> 7e7579825a2d37c238b04fbbb2d3a225119600f0 (expected 7e7579825a2d37c238b04fbbb2d3a225119600f0)
+host: <GX10_HOST> aarch64 12:40:38Z
+--- preflight (read-only)
+production service: active pid 3756 on <GX10_LAN_IP>:8484  (untouched)
+rc1 process: pid 1516183 Ss on <GX10_LAN_IP>:8485  (untouched)
+dirs unused; port 8486 free
+python3: 3.12.3; git: /usr/bin/git
+ollama: {"version":"0.40.5"}; ps before: []
+qwen3.8:latest present: True ( 11 tags )
+checkout: 7e7579825a2d37c238b04fbbb2d3a225119600f0 (expected 7e7579825a2d37c238b04fbbb2d3a225119600f0); describe v0.1.0-rc.2; clean: yes
+installed: modelsaar 0.1.0; module path: <RC2_CHECKOUT>/src/modelsaar; continuation in PROBE_NAMES: True
+config: host=<GX10_LAN_IP> port=8486 allow_lan=True backends=['http://127.0.0.1:11434'] deployments override=[]
+--- discover + doctor
+ollama/qwen3.8:latest                    generative ctx=4096    tools=supported   vision=supported   json_schema=unknown     loaded=False healthy=True locality=local
+  auto           -> ['ollama/qwen3.6:latest', 'ollama/qwen3.8:latest', 'ollama/muse-glimmer:latest', 'ollama/gemma4:31b', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+  auto-quality   -> ['ollama/qwen3.6:latest', 'ollama/qwen3.8:latest', 'ollama/muse-glimmer:latest', 'ollama/gemma4:31b', 'ollama/qwen3-coder-next:latest', 'ollama/qwen3-coder:latest', 'ollama/qwen3.6-accurate:latest', 'ollama/qwen3.6-fast:latest'] ctx>=4096 tools=supported vision=partial
+[OK  ] alias:auto: advertised with 8 deployment(s)
+0 failure(s)
+serve pid 2986321; healthz: {"status":"ok","service":"modelsaar","version":"0.1.0","api":"openai-compatible"}
+listening: <GX10_LAN_IP>:8486  (must be <GX10_LAN_IP>:8486 only)
+process: 2986321 <RC2_CHECKOUT>/.venv/bin/python3 <RC2_CHECKOUT>/.venv/bin/modelsaar serve
+--- capability BEFORE the probe (must be unknown, no override):
+continuation: {'value': 'unknown', 'provenance': 'none', 'checked_at': None, 'note': ''}
+--- the one probe: modelsaar probe ollama/qwen3.8:latest --which continuation  (12:40:47Z)
+probe exit 0 after 10 s; human report:
+--- capability AFTER the probe:
+continuation: {'value': 'supported', 'provenance': 'probe', 'checked_at': 1793277657.1999524, 'note': 'stored probe for current fingerprint'}
+ps after: [('qwen3.8:latest', 18798597897)]
+grep: Invalid content of \{\}
+serve.log lines: 29; admin/probe lines: 0
+probes table rows (continuation): 1
+production still: active pid 3756; ~/.modelsaar/config.yaml mtime 2026-10-14 01:06:36; rc1 pid 1516183 Ss; 8485 healthz: {"status":"ok","service":"modelsaar","ve
+RC2 on GX10 running: http://<GX10_LAN_IP>:8486/v1  (key: first line of <RC2_HOME>/keys/api_keys on the GX10 — not printed; stop: kill $(cat <RC2_HOME>/serve.pid))
+evidence dir: <RC2_HOME>/evidence (admin-status-after.trimmed.json admin-status-before.trimmed.json config-trimmed.json discover.txt doctor.txt init.txt probes-table.json probe-stdout.txt serve.log )
+ssh exit: 0
+--- reachability from this Mac: {"status":"ok","service":"modelsaar","version":"0.1.0","api":"openai-compatible"}
+evidence copied: 9 files
+key scan of copied evidence: 0 files (must be 0)
+=== done 2026-10-29T20:40:58+0800

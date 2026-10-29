@@ -239,6 +239,7 @@ RC_COMMIT = "7e7579825a2d37c238b04fbbb2d3a225119600f0"  # the main commit the ta
 RC_RELEASE_URL = f"{REPO_URL}/releases/tag/{RC_TAG}"
 RC1_RELEASE_URL = f"{REPO_URL}/releases/tag/{RC1_TAG}"
 PREVIEW_SMOKE_DIR = "docs/live-runs/2026-10-28-decision-preview-smoke"
+CONTINUATION_PROBE_DIR = "docs/live-runs/2026-10-29-rc2-continuation-probe"  # the one live run of the rc.2 continuation probe (qwen3.8 on the GX10)
 PREVIEW_INSTALL = (
     "git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview && cd modelsaar-preview\n"
     f"git checkout {RC_TAG}                                               # the pre-release tag = commit {RC_COMMIT[:12]}\n"
@@ -284,6 +285,13 @@ def decision_preview() -> dict:
     """The preview's live smoke-test record, read from docs/live-runs at build time (never hand-copied)."""
     d = json.loads((ROOT / PREVIEW_SMOKE_DIR / "SMOKE.json").read_text(encoding="utf-8"))
     d["dir"] = PREVIEW_SMOKE_DIR
+    return d
+
+
+def continuation_probe() -> dict:
+    """The one live run of the rc.2 continuation probe, read from docs/live-runs at build time (never hand-copied)."""
+    d = json.loads((ROOT / CONTINUATION_PROBE_DIR / "PROBE.json").read_text(encoding="utf-8"))
+    d["dir"] = CONTINUATION_PROBE_DIR
     return d
 
 

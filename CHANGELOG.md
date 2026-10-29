@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — evidence: the rc.2 continuation probe run live once, 2026-10-29
+
+* `docs/live-runs/2026-10-29-rc2-continuation-probe/`: one bounded run of `modelsaar probe ollama/qwen3.8:latest
+  --which continuation` from an isolated checkout at `v0.1.0-rc.2` (commit `7e757982`) on the GX10 (Ollama 0.40.5),
+  no operator override: `continuation: supported`, probe provenance, HTTP 200, 9.7 s including the model load.
+  Protocol acceptance only — not semantic use of the replayed reasoning, not other models, not a real-client turn.
+  `/preview/decision-models/` ("Run once live"), README and `docs/release.md` now describe that single result instead
+  of "not yet run live". No code, installer-pin, tag or evaluator change.
+
 ## Unreleased — website and docs for the GitHub pre-release v0.1.0-rc.2, 2026-10-29
 
 * `/preview/decision-models/` installs from `v0.1.0-rc.2`, gains the section "Agentic clients that replay

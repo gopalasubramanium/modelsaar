@@ -1,0 +1,24 @@
+probing ollama/qwen3.8:latest via gateway http://<GX10_LAN_IP>:8486 (admission-coordinated) ...
+  continuation     supported       9738ms  accepted an assistant history carrying reasoning_content and answered (protocol acceptance; whether the model semantically uses the replayed reasoning is not verifiable through the OpenAI-compatible API)
+[
+  {
+    "deployment_id": "ollama/qwen3.8:latest",
+    "fingerprint": "d004025f23bf51de",
+    "results": [
+      {
+        "capability": "continuation",
+        "value": "supported",
+        "note": "accepted an assistant history carrying reasoning_content and answered (protocol acceptance; whether the model semantically uses the replayed reasoning is not verifiable through the OpenAI-compatible API)",
+        "latency_ms": 9737.648575013736,
+        "details": {
+          "answer_mentions_7": true
+        },
+        "uncertain": false
+      }
+    ],
+    "measurements": [],
+    "errors": [],
+    "uncertain": false,
+    "skipped": []
+  }
+]

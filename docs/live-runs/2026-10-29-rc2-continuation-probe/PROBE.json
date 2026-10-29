@@ -1,0 +1,52 @@
+{
+ "date": "2026-10-29",
+ "timezone": "SGT (UTC+08:00)",
+ "window_local": "20:40:36–20:40:58",
+ "probe_at_utc": "2026-10-29T12:40:47Z",
+ "status": "completed",
+ "tag": "v0.1.0-rc.2",
+ "commit": "7e7579825a2d37c238b04fbbb2d3a225119600f0",
+ "gateway_version": "modelsaar 0.1.0",
+ "python": "3.12.3",
+ "placement": "isolated RC2 checkout (<RC2_CHECKOUT>, detached at the tag, clean) and isolated home (<RC2_HOME>) on the GX10 itself; gateway bound to the GX10's LAN address on port 8486 as a plain background process; backend the same machine's Ollama at 127.0.0.1:11434; production modelsaar.service (8484), ~/.modelsaar and the rc.1 process (8485) untouched",
+ "ollama_version": "0.40.5",
+ "host_arch": "aarch64",
+ "command": "modelsaar probe ollama/qwen3.8:latest --which continuation",
+ "command_note": "run exactly once, through the running gateway's POST /admin/probe (admission-coordinated); --json was appended for the record, same single request",
+ "deployment": {
+  "id": "ollama/qwen3.8:latest",
+  "family": "qwen35",
+  "parameter_size": "27.3B",
+  "quantization": "Q4_K_M",
+  "identity_source": "ollama digest",
+  "identity": "aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813",
+  "fingerprint": "d004025f23bf51de",
+  "runtime": "ollama 0.40.5",
+  "override": "none (deployments: [] in the RC2 config; verified before the probe)"
+ },
+ "before": {"continuation": {"value": "unknown", "provenance": "none"}},
+ "result": {
+  "capability": "continuation",
+  "value": "supported",
+  "provenance": "probe",
+  "latency_ms": 9738,
+  "includes_model_load": true,
+  "backend_http": 200,
+  "note": "accepted an assistant history carrying reasoning_content and answered (protocol acceptance; whether the model semantically uses the replayed reasoning is not verifiable through the OpenAI-compatible API)",
+  "details": {"answer_mentions_7": true},
+  "uncertain": false,
+  "errors": [],
+  "skipped": []
+ },
+ "after": {"continuation": {"value": "supported", "provenance": "probe", "checked_at_utc": "2026-10-29T12:40:57Z"}, "stored_probe_rows": 1, "scheme": 2},
+ "request_id": null,
+ "request_id_note": "the probe runs inside the gateway through the adapter, not as a /v1 request; no X-ModelSaar-Request-Id is issued. The single upstream call is the one POST /v1/chat/completions 200 in raw/serve.log at 20:40:57 local",
+ "establishes": "protocol acceptance: Ollama 0.40.5 serving qwen3.8:latest accepted a three-message history whose assistant turn carries reasoning_content and returned HTTP 200 with a well-formed assistant message, so the deployment's continuation capability is now supported with probe provenance and no operator override",
+ "not_established": "that the model semantically uses the replayed reasoning (the OpenAI-compatible API gives no way to check it; answer_mentions_7 is a diagnostic detail consistent with reading the replayed content alone), the behaviour of any other model or runtime, answer quality, latency distributions, or that a real client's follow-up turn succeeds end to end on this candidate",
+ "observations": [
+  "The 9.7 s probe latency includes the first load of qwen3.8 (Ollama /api/ps was empty before the probe and showed qwen3.8:latest resident with 18.8 GB afterwards); it is one sample and not a latency measurement.",
+  "After the load, the gateway's observed served context for qwen3.8 changed from 4096 (discovery default before any load) to 131072 (read from the running model); this is the documented residency refresh and is unrelated to the probe's result.",
+  "No request id exists for a probe: it is an admin action inside the gateway, not a /v1 request."
+ ],
+ "untouched": ["production modelsaar.service (pid 3756, 8484) active before and after", "~/.modelsaar/config.yaml mtime 2026-10-14 01:06:36 unchanged", "rc.1 process (pid 1516183, 8485) running before and after", "Ollama, model tags, firewall", "installer pin, release tags, evaluator/scorer"]
+}

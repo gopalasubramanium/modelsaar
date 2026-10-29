@@ -45,8 +45,10 @@ being tested and what the evidence does and does not show. It is for testers who
   live smoke test of three requests (`docs/live-runs/2026-10-28-decision-preview-smoke/`); no quality
   or routing-benefit claim. `v0.1.0-rc.2` (2026-10-29) — rc.1 plus the `continuation` capability probe
   (`modelsaar probe <id> --which continuation`; protocol acceptance, not semantic continuity) and the
-  corrected `422` remedy; fixture-tested (294 tests); the probe has not yet been run against a live
-  backend from this tag. rc.1 remains available unchanged.
+  corrected `422` remedy; fixture-tested (294 tests); the probe was run live exactly once from this tag on
+  2026-10-29 against `ollama/qwen3.8:latest` (Ollama 0.40.5) and reported `supported` — protocol acceptance of
+  `reasoning_content` in the history, not semantic continuity (`docs/live-runs/2026-10-29-rc2-continuation-probe/`).
+  rc.1 remains available unchanged.
 
 ## Readiness for the first versioned alpha release (checked 2026-10-14)
 
