@@ -1,6 +1,6 @@
 <section aria-labelledby="pv-title">
   <h1 id="pv-title">Release candidate: decision models</h1>
-  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. They are available for testing as the GitHub pre-release <a href="{{ facts.RC_RELEASE_URL }}"><strong>{{ facts.RC_TAG }}</strong></a> (tag on commit <code>{{ facts.RC_COMMIT[:12] }}</code>; code identical to <code>{{ facts.PREVIEW_COMMIT[:12] }}</code>). <strong>This is a release candidate for testing, not a stable release: no package, no container image, and the default installer and the stable installation path are unchanged.</strong></p>
+  <p class="lede">Two opt-in, experimental features merged into <code>main</code> on 2026-10-28 let ModelSaar use <em>decision models</em> — small models that answer typed questions with probabilities instead of generating text. They are available for testing as the GitHub pre-release <a href="{{ facts.RC_RELEASE_URL }}"><strong>{{ facts.RC_TAG }}</strong></a> (tag on commit <code>{{ facts.RC_COMMIT[:12] }}</code>), which adds the <a href="#continuation-title">continuation probe</a> and a corrected <code>422</code> remedy on top of <a href="{{ facts.RC1_RELEASE_URL }}">{{ facts.RC1_TAG }}</a> (commit <code>{{ facts.RC1_COMMIT[:12] }}</code>, still available unchanged). <strong>This is a release candidate for testing, not a stable release: no package, no container image, and the default installer and the stable installation path are unchanged.</strong></p>
   <div class="callout"><p><strong>Status:</strong> GitHub-only release candidate (<a href="{{ facts.RC_RELEASE_URL }}">release notes</a>). Both features are <strong>fixture-tested</strong> in CI (fake backend speaking Ollama's documented decision API), and <strong>one bounded live smoke test</strong> — three requests against a real decision model — <strong>{{ 'succeeded' if facts.decision_preview()['status'] == 'completed' else 'was not completed' }}</strong> on {{ facts.decision_preview()['date'] }} (details below). Nothing here has been benchmarked: no claim is made about answer quality or about the classifier improving routing.</p></div>
 </section>
 
@@ -39,6 +39,19 @@
   <p>To remove the candidate: delete the <code>modelsaar-preview</code> directory and <code>~/.modelsaar-preview</code>. Nothing else was written. Problems or feedback: <a href="{{ facts.REPO_URL }}/issues">GitHub issues</a>.</p>
 </section>
 
+<section aria-labelledby="continuation-title">
+  <h2 id="continuation-title">Agentic clients that replay reasoning (new in {{ facts.RC_TAG }})</h2>
+  <p>Clients such as Odysseus send every follow-up turn with the previous assistant message <em>and its</em> <code>reasoning_content</code>. The gateway marks such requests as needing <em>continuation</em>, and a deployment is eligible only when its <code>continuation</code> capability is <code>supported</code>. No runtime reports that capability, so on a fresh installation every follow-up turn of this kind answers <code>422 no_eligible_deployment</code> with <q>capability continuation is unknown</q> on each deployment — this is exactly what the real-client Odysseus test against the stable gateway produced, and what {{ facts.RC1_TAG }} could only pass with a hand-written override. {{ facts.RC_TAG }} adds a probe for it and corrects the remedy text:</p>
+  {{ cmd(facts.PREVIEW_CONTINUATION_PROBE, scroll=True) }}
+  <ul>
+    <li><strong>What the probe does:</strong> one bounded two-turn request in exactly the client shape (user → assistant with <code>content</code> + <code>reasoning_content</code> → user), forwarded to the backend unchanged. <code>supported</code> only when <em>that</em> request is answered with a well-formed assistant message; <code>unsupported</code> when the backend explicitly rejects it (4xx); <code>unknown</code> (nothing recorded) on 5xx, transport errors, a timeout or an exhausted output budget — re-run it.</li>
+    <li><strong>What it establishes:</strong> <em>protocol acceptance</em> — the backend accepts and answers a history carrying <code>reasoning_content</code>. It does <em>not</em> verify that the model semantically uses the replayed reasoning; the OpenAI-compatible API offers no way to check that.</li>
+    <li><strong>Without probing</strong> you can still declare the capability yourself (recorded with operator provenance) in <code>~/.modelsaar-preview/config.yaml</code>:</li>
+  </ul>
+  {{ cmd(facts.PREVIEW_CONTINUATION_OVERRIDE, lang='yaml', scroll=True) }}
+  <p>A context-length exclusion on the same deployment is separate: raising <code>context_length</code>/<code>num_ctx</code> does not establish continuation, and probing continuation does not change the context limit. The remedy printed by the gateway now says both. Unprobed, undeclared deployments behave exactly as before (excluded).</p>
+</section>
+
 <section aria-labelledby="smoke-title">
   <h2 id="smoke-title">Live smoke test — {{ facts.decision_preview()['date'] }}, {{ 'completed' if facts.decision_preview()['status'] == 'completed' else 'not completed' }}</h2>
   <p>{{ facts.decision_preview()['placement'] }}. Ollama {{ facts.decision_preview()['ollama_version'] }}; decision models discovered: {{ ', '.join(facts.decision_preview()['decision_models_discovered']) }}; the configured one, <code>nimble-v3</code> ({{ facts.decision_preview()['nimble_v3']['parameter_size'] }}, {{ facts.decision_preview()['nimble_v3']['quantization'] }}, capabilities {{ facts.decision_preview()['nimble_v3']['capabilities'] }}). Exactly three requests were made; every number below is read from the recorded result at build time.</p>
@@ -59,7 +72,7 @@
   <h2 id="not-title">What this release candidate is not</h2>
   <ul>
     <li>Not a stable release: <code>{{ facts.RC_TAG }}</code> is a GitHub pre-release tag only — no package on PyPI, no container image, no version bump; the default installer pin is unchanged and still predates these features. A stable <code>v0.1.x</code> remains a separate owner decision (<a href="{{ href('/docs/release/') }}">release process</a>).</li>
-    <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="{{ href('/benchmarks/') }}">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above.</li>
-    <li>Not frozen: the wire contract follows Ollama's documented System One API and may change with it; a later candidate would be <code>-rc.2</code>, never a moved tag.</li>
+    <li>Not a benchmark: the classifier comparison of 2026-10-25 used the chat classifier, and its result (that configuration failed its timeout criteria; not a causal on-versus-off comparison) stands unchanged — see <a href="{{ href('/benchmarks/') }}">Benchmarks</a>. No live measurement of <code>mode: decision</code> exists beyond the one consultation above, and the continuation probe has not yet been run against a live backend from this candidate.</li>
+    <li>Not frozen: the wire contract follows Ollama's documented System One API and may change with it; a later candidate would be <code>-rc.3</code>, never a moved tag. {{ facts.RC1_TAG }} stays available unchanged.</li>
   </ul>
 </section>

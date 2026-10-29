@@ -16,7 +16,7 @@ CREATOR_NAME = "Gopala Subramanium"
 CREATOR_URL = "https://me.sgopala.com"
 PAYPAL_EMAIL = "gopalasubramanium@gmail.com"
 LICENSE = "Apache-2.0"
-STATUS = "public alpha"  # clearly labelled alpha; no stable tag, no PyPI package, no container image published (one GitHub-only pre-release tag, RC_TAG)
+STATUS = "public alpha"  # clearly labelled alpha; no stable tag, no PyPI package, no container image published (GitHub-only pre-release tags only: RC1_TAG, RC_TAG)
 VERSION_STRING = "0.1.0 (unreleased public alpha)"
 
 # The revision the public installer pins. Must be a commit that is PUBLIC on GitHub and whose CI checks
@@ -232,9 +232,12 @@ def classifier_comparison() -> dict:
 
 # ---- decision-model release candidate (GitHub-only pre-release; opt-in, experimental; not a stable release) ----
 PREVIEW_COMMIT = "6075cdcf3b0952d4213a7899438f5fe546e95d19"  # main with POST /v1/decisions (#18) and classifier mode: decision (#17)
-RC_TAG = "v0.1.0-rc.1"  # GitHub pre-release tag; its src/ + pyproject.toml are byte-identical to PREVIEW_COMMIT (site/check_site.py does not verify tags; the publish gate did)
-RC_COMMIT = "5b947f2859a7cce6af69ecc28436222233cbeebd"  # the main commit the tag points to (squash-merge of PR #20: release.yml stable-tags-only guard, release docs)
+RC1_TAG = "v0.1.0-rc.1"  # first GitHub pre-release tag (2026-10-28); its src/ + pyproject.toml are byte-identical to PREVIEW_COMMIT; kept available unchanged
+RC1_COMMIT = "5b947f2859a7cce6af69ecc28436222233cbeebd"
+RC_TAG = "v0.1.0-rc.2"  # current GitHub pre-release tag (2026-10-29): rc.1 + the continuation probe and the corrected 422 remedy (PR #22)
+RC_COMMIT = "7e7579825a2d37c238b04fbbb2d3a225119600f0"  # the main commit the tag points to (squash-merge of PR #22); site/check_site.py does not verify tags — the tag gate did
 RC_RELEASE_URL = f"{REPO_URL}/releases/tag/{RC_TAG}"
+RC1_RELEASE_URL = f"{REPO_URL}/releases/tag/{RC1_TAG}"
 PREVIEW_SMOKE_DIR = "docs/live-runs/2026-10-28-decision-preview-smoke"
 PREVIEW_INSTALL = (
     "git clone https://github.com/gopalasubramanium/modelsaar.git modelsaar-preview && cd modelsaar-preview\n"
@@ -244,6 +247,18 @@ PREVIEW_INSTALL = (
     "modelsaar init --port 8485                                            # or: --endpoint http://host:11434 --type ollama\n"
     "modelsaar discover                                                    # a decision model shows role \"decision\"\n"
     "modelsaar serve"
+)
+PREVIEW_CONTINUATION_PROBE = (
+    "# in a second shell, same MODELSAAR_HOME, while `modelsaar serve` is running (the probe goes through the gateway admission control)\n"
+    "export MODELSAAR_HOME=~/.modelsaar-preview\n"
+    "modelsaar probe ollama/<model> --which continuation          # one bounded two-turn request; uses local compute\n"
+    "# the report prints continuation: supported | unsupported | unknown with the reason; re-run on unknown"
+)
+PREVIEW_CONTINUATION_OVERRIDE = (
+    "deployments:\n"
+    "  - backend: ollama\n"
+    "    model: <model>           # e.g. qwen3.8:latest\n"
+    "    capabilities: { continuation: supported }   # operator provenance; no probe needed"
 )
 PREVIEW_DECISIONS_REQUEST = (
     "curl -s http://127.0.0.1:8485/v1/decisions \\\n"
